@@ -143,4 +143,275 @@ function admin(){
 <style>
 .logoutBtn{margin-top:16px!important;border-top:1px solid #DAD9D6!important;color:#76232F!important;font-weight:800!important}
 </style>
+<script>
+/* ===== PERSISTENT DAILY UPDATE v1 ===== */
+const ESTORE_API = 'https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-api';
+const COMMON_BASE_PERSIST = JSON.parse(JSON.stringify(COMMON));
+
+function _estoreDate(s){ return new Date(s+'T12:00:00'); }
+function _estoreNextDate(s){ let d=_estoreDate(s); d.setDate(d.getDate()+1); return d.toISOString().slice(0,10); }
+function _estoreSameWeek(a,b){
+  const m=s=>{let d=_estoreDate(s),x=new Date(d);let k=(x.getDay()+6)%7;x.setDate(x.getDate()-k);return x.toISOString().slice(0,10)};
+  return m(a)===m(b);
+}
+function _estoreInPeriod(d,p,asof){
+  if(p==='day') return d===asof;
+  if(p==='week') return _estoreSameWeek(d,asof);
+  if(p==='month') return d.slice(0,7)===asof.slice(0,7);
+  return d.slice(0,4)===asof.slice(0,4);
+}
+function _estoreBaseIncluded(p,asof){
+  const b='2026-09-17';
+  if(p==='day') return asof===b;
+  if(p==='week') return _estoreSameWeek(b,asof);
+  if(p==='month') return b.slice(0,7)===asof.slice(0,7);
+  return b.slice(0,4)===asof.slice(0,4);
+}
+function _estoreRate(d){
+  let x=_estoreDate(d);
+  return d>='2026-08-01' && x.getDay()===1 ? .10 : .03;
+}
+function _estoreClone(x){ return JSON.parse(JSON.stringify(x)); }
+function _estoreZeroPerson(base){
+  return {c:0,a:0,o:0,com:0,rr:base?.rr??null,nr:base?.nr??null};
+}
+async function _estoreFetchDelta(){
+  const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'delta'})});
+  const j=await r.json();
+  if(!r.ok||!j.ok) throw new Error(j.error||'Falha ao consultar atualização.');
+  return j;
+}
+function _estoreRows(delta,p,st){
+  const out=[];
+  for(const up of (delta.updates||[])){
+    const d=String(up.result_date);
+    if(!_estoreInPeriod(d,p,delta.asof)) continue;
+    for(const r of (up.collaborators||[])){
+      if(r.regional==='CE + PI' && (!st || r.st===st)) out.push({...r,_d:d});
+    }
+  }
+  return out;
+}
+function _estoreMgmt(delta,p,st){
+  const out=[];
+  for(const up of (delta.updates||[])){
+    const d=String(up.result_date);
+    if(!_estoreInPeriod(d,p,delta.asof)) continue;
+    const r=(up.management||[]).find(x=>x.st===st);
+    if(r) out.push({...r,_d:d});
+  }
+  return out;
+}
+function _estoreCalcMeta(delta,st,p,baseP){
+  const meta=delta.meta||{}, asof=delta.asof, dates=Object.keys(meta).sort();
+  let ee=0,ef=0;
+  if(_estoreBaseIncluded(p,asof)){ ee=Number(baseP?.ee||0); ef=Number(baseP?.ef||0); }
+  else {
+    for(const d of dates) if(_estoreInPeriod(d,p,asof)) ef += Number(meta[d]?.[st]?.metaEstore||0);
+  }
+  for(const d of dates){
+    if(d<='2026-09-17'||d>asof||!_estoreInPeriod(d,p,asof)) continue;
+    ee += Number(meta[d]?.[st]?.metaEstore||0);
+  }
+  if(p==='day' && asof>'2026-09-17'){
+    ee=Number(meta[asof]?.[st]?.metaEstore||0); ef=ee;
+  }
+  return {ee:+ee.toFixed(2),ef:+ef.toFixed(2)};
+}
+function _estoreApplyDelta(user,delta){
+  if(!delta?.asof) return;
+  COMMON = _estoreClone(COMMON_BASE_PERSIST);
+  COMMON.asof=delta.asof;
+  const asof=delta.asof, periods=['day','week','month','year'];
+
+  // Resultado individual
+  for(const p of periods){
+    const base=user.p?.[p]||{};
+    const z=_estoreBaseIncluded(p,asof)?_estoreClone(base):_estoreZeroPerson(base);
+    if(!_estoreBaseIncluded(p,asof)){z.c=0;z.a=0;z.o=0;z.com=0;}
+    for(const r of _estoreRows(delta,p)){
+      if(String(r.id)!==String(user.u.id)) continue;
+      z.c=Number(z.c||0)+Number(r.c||0);
+      z.a=Number(z.a||0)+Number(r.a||0);
+      z.o=Number(z.o||0)+Number(r.o||0);
+      z.com=Number(z.com||0)+Number(r.a||0)*_estoreRate(r._d);
+    }
+    z.c=+Number(z.c||0).toFixed(2);z.a=+Number(z.a||0).toFixed(2);z.com=+Number(z.com||0).toFixed(2);
+    user.p[p]=z;
+  }
+
+  // Time da filial do supervisor: mantém cadastro/base e incorpora cada novo dia.
+  if(user.team){
+    for(const p of periods){
+      const baseArr=_estoreClone(user.team[p]||[]);
+      const map=new Map(baseArr.map(x=>[String(x.id),x]));
+      if(!_estoreBaseIncluded(p,asof)){
+        for(const x of map.values()){x.c=0;x.a=0;x.o=0;}
+      }
+      for(const r of _estoreRows(delta,p,user.u.st)){
+        let x=map.get(String(r.id));
+        if(!x){x={id:String(r.id),name:'Colaborador',c:0,a:0,o:0,rr:null,nr:null};map.set(String(r.id),x)}
+        x.c=+(Number(x.c||0)+Number(r.c||0)).toFixed(2);
+        x.a=+(Number(x.a||0)+Number(r.a||0)).toFixed(2);
+        x.o=Number(x.o||0)+Number(r.o||0);
+      }
+      user.team[p]=[...map.values()];
+    }
+  }
+
+  // Filiais e indicadores regionais
+  for(const stCode of Object.keys(COMMON.stores||{})){
+    const bStore=COMMON_BASE_PERSIST.stores?.[stCode];
+    COMMON.stores[stCode].p=COMMON.stores[stCode].p||{};
+    for(const p of periods){
+      const bp=bStore?.p?.[p]||{};
+      let c=_estoreBaseIncluded(p,asof)?Number(bp.c||0):0;
+      let a=_estoreBaseIncluded(p,asof)?Number(bp.a||0):0;
+      let o=_estoreBaseIncluded(p,asof)?Number(bp.o||0):0;
+      const rows=_estoreRows(delta,p,stCode);
+      for(const r of rows){c+=Number(r.c||0);a+=Number(r.a||0);o+=Number(r.o||0)}
+      c=+c.toFixed(2);a=+a.toFixed(2);
+
+      // Share ponderado pelo denominador oficial de cada dia/período.
+      let denom=0;
+      if(_estoreBaseIncluded(p,asof) && Number(bp.c||0)>0 && Number(bp.share||0)>0) denom += Number(bp.c)/Number(bp.share);
+      for(const m of _estoreMgmt(delta,p,stCode)) if(Number(m.c||0)>0 && Number(m.share||0)>0) denom += Number(m.c)/Number(m.share);
+      const share=denom>0?c/denom:0;
+      const mm=_estoreCalcMeta(delta,stCode,p,bp);
+      const att=mm.ee>0?c/mm.ee:0;
+      let hi=_estoreBaseIncluded(p,asof)?_estoreClone(bp.hi||[]):[];
+      if(p==='day') hi=c>0?[[asof,c]]:[];
+      if(p==='week'){
+        for(const up of (delta.updates||[])){
+          const d=String(up.result_date);if(!_estoreInPeriod(d,p,asof))continue;
+          const dc=(up.collaborators||[]).filter(r=>r.regional==='CE + PI'&&r.st===stCode).reduce((s,r)=>s+Number(r.c||0),0);
+          if(dc>0) hi.push([d,+dc.toFixed(2)]);
+        }
+        const uniq=new Map();for(const x of hi)uniq.set(x[0],x);
+        hi=[...uniq.values()].sort((x,y)=>y[1]-x[1]).slice(0,3);
+      }
+      COMMON.stores[stCode].p[p]={...bp,c,a,o,share,ee:mm.ee,ef:mm.ef,att,gap:+(c-mm.ee).toFixed(2),left:+Math.max(mm.ef-c,0).toFixed(2),hi};
+    }
+  }
+
+  // Pódio da filial logada vem do time, já com os dados incorporados.
+  if(user.team && COMMON.stores?.[user.u.st]){
+    for(const p of periods){
+      COMMON.stores[user.u.st].p[p].top=[...(user.team[p]||[])].filter(x=>Number(x.c||0)>0).sort((x,y)=>Number(y.c||0)-Number(x.c||0)).slice(0,3).map(x=>({id:x.id,name:x.name,c:x.c,a:x.a,o:x.o}));
+    }
+  }
+
+  // Painel regional e destaques.
+  COMMON.regional={};COMMON.awards={};
+  for(const p of periods){
+    const arr=Object.keys(COMMON.stores).map(stCode=>{
+      const x=COMMON.stores[stCode].p[p];
+      return {st:stCode,c:x.c,a:x.a,o:x.o,share:x.share,att:x.att,ee:x.ee,ef:x.ef,gap:x.gap,left:x.left};
+    });
+    COMMON.regional[p]=arr;
+    const active=arr.filter(x=>Number(x.c||0)>0);
+    COMMON.awards[p]={
+      share:[...active].sort((x,y)=>Number(y.share||0)-Number(x.share||0))[0]||null,
+      sales:[...active].sort((x,y)=>Number(y.c||0)-Number(x.c||0))[0]||null,
+      att:[...active].sort((x,y)=>Number(y.att||0)-Number(x.att||0))[0]||null
+    };
+  }
+
+  // Atualiza Top 10 já conhecido com os novos dias e reordena.
+  for(const p of periods){
+    const top=_estoreClone(COMMON_BASE_PERSIST.top?.[p]||[]);
+    for(const t of top){
+      if(!_estoreBaseIncluded(p,asof)){t.c=0;t.a=0;t.o=0;}
+      for(const r of _estoreRows(delta,p)) if(String(r.id)===String(t.id)){
+        t.c=+(Number(t.c||0)+Number(r.c||0)).toFixed(2);
+        t.a=+(Number(t.a||0)+Number(r.a||0)).toFixed(2);
+        t.o=Number(t.o||0)+Number(r.o||0);
+      }
+    }
+    COMMON.top[p]=top.sort((x,y)=>Number(y.c||0)-Number(x.c||0)).slice(0,10);
+  }
+
+  // Pool do supervisor: filial, não regional.
+  if(user.pool){
+    const approved=Number(COMMON.stores?.[user.u.st]?.p?.month?.a||0);
+    user.pool.approved=approved;user.pool.pool=+(approved*.03).toFixed(2);
+    user.pool.sim=user.pool.eligible?.length?+(user.pool.pool/user.pool.eligible.length).toFixed(2):0;
+  }
+  user.nextDay=_estoreNextDate(asof);
+  user.nextDayMeta=Number(delta.meta?.[user.nextDay]?.[user.u.st]?.metaEstore||0);
+}
+
+async function _estoreRefreshLoggedUser(){
+  const d=await _estoreFetchDelta();
+  _estoreApplyDelta(U,d);
+  return d;
+}
+
+// Override final de login: carrega a base histórica local e incorpora o banco persistente.
+login=async function(){
+  const id=$('#mat').value.trim();
+  $('#err').textContent='Carregando resultado atualizado...';
+  U=await loadUser(id);
+  if(!U){$('#err').textContent='Matrícula não localizada.';return}
+  try{await _estoreRefreshLoggedUser()}catch(e){console.error(e);$('#err').textContent='Base local carregada. Não foi possível consultar a última atualização.'}
+  $('#login').classList.add('hide');$('#app').classList.remove('hide');$('#nav').classList.remove('hide');
+  if(U.lead||U.admin)$('#admMenu')?.classList.remove('hide'); else $('#admMenu')?.classList.add('hide');
+  $('#logoutMenu')?.classList.remove('hide');
+  go('home');setTimeout(celebrate,300);
+};
+
+rateio=function(){
+  const h=+$('#hc').value;
+  const x=Number(U?.nextDayMeta||0);
+  const label=U?.nextDay?new Date(U.nextDay+'T12:00').toLocaleDateString('pt-BR'):'próximo dia';
+  $('#rateio').innerHTML=h?'<div class=grid><div class=kpi>Meta do dia '+label+'<b>'+money(x)+'</b></div><div class=kpi>HC informado<b>'+num(h)+'</b></div><div class=kpi>Meta por colaborador<b>'+money(x/h)+'</b></div><div class=kpi>Pedidos sugeridos<b>'+num(Math.ceil((x/h)/400))+'</b></div></div>':'<p class=bad>Informe o HC.</p>';
+};
+
+function _estoreAdminNextDate(){ return _estoreNextDate(COMMON.asof||'2026-09-17'); }
+admin=function(){
+  if(!U?.admin)return '<div class=card><div class=title>🔐 Administrativo</div><p>Acesso restrito ao administrador.</p></div>';
+  const arr=COMMON.regional?.[PER]||[],aw=COMMON.awards?.[PER]||{};
+  return `
+  <div class=card><div class=title>🔐 Administrativo • Painel Regional CE+PI</div>
+    <div class=notice><b>Base atualizada até ${new Date(COMMON.asof+'T12:00').toLocaleDateString('pt-BR')}.</b><br><small>As novas cargas ficam gravadas no banco e passam a compor automaticamente o histórico.</small></div>
+    ${tabs()}
+    <div class=awardGrid>${awardCard('Melhor Share',aw.share,'share')}${awardCard('Maior Venda',aw.sales,'sales')}${awardCard('Maior Atingimento',aw.att,'att')}</div>
+    <div class=table><table><tr><th>Loja</th><th>Meta eStore</th><th>Captada</th><th>Aprovada</th><th>Pedidos</th><th>Ating.</th><th>Gap</th><th>Share</th></tr>
+    ${[...arr].sort((a,b)=>Number(b.c||0)-Number(a.c||0)).map(x=>`<tr class="${x.att==null?'':x.att>=1?'cond-good':x.att>=.8?'cond-warn':'cond-bad'}"><td><b>${x.st}</b></td><td>${money(x.ee)}</td><td>${money(x.c)}</td><td>${money(x.a)}</td><td>${num(x.o)}</td><td>${pct(x.att)}</td><td>${money(x.gap)}</td><td>${pct(x.share)}</td></tr>`).join('')}
+    </table></div></div>
+  <div class=card><div class=title>📥 Atualizar resultado do dia anterior</div>
+    <p>Envie os <b>dois relatórios do mesmo dia</b>. Se a data já existir, os registros daquele dia serão atualizados, sem duplicação.</p>
+    <label>Data do resultado</label><input class=field type=date id=updDate value="${_estoreAdminNextDate()}">
+    <div class=adminGrid>
+      <div class=upload><b>👤 Resultado Colaboradores</b><input class=field type=file id=fCol accept=".xlsx,.xls,.csv"></div>
+      <div class=upload><b>🏬 Resultado Gerencial / Share</b><input class=field type=file id=fGer accept=".xlsx,.xls,.csv"></div>
+    </div>
+    <label>Senha do Administrativo</label><input class=field type=password id=updPwd placeholder="Digite a senha ADM">
+    <button class=btn id=updBtn onclick="validateUpdate()">Validar e incorporar ao histórico</button><div id=updOut></div>
+  </div>
+  <div class=card><div class=title>🧩 Bases estruturais</div><p class=muted>Use somente quando houver alteração estrutural.</p>
+    <div class=adminGrid><div class=upload><b>👥 Colaboradores e Perfis</b><p class=muted>Equipe, cargo, filial e situação.</p><input class=field type=file accept=".xlsx,.xls,.csv"></div>
+    <div class=upload><b>🎯 Meta de Venda das Lojas</b><p class=muted>Nova meta ou novo período.</p><input class=field type=file accept=".xlsx,.xls,.csv"></div></div>
+  </div>`;
+};
+
+validateUpdate=async function(){
+  const d=$('#updDate')?.value, a=$('#fCol')?.files?.[0], b=$('#fGer')?.files?.[0], pwd=$('#updPwd')?.value||'';
+  const out=$('#updOut'),btn=$('#updBtn');
+  if(!d||!a||!b||!pwd){out.innerHTML='<p class=bad>Informe a data, selecione os dois relatórios e digite a senha ADM.</p>';return}
+  btn.disabled=true;btn.textContent='Validando e incorporando...';out.innerHTML='<div class=notice>Processando os arquivos e atualizando o histórico...</div>';
+  try{
+    const fd=new FormData();fd.append('action','daily_update');fd.append('matricula',String(U.u.id));fd.append('password',pwd);fd.append('date',d);fd.append('collaborators',a);fd.append('management',b);
+    const r=await fetch(ESTORE_API,{method:'POST',body:fd});const j=await r.json();
+    if(!r.ok||!j.ok)throw new Error(j.error||'Não foi possível incorporar os arquivos.');
+    await _estoreRefreshLoggedUser();
+    out.innerHTML='<div class=notice><b>✅ '+j.message+'</b><br>'+new Date(j.date+'T12:00').toLocaleDateString('pt-BR')+' • '+num(j.collaborators)+' registros de colaboradores • '+num(j.management)+' lojas gerenciais.<br><small>Os painéis Dia, Semana, Mês e Ano já consideram essa atualização.</small></div>';
+    setTimeout(()=>go('admin'),1800);
+  }catch(e){out.innerHTML='<p class=bad><b>Não foi possível atualizar.</b><br>'+String(e.message||e)+'</p>'}
+  finally{btn.disabled=false;btn.textContent='Validar e incorporar ao histórico'}
+};
+</script>
+<style>
+#updBtn:disabled{opacity:.55;cursor:wait}
+</style>
 </body></html>
