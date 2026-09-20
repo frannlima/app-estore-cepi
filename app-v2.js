@@ -412,3 +412,7 @@ const adminBaseV4=adminV3;adminV3=function(){return adminBaseV4()+mediaAdminV4()
 
 go=function(v){CUR=v;$('#drawer')?.classList.remove('open');const map={home,result,metasv4:metasV4,store,ranking,campaigns:campaignsV3,poolv3:poolV3,important:importantV3,teamv3:teamV3,reportsv3:reportsV3,profilev3:profileV3,adminv3:adminV3,admin:adminV3};$('#view').innerHTML=(map[v]||home)();window.scrollTo(0,0);applyMediaV4()}
 window.addEventListener('DOMContentLoaded',preloadPublicMediaV4);
+
+function mediaBannerV4(position){const m=activeMediaV4(position);return m?.image?`<div class=mediaBannerV4 style="background-image:url('${m.image}')"><div><b>${escV3(m.title||'')}</b></div></div>`:''}
+const campaignsBaseV4=campaignsV3;campaignsV3=function(){return mediaBannerV4('Campanhas')+campaignsBaseV4()}
+const importantBaseV4=importantV3;importantV3=function(){return mediaBannerV4('Informações Importantes')+importantBaseV4()}
