@@ -664,3 +664,14 @@ login=async function(){
   go('home');
   setTimeout(()=>{try{celebrate()}catch(e){}},300);
 };
+
+
+/* ===== V12: Hora a Hora — Share sobre a meta geral de vendas da loja ===== */
+hourlyV5=function(){
+ const d=localIsoV4();
+ return `<div class=pageTitleV3><span>Hora a Hora eStore | CE+PI</span></div><div class=card><div class=hourlyEntryV5><div class=title>Lançar resultado da filial</div><div class=hourlyGridV5><label>Data<input id=hourDateV5 class=field type=date value="${d}" onchange="loadHourlyV5()"></label><label>Venda eStore capturada acumulada<input id=hourCapturedV5 class=field type=number min=0 step=.01 placeholder="R$"></label><label>Pedidos acumulados<input id=hourOrdersV5 class=field type=number min=0 step=1 placeholder="0"></label></div><div class=notice>Share calculado automaticamente: venda eStore ÷ meta geral de vendas da filial no dia.</div><button class=btn onclick="submitHourlyV5()">Registrar atualização</button><div id=hourOutV5></div></div></div><div id=hourlyDashboardV5><div class=card><div class=notice>Carregando consolidado...</div></div></div>`;
+};
+submitHourlyV5=async function(){
+ const d=$('#hourDateV5').value,c=Number($('#hourCapturedV5').value||0),o=Math.trunc(Number($('#hourOrdersV5').value||0)),out=$('#hourOutV5');
+ try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'hourly_submit',matricula:String(U.u.id),store_code:String(U.u.st),result_date:d,captured:c,orders:o,store_sales:0})}),j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Não foi possível registrar.');out.innerHTML='<div class=notice>Atualização registrada.</div>';await loadHourlyV5()}catch(e){out.innerHTML='<p class=bad>'+escV3(e.message||e)+'</p>'}
+};
