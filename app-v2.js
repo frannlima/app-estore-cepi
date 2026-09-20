@@ -417,3 +417,183 @@ window.addEventListener('DOMContentLoaded',preloadPublicMediaV4);
 function mediaBannerV4(position){const m=activeMediaV4(position);return m?.image?`<div class=mediaBannerV4 style="background-image:url('${m.image}')"><div><b>${escV3(m.title||'')}</b></div></div>`:''}
 const campaignsBaseV4=campaignsV3;campaignsV3=function(){return mediaBannerV4('Campanhas')+campaignsBaseV4()}
 const importantBaseV4=importantV3;importantV3=function(){return mediaBannerV4('Informações Importantes')+importantBaseV4()}
+
+
+/* ===== V5: foto compartilhada, pool executivo, suporte e hora a hora ===== */
+let APP_PROFILE_PHOTOS={};
+let SUPPORT_TARGET=null;
+let HOURLY_SORT='att';
+let HOURLY_CACHE=null;
+
+async function loadContentV3(){
+  try{
+    const [cr,dr]=await Promise.all([
+      fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'content_get'})}),
+      fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'delta'})})
+    ]);
+    const c=await cr.json(),d=await dr.json();
+    if(cr.ok&&c.ok){
+      APP_CONTENT={importantInfo:Array.isArray(c.importantInfo)?c.importantInfo:[],campaigns:Array.isArray(c.campaigns)?c.campaigns:[],media:Array.isArray(c.media)?c.media:[]};
+      APP_PROFILE_PHOTOS=c.profilePhotos||{};
+    }
+    if(dr.ok&&d.ok)APP_DELTA=d;
+    applyMediaV4();
+  }catch(e){}
+}
+function avatarForV5(id,name,size='xs'){
+  const url=APP_PROFILE_PHOTOS[String(id)]||(String(id)===String(U?.u?.id)?profilePhotoV3():'');
+  return url?`<img class="profilePicV3 ${size}" src="${escV3(url)}" alt="">`:`<div class="profileInitialV3 ${size}">${escV3(String(name||'?').trim().slice(0,1)||'?')}</div>`;
+}
+profileAvatarV3=function(size='md'){return avatarForV5(U?.u?.id,U?.u?.name,size)};
+
+function compressProfileV5(file){
+  return new Promise((resolve,reject)=>{
+    const img=new Image(),r=new FileReader();
+    r.onload=()=>img.src=r.result;
+    img.onload=()=>{
+      const side=Math.min(img.width,img.height),sx=(img.width-side)/2,sy=(img.height-side)/2,c=document.createElement('canvas');
+      c.width=480;c.height=480;c.getContext('2d').drawImage(img,sx,sy,side,side,0,0,480,480);
+      resolve(c.toDataURL('image/jpeg',.82));
+    };
+    img.onerror=reject;r.onerror=reject;r.readAsDataURL(file);
+  });
+}
+saveProfilePhotoV3=async function(input){
+  const f=input?.files?.[0];if(!f)return;
+  if(f.size>10485760){alert('Selecione uma imagem de até 10 MB.');return}
+  const labels=document.querySelectorAll('.editPhotoV3,.photoBtnV3');labels.forEach(e=>e.classList.add('uploadingV5'));
+  try{
+    const dataUrl=await compressProfileV5(f);
+    const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'profile_photo_set',matricula:String(U.u.id),dataUrl})});
+    const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Não foi possível salvar a foto.');
+    APP_PROFILE_PHOTOS[String(U.u.id)]=j.photo_url;
+    try{localStorage.setItem(profilePhotoKeyV3(),j.photo_url)}catch(e){}
+    refreshNavV5();go('profilev3');
+  }catch(e){alert(String(e.message||e))}
+  finally{labels.forEach(e=>e.classList.remove('uploadingV5'))}
+};
+
+ranking=function(){
+  const me=person();let body='';
+  if(RANK_SCOPE==='regional'){
+    const a=COMMON.top?.[PER]||[];
+    body=a.map((x,i)=>`<div class="rank rankV3 ${String(x.id)===String(U.u.id)?'meRankV3':''}"><div class=medal>${i<3?['🥇','🥈','🥉'][i]:i+1+'º'}</div><div>${avatarForV5(x.id,x.name,'xs')}<section><b>${escV3(String(x.id)===String(U.u.id)?'Você':x.name)}</b><div class=muted>Filial ${escV3(x.st)}</div></section></div><span><b>${money(x.c)}</b><br><small>${num(x.o)} pedidos</small></span></div>`).join('')||'<p class=muted>Sem resultados no período.</p>';
+  }else if(RANK_SCOPE==='filial'){
+    const a=(U.team?.[PER]||[]).length?(U.team[PER]||[]):((st().p?.[PER]?.top)||[]);
+    body=[...a].sort((a,b)=>(b.c||0)-(a.c||0)).map((x,i)=>`<div class="rank rankV3 ${String(x.id)===String(U.u.id)?'meRankV3':''}"><div class=medal>${i+1}º</div><div>${avatarForV5(x.id,x.name,'xs')}<section><b>${escV3(String(x.id)===String(U.u.id)?'Você':x.name)}</b></section></div><span><b>${money(x.c)}</b><br><small>${num(x.o)} pedidos</small></span></div>`).join('')||'<p class=muted>Sem resultados no período.</p>';
+  }else body=`<div class=metricGridV3><div class="metricCardV3 mGreenV3"><span>Posição empresa</span><b>${me.nr?num(me.nr)+'º':'—'}</b></div><div class="metricCardV3 mSandV3"><span>Venda captada</span><b>${money(me.c)}</b></div></div>`;
+  return `<div class=pageTitleV3><span>Ranking</span></div><div class=card><div class=scopeTabs><button class="${RANK_SCOPE==='filial'?'on':''}" onclick="setRankV3('filial')">Filial</button><button class="${RANK_SCOPE==='regional'?'on':''}" onclick="setRankV3('regional')">Regional</button><button class="${RANK_SCOPE==='empresa'?'on':''}" onclick="setRankV3('empresa')">Empresa</button></div>${tabs()}${body}</div>${shareBarV4('ranking')}`;
+};
+teamV3=function(){
+ if(!supV3())return '<div class=card><div class=title>Meu Time</div><p>Conteúdo disponível para liderança.</p></div>';
+ const a=U.team?.[PER]||[],yes=a.filter(x=>(x.c||0)>0),no=a.filter(x=>(x.c||0)===0),sorted=[...a].sort((x,y)=>(y.c||0)-(x.c||0));
+ return `<div class=pageTitleV3><span>Meu Time</span></div><div class=card>${tabs()}<div class=metricGridV3><div class="metricCardV3 mGreenV3"><span>Ativos eStore</span><b>${num(yes.length)}</b></div><div class="metricCardV3 mLowV3"><span>Zerados</span><b>${num(no.length)}</b></div><div class="metricCardV3 mSandV3"><span>Venda captada</span><b>${money(yes.reduce((s,x)=>s+(x.c||0),0))}</b></div><div class="metricCardV3 mOrangeV3"><span>Pedidos</span><b>${num(yes.reduce((s,x)=>s+(x.o||0),0))}</b></div></div><div class=title style="margin-top:16px">Ranking da equipe <small class=autoTagV3>Automático</small></div><div class=teamRankV3>${sorted.map((x,i)=>{const status=(x.c||0)>0?(i<Math.ceil(sorted.length*.33)?['Alta','perfGoodV3']:i<Math.ceil(sorted.length*.66)?['Média','perfMidV3']:['Baixa','perfLowV3']):['Zerado','perfLowV3'];return `<div class=teamRankRowV5><span class=posV3>${i+1}</span>${avatarForV5(x.id,x.name,'xs')}<b>${escV3(String(x.id)===String(U.u.id)?'Você':x.name)}</b><strong>${money(x.c)}</strong><em class="${status[1]}">${status[0]}</em></div>`}).join('')}</div></div>${shareBarV4('team')}`;
+};
+
+function poolSummaryV5(x){
+  const month=storeP(),series=poolSeriesV3(),last=series[series.length-1]?.value||0,prev=series[series.length-2]?.value||0,delta=prev?last/prev-1:null;
+  return `<div class=poolExecutiveV5><div><small>Seu rateio estimado</small><b>${money(x.sim||0)}</b><span>Pool total: ${money(x.pool||0)}</span></div><div class=poolExecGridV5><span><small>Venda aprovada</small><b>${money(x.approved||0)}</b></span><span><small>Elegíveis</small><b>${num(x.eligible?.length||0)}</b></span><span><small>Variação</small><b class="${delta==null?'':delta>=0?'perfGoodV3':'perfLowV3'}">${delta==null?'—':(delta>=0?'▲ ':'▼ ')+Math.abs(delta*100).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%'}</b></span></div></div>`;
+}
+poolV3=function(){
+ if(!supV3())return '<div class=card><div class=title>Pool / Comissão</div><p>Conteúdo disponível para supervisores elegíveis.</p></div>';
+ const x=U.pool||{approved:0,pool:0,eligible:[],sim:0},hist=poolSeriesV3(),mx=Math.max(1,...hist.map(h=>h.value));
+ return `<div class=pageTitleV3><span>Pool / Comissionamento</span></div><div class=card>${poolSummaryV5(x)}<div class=metricGridV3><div class="metricCardV3 mRoseV3"><span>Venda aprovada da loja</span><b>${money(x.approved)}</b></div><div class="metricCardV3 mOrangeV3"><span>Pool 3%</span><b>${money(x.pool)}</b></div><div class="metricCardV3 mGreenV3"><span>Supervisores elegíveis</span><b>${num(x.eligible?.length||0)}</b></div><div class="metricCardV3 mSandV3"><span>Rateio estimado</span><b>${money(x.sim)}</b></div></div><div class=title style="margin-top:16px">Regras do Pool</div><ol class=rulesV3><li>3% sobre o valor aprovado da loja.</li><li>Rateio igualitário entre supervisores elegíveis.</li><li>Elegíveis conforme perfil e situação ativa no período.</li><li>Mês parcial considera o período trabalhado conforme regra da campanha.</li></ol><div class=chartCardV3><div class=chartTitleV3><div><b>Evolução do Pool</b><small>Histórico considerado a partir de agosto/2026</small></div><span>R$</span></div><div class=poolTabsV3><button class="${POOL_VIEW==='day'?'on':''}" onclick="setPoolViewV3('day')">Dia</button><button class="${POOL_VIEW==='week'?'on':''}" onclick="setPoolViewV3('week')">Semana</button><button class="${POOL_VIEW==='month'?'on':''}" onclick="setPoolViewV3('month')">Mês</button></div>${hist.length?`<div class=barChartV3>${hist.map(h=>`<div><span style="height:${Math.max(8,h.value/mx*110)}px"></span><small>${h.label}</small><em>${money(h.value)}</em></div>`).join('')}</div>`:'<p class=muted>O gráfico será preenchido conforme as cargas diárias forem incorporadas ao histórico.</p>'}</div></div>${shareBarV4('pool')}`;
+};
+
+function loadImgV5(url){return new Promise(resolve=>{if(!url)return resolve(null);const img=new Image();img.crossOrigin='anonymous';img.onload=()=>resolve(img);img.onerror=()=>resolve(null);img.src=url})}
+function rankingRowsV5(type){
+  if(type==='store'||type==='meta')return (storeP().top||[]).slice(0,5);
+  if(type==='team')return [...(U.team?.[PER]||[])].sort((a,b)=>(b.c||0)-(a.c||0)).slice(0,5);
+  if(type==='ranking'&&RANK_SCOPE==='filial')return [...(U.team?.[PER]||[])].sort((a,b)=>(b.c||0)-(a.c||0)).slice(0,5);
+  return (COMMON.top?.[PER]||[]).slice(0,5);
+}
+async function highlightsCanvasV5(type,title){
+  const rows=rankingRowsV5(type),c=document.createElement('canvas');c.width=1080;c.height=1500;const x=c.getContext('2d');
+  x.fillStyle='#f8f7f4';x.fillRect(0,0,c.width,c.height);x.fillStyle='#173F35';x.fillRect(0,0,c.width,210);
+  x.fillStyle='white';x.font='bold 50px Arial';x.fillText(title,65,90);x.font='30px Arial';x.fillText('Período: '+pLabel[PER]+' • '+storeFullV3(),65,145);
+  x.fillStyle='#173F35';x.font='bold 38px Arial';x.fillText('Destaques do período',65,285);
+  let y=345;
+  for(let i=0;i<rows.length;i++){
+    const r=rows[i],url=APP_PROFILE_PHOTOS[String(r.id)]||'',img=await loadImgV5(url);
+    x.fillStyle=i<3?'#fff4dc':'#ffffff';x.beginPath();x.roundRect(55,y,970,155,26);x.fill();
+    x.fillStyle='#173F35';x.font='bold 34px Arial';x.fillText((i+1)+'º',80,y+90);
+    if(img){x.save();x.beginPath();x.arc(175,y+77,48,0,Math.PI*2);x.clip();x.drawImage(img,127,y+29,96,96);x.restore()}
+    else{x.fillStyle='#D6D2C4';x.beginPath();x.arc(175,y+77,48,0,Math.PI*2);x.fill();x.fillStyle='#173F35';x.font='bold 34px Arial';x.fillText(String(r.name||'?').slice(0,1),164,y+89)}
+    x.fillStyle='#173F35';x.font='bold 27px Arial';const nm=String(r.name||'').split(' ').slice(0,3).join(' ');x.fillText(nm,245,y+63);
+    x.fillStyle='#466964';x.font='24px Arial';x.fillText('Filial '+(r.st||U.u.st),245,y+100);
+    x.fillStyle='#173F35';x.font='bold 28px Arial';x.textAlign='right';x.fillText(money(r.c||0),990,y+78);x.textAlign='left';
+    y+=172;
+  }
+  const lines=shareLinesV4(type).filter(Boolean);x.fillStyle='#173F35';x.font='bold 30px Arial';x.fillText('Resumo',65,y+30);x.font='26px Arial';let yy=y+78;for(const l of lines.slice(0,5)){x.fillText(l,65,yy);yy+=42}
+  x.fillStyle='#173F35';x.font='bold 24px Arial';x.fillText('Fran Lima',65,1440);return c;
+}
+async function shareHighlightsV5(type,title){const c=await highlightsCanvasV5(type,title),lines=shareLinesV4(type).filter(Boolean),text=title+'\n'+lines.join('\n');shareCanvas(c,text)}
+shareResultV4=function(){return shareHighlightsV5('result','Destaques eStore | '+pLabel[PER])};
+shareStoreV4=function(){return shareHighlightsV5('store','Destaques Filial | '+pLabel[PER])};
+shareMetaV4=function(){return shareHighlightsV5('meta','Metas eStore | '+pLabel[PER])};
+shareTeamV4=function(){return shareHighlightsV5('team','Destaques Meu Time | '+pLabel[PER])};
+shareRankingV4=function(){return shareHighlightsV5('ranking','Ranking eStore | '+pLabel[PER])};
+
+function supportV5(){
+  return `<div class=pageTitleV3><span>Chat / Suporte</span></div><div class=card><div id=supportTopV5></div><div id=supportMessagesV5 class=supportMessagesV5><div class=notice>Carregando conversa...</div></div><div class=supportComposeV5><textarea id=supportTextV5 class=field rows=2 placeholder="Digite sua mensagem"></textarea><label class=attachBtnV5>＋ Anexar<input id=supportFileV5 type=file accept="image/*,.pdf,.xlsx,.xls,.csv,.doc,.docx"></label><button class=btn onclick="sendSupportV5()">Enviar</button></div><div id=supportOutV5></div></div>`;
+}
+async function loadSupportV5(){
+  try{
+    const isAdmin=admV3(),body={action:'support_get',matricula:String(U.u.id)};
+    if(isAdmin&&SUPPORT_TARGET)body.target=SUPPORT_TARGET;
+    if(isAdmin&&!SUPPORT_TARGET)body.listThreads=true;
+    const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}),j=await r.json();
+    if(!r.ok||!j.ok)throw new Error(j.error||'Falha ao carregar o chat.');
+    if(isAdmin&&!SUPPORT_TARGET){renderSupportThreadsV5(j.threads||[]);return}
+    renderSupportMessagesV5(j.messages||[]);
+  }catch(e){$('#supportMessagesV5').innerHTML='<p class=bad>'+escV3(e.message||e)+'</p>'}
+}
+function renderSupportThreadsV5(threads){
+  $('#supportTopV5').innerHTML='<div class=title>Conversas</div>';
+  $('#supportMessagesV5').innerHTML=threads.length?`<div class=supportThreadsV5>${threads.map(t=>`<button onclick="openSupportThreadV5('${escV3(t.matricula)}')"><b>${escV3(t.matricula)}</b><span>Filial ${escV3(t.store_code||'—')}</span><small>${escV3((t.message||t.attachment_name||'Arquivo').slice(0,55))}</small></button>`).join('')}</div>`:'<p class=muted>Nenhuma conversa ainda.</p>';
+  document.querySelector('.supportComposeV5')?.classList.add('hide');
+}
+function openSupportThreadV5(id){SUPPORT_TARGET=id;go('supportv5');setTimeout(loadSupportV5,0)}
+function renderSupportMessagesV5(messages){
+  if(admV3()&&SUPPORT_TARGET)$('#supportTopV5').innerHTML=`<button class=backChatV5 onclick="SUPPORT_TARGET=null;go('supportv5');setTimeout(loadSupportV5,0)">‹ Conversas</button><b>Matrícula ${escV3(SUPPORT_TARGET)}</b>`;
+  const el=$('#supportMessagesV5');el.innerHTML=messages.length?messages.map(m=>`<div class="chatBubbleV5 ${m.sender_role==='admin'?'fromAdminV5':'fromUserV5'}"><p>${escV3(m.message||'')}</p>${m.attachment_url?`<a href="${escV3(m.attachment_url)}" target="_blank">${String(m.attachment_type||'').startsWith('image/')?`<img src="${escV3(m.attachment_url)}" alt="">`:'📎 '+escV3(m.attachment_name||'Arquivo')}</a>`:''}<small>${new Date(m.created_at).toLocaleString('pt-BR')}</small></div>`).join(''):'<p class=muted>Envie uma mensagem, foto ou arquivo para iniciar a conversa.</p>';el.scrollTop=el.scrollHeight;
+}
+async function sendSupportV5(){
+ const text=$('#supportTextV5')?.value.trim()||'',file=$('#supportFileV5')?.files?.[0],out=$('#supportOutV5');if(!text&&!file){out.innerHTML='<p class=bad>Digite uma mensagem ou anexe um arquivo.</p>';return}if(file&&file.size>10485760){out.innerHTML='<p class=bad>O arquivo deve ter no máximo 10 MB.</p>';return}
+ try{const fd=new FormData();fd.append('action','support_send');fd.append('matricula',String(U.u.id));fd.append('store_code',String(U.u.st));fd.append('message',text);if(admV3()&&SUPPORT_TARGET)fd.append('target',SUPPORT_TARGET);if(file)fd.append('attachment',file);const r=await fetch(ESTORE_API,{method:'POST',body:fd}),j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Não foi possível enviar.');$('#supportTextV5').value='';$('#supportFileV5').value='';out.innerHTML='';await loadSupportV5()}catch(e){out.innerHTML='<p class=bad>'+escV3(e.message||e)+'</p>'}
+}
+
+function hourlyV5(){
+ const d=localIsoV4();
+ return `<div class=pageTitleV3><span>Hora a Hora eStore | CE+PI</span></div><div class=card><div class=hourlyEntryV5><div class=title>Lançar resultado da filial</div><div class=hourlyGridV5><label>Data<input id=hourDateV5 class=field type=date value="${d}" onchange="loadHourlyV5()"></label><label>Venda eStore capturada acumulada<input id=hourCapturedV5 class=field type=number min=0 step=.01 placeholder="R$"></label><label>Pedidos acumulados<input id=hourOrdersV5 class=field type=number min=0 step=1 placeholder="0"></label><label>Venda total da loja acumulada <small>(para calcular Share)</small><input id=hourStoreSalesV5 class=field type=number min=0 step=.01 placeholder="R$"></label></div><button class=btn onclick="submitHourlyV5()">Registrar atualização</button><div id=hourOutV5></div></div></div><div id=hourlyDashboardV5><div class=card><div class=notice>Carregando consolidado...</div></div></div>`;
+}
+async function submitHourlyV5(){
+ const d=$('#hourDateV5').value,c=Number($('#hourCapturedV5').value||0),o=Math.trunc(Number($('#hourOrdersV5').value||0)),ss=Number($('#hourStoreSalesV5').value||0),out=$('#hourOutV5');
+ try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'hourly_submit',matricula:String(U.u.id),store_code:String(U.u.st),result_date:d,captured:c,orders:o,store_sales:ss})}),j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Não foi possível registrar.');out.innerHTML='<div class=notice>Atualização registrada.</div>';await loadHourlyV5()}catch(e){out.innerHTML='<p class=bad>'+escV3(e.message||e)+'</p>'}
+}
+async function loadHourlyV5(){
+ const d=$('#hourDateV5')?.value||localIsoV4();try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'hourly_get',result_date:d})}),j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Falha ao carregar.');HOURLY_CACHE=j;renderHourlyV5()}catch(e){$('#hourlyDashboardV5').innerHTML='<div class=card><p class=bad>'+escV3(e.message||e)+'</p></div>'}
+}
+function setHourlySortV5(v){HOURLY_SORT=v;renderHourlyV5()}
+function hourlySortValueV5(x){return HOURLY_SORT==='sales'?x.captured:HOURLY_SORT==='share'?x.share:x.att}
+function renderHourlyV5(){
+ const j=HOURLY_CACHE;if(!j)return;const stores=j.stores||[],regional={meta:stores.reduce((s,x)=>s+x.metaValue,0),captured:stores.reduce((s,x)=>s+x.captured,0),orders:stores.reduce((s,x)=>s+x.orders,0),orderTarget:stores.reduce((s,x)=>s+x.orderTarget,0),storeSales:stores.reduce((s,x)=>s+x.storeSales,0)},active=stores.filter(x=>x.updated_at).length;
+ const sorted=[...stores].sort((a,b)=>hourlySortValueV5(b)-hourlySortValueV5(a));
+ $('#hourlyDashboardV5').innerHTML=`<div class=card><div class=sectionHeadV3><div><div class=title>Consolidado CE+PI</div><small>${new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR')}</small></div><button class=hourShareBtnV5 onclick="shareHourlyV5()">Compartilhar tela</button></div><div class=metricGridV3><div class="metricCardV3 mGreenV3"><span>Meta Regional</span><b>${money(regional.meta)}</b></div><div class="metricCardV3 mRoseV3"><span>Realizado</span><b>${money(regional.captured)}</b></div><div class="metricCardV3 mOrangeV3"><span>Atingimento</span><b>${regional.meta?pct(regional.captured/regional.meta):'—'}</b></div><div class="metricCardV3 mSandV3"><span>Pedidos</span><b>${num(regional.orders)} / ${num(regional.orderTarget)}</b></div><div class="metricCardV3 mGreenV3"><span>Share Regional</span><b>${regional.storeSales?pct(regional.captured/regional.storeSales):'—'}</b></div><div class="metricCardV3 mSandV3"><span>Filiais atualizadas</span><b>${num(active)} / 19</b></div></div><div class=hourSortV5><button class="${HOURLY_SORT==='att'?'on':''}" onclick="setHourlySortV5('att')">Atingimento</button><button class="${HOURLY_SORT==='sales'?'on':''}" onclick="setHourlySortV5('sales')">Venda</button><button class="${HOURLY_SORT==='share'?'on':''}" onclick="setHourlySortV5('share')">Share</button></div><div class=table><table><tr><th>Ranking</th><th>Filial</th><th>Captado</th><th>Meta</th><th>Ating.</th><th>Pedidos</th><th>Share</th><th>Atualização</th></tr>${sorted.map((x,i)=>{const p=perfV3(x.att);return `<tr class="${p.cls}Row"><td>${i+1}º</td><td><b>${x.st}</b></td><td>${money(x.captured)}</td><td>${money(x.metaValue)}</td><td>${pct(x.att)}</td><td>${num(x.orders)}/${num(x.orderTarget)}</td><td>${x.storeSales?pct(x.share):'—'}</td><td>${x.updated_at?new Date(x.updated_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'—'}</td></tr>`}).join('')}</table></div></div>`;
+}
+async function shareHourlyV5(){
+ if(!HOURLY_CACHE)return;const j=HOURLY_CACHE,stores=[...(j.stores||[])].sort((a,b)=>b.att-a.att),regional={meta:stores.reduce((s,x)=>s+x.metaValue,0),captured:stores.reduce((s,x)=>s+x.captured,0),orders:stores.reduce((s,x)=>s+x.orders,0),orderTarget:stores.reduce((s,x)=>s+x.orderTarget,0),sales:stores.reduce((s,x)=>s+x.storeSales,0)},c=document.createElement('canvas');c.width=1080;c.height=1900;const x=c.getContext('2d');
+ x.fillStyle='#f8f7f4';x.fillRect(0,0,c.width,c.height);x.fillStyle='#173F35';x.fillRect(0,0,1080,250);x.fillStyle='white';x.font='bold 48px Arial';x.fillText('eStore CE+PI | Hora a Hora',60,82);x.font='30px Arial';x.fillText('Parcial '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+' • '+new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR'),60,135);x.fillText('Meta Regional: '+money(regional.meta)+'  |  Pedidos: '+num(regional.orders)+'/'+num(regional.orderTarget),60,190);
+ x.fillStyle='#173F35';x.font='bold 32px Arial';x.fillText('Realizado '+money(regional.captured)+' • Ating. '+(regional.meta?pct(regional.captured/regional.meta):'—')+' • Share '+(regional.sales?pct(regional.captured/regional.sales):'—'),60,315);
+ let y=375;x.font='bold 24px Arial';for(let i=0;i<stores.length;i++){const r=stores[i];x.fillStyle=i%2?'#ffffff':'#f0f2ee';x.fillRect(50,y-28,980,62);x.fillStyle='#173F35';x.fillText((i+1)+'º',70,y);x.fillText(r.st,145,y);x.fillText(money(r.captured),250,y);x.fillText(pct(r.att),500,y);x.fillText(num(r.orders)+'/'+num(r.orderTarget),665,y);x.fillText(r.storeSales?pct(r.share):'—',850,y);y+=70}x.fillStyle='#173F35';x.font='bold 22px Arial';x.fillText('Fran Lima',60,1840);
+ const text='🎯 *eStore CE+PI | PARCIAL '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+' — '+new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR')+'*\\n\\n💰 *Meta Regional:* '+money(regional.meta)+'\\n💵 *Realizado:* '+money(regional.captured)+'\\n📈 *Atingimento:* '+(regional.meta?pct(regional.captured/regional.meta):'—')+'\\n🛍️ *Pedidos:* '+num(regional.orders)+' / '+num(regional.orderTarget)+'\\n🎫 *Ticket referência:* R$ 400\\n\\n'+stores.map(r=>'*'+r.st+'* | '+num(r.orders)+'/'+num(r.orderTarget)+' | '+pct(r.att)+(r.storeSales?' | '+pct(r.share):'')).join('\\n');
+ shareCanvas(c,text);
+}
+
+function refreshNavV5(){
+ const sh=document.querySelector('#drawer .sheet');if(sh)sh.innerHTML=`<div class="menuHeadV3"><div>${profileAvatarV3('sm')}<div><b>${escV3(U?.u?.name||'')}</b><small>${escV3(storeFullV3())}</small></div></div></div><button onclick="go('home')">⌂ Início</button><button onclick="go('result')">▣ Meu Resultado</button><button onclick="go('metasv4')">◎ Metas</button><button onclick="go('hourlyv5')">◷ Hora a Hora CE+PI</button><button onclick="go('store')">▤ Minha Filial</button><button onclick="go('ranking')">★ Ranking</button><button onclick="go('campaigns')">◇ Cupons e Campanhas</button>${supV3()?`<button onclick="go('poolv3')">◎ Pool / Comissão</button>`:''}<button onclick="go('important')">ⓘ Informações Importantes</button>${supV3()?`<button onclick="go('teamv3')">♙ Meu Time</button><button onclick="go('reportsv3')">▥ Relatórios e Rankings</button>`:''}<button onclick="go('supportv5')">◉ Chat / Suporte</button><button onclick="go('profilev3')">◉ Meu Perfil</button>${admV3()?`<button onclick="go('adminv3')">⚙ Administrativo</button>`:''}<button class="logoutBtn" onclick="logoutApp()">↪ Sair</button>`;
+ const nav=document.getElementById('nav');if(nav)nav.innerHTML=`<button onclick="go('home')"><span>⌂</span>Início</button><button onclick="go('result')"><span>▣</span>Vendas</button><button onclick="go('metasv4')"><span>◎</span>Metas</button><button onclick="go('hourlyv5')"><span>◷</span>Hora a Hora</button><button onclick="go('profilev3')"><span>◉</span>Perfil</button>`;
+ const footer=document.querySelector('.footer');if(footer)footer.innerHTML='App. eStore | CE+PI<br><small>Fran Lima</small>';
+}
+refreshNavV3=refreshNavV5;
+go=function(v){CUR=v;$('#drawer')?.classList.remove('open');const map={home,result,metasv4:metasV4,hourlyv5:hourlyV5,supportv5:supportV5,store,ranking,campaigns:campaignsV3,poolv3:poolV3,important:importantV3,teamv3:teamV3,reportsv3:reportsV3,profilev3:profileV3,adminv3:adminV3,admin:adminV3};$('#view').innerHTML=(map[v]||home)();window.scrollTo(0,0);applyMediaV4();if(v==='hourlyv5')setTimeout(loadHourlyV5,0);if(v==='supportv5')setTimeout(loadSupportV5,0)};
