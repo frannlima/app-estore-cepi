@@ -633,3 +633,34 @@ async function refreshNowV6(){
   }catch(e){alert(String(e.message||e))}
   finally{if(btn){btn.disabled=false;btn.textContent='Atualizar agora'}}
 }
+
+
+/* ===== V7: login resiliente — backend com fallback para base local ===== */
+login=async function(){
+  const id=$('#mat').value.trim();
+  $('#err').textContent='Carregando resultado atualizado...';
+  try{
+    try{
+      await refreshSessionV6(id);
+    }catch(apiErr){
+      const localUser=await loadUser(id);
+      if(!localUser) throw apiErr;
+      U=localUser;
+      try{
+        const d=await _estoreFetchDelta();
+        if(d?.asof) _estoreApplyDelta(U,d);
+      }catch(deltaErr){ console.warn('Atualização dinâmica indisponível; usando base local.',deltaErr); }
+    }
+    await loadContentV3();
+  }catch(e){
+    console.error(e);
+    $('#err').textContent='Matrícula não localizada.';
+    return;
+  }
+  $('#login').classList.add('hide');
+  $('#app').classList.remove('hide');
+  $('#nav').classList.remove('hide');
+  refreshNavV5();
+  go('home');
+  setTimeout(()=>{try{celebrate()}catch(e){}},300);
+};
