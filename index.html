@@ -135,7 +135,7 @@ function admin(){
       <p class=muted>Atualize somente quando houver mudança de estrutura ou nova meta.</p>
       <div class=adminGrid>
         <div class=upload><b>👥 Colaboradores e Perfis</b><p class=muted>Equipe, cargo, filial e situação.</p><input class=field type=file accept=".xlsx,.xls,.csv"></div>
-        <div class=upload><b>🎯 Meta de Venda das Lojas</b><p class=muted>Nova meta ou novo período.</p><input class=field type=file accept=".xlsx,.xls,.csv"></div>
+        <div class=upload><b>🎯 Meta de Venda das Lojas</b><p class=muted>Atualize metas diárias ou anuais. O App recalcula Dia, Semana, Mês e Ano.</p><input class=field type=file id=fMeta accept=".xlsx,.xls,.csv"><input class=field type=password id=metaPwd placeholder="Senha ADM"><button class=btn id=metaBtn onclick="uploadMeta()">Incorporar meta</button><div id=metaOut></div></div>
       </div>
     </div>`;
 }
@@ -204,6 +204,15 @@ function _estoreMgmt(delta,p,st){
 }
 function _estoreCalcMeta(delta,st,p,baseP){
   const meta=delta.meta||{}, asof=delta.asof, dates=Object.keys(meta).sort();
+  if(p==='year' && delta.annualMeta?.[st]){
+    let ee=Number(delta.annualMeta[st].to_baseline||0);
+    const ef=Number(delta.annualMeta[st].final||0);
+    for(const d of dates){
+      if(d<='2026-09-17'||d>asof) continue;
+      ee+=Number(meta[d]?.[st]?.metaEstore||0);
+    }
+    return {ee:+ee.toFixed(2),ef:+ef.toFixed(2)};
+  }
   let ee=0,ef=0;
   if(_estoreBaseIncluded(p,asof)){ ee=Number(baseP?.ee||0); ef=Number(baseP?.ef||0); }
   else {
@@ -409,6 +418,21 @@ validateUpdate=async function(){
     setTimeout(()=>go('admin'),1800);
   }catch(e){out.innerHTML='<p class=bad><b>Não foi possível atualizar.</b><br>'+String(e.message||e)+'</p>'}
   finally{btn.disabled=false;btn.textContent='Validar e incorporar ao histórico'}
+};
+
+uploadMeta=async function(){
+  const f=$('#fMeta')?.files?.[0],pwd=$('#metaPwd')?.value||'',out=$('#metaOut'),btn=$('#metaBtn');
+  if(!f||!pwd){out.innerHTML='<p class=bad>Selecione o arquivo de meta e informe a senha ADM.</p>';return}
+  btn.disabled=true;btn.textContent='Incorporando meta...';out.innerHTML='<div class=notice>Validando datas, filiais e metas...</div>';
+  try{
+    const fd=new FormData();fd.append('action','meta_update');fd.append('matricula',String(U.u.id));fd.append('password',pwd);fd.append('meta',f);
+    const r=await fetch(ESTORE_API,{method:'POST',body:fd});const j=await r.json();
+    if(!r.ok||!j.ok)throw new Error(j.error||'Não foi possível atualizar a meta.');
+    await _estoreRefreshLoggedUser();
+    out.innerHTML='<div class=notice><b>✅ '+j.message+'</b><br>'+num(j.rows)+' linhas • '+num(j.stores)+' filiais • '+new Date(j.minDate+'T12:00').toLocaleDateString('pt-BR')+' a '+new Date(j.maxDate+'T12:00').toLocaleDateString('pt-BR')+'<br><small>As visões Dia, Semana, Mês e Ano foram recalculadas.</small></div>';
+    setTimeout(()=>go('admin'),1800);
+  }catch(e){out.innerHTML='<p class=bad><b>Não foi possível atualizar a meta.</b><br>'+String(e.message||e)+'</p>'}
+  finally{btn.disabled=false;btn.textContent='Incorporar meta'}
 };
 </script>
 <style>
