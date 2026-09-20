@@ -601,7 +601,7 @@ go=function(v){CUR=v;$('#drawer')?.classList.remove('open');const map={home,resu
 
 /* ===== V6: sessão dinâmica pelo backend + atualização imediata ===== */
 async function refreshSessionV6(matricula){
-  const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json','Cache-Control':'no-cache'},cache:'no-store',body:JSON.stringify({action:'dashboard',matricula:String(matricula)})});
+  const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:'dashboard',matricula:String(matricula)})});
   const j=await r.json();
   if(!r.ok||!j.ok)throw new Error(j.error||'Não foi possível carregar a sessão atualizada.');
   U=j.user;
