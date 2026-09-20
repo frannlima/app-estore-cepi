@@ -96,7 +96,7 @@ home=function(){
   return `
   <div class="homeBannerV3"><div><small>App. eStore | CE+PI</small><h1>Olá, ${escV3(firstV3())}!</h1><p>Moda que inspira o Brasil</p></div></div>
   ${recognitionV3()}
-  <div class=card><div class=title>Acesso rápido</div>${quickV3()}</div>
+  <div class="brandPhotoCardV3"><div class="brandPhotoOverlayV3"><b>Moda que inspira o Brasil</b></div></div>
   <div class=card><div class=sectionHeadV3><div><div class=title>Resultado • ${pLabel[PER]}</div><small>${escV3(storeFullV3())}</small></div>${tabs()}</div>
     <div class=metricGridV3>
       <div class="metricCardV3 mGreenV3"><span>▥ Venda captada</span><b>${money(x.c)}</b></div>
@@ -108,23 +108,27 @@ home=function(){
 };
 
 function eDayDataV3(){
-  const m=U?.p?.month||{};
-  const approved=Math.max(0,Number(m.a||0)),commission=Math.max(0,Number(m.com||0));
+  const p=U?.p?.[PER]||{},approved=Math.max(0,Number(p.a||0)),commission=Math.max(0,Number(p.com||0));
   let eApproved=(commission-approved*.03)/.07;
   eApproved=clampV3(Number.isFinite(eApproved)?eApproved:0,0,approved);
-  const eCommission=eApproved*.10;
+  const eCommission=+(eApproved*.10).toFixed(2);
   const regularCommission=Math.max(0,commission-eCommission);
   const asof=APP_DELTA?.asof||COMMON.asof||'';
-  const ym=String(asof).slice(0,7);
   const details=[];
+  const inSelectedPeriod=(d)=>{
+    if(PER==='day')return d===asof;
+    const dt=new Date(d+'T12:00:00'),aa=new Date(asof+'T12:00:00');
+    if(PER==='month')return d.slice(0,7)===asof.slice(0,7);
+    if(PER==='year')return d.slice(0,4)===asof.slice(0,4);
+    const monday=x=>{const z=new Date(x);const k=(z.getDay()+6)%7;z.setDate(z.getDate()-k);return z.toISOString().slice(0,10)};
+    return monday(dt)===monday(aa);
+  };
   for(const up of APP_DELTA?.updates||[]){
-    const d=String(up.result_date||'');
-    if(d.slice(0,7)!==ym)continue;
-    const dt=new Date(d+'T12:00:00');
-    if(dt.getDay()!==1)continue;
+    const d=String(up.result_date||''); if(!inSelectedPeriod(d))continue;
+    const dt=new Date(d+'T12:00:00'); if(dt.getDay()!==1)continue;
     const rows=(up.collaborators||[]).filter(r=>String(r.id)===String(U.u.id));
-    const a=rows.reduce((s,r)=>s+Number(r.a||0),0);
-    if(a>0)details.push({d,approved:a,commission:a*.10});
+    const a=rows.reduce((sum,r)=>sum+Number(r.a||0),0);
+    if(a>0)details.push({d,approved:a,commission:+(a*.10).toFixed(2)});
   }
   return {approved,commission,eApproved,eCommission,regularCommission,details};
 }
@@ -138,9 +142,9 @@ result=function(){
   const x=person(),ed=eDayDataV3();
   return `<div class=pageTitleV3><span>Meu Resultado</span></div>
   <div class=card>${tabs()}
-    <div class="commissionHeroV3"><div><small>Comissão acumulada</small><b>${money(ed.commission)}</b></div><span>${PER==='month'?'Mês':'Período'}</span></div>
+    <div class="commissionHeroV3"><div><small>Comissão do período selecionado</small><b>${money(ed.commission)}</b></div><span>${pLabel[PER]}</span></div>
     <div class="edayCardV3">
-      <div class=edayTopV3><div><small>Comissão eDay • segundas</small><b>${money(ed.eCommission)}</b><span>10% sobre vendas aprovadas nas segundas</span></div><div class=edayIconV3>▣</div></div>
+      <div class=edayTopV3><div><small>Comissão eDay • segundas</small><b>${money(ed.eCommission)}</b><span>10% sobre vendas aprovadas nas segundas do período selecionado</span></div><div class=edayIconV3>▣</div></div>
       ${eDayChartV3(ed.details,ed.eCommission)}
       <details><summary>Detalhamento das segundas disponíveis</summary>
         ${ed.details.length?ed.details.map(d=>`<div class=edayRowV3><span>${new Date(d.d+'T12:00').toLocaleDateString('pt-BR')}</span><b>${money(d.commission)}</b></div>`).join(''):`<p class=muted>O total eDay é calculado pela comissão acumulada. O detalhamento por segunda aparece conforme as cargas diárias disponíveis.</p>`}
@@ -206,7 +210,18 @@ function couponsV3(){
  </div>
  <div class=accordionV3>
   <details><summary><span>⚙</span> Como funciona</summary><p>O pedido é realizado pelo eStore conforme a necessidade do cliente e as condições disponíveis no momento da compra.</p></details>
-  <details><summary><span>▤</span> Regras operacionais</summary><ul><li>BOPIS não comissiona.</li><li>Retira Rápido não deve ser utilizado no eStore.</li><li>O desconto de colaborador de 30% não se aplica.</li><li>Não alterar o destino do pedido.</li><li>Cupons não são cumulativos.</li></ul></details>
+  <details><summary><span>▤</span> Regras operacionais</summary>
+  <div class="rulesFlowV3">
+    <b>Quando usar o eStore</b>
+    <ol><li>Primeiro, consulte o estoque do produto na loja.</li><li>Após confirmar a indisponibilidade do produto, tamanho, cor ou variante na loja, ofereça o eStore ao cliente.</li><li>Não utilize o eStore para vender um produto disponível fisicamente na loja. Nessa situação, a comissão pode ser cancelada conforme a regra do processo.</li></ol>
+    <b>Venda para clientes externos</b>
+    <ul><li>Venda eStore destinada somente a clientes externos.</li><li>Não realizar venda eStore para colaboradores.</li><li>O desconto de colaborador de 30% não se aplica ao eStore.</li></ul>
+    <b>BOPIS</b>
+    <ul><li>BOPIS não comissiona.</li></ul>
+    <b>Cupons</b>
+    <ul><li>Cupons não são cumulativos.</li></ul>
+  </div>
+ </details>
   <details><summary><span>♙</span> Benefícios para o cliente</summary><ul><li>Frete grátis conforme regra vigente.</li><li>Parcelamento em até 10x.</li><li>ESTORE20 na 1ª compra pelo App Riachuelo.</li><li>ESTORE10 válido sempre, conforme condições vigentes.</li></ul></details>
   <details><summary><span>▥</span> Benefícios para o colaborador</summary><ul><li>Comissão sobre venda aprovada conforme regra vigente.</li><li>Referência de 3% nos dias regulares.</li><li>eDay nas segundas-feiras: 10% sobre venda aprovada.</li></ul></details>
  </div>`;
@@ -220,16 +235,37 @@ function campaignsV3(){
   ${supV3()?`<div class=card><button class=campaignLinkV3 onclick="go('poolv3')"><span>★</span><div><b>Pool eStore</b><small>Disponível conforme perfil.</small></div><b>›</b></button></div>`:''}`;
 };
 
+let POOL_VIEW='day';
+function setPoolViewV3(v){POOL_VIEW=v;go('poolv3')}
+function poolSeriesV3(){
+  const asof=APP_DELTA?.asof||COMMON.asof||'',st=String(U.u.st),rows=[];
+  for(const up of APP_DELTA?.updates||[]){
+    const d=String(up.result_date||'');
+    if(d<'2026-08-01'||d.slice(0,7)!==asof.slice(0,7))continue;
+    const r=(up.management||[]).find(x=>String(x.st)===st);
+    if(r)rows.push({d,approved:Number(r.a||0)});
+  }
+  if(POOL_VIEW==='day')return rows.map(x=>({label:new Date(x.d+'T12:00').toLocaleDateString('pt-BR',{day:'2-digit'}),value:x.approved*.03}));
+  if(POOL_VIEW==='week'){
+    const m=new Map();
+    const key=d=>{const z=new Date(d+'T12:00'),k=(z.getDay()+6)%7;z.setDate(z.getDate()-k);return z.toISOString().slice(0,10)};
+    for(const x of rows){const k=key(x.d);m.set(k,(m.get(k)||0)+x.approved*.03)}
+    return [...m.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map((x,i)=>({label:'Sem '+(i+1),value:x[1]}));
+  }
+  const total=Number(U.pool?.pool||0);
+  return [{label:new Date(asof+'T12:00').toLocaleDateString('pt-BR',{month:'short'}).replace('.',''),value:total}];
+}
 function poolV3(){
  if(!supV3())return '<div class=card><div class=title>Pool / Comissão</div><p>Conteúdo disponível para supervisores elegíveis.</p></div>';
- const x=U.pool||{approved:0,pool:0,eligible:[],sim:0};
- const hist=[.45,.52,.61,.68,.79,1].map((r,i)=>({m:['Abr','Mai','Jun','Jul','Ago','Set'][i],v:(x.pool||0)*r}));
- const mx=Math.max(1,...hist.map(h=>h.v));
+ const x=U.pool||{approved:0,pool:0,eligible:[],sim:0},hist=poolSeriesV3(),mx=Math.max(1,...hist.map(h=>h.value));
  return `<div class=pageTitleV3><span>Pool / Comissionamento</span></div>
  <div class=card><div class=poolHeroV3><small>Moda que inspira o Brasil</small></div>
  <div class=metricGridV3><div class="metricCardV3 mRoseV3"><span>Venda aprovada da loja</span><b>${money(x.approved)}</b></div><div class="metricCardV3 mOrangeV3"><span>Pool 3%</span><b>${money(x.pool)}</b></div><div class="metricCardV3 mGreenV3"><span>Supervisores elegíveis</span><b>${num(x.eligible?.length||0)}</b></div><div class="metricCardV3 mSandV3"><span>Rateio estimado</span><b>${money(x.sim)}</b></div></div>
  <div class=title style="margin-top:16px">Regras do Pool</div><ol class=rulesV3><li>3% sobre o valor aprovado da loja.</li><li>Rateio igualitário entre supervisores elegíveis.</li><li>Elegíveis conforme perfil e situação ativa no período.</li><li>Mês parcial considera o período trabalhado conforme regra da campanha.</li></ol>
- <div class=chartCardV3><div class=chartTitleV3><b>Comparativo do Pool</b><small>R$</small></div><div class=barChartV3>${hist.map(h=>`<div><span style="height:${Math.max(8,h.v/mx*110)}px"></span><small>${h.m}</small></div>`).join('')}</div></div></div>`;
+ <div class=chartCardV3><div class=chartTitleV3><div><b>Evolução do Pool</b><small>Histórico considerado a partir de agosto/2026</small></div><span>R$</span></div>
+ <div class=poolTabsV3><button class="${POOL_VIEW==='day'?'on':''}" onclick="setPoolViewV3('day')">Dia</button><button class="${POOL_VIEW==='week'?'on':''}" onclick="setPoolViewV3('week')">Semana</button><button class="${POOL_VIEW==='month'?'on':''}" onclick="setPoolViewV3('month')">Mês</button></div>
+ ${hist.length?`<div class=barChartV3>${hist.map(h=>`<div><span style="height:${Math.max(8,h.value/mx*110)}px"></span><small>${h.label}</small><em>${money(h.value)}</em></div>`).join('')}</div>`:'<p class=muted>O gráfico será preenchido conforme as cargas diárias forem incorporadas ao histórico.</p>'}
+ </div></div>`;
 }
 
 function importantV3(){
@@ -259,14 +295,14 @@ function reportsV3(){
  return `<div class=pageTitleV3><span>Relatórios e Rankings</span></div><div class=card>
  <div class=reportTabsV3><button class="${REPORT_METRIC==='sales'?'on':''}" onclick="setReportMetricV3('sales')">Vendas</button><button class="${REPORT_METRIC==='orders'?'on':''}" onclick="setReportMetricV3('orders')">Pedidos</button><button class="${REPORT_METRIC==='ticket'?'on':''}" onclick="setReportMetricV3('ticket')">Ticket</button><button class="${REPORT_METRIC==='share'?'on':''}" onclick="setReportMetricV3('share')">Share</button></div>${tabs()}
  <div class=chartCardV3><div class=chartTitleV3><b>${reportLabelV3()}</b><small>Ranking automático</small></div><div class=horizontalBarsV3>${sorted.slice(0,10).map((x,i)=>`<div><span class=hbLabelV3>${i+1}. ${escV3(x.st||U.u.st)}</span><div><i style="width:${Math.max(3,reportValueV3(x)/mx*100)}%"></i></div><b>${reportFormatV3(reportValueV3(x))}</b></div>`).join('')}</div></div>
- ${admV3()?`<div class=title style="margin-top:16px">Ranking de filiais</div><div class=table><table><tr><th>#</th><th>Filial</th><th>Venda</th><th>Ating.</th><th>Performance</th></tr>${[...(COMMON.regional?.[PER]||[])].sort((a,b)=>b.c-a.c).map((x,i)=>{const p=perfV3(x.att);return `<tr class="${p.cls}Row"><td>${i+1}</td><td>${x.st}</td><td>${money(x.c)}</td><td>${pct(x.att)}</td><td><span class="perfPillV3 ${p.cls}">${p.icon} ${p.label}</span></td></tr>`}).join('')}</table></div>`:''}</div>`;
+ ${admV3()?`<div class=title style="margin-top:16px">Ranking de filiais</div><div class=table><table><tr><th>Ranking</th><th>Filial</th><th>Venda</th><th>Ating.</th><th>Performance</th></tr>${[...(COMMON.regional?.[PER]||[])].sort((a,b)=>reportValueV3(b)-reportValueV3(a)).map((x,i)=>{const p=perfV3(x.att);return `<tr class="${p.cls}Row"><td>${i+1}º</td><td>${x.st}</td><td>${money(x.c)}</td><td>${pct(x.att)}</td><td><span class="perfPillV3 ${p.cls}">${p.icon} ${p.label}</span></td></tr>`}).join('')}</table></div>`:''}</div>`;
 }
 
 function profileV3(){
- const area=U?.u?.area||U?.area||'—',photo=profilePhotoV3();
+ const photo=profilePhotoV3();
  return `<div class=pageTitleV3><span>Meu Perfil</span></div><div class=card>
  <div class=profileCoverV3></div><div class=profileHeaderV3>${profileAvatarV3('lg')}<label class=photoBtnV3>▣<input type=file accept="image/*" onchange="saveProfilePhotoV3(this)"></label><h2>${escV3(U.u.name)}</h2></div>
- <div class=profileRowsV3><div><span>Matrícula</span><b>${escV3(U.u.id)}</b></div><div><span>Filial</span><b>${escV3(storeFullV3())}</b></div><div><span>Cargo</span><b>${escV3(U.u.role)}</b></div><div><span>Área</span><b>${escV3(area)}</b></div></div>
+ <div class=profileRowsV3><div><span>Matrícula</span><b>${escV3(U.u.id)}</b></div><div><span>Filial</span><b>${escV3(storeFullV3())}</b></div><div><span>Cargo</span><b>${escV3(U.u.role)}</b></div></div>
  <label class=editPhotoV3>▣ Inserir / alterar foto<input type=file accept="image/*" onchange="saveProfilePhotoV3(this)"></label>
  </div>`;
 }
@@ -339,4 +375,4 @@ login=async function(){
  await loginV3Original();if(!U)return;await loadContentV3();refreshNavV3();go('home');
 };
 celebrate=function(){};
-window.addEventListener('DOMContentLoaded',()=>{const f=document.querySelector('.footer');if(f)f.innerHTML='App. eStore | CE+PI<br><small>Fran Lima</small>';});
+window.addEventListener('DOMContentLoaded',()=>{const f=document.querySelector('.footer');if(f)f.innerHTML='App. eStore | CE+PI<br><small>Fran Lima</small>';const box=document.querySelector('.loginbox'),logo=document.querySelector('.loginlogo');if(box&&logo&&!document.querySelector('.loginHeroPhotoV3')){const hero=document.createElement('div');hero.className='loginHeroPhotoV3';logo.insertAdjacentElement('afterend',hero)}});
