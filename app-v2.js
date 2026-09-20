@@ -597,3 +597,39 @@ function refreshNavV5(){
 }
 refreshNavV3=refreshNavV5;
 go=function(v){CUR=v;$('#drawer')?.classList.remove('open');const map={home,result,metasv4:metasV4,hourlyv5:hourlyV5,supportv5:supportV5,store,ranking,campaigns:campaignsV3,poolv3:poolV3,important:importantV3,teamv3:teamV3,reportsv3:reportsV3,profilev3:profileV3,adminv3:adminV3,admin:adminV3};$('#view').innerHTML=(map[v]||home)();window.scrollTo(0,0);applyMediaV4();if(v==='hourlyv5')setTimeout(loadHourlyV5,0);if(v==='supportv5')setTimeout(loadSupportV5,0)};
+
+
+/* ===== V6: sessão dinâmica pelo backend + atualização imediata ===== */
+async function refreshSessionV6(matricula){
+  const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json','Cache-Control':'no-cache'},cache:'no-store',body:JSON.stringify({action:'dashboard',matricula:String(matricula)})});
+  const j=await r.json();
+  if(!r.ok||!j.ok)throw new Error(j.error||'Não foi possível carregar a sessão atualizada.');
+  U=j.user;
+  COMMON=j.common;
+  if(window.DB){DB.asof=j.asof||DB.asof}
+  return j;
+}
+login=async function(){
+  const id=$('#mat').value.trim();
+  $('#err').textContent='Carregando resultado atualizado...';
+  try{
+    await refreshSessionV6(id);
+    await loadContentV3();
+  }catch(e){
+    console.error(e);
+    $('#err').textContent=String(e.message||'Não foi possível carregar sua matrícula.');
+    return;
+  }
+  $('#login').classList.add('hide');$('#app').classList.remove('hide');$('#nav').classList.remove('hide');
+  refreshNavV5();
+  go('home');
+  setTimeout(()=>{try{celebrate()}catch(e){}},300);
+};
+async function refreshNowV6(){
+  const id=String(U?.u?.id||''); if(!id)return;
+  const btn=document.getElementById('refreshNowV6'); if(btn){btn.disabled=true;btn.textContent='Atualizando...'}
+  try{
+    await refreshSessionV6(id); await loadContentV3(); refreshNavV5(); go(CUR||'home');
+  }catch(e){alert(String(e.message||e))}
+  finally{if(btn){btn.disabled=false;btn.textContent='Atualizar agora'}}
+}
