@@ -87,3 +87,10 @@ body{background:var(--bg)}
 /* V17 */
 .metaMissingV17{border-left:5px solid #DE7C00;background:#fff6e9}.closingStatusV17{margin:0 0 12px;padding:14px 16px;border-radius:15px;background:#173F35;color:#fff;display:flex;justify-content:space-between;gap:10px;align-items:center}.closingStatusV17 span{font-size:12px;opacity:.9}
 @media(max-width:600px){.closingStatusV17{align-items:flex-start;flex-direction:column}}
+
+/* V18 metas individuais */
+.metaCoverageV18{display:flex;flex-direction:column;gap:5px;padding:12px 14px;margin:10px 0 14px;border-radius:14px;background:#f3f1eb;color:#173F35}
+.metaCoverageV18 span{font-size:12px;color:#466964}
+.metaPersonV18{display:grid;grid-template-columns:minmax(0,1fr) 120px 78px;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid #e6e1d8}
+.metaPersonV18 span{display:flex;flex-direction:column}.metaPersonV18 small{color:#6b6b68}.metaPersonV18 .btn{padding:10px 8px}
+@media(max-width:600px){.metaPersonV18{grid-template-columns:minmax(0,1fr) 92px 68px}.metaPersonV18 .field{min-width:0}}
