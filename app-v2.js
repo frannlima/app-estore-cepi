@@ -897,3 +897,27 @@ function hourlyClosingStatusV17(){
 }
 const _renderHourlyV17=renderHourlyV5;
 renderHourlyV5=function(j){_renderHourlyV17(j);const d=document.querySelector('#hourlyDashboardV5');if(d){const s=hourlyClosingStatusV17();if(s)d.insertAdjacentHTML('afterbegin',s)}}
+
+/* ===== V18: metas individuais ===== */
+function metaRowsV18(){return (APP_DELTA&&APP_DELTA.metaAssignments)||[]}
+function metaTodayV18(){return localIsoV4()}
+function metaManagerV18(){
+ if(!supV3())return '';
+ const team=(U.team&&U.team.day)||[],d=metaTodayV18();
+ const rows=metaRowsV18().filter(r=>String(r.result_date)===d&&String(r.store_code)===String(U.u.st));
+ const map=new Map(rows.map(r=>[String(r.matricula),Number(r.target||0)]));
+ const missing=team.filter(r=>!map.has(String(r.id)));
+ return '<div class="card metaManagerV18"><div class="title">Distribuição individual de Meta eStore</div><div class="metaCoverageV18"><b>'+rows.length+' de '+team.length+' colaboradores com meta distribuída hoje</b><span>'+(missing.length?'Pendentes: '+missing.map(r=>escV3(r.name)).join(', '):'Todos os colaboradores estão com meta distribuída.')+'</span></div>'+team.map(r=>'<div class="metaPersonV18"><span><b>'+escV3(r.name)+'</b><small>'+escV3(String(r.id))+'</small></span><input class="field" id="mav18_'+escV3(String(r.id))+'" type="number" min="0" step="0.01" value="'+(map.has(String(r.id))?map.get(String(r.id)):'')+'" placeholder="Meta R$"><button class="btn" onclick="saveMetaV18(\''+escV3(String(r.id))+'\')">Salvar</button></div>').join('')+'</div>';
+}
+async function saveMetaV18(id){
+ const el=document.getElementById('mav18_'+id),target=Number(el&&el.value||0);
+ try{
+  const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'meta_assign_set',matricula:String(U.u.id),st:String(U.u.st),date:metaTodayV18(),target_matricula:String(id),target})});
+  const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Falha ao salvar meta.');
+  if(!APP_DELTA.metaAssignments)APP_DELTA.metaAssignments=[];
+  APP_DELTA.metaAssignments=APP_DELTA.metaAssignments.filter(x=>!(String(x.result_date)===metaTodayV18()&&String(x.store_code)===String(U.u.st)&&String(x.matricula)===String(id)));
+  APP_DELTA.metaAssignments.push(j.assignment);go('metasv4');
+ }catch(e){alert(e.message||e)}
+}
+const _metasBaseV18=metasV4;
+metasV4=function(){const h=_metasBaseV18();return supV3()?h+metaManagerV18():h}
