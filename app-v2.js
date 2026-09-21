@@ -822,3 +822,46 @@ const _loginV15=login;
 login=async function(){await loadEDayV15();await _loginV15();if(U)await loadNotificationsV14()}
 const _adminV15=adminV3;
 adminV3=function(){return _adminV15()+eDayAdminV15()}
+
+
+/* ===== V16: rankings de supervisores/Pool + alertas Hora a Hora ===== */
+let POOL_RANK_V16={stores:[],supervisors:[]},SUP_RANK_TAB_V16='pool';
+async function loadPoolRankV16(){
+ if(!supV3())return;
+ try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'pool_rankings',matricula:String(U.u.id)})}),j=await r.json();if(r.ok&&j.ok)POOL_RANK_V16=j}catch(e){}
+}
+function setSupRankV16(v){SUP_RANK_TAB_V16=v;go('poolv3')}
+function supervisorSalesV16(){
+ const rows=[];for(const stc of Object.keys(COMMON.stores||{})){const top=COMMON.stores?.[stc]?.p?.[PER]?.top||[];for(const r of top){if(r.lead||r.supervisor)rows.push({...r,st:r.st||stc})}}
+ const mine=U.team?.[PER]||[];for(const r of mine){if(r.lead||r.supervisor||String(r.id)===String(U.u.id))rows.push({...r,st:r.st||U.u.st})}
+ const m=new Map();for(const r of rows){const k=String(r.id);if(!m.has(k)||(r.a||r.c)>(m.get(k).a||m.get(k).c))m.set(k,r)}return [...m.values()].sort((a,b)=>Number(b.a||b.c||0)-Number(a.a||a.c||0));
+}
+function supervisorRankBlockV16(){
+ let rows=[],label='';
+ if(SUP_RANK_TAB_V16==='stores'){rows=POOL_RANK_V16.stores||[];label='Pool conquistado pelas lojas'}
+ else if(SUP_RANK_TAB_V16==='sales'){rows=supervisorSalesV16();label='Supervisores que vendem'}
+ else {rows=POOL_RANK_V16.supervisors||[];label='Pool conquistado por supervisor'}
+ return '<div class=superRankV16><div class=scopeTabs><button class="'+(SUP_RANK_TAB_V16==='pool'?'on':'')+'" onclick="setSupRankV16(\'pool\')">Supervisores</button><button class="'+(SUP_RANK_TAB_V16==='stores'?'on':'')+'" onclick="setSupRankV16(\'stores\')">Filiais</button><button class="'+(SUP_RANK_TAB_V16==='sales'?'on':'')+'" onclick="setSupRankV16(\'sales\')">Venda individual</button></div><div class=title>'+label+'</div>'+(rows.length?rows.slice(0,20).map((r,i)=>'<div class="rank rankV3 '+(String(r.id)===String(U.u.id)?'meRankV3':'')+'"><div class=medal>'+(i<3?['🥇','🥈','🥉'][i]:(i+1)+'º')+'</div><div><b>'+escV3(r.name||('Filial '+r.st))+'</b><div class=muted>Filial '+escV3(r.st||'')+'</div></div><span><b>'+money(SUP_RANK_TAB_V16==='sales'?Number(r.a||r.c||0):Number(r.pool||0))+'</b></span></div>').join(''):'<p class=muted>Ranking em atualização conforme os resultados disponíveis.</p>')+'</div>';
+}
+const _poolV16=poolV3;
+poolV3=function(){
+ if(!supV3())return _poolV16();
+ const x=U.pool||{},individual=person(),total=Number(x.sim||0)+Number(individual.a||0)*.03;
+ return _poolV16()+'<div class=card><div class=title>🏆 Reconhecimento de Supervisores</div><p class=poolNudgeV13><b>Mobilize sua operação.</b> Cada venda aprovada fortalece o resultado da filial e amplia o potencial do Pool. No eDay, sua venda individual também pode potencializar seus ganhos.</p><div class=metricGridV3><div class="metricCardV3 mGreenV3"><span>Meu rateio Pool</span><b>'+money(x.sim||0)+'</b></div><div class="metricCardV3 mOrangeV3"><span>Minha venda individual</span><b>'+money(individual.a||individual.c||0)+'</b></div><div class="metricCardV3 mRoseV3"><span>Total estimado*</span><b>'+money(total)+'</b></div></div><small class=muted>*Estimativa: Pool rateado + referência de 3% sobre venda individual. eDay é calculado conforme vendas aprovadas nas segundas.</small>'+supervisorRankBlockV16()+'</div>';
+}
+
+function hourlyPendingV16(){
+ if(!HOURLY_CACHE)return'';
+ const p=(HOURLY_CACHE.stores||[]).filter(r=>!r.updated_at);if(!p.length)return'<div class="hourCoverageV16 ok"><b>✓ Cobertura completa</b><span>Todas as filiais já registraram informação.</span></div>';
+ return '<div class="hourCoverageV16"><b>⚠ '+p.length+' filial'+(p.length>1?'is':'')+' sem informação</b><span>'+p.map(r=>r.st).join(' • ')+'</span>'+(admV3()?'<button onclick="notifyPendingV16()">Notificar supervisores</button>':'')+'</div>';
+}
+async function notifyPendingV16(){
+ const p=(HOURLY_CACHE?.stores||[]).filter(r=>!r.updated_at);if(!p.length)return;
+ const out=[];for(const r of p){const resp=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'notification_publish',matricula:String(U.u.id),title:'Hora a Hora pendente | Filial '+r.st,message:'Ainda não identificamos a atualização deste período. Atualize o resultado para garantir a consolidação da Regional CE+PI.',target:'store',store_code:String(r.st)})});if(resp.ok)out.push(r.st)}
+ alert('Aviso enviado para '+out.length+' filial(is): '+out.join(', '));await loadNotificationsV14();
+}
+const _renderHourlyV16=renderHourlyV5;
+renderHourlyV5=function(j){_renderHourlyV16(j);const d=document.querySelector('#hourlyDashboardV5');if(d)d.insertAdjacentHTML('afterbegin',hourlyPendingV16())}
+
+const _loginV16=login;
+login=async function(){await _loginV16();if(U&&supV3())await loadPoolRankV16()}
