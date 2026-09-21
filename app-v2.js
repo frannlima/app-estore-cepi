@@ -675,3 +675,44 @@ submitHourlyV5=async function(){
  const d=$('#hourDateV5').value,c=Number($('#hourCapturedV5').value||0),o=Math.trunc(Number($('#hourOrdersV5').value||0)),out=$('#hourOutV5');
  try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'hourly_submit',matricula:String(U.u.id),store_code:String(U.u.st),result_date:d,captured:c,orders:o,store_sales:0})}),j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Não foi possível registrar.');out.innerHTML='<div class=notice>Atualização registrada.</div>';await loadHourlyV5()}catch(e){out.innerHTML='<p class=bad>'+escV3(e.message||e)+'</p>'}
 };
+
+
+/* ===== V13: experiência por perfil, comissão e Hora a Hora incremental ===== */
+function rankInfoV13(){
+ const reg=COMMON?.top?.[PER]||[],ri=reg.findIndex(x=>String(x.id)===String(U.u.id));
+ const fil=(U.team?.[PER]||COMMON?.stores?.[U.u.st]?.p?.[PER]?.top||[]).slice().sort((a,b)=>Number(b.c||0)-Number(a.c||0)),fi=fil.findIndex(x=>String(x.id)===String(U.u.id));
+ return {regional:ri>=0?ri+1:null,filial:fi>=0?fi+1:null,topRegional:ri>=0&&ri<10,topFilial:fi>=0&&fi<5};
+}
+function recognitionV13(){
+ const r=rankInfoV13();
+ if(r.topRegional||r.topFilial)return '<div class="recognitionV3 top10V3"><div class=recIconV3>🏆</div><div><span class=recTagV3>Reconhecimento eStore</span><h3>Parabéns! Você é incrivelmente Brasil.</h3><p>'+(r.topRegional?'Top 10 Regional • '+r.regional+'º lugar':'Top 5 da filial • '+r.filial+'º lugar')+'</p></div></div>';
+ return '<div class="recognitionV3"><div class=recIconV3>★</div><div><span class=recTagV3>Sua jornada eStore</span><h3>Somos criadores de possibilidades.</h3><p>Você tem a missão de continuar inspirando moda na sua operação. Cada venda contribui para sua filial e para a Regional CE+PI.</p></div></div>';
+}
+function commissionSimulatorV13(){
+ return '<div class="card simV13"><div class=title>Simulador de comissionamento</div><p class=muted>Veja o potencial da sua venda aprovada.</p><input id=simComV13 class=field type=number min=0 step=.01 placeholder="Valor da venda aprovada" oninput="calcCommissionV13()"><div id=simOutV13 class=simOutV13><span>Dia normal • 3% <b>R$ 0,00</b></span><span>Segunda eDay • 10% <b>R$ 0,00</b></span></div></div>';
+}
+function calcCommissionV13(){const v=Number(document.querySelector('#simComV13')?.value||0),e=document.querySelector('#simOutV13');if(e)e.innerHTML='<span>Dia normal • 3% <b>'+money(v*.03)+'</b></span><span>Segunda eDay • 10% <b>'+money(v*.10)+'</b></span><strong>No eDay: +'+money(v*.07)+'</strong>'}
+function isMondayV13(){return new Date().getDay()===1}
+function eDayAlertV13(){return isMondayV13()?'<button class="edayAlertV13" onclick="go(\'result\')"><b>⚡ Hoje é eDay • 10% de comissão</b><span>Aproveite a segunda para potencializar seus ganhos. Simular meus ganhos ›</span></button>':''}
+function menuGridV13(){
+ const items=[['▥','Meu Resultado','result','green'],['◎','Metas','metasv4','orange'],['◷','Hora a Hora','hourlyv5','rose'],['▤','Minha Filial','store','sand'],['★','Ranking','ranking','pink'],['◇','Cupons e Campanhas','campaigns','orange'],['ⓘ','Informações','important','green'],['◉','Chat / Suporte','supportv5','rose'],['◉','Meu Perfil','profilev3','sand']];
+ if(supV3())items.splice(6,0,['◎','Pool / Comissão','poolv3','wine'],['♙','Meu Time','teamv3','green'],['▥','Relatórios','reportsv3','orange']);
+ if(admV3())items.push(['⚙','Administrativo','adminv3','wine']);
+ return '<div class=menuGridV13>'+items.map(i=>'<button class="'+i[3]+'" onclick="go(\''+i[2]+'\')"><b>'+i[0]+'</b><span>'+i[1]+'</span></button>').join('')+'</div>';
+}
+home=function(){
+ return '<div class=homeBannerV3><div><small>App. eStore | CE+PI</small><h1>Olá, '+escV3(firstV3())+'!</h1><p>Moda que inspira o Brasil</p></div></div>'+eDayAlertV13()+'<div class=card><div class=title>Acessos</div><p class=muted>Menus disponíveis para o seu perfil.</p>'+menuGridV13()+'</div>';
+};
+result=function(){
+ const x=person(),ed=eDayDataV3(),pool=U.pool||{},eligible=supV3()&&Number(pool.eligible?.length||0)>0;
+ const poolPart=eligible?Number(pool.sim||0):0,total=Number(ed.commission||0)+poolPart;
+ return '<div class=pageTitleV3><span>Meu Resultado</span></div>'+recognitionV13()+'<div class=card>'+tabs()+'<div class=commissionHeroV3><div><small>Comissão individual estimada</small><b>'+money(ed.commission)+'</b></div><span>'+pLabel[PER]+'</span></div><div class=edayCardV3><div class=edayTopV3><div><small>eDay • segundas</small><b>'+money(ed.eCommission)+'</b><span>10% sobre vendas aprovadas nas segundas do período.</span></div><div class=edayIconV3>⚡</div></div></div><div class=metricGridV3><div class="metricCardV3 mGreenV3"><span>Venda captada</span><b>'+money(x.c)+'</b></div><div class="metricCardV3 mRoseV3"><span>Venda aprovada</span><b>'+money(x.a)+'</b></div><div class="metricCardV3 mOrangeV3"><span>Pedidos</span><b>'+num(x.o)+'</b></div><div class="metricCardV3 mSandV3"><span>Posição CE+PI</span><b>'+(rankInfoV13().regional?rankInfoV13().regional+'º':'—')+'</b></div></div></div>'+(eligible?'<div class=card><div class=title>Meu Pool eStore</div><div class=metricGridV3><div class="metricCardV3 mRoseV3"><span>Venda aprovada da loja</span><b>'+money(pool.approved)+'</b></div><div class="metricCardV3 mOrangeV3"><span>Pool gerado • 3%</span><b>'+money(pool.pool)+'</b></div><div class="metricCardV3 mGreenV3"><span>Meu rateio estimado</span><b>'+money(poolPart)+'</b></div><div class="metricCardV3 mSandV3"><span>Total estimado</span><b>'+money(total)+'</b></div></div><p class=poolNudgeV13>Mobilize sua operação: mais venda aprovada amplia o Pool. Nas segundas, aproveite também o eDay para potencializar sua comissão individual.</p><button class=btn onclick="go(\'poolv3\')">Ver Pool e rankings</button></div>':'')+commissionSimulatorV13();
+};
+function hourlyV5(){
+ const d=localIsoV4(),adminStore=admV3()?'<label>Filial<select id=hourStoreV13 class=field>'+Object.keys(COMMON.stores||{}).sort().map(s=>'<option value="'+s+'">'+s+'</option>').join('')+'</select></label>':'';
+ return '<div class=pageTitleV3><span>Hora a Hora eStore | CE+PI</span></div><div class=card><div class=hourlyEntryV5><div class=title>Novo lançamento</div><div class=hourlyGridV5><label>Data<input id=hourDateV5 class=field type=date value="'+d+'" onchange="loadHourlyV5()"></label>'+adminStore+'<label>Venda eStore deste lançamento<input id=hourCapturedV5 class=field type=number min=0 step=.01 placeholder="+ R$"></label><label>Pedidos deste lançamento<input id=hourOrdersV5 class=field type=number min=0 step=1 placeholder="+ 0"></label></div><div class=notice>O App soma os lançamentos automaticamente. Share = venda eStore acumulada ÷ meta geral de vendas da filial.</div><button class=btn onclick="submitHourlyV5()">Adicionar ao acumulado</button><div id=hourOutV5></div></div></div><div id=hourlyDashboardV5><div class=card><div class=notice>Carregando consolidado...</div></div></div>';
+}
+submitHourlyV5=async function(){
+ const d=document.querySelector('#hourDateV5').value,c=Number(document.querySelector('#hourCapturedV5').value||0),o=Math.trunc(Number(document.querySelector('#hourOrdersV5').value||0)),st=admV3()?(document.querySelector('#hourStoreV13')?.value||U.u.st):U.u.st,out=document.querySelector('#hourOutV5');
+ try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'hourly_submit',matricula:String(U.u.id),store_code:String(st),result_date:d,captured:c,orders:o,store_sales:0,incremental:true,source:admV3()?'admin':'store'})}),j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Não foi possível registrar.');out.innerHTML='<div class=notice>Atualização adicionada ao acumulado.</div>';document.querySelector('#hourCapturedV5').value='';document.querySelector('#hourOrdersV5').value='';await loadHourlyV5()}catch(e){out.innerHTML='<p class=bad>'+escV3(e.message||e)+'</p>'}
+};
