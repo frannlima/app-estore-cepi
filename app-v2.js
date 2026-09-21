@@ -716,3 +716,59 @@ submitHourlyV5=async function(){
  const d=document.querySelector('#hourDateV5').value,c=Number(document.querySelector('#hourCapturedV5').value||0),o=Math.trunc(Number(document.querySelector('#hourOrdersV5').value||0)),st=admV3()?(document.querySelector('#hourStoreV13')?.value||U.u.st):U.u.st,out=document.querySelector('#hourOutV5');
  try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'hourly_submit',matricula:String(U.u.id),store_code:String(st),result_date:d,captured:c,orders:o,store_sales:0,incremental:true,source:admV3()?'admin':'store'})}),j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Não foi possível registrar.');out.innerHTML='<div class=notice>Atualização adicionada ao acumulado.</div>';document.querySelector('#hourCapturedV5').value='';document.querySelector('#hourOrdersV5').value='';await loadHourlyV5()}catch(e){out.innerHTML='<p class=bad>'+escV3(e.message||e)+'</p>'}
 };
+
+
+/* ===== V14: notificações, auditoria Hora a Hora e suporte identificado ===== */
+let NOTIF_V14=[];
+async function loadNotificationsV14(){
+ if(!U?.u?.id)return;
+ try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'notifications_get',matricula:String(U.u.id)})}),j=await r.json();NOTIF_V14=j.items||[];renderBellV14()}catch(e){}
+}
+function renderBellV14(){
+ let b=document.getElementById('notifyBellV14'),brand=document.querySelector('.top .brand');if(!brand)return;
+ if(!b){b=document.createElement('button');b.id='notifyBellV14';b.className='notifyBellV14';b.onclick=()=>go('notificationsv14');brand.parentNode.insertBefore(b,brand)}
+ const seen=Number(localStorage.getItem('estore_notif_seen_v14')||0),unread=Math.max(0,NOTIF_V14.length-seen);b.innerHTML='🔔'+(unread?'<i>'+unread+'</i>':'');
+}
+function notificationsV14(){
+ localStorage.setItem('estore_notif_seen_v14',String(NOTIF_V14.length));setTimeout(renderBellV14,0);
+ return '<div class=pageTitleV3><span>Notificações</span></div><div class=card><div class=title>Central de avisos</div><p class=muted>Informações e direcionamentos eStore.</p>'+(NOTIF_V14.length?NOTIF_V14.map(x=>'<div class=notifItemV14><b>'+escV3(x.title||'Aviso eStore')+'</b><p>'+escV3(x.message||'')+'</p><small>'+new Date(x.created_at).toLocaleString('pt-BR')+'</small></div>').join(''):'<div class=notice>Nenhuma notificação nova.</div>')+'</div>';
+}
+async function publishNotificationV14(){
+ const out=document.querySelector('#notifAdmOutV14'),title=document.querySelector('#notifTitleV14')?.value||'',message=document.querySelector('#notifMsgV14')?.value||'',target=document.querySelector('#notifTargetV14')?.value||'all',store_code=document.querySelector('#notifStoreV14')?.value||'',target_matricula=document.querySelector('#notifMatV14')?.value||'';
+ if(!message.trim()){out.innerHTML='<p class=bad>Digite a mensagem.</p>';return}
+ try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'notification_publish',matricula:String(U.u.id),title,message,target,store_code,target_matricula})}),j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Falha ao publicar.');out.innerHTML='<div class=notice>Notificação publicada.</div>';document.querySelector('#notifMsgV14').value='';await loadNotificationsV14()}catch(e){out.innerHTML='<p class=bad>'+escV3(e.message||e)+'</p>'}
+}
+function notificationAdminV14(){
+ if(!admV3())return'';
+ return '<div class=card><div class=title>🔔 Enviar notificação</div><div class=adminGrid><label>Título<input id=notifTitleV14 class=field value="Aviso eStore"></label><label>Público<select id=notifTargetV14 class=field><option value=all>Regional • todos</option><option value=supervisors>Supervisores</option><option value=store>Filial específica</option><option value=matricula>Matrícula específica</option></select></label><label>Filial<select id=notifStoreV14 class=field><option value="">—</option>'+Object.keys(COMMON.stores||{}).sort().map(s=>'<option>'+s+'</option>').join('')+'</select></label><label>Matrícula<input id=notifMatV14 class=field inputmode=numeric placeholder="Opcional"></label></div><textarea id=notifMsgV14 class=field rows=4 placeholder="Mensagem"></textarea><button class=btn onclick="publishNotificationV14()">Publicar notificação</button><div id=notifAdmOutV14></div></div>';
+}
+const _adminV14=adminv3;
+adminv3=function(){return _adminV14()+notificationAdminV14()}
+
+function hourlyHistoryV14(j){
+ const rows=[...(j.history||[])].reverse();
+ if(!rows.length)return '<div class=notice>Nenhum lançamento realizado neste dia.</div>';
+ return '<div class=hourHistoryV14><div class=title>Histórico do dia</div>'+rows.map(r=>'<div class=hourHistRowV14><div><b>Filial '+escV3(r.store_code)+'</b><small>'+new Date(r.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+' • '+escV3(r.updated_by||r.matricula)+' • '+escV3(r.matricula)+'</small></div><span><b>+'+money(r.captured)+'</b><small>+'+num(r.orders)+' pedidos</small></span>'+((admV3()||String(r.matricula)===String(U.u.id))?'<div class=histActionsV14><button onclick="editHourlyV14(\''+r.id+'\','+Number(r.captured||0)+','+Number(r.orders||0)+')">Editar</button><button onclick="deleteHourlyV14(\''+r.id+'\')">Excluir</button></div>':'')+'</div>').join('')+'</div>';
+}
+async function editHourlyV14(id,c,o){
+ const nc=prompt('Valor correto deste lançamento:',String(c).replace('.',','));if(nc===null)return;const no=prompt('Pedidos corretos deste lançamento:',String(o));if(no===null)return;
+ await manageHourlyV14('edit',id,Number(String(nc).replace(',','.')),Math.trunc(Number(no)||0));
+}
+async function deleteHourlyV14(id){if(!confirm('Excluir este lançamento? O acumulado será recalculado.'))return;await manageHourlyV14('delete',id,0,0)}
+async function manageHourlyV14(op,id,captured,orders){
+ try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'hourly_manage',matricula:String(U.u.id),op,id,captured,orders})}),j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Não foi possível alterar.');await loadHourlyV5()}catch(e){alert(e.message||e)}
+}
+const _renderHourlyV14=renderHourlyV5;
+renderHourlyV5=function(j){
+ _renderHourlyV14(j);
+ const dash=document.querySelector('#hourlyDashboardV5');if(dash)dash.insertAdjacentHTML('beforeend','<div class=card>'+hourlyHistoryV14(j)+'</div>');
+}
+
+const _supportV14=supportv5;
+supportv5=function(){
+ const base=_supportV14(),who='<div class=supportIdentityV14><b>'+escV3(String(U.u.id))+' • '+escV3(firstV3())+'</b><span>Filial '+escV3(U.u.st)+'</span></div>';
+ return base.replace('<div class=pageTitleV3><span>Chat / Suporte</span></div>','<div class=pageTitleV3><span>Chat / Suporte</span></div>'+who);
+}
+
+const _goV14=go;
+go=function(p){_goV14(p);if(U?.u?.id){loadNotificationsV14();setTimeout(renderBellV14,0)}}
