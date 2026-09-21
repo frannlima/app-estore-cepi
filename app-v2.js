@@ -865,3 +865,35 @@ renderHourlyV5=function(j){_renderHourlyV16(j);const d=document.querySelector('#
 
 const _loginV16=login;
 login=async function(){await _loginV16();if(U&&supV3())await loadPoolRankV16()}
+
+
+/* ===== V17: metas claras + fechamento Hora a Hora ===== */
+const _metasV17=metasV4;
+metasV4=function(){
+ const html=_metasV17();
+ if(supV3())return html;
+ return html.replace('<div class=notice>O supervisor ainda não registrou a distribuição por HC para os dias deste período.</div>','<div class="notice metaMissingV17"><b>Sua meta eStore ainda não foi distribuída.</b><br>Procure seu gestor imediato e peça a distribuição da meta eStore do dia para o time.</div>');
+}
+
+function isClosingV17(dateStr){
+ const today=localIsoV4(),h=new Date().getHours();return dateStr<today||(dateStr===today&&h>=22);
+}
+shareHourlyV5=async function(){
+ if(!HOURLY_CACHE)return;
+ const j=HOURLY_CACHE,closing=isClosingV17(j.result_date),stores=[...(j.stores||[])].sort((a,b)=>Number(b.att||0)-Number(a.att||0)),active=stores.filter(r=>r.updated_at),missing=stores.filter(r=>!r.updated_at),regional={meta:stores.reduce((s,r)=>s+Number(r.metaValue||0),0),captured:stores.reduce((s,r)=>s+Number(r.captured||0),0),orders:stores.reduce((s,r)=>s+Number(r.orders||0),0),orderTarget:stores.reduce((s,r)=>s+Number(r.orderTarget||0),0),sales:stores.reduce((s,r)=>s+Number(r.storeSales||0),0)};
+ const c=document.createElement('canvas');c.width=1080;c.height=1900;const x=c.getContext('2d');x.fillStyle='#f8f7f4';x.fillRect(0,0,1080,1900);x.fillStyle='#173F35';x.fillRect(0,0,1080,260);x.fillStyle='#fff';x.font='bold 46px Arial';x.fillText(closing?'eStore CE+PI | Fechamento':'eStore CE+PI | Hora a Hora',55,76);x.font='28px Arial';x.fillText(new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR')+' • consolidado '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),55,128);x.fillText('Cobertura de atualização: '+active.length+'/'+stores.length+' filiais'+(missing.length?' • '+missing.length+' sem informação':''),55,180);
+ const cards=[['Realizado',money(regional.captured)],['Meta',money(regional.meta)],['Atingimento',regional.meta?pct(regional.captured/regional.meta):'—'],['Share',regional.sales?pct(regional.captured/regional.sales):'—']];let cx=45;for(const q of cards){x.fillStyle='#fff';x.beginPath();x.roundRect(cx,285,240,105,18);x.fill();x.fillStyle='#466964';x.font='19px Arial';x.fillText(q[0],cx+17,320);x.fillStyle='#173F35';x.font='bold 24px Arial';x.fillText(q[1],cx+17,360);cx+=250}
+ x.fillStyle='#173F35';x.font='bold 20px Arial';['RK','FILIAL','CAPTADO','ATING.','PEDIDOS','SHARE'].forEach((v,i)=>x.fillText(v,[55,120,250,500,650,845][i],445));
+ let y=485;for(let i=0;i<stores.length;i++){const r=stores[i];x.fillStyle=shareClassV15(r);x.beginPath();x.roundRect(42,y-29,995,58,10);x.fill();x.fillStyle='#173F35';x.font='bold 21px Arial';x.fillText((i+1)+'º',55,y);x.fillText(r.st,120,y);if(!r.updated_at&&closing){x.fillStyle='#76232F';x.font='bold 17px Arial';x.fillText('Nenhuma informação de venda ao longo do dia',250,y)}else{x.fillText(money(r.captured),250,y);x.fillText(pct(r.att),500,y);x.fillText(num(r.orders)+'/'+num(r.orderTarget),650,y);x.fillText(r.storeSales?pct(r.share):'—',845,y);if(r.updated_at&&Number(r.captured)===0){x.fillStyle='#76232F';x.font='bold 13px Arial';x.fillText('R$ 0,00 informado',250,y+18)}}y+=64}
+ x.fillStyle='#173F35';x.font='bold 22px Arial';x.fillText('Pedidos: '+num(regional.orders)+' / '+num(regional.orderTarget),55,1740);x.font='20px Arial';x.fillText('Share = venda eStore captada ÷ meta geral de vendas da filial',55,1790);x.fillText('Atualizado em '+new Date().toLocaleString('pt-BR')+' • Fran Lima',55,1840);
+ const text=(closing?'🏁 *eStore CE+PI | FECHAMENTO*':'🎯 *eStore CE+PI | HORA A HORA*')+'\\n📅 '+new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR')+'\\n💵 *Realizado:* '+money(regional.captured)+'\\n🎯 *Meta:* '+money(regional.meta)+'\\n📈 *Atingimento:* '+(regional.meta?pct(regional.captured/regional.meta):'—')+'\\n🛍️ *Pedidos:* '+num(regional.orders)+' / '+num(regional.orderTarget)+'\\n📊 *Share:* '+(regional.sales?pct(regional.captured/regional.sales):'—')+'\\n🏬 *Cobertura:* '+active.length+'/'+stores.length+(missing.length?' • '+missing.length+' sem informação':'')+(closing&&missing.length?'\\n⚠️ *Sem informação ao longo do dia:* '+missing.map(r=>r.st).join(', '):'');
+ shareCanvas(c,text);
+}
+
+function hourlyClosingStatusV17(){
+ if(!HOURLY_CACHE||!isClosingV17(HOURLY_CACHE.result_date))return'';
+ const miss=(HOURLY_CACHE.stores||[]).filter(r=>!r.updated_at);
+ return '<div class="closingStatusV17"><b>Fechamento Hora a Hora</b><span>Cobertura: '+((HOURLY_CACHE.stores||[]).length-miss.length)+'/'+(HOURLY_CACHE.stores||[]).length+' filiais'+(miss.length?' • '+miss.length+' sem informação':' • cobertura completa')+'</span></div>';
+}
+const _renderHourlyV17=renderHourlyV5;
+renderHourlyV5=function(j){_renderHourlyV17(j);const d=document.querySelector('#hourlyDashboardV5');if(d){const s=hourlyClosingStatusV17();if(s)d.insertAdjacentHTML('afterbegin',s)}}
