@@ -784,3 +784,41 @@ go=function(v){
  const map={home,result,metasv4:metasV4,hourlyv5:hourlyV5,supportv5:supportV5,notificationsv14:notificationsV14,store,ranking,campaigns:campaignsV3,poolv3:poolV3,important:importantV3,teamv3:teamV3,reportsv3:reportsV3,profilev3:profileV3,adminv3:adminV3,admin:adminV3};
  document.querySelector('#view').innerHTML=(map[v]||home)();window.scrollTo(0,0);if(typeof applyMediaV4==='function')applyMediaV4();if(v==='hourlyv5')setTimeout(loadHourlyV5,0);if(v==='supportv5')setTimeout(loadSupportV5,0);if(U?.u?.id){loadNotificationsV14();setTimeout(renderBellV14,0)}
 };
+
+
+/* ===== V15: eDay administrável + compartilhamento Hora a Hora profissional ===== */
+let EDAY_V15={active:true,rate:.10,start:'2026-08-01',end:''};
+async function loadEDayV15(){try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'eday_get'})}),j=await r.json();if(r.ok&&j.ok)EDAY_V15=j.config||EDAY_V15}catch(e){}}
+function eDayActiveV15(){
+ const d=new Date(),iso=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+ return EDAY_V15.active!==false&&d.getDay()===1&&(!EDAY_V15.start||iso>=EDAY_V15.start)&&(!EDAY_V15.end||iso<=EDAY_V15.end);
+}
+eDayAlertV13=function(){return eDayActiveV15()?'<button class="edayAlertV13" onclick="go(\'result\')"><b>⚡ Hoje é eDay • 10% de comissão</b><span>Segunda é dia de transformar oportunidade em resultado. Aproveite o eDay para potencializar seus ganhos. Simular meus ganhos ›</span></button>':''}
+async function saveEDayV15(){
+ const out=document.querySelector('#edayOutV15'),active=document.querySelector('#edayActiveV15')?.checked!==false,start=document.querySelector('#edayStartV15')?.value||'',end=document.querySelector('#edayEndV15')?.value||'';
+ try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'eday_update',matricula:String(U.u.id),active,start,end})}),j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Falha ao salvar.');EDAY_V15=j.config;out.innerHTML='<div class=notice>Configuração eDay atualizada.</div>'}catch(e){out.innerHTML='<p class=bad>'+escV3(e.message||e)+'</p>'}
+}
+function eDayAdminV15(){
+ if(!admV3())return'';
+ return '<div class=card><div class=title>⚡ Controle eDay</div><p class=muted>O alerta de 10% aparece automaticamente às segundas enquanto a campanha estiver ativa.</p><label class=switchLineV15><input id=edayActiveV15 type=checkbox '+(EDAY_V15.active!==false?'checked':'')+'> Incentivo ativo</label><div class=adminGrid><label>Início<input id=edayStartV15 class=field type=date value="'+escV3(EDAY_V15.start||'')+'"></label><label>Fim opcional<input id=edayEndV15 class=field type=date value="'+escV3(EDAY_V15.end||'')+'"></label></div><button class=btn onclick="saveEDayV15()">Salvar eDay</button><div id=edayOutV15></div></div>';
+}
+
+function shareClassV15(r){if(!r.updated_at)return'#f1e7e8';if(Number(r.share)>=.01)return'#e8f3ee';if(Number(r.share)>=.005)return'#fff4df';return'#fdecea'}
+shareHourlyV5=async function(){
+ if(!HOURLY_CACHE)return;
+ const j=HOURLY_CACHE,stores=[...(j.stores||[])].sort((a,b)=>Number(b.att||0)-Number(a.att||0)),active=stores.filter(r=>r.updated_at),pending=stores.filter(r=>!r.updated_at),regional={meta:stores.reduce((s,r)=>s+Number(r.metaValue||0),0),captured:stores.reduce((s,r)=>s+Number(r.captured||0),0),orders:stores.reduce((s,r)=>s+Number(r.orders||0),0),orderTarget:stores.reduce((s,r)=>s+Number(r.orderTarget||0),0),sales:stores.reduce((s,r)=>s+Number(r.storeSales||0),0)};
+ const c=document.createElement('canvas');c.width=1080;c.height=1900;const x=c.getContext('2d');x.fillStyle='#f8f7f4';x.fillRect(0,0,1080,1900);x.fillStyle='#173F35';x.fillRect(0,0,1080,255);x.fillStyle='#fff';x.font='bold 48px Arial';x.fillText('eStore CE+PI | Hora a Hora',60,78);x.font='29px Arial';x.fillText('Parcial '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+' • '+new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR'),60,130);x.fillText('Filiais atualizadas: '+active.length+' / '+stores.length,60,182);
+ const cards=[['Realizado',money(regional.captured)],['Atingimento',regional.meta?pct(regional.captured/regional.meta):'—'],['Pedidos',num(regional.orders)+' / '+num(regional.orderTarget)],['Share',regional.sales?pct(regional.captured/regional.sales):'—']];
+ let cx=50;for(const q of cards){x.fillStyle='#fff';x.beginPath();x.roundRect(cx,285,235,105,18);x.fill();x.fillStyle='#466964';x.font='20px Arial';x.fillText(q[0],cx+18,320);x.fillStyle='#173F35';x.font='bold 25px Arial';x.fillText(q[1],cx+18,360);cx+=250}
+ x.fillStyle='#173F35';x.font='bold 22px Arial';x.fillText('RK',60,445);x.fillText('FILIAL',125,445);x.fillText('CAPTADO',255,445);x.fillText('ATING.',500,445);x.fillText('PEDIDOS',655,445);x.fillText('SHARE',850,445);
+ let y=485;for(let i=0;i<stores.length;i++){const r=stores[i];x.fillStyle=shareClassV15(r);x.beginPath();x.roundRect(45,y-30,990,58,10);x.fill();x.fillStyle='#173F35';x.font='bold 22px Arial';x.fillText((i+1)+'º',60,y);x.fillText(r.st,130,y);x.fillText(money(r.captured),255,y);x.fillText(pct(r.att),500,y);x.fillText(num(r.orders)+'/'+num(r.orderTarget),655,y);x.fillText(r.storeSales?pct(r.share):'—',850,y);if(!r.updated_at){x.fillStyle='#76232F';x.font='bold 15px Arial';x.fillText('PENDENTE',930,y)}y+=64}
+ if(pending.length){x.fillStyle='#76232F';x.font='bold 25px Arial';x.fillText('Pendentes: '+pending.map(r=>r.st).join(' • '),55,1745)}
+ x.fillStyle='#173F35';x.font='bold 21px Arial';x.fillText('Share: eStore captado ÷ meta geral de vendas da filial',55,1800);x.fillText('Fran Lima',55,1845);
+ const txt='🎯 *eStore CE+PI | HORA A HORA*\\n💵 *Realizado:* '+money(regional.captured)+'\\n📈 *Atingimento:* '+(regional.meta?pct(regional.captured/regional.meta):'—')+'\\n🛍️ *Pedidos:* '+num(regional.orders)+' / '+num(regional.orderTarget)+'\\n📊 *Share:* '+(regional.sales?pct(regional.captured/regional.sales):'—')+'\\n🏬 *Atualizadas:* '+active.length+'/'+stores.length+(pending.length?'\\n⚠️ *Pendentes:* '+pending.map(r=>r.st).join(', '):'');
+ shareCanvas(c,txt);
+}
+
+const _loginV15=login;
+login=async function(){await loadEDayV15();await _loginV15();if(U)await loadNotificationsV14()}
+const _adminV15=adminV3;
+adminV3=function(){return _adminV15()+eDayAdminV15()}
