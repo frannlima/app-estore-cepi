@@ -772,3 +772,15 @@ supportv5=function(){
 
 const _goV14=go;
 go=function(p){_goV14(p);if(U?.u?.id){loadNotificationsV14();setTimeout(renderBellV14,0)}}
+
+
+/* V14 routing final */
+hourlyV5=hourlyV5;
+supportV5=supportv5;
+const _adminBaseV14=adminV3;
+adminV3=function(){return _adminBaseV14()+notificationAdminV14()}
+go=function(v){
+ CUR=v;document.querySelector('#drawer')?.classList.remove('open');
+ const map={home,result,metasv4:metasV4,hourlyv5:hourlyV5,supportv5:supportV5,notificationsv14:notificationsV14,store,ranking,campaigns:campaignsV3,poolv3:poolV3,important:importantV3,teamv3:teamV3,reportsv3:reportsV3,profilev3:profileV3,adminv3:adminV3,admin:adminV3};
+ document.querySelector('#view').innerHTML=(map[v]||home)();window.scrollTo(0,0);if(typeof applyMediaV4==='function')applyMediaV4();if(v==='hourlyv5')setTimeout(loadHourlyV5,0);if(v==='supportv5')setTimeout(loadSupportV5,0);if(U?.u?.id){loadNotificationsV14();setTimeout(renderBellV14,0)}
+};
