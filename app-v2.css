@@ -94,3 +94,8 @@ body{background:var(--bg)}
 .metaPersonV18{display:grid;grid-template-columns:minmax(0,1fr) 120px 78px;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid #e6e1d8}
 .metaPersonV18 span{display:flex;flex-direction:column}.metaPersonV18 small{color:#6b6b68}.metaPersonV18 .btn{padding:10px 8px}
 @media(max-width:600px){.metaPersonV18{grid-template-columns:minmax(0,1fr) 92px 68px}.metaPersonV18 .field{min-width:0}}
+
+
+/* V19 — Meu Time Regional compacto */
+.teamToolbarV19{display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:12px;align-items:end;margin-bottom:14px}.teamToolbarV19 small{display:block;font-size:11px;color:#65746f;margin-bottom:5px}.teamToolbarV19 .btn{white-space:nowrap}.regionalCompactV19{margin-top:18px}.regionalCompactV19 .table{max-height:430px;overflow:auto;border:1px solid #ece9e2;border-radius:16px}.regionalCompactV19 table{margin:0}.regionalCompactV19 th{position:sticky;top:0;background:#f5f3ee;z-index:1}.miniBtnV19{border:0;border-radius:999px;background:#173F35;color:#fff;padding:7px 10px;font-size:10px;font-weight:800;white-space:nowrap}
+@media(max-width:700px){.teamToolbarV19{grid-template-columns:1fr}.teamToolbarV19 .btn{width:100%}.regionalCompactV19 .table{max-height:360px}.regionalCompactV19 table{min-width:650px}}
