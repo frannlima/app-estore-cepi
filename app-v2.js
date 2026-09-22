@@ -943,3 +943,77 @@ login=async function(){
     if(btn){btn.disabled=false;btn.textContent='Entrar'}
   }
 };
+
+
+/* V19 — Meu Time Regional: visão compacta por filial + exportação Excel */
+let TEAM_STORE_V19='regional';
+function teamDatesV19(d){
+  const asof=String(APP_DELTA?.asof||COMMON?.asof||'');
+  if(!d||!asof)return false;
+  if(PER==='day')return d===asof;
+  if(PER==='month')return d.slice(0,7)===asof.slice(0,7);
+  if(PER==='year')return d.slice(0,4)===asof.slice(0,4);
+  const monday=s=>{const z=new Date(s+'T12:00:00'),k=(z.getDay()+6)%7;z.setDate(z.getDate()-k);return z.toISOString().slice(0,10)};
+  return monday(d)===monday(asof);
+}
+function regionalPeopleV19(){
+  const m=new Map();
+  for(const up of (APP_DELTA?.updates||[])){
+    const d=String(up.result_date||''); if(!teamDatesV19(d))continue;
+    for(const x of (up.collaborators||[])){
+      const id=String(x.id??x.matricula??''), st=String(x.st??x.store??x.loja??'');
+      if(!id||!st)continue;
+      const k=st+'|'+id, old=m.get(k)||{id,st,name:x.name||x.nome||id,c:0,a:0,o:0};
+      old.name=x.name||x.nome||old.name; old.c+=Number(x.c??x.captada??0); old.a+=Number(x.a??x.aprovada??0); old.o+=Number(x.o??x.pedidos??0); m.set(k,old);
+    }
+  }
+  return [...m.values()];
+}
+function teamStoresV19(){
+  const fromPeople=[...new Set(regionalPeopleV19().map(x=>String(x.st)))];
+  const fromRegional=(COMMON.regional?.[PER]||[]).map(x=>String(x.st));
+  return [...new Set([...fromRegional,...fromPeople])].filter(Boolean).sort((a,b)=>a.localeCompare(b,'pt-BR',{numeric:true}));
+}
+function setTeamStoreV19(v){TEAM_STORE_V19=String(v||'regional');go('teamv3')}
+function teamRowsV19(){
+  if(TEAM_STORE_V19==='regional')return regionalPeopleV19();
+  const all=regionalPeopleV19().filter(x=>String(x.st)===TEAM_STORE_V19);
+  if(all.length)return all;
+  if(String(TEAM_STORE_V19)===String(U?.u?.st))return (U.team?.[PER]||[]).map(x=>({...x,st:String(U.u.st)}));
+  return [];
+}
+function teamStoreSummaryV19(st,people){
+  const r=(COMMON.regional?.[PER]||[]).find(x=>String(x.st)===String(st))||{};
+  const p=people.filter(x=>String(x.st)===String(st)), c=p.reduce((s,x)=>s+Number(x.c||0),0), o=p.reduce((s,x)=>s+Number(x.o||0),0);
+  return {st,c:Number(r.c??c),o:Number(r.o??o),active:p.filter(x=>Number(x.c||0)>0).length,zero:p.filter(x=>Number(x.c||0)===0).length,att:Number(r.att||0)};
+}
+function exportTeamExcelV19(){
+  const people=teamRowsV19(), stores=TEAM_STORE_V19==='regional'?teamStoresV19():[TEAM_STORE_V19];
+  const sums=stores.map(st=>teamStoreSummaryV19(st,regionalPeopleV19()));
+  const title=TEAM_STORE_V19==='regional'?'Regional CE+PI':'Filial '+TEAM_STORE_V19;
+  const html='<html><head><meta charset="UTF-8"></head><body><h2>eStore CE+PI - '+title+'</h2><p>Período: '+escV3(pLabel[PER])+'</p>'+
+    '<h3>Resumo</h3><table border="1"><tr><th>Filial</th><th>Venda Captada</th><th>Pedidos</th><th>Ativos</th><th>Zerados</th><th>Atingimento</th></tr>'+
+    sums.map(x=>'<tr><td>'+x.st+'</td><td>'+x.c.toFixed(2)+'</td><td>'+x.o+'</td><td>'+x.active+'</td><td>'+x.zero+'</td><td>'+(x.att*100).toFixed(1)+'%</td></tr>').join('')+'</table>'+
+    '<h3>Colaboradores</h3><table border="1"><tr><th>Filial</th><th>Matrícula</th><th>Colaborador</th><th>Captada</th><th>Aprovada</th><th>Pedidos</th><th>Status</th></tr>'+
+    people.sort((a,b)=>String(a.st).localeCompare(String(b.st),'pt-BR',{numeric:true})||Number(b.c||0)-Number(a.c||0)).map(x=>'<tr><td>'+escV3(x.st)+'</td><td>'+escV3(x.id)+'</td><td>'+escV3(x.name)+'</td><td>'+Number(x.c||0).toFixed(2)+'</td><td>'+Number(x.a||0).toFixed(2)+'</td><td>'+Number(x.o||0)+'</td><td>'+(Number(x.c||0)>0?'Com venda':'Zerado')+'</td></tr>').join('')+'</table><p>Fran Lima</p></body></html>';
+  const blob=new Blob(['\ufeff',html],{type:'application/vnd.ms-excel;charset=utf-8'}),a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='eStore_'+(TEAM_STORE_V19==='regional'?'Regional_CE_PI':'Filial_'+TEAM_STORE_V19)+'_'+PER+'.xls';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
+}
+teamV3=function(){
+ if(!supV3())return '<div class=card><div class=title>Meu Time</div><p>Conteúdo disponível para liderança.</p></div>';
+ if(!admV3()&&TEAM_STORE_V19==='regional')TEAM_STORE_V19=String(U.u.st);
+ const stores=teamStoresV19(),people=teamRowsV19(),yes=people.filter(x=>Number(x.c||0)>0),no=people.filter(x=>Number(x.c||0)===0);
+ const totalC=people.reduce((s,x)=>s+Number(x.c||0),0),totalO=people.reduce((s,x)=>s+Number(x.o||0),0);
+ const storeSummaries=stores.map(st=>teamStoreSummaryV19(st,regionalPeopleV19())).sort((a,b)=>b.c-a.c);
+ const selected=TEAM_STORE_V19!=='regional';
+ const sorted=[...people].sort((a,b)=>Number(b.c||0)-Number(a.c||0));
+ return '<div class=pageTitleV3><span>Meu Time</span></div><div class=card>'+
+   '<div class=teamToolbarV19><div><small>Visão</small><select class=field onchange="setTeamStoreV19(this.value)">'+
+   (admV3()?'<option value="regional" '+(TEAM_STORE_V19==='regional'?'selected':'')+'>Regional CE+PI</option>':'')+
+   stores.map(st=>'<option value="'+escV3(st)+'" '+(TEAM_STORE_V19===st?'selected':'')+'>Filial '+escV3(st)+'</option>').join('')+
+   '</select></div><button class=btn onclick="exportTeamExcelV19()">Exportar Excel</button></div>'+tabs()+
+   '<div class=metricGridV3><div class="metricCardV3 mGreenV3"><span>Ativos eStore</span><b>'+num(yes.length)+'</b></div><div class="metricCardV3 mLowV3"><span>Zerados</span><b>'+num(no.length)+'</b></div><div class="metricCardV3 mSandV3"><span>Venda captada</span><b>'+money(totalC)+'</b></div><div class="metricCardV3 mOrangeV3"><span>Pedidos</span><b>'+num(totalO)+'</b></div></div>'+
+   (!selected?'<div class=regionalCompactV19><div class=title>Filiais <small class=autoTagV3>selecione para detalhar</small></div><div class=table><table><tr><th>Filial</th><th>Venda</th><th>Pedidos</th><th>Ativos</th><th>Zerados</th><th></th></tr>'+storeSummaries.map(x=>'<tr><td><b>'+escV3(x.st)+'</b></td><td>'+money(x.c)+'</td><td>'+num(x.o)+'</td><td>'+num(x.active)+'</td><td>'+num(x.zero)+'</td><td><button class=miniBtnV19 onclick="setTeamStoreV19(\''+String(x.st).replace(/'/g,"\\'")+'\')">Ver time</button></td></tr>').join('')+'</table></div></div>':
+   '<div class=regionalCompactV19><div class=title>Colaboradores • Filial '+escV3(TEAM_STORE_V19)+'</div><div class=teamRankV3>'+sorted.map((x,i)=>'<div class=teamRankRowV5><span class=posV3>'+(i+1)+'</span>'+avatarForV5(x.id,x.name,'xs')+'<b>'+escV3(x.name)+'</b><strong>'+money(x.c)+'</strong><em class="'+(Number(x.c||0)>0?'perfGoodV3':'perfLowV3')+'">'+(Number(x.c||0)>0?num(x.o)+' ped.':'Zerado')+'</em></div>').join('')+(sorted.length?'':'<p class=muted>Sem dados de colaboradores para esta filial no período selecionado.</p>')+'</div></div>')+
+   '</div>';
+};
