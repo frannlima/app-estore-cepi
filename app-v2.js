@@ -1017,3 +1017,55 @@ teamV3=function(){
    '<div class=regionalCompactV19><div class=title>Colaboradores • Filial '+escV3(TEAM_STORE_V19)+'</div><div class=teamRankV3>'+sorted.map((x,i)=>'<div class=teamRankRowV5><span class=posV3>'+(i+1)+'</span>'+avatarForV5(x.id,x.name,'xs')+'<b>'+escV3(x.name)+'</b><strong>'+money(x.c)+'</strong><em class="'+(Number(x.c||0)>0?'perfGoodV3':'perfLowV3')+'">'+(Number(x.c||0)>0?num(x.o)+' ped.':'Zerado')+'</em></div>').join('')+(sorted.length?'':'<p class=muted>Sem dados de colaboradores para esta filial no período selecionado.</p>')+'</div></div>')+
    '</div>';
 };
+
+/* V20 — home e menu conforme referência aprovada 22/09 */
+function navBtnV20(icon,label,target,active=''){return '<button class="'+active+'" onclick="go(\''+target+'\')"><span class="navIcoV20">'+icon+'</span><span>'+label+'</span><span class="navArrV20">›</span></button>'}
+refreshNavV3=function(){
+ const sh=document.querySelector('#drawer .sheet');
+ if(sh)sh.innerHTML=
+  '<div class="menuBrandV20">RIACHUELO</div><div class="menuAppV20">App. eStore CE+PI</div>'+
+  '<div class="menuHeadV20">'+profileAvatarV3('sm')+'<div><b>'+escV3(U?.u?.name||'')+'</b><small>'+escV3(storeFullV3())+'</small></div></div>'+
+  '<div class="menuSectionV20">Principal</div>'+
+  navBtnV20('⌂','Início','home','activeV20')+
+  navBtnV20('▥','Meu Resultado','result')+
+  navBtnV20('◎','Metas','metas')+
+  '<div class="menuSectionV20">Gestão</div>'+
+  navBtnV20('▤','Minha Filial','store')+
+  (supV3()?navBtnV20('♙','Meu Time','teamv3'):'')+
+  navBtnV20('♕','Ranking','ranking')+
+  (supV3()?navBtnV20('▣','Pool / Comissão','poolv3'):'')+
+  (supV3()?navBtnV20('◷','Hora a Hora','hourly'):'')+
+  '<div class="menuSectionV20">Informações</div>'+
+  navBtnV20('◇','Cupons e Campanhas','campaigns')+
+  navBtnV20('ⓘ','Informações Importantes','important')+
+  navBtnV20('♧','Chat / Suporte','support')+
+  (admV3()?'<div class="menuSectionV20"></div>'+navBtnV20('☷','Administrativo','adminv3'):'')+
+  '<button class="logoutBtn" onclick="logoutApp()"><span class="navIcoV20">↪</span><span>Sair</span><span class="navArrV20"></span></button>'+
+  '<div class="menuFootV20">Moda que inspira o Brasil.<br>Fran Lima</div>';
+ const nav=document.getElementById('nav');
+ if(nav)nav.innerHTML=
+  '<button onclick="go(\'home\')"><span>⌂</span>Início</button>'+
+  '<button onclick="go(\'result\')"><span>▱</span>Vendas</button>'+
+  '<button onclick="go(\'metas\')"><span>◎</span>Metas</button>'+
+  '<button onclick="go(\'hourly\')"><span>◷</span>Hora a Hora</button>'+
+  '<button onclick="go(\'profilev3\')"><span>♙</span>Perfil</button>';
+ const footer=document.querySelector('.footer');if(footer)footer.innerHTML='Moda que inspira o Brasil.<br><small>Fran Lima</small>';
+};
+function homeTileV20(cls,icon,title,sub,target){return '<button class="'+cls+'" onclick="go(\''+target+'\')"><span class="miV20">'+icon+'</span><span><b>'+title+'</b><small>'+sub+'</small></span><span class="maV20">›</span></button>'}
+home=function(){
+ return '<div class="homePremiumV20">'+
+  '<h1>App. eStore CE+PI</h1><div class="helloV20">Olá, '+escV3(firstV3())+'</div><div class="storeV20">'+escV3(storeFullV3())+'</div>'+
+  '<button class="weekFeatureV20" onclick="go(\'ranking\')"><span class="icoV20">♕</span><b>Destaques da semana</b><span class="arrV20">›</span></button>'+
+  '<div class="quickTitleV20">Acesso rápido</div><div class="menuGridV20">'+
+   homeTileV20('green','▥','Meu Resultado','Desempenho individual','result')+
+   homeTileV20('orange','◎','Metas','Acompanhe sua meta','metas')+
+   homeTileV20('wine','▤','Minha Filial','Resultado da operação','store')+
+   (supV3()?homeTileV20('sage','♙','Meu Time','Equipe e participação','teamv3'):'')+
+   homeTileV20('orange','♕','Ranking','Filial e regional','ranking')+
+   (supV3()?homeTileV20('wine','▣','Pool / Comissão','Estimativas e incentivos','poolv3'):'')+
+   homeTileV20('sage','◇','Cupons e Campanhas','Regras e incentivos','campaigns')+
+   (supV3()?homeTileV20('green','◷','Hora a Hora','Evolução das vendas','hourly'):'')+
+   homeTileV20('sand','ⓘ','Informações Importantes','Atualizações eStore','important')+
+   homeTileV20('sage','♧','Chat / Suporte','Fale com o suporte','support')+
+  '</div><div class="homeSignV20">Fran Lima</div></div>';
+};
