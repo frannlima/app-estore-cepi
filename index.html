@@ -119,7 +119,38 @@ async function generateTeamPDFV19(){
  await Promise.all(selectedStoresV19().map(loadRegionalStoreV19));
  let sel=selectedStoresV19(),filter=TEAM_FILTER==='sold'?'Com venda':TEAM_FILTER==='zero'?'Zerados':'Todos',period=({day:'Dia',week:'Semana',month:'Mês',year:'Ano'})[PER],w=window.open('','_blank');if(!w){alert('Permita pop-ups para gerar o PDF.');return}
  let sections=sel.map(st=>{let rows=filterCollabsV19(TEAM_STORE_DATA_V19[PER+'|'+st]||[]).sort((a,b)=>(+b.c||0)-(+a.c||0)),sales=(TEAM_STORE_DATA_V19[PER+'|'+st]||[]).reduce((s,x)=>s+(+x.c||0),0);return '<h2>Filial '+st+'</h2><table><thead><tr><th>#</th><th>Colaborador</th><th>Matrícula</th><th>Pedidos</th><th>Captado</th><th>Aprovado</th><th>Part.</th><th>Status</th></tr></thead><tbody>'+rows.map((u,i)=>'<tr><td>'+((+u.c||0)>0?(i+1)+'º':'—')+'</td><td>'+esc(preferredName(u.id,u.name))+'</td><td>'+esc(u.id)+'</td><td>'+num(u.o)+'</td><td>'+money(u.c)+'</td><td>'+money(u.a)+'</td><td>'+(sales?(+u.c||0)/sales*100:0).toFixed(1).replace('.',',')+'%</td><td>'+((+u.c||0)>0?'Com venda':'Zerado')+'</td></tr>').join('')+'</tbody></table>'}).join('');
- w.document.write('<!doctype html><html><head><meta charset=utf-8><title>Meu Time Regional CE+PI</title><style>@page{size:A4;margin:12mm}body{font-family:Arial;color:#173F35}.head{border-bottom:5px solid #173F35;padding-bottom:12px}.head img{height:58px}.sub{color:#68736f;margin-top:6px}h2{font-size:17px;margin:22px 0 7px;page-break-after:avoid}table{width:100%;border-collapse:collapse;font-size:9px}th{background:#173F35;color:white;text-align:left;padding:6px}td{padding:6px;border-bottom:1px solid #ddd}.foot{margin-top:20px;color:#777;font-size:9px}.print{padding:10px 16px;background:#173F35;color:white;border:0;border-radius:8px;margin:15px 0}@media print{.print{display:none}}</style></head><body><div class=head><img src="'+LOGO+'"><h1>Meu Time • Regional CE+PI</h1><div class=sub>'+period+' • Filtro: '+filter+' • Filiais: '+sel.join(', ')+' • Gerado em '+new Date().toLocaleString('pt-BR')+'</div></div>'+sections+'<div class=foot>App. eStore CE+PI • Fran Lima</div><button class=print onclick="window.print()">Salvar / imprimir PDF</button><script>setTimeout(()=>window.print(),500)<\/script></body></html>');w.document.close();
+ w.document.write('<!doctype html><html><head><meta charset=utf-8><title>Meu Time Regional CE+PI</title><style>@page{size:A4;margin:12mm}body{font-family:Arial;color:#173F35}.head{border-bottom:5px solid #173F35;padding-bottom:12px}.head img{height:58px}.sub{color:#68736f;margin-top:6px}h2{font-size:17px;margin:22px 0 7px;page-break-after:avoid}table{width:100%;border-collapse:collapse;font-size:9px}th{background:#173F35;color:white;text-align:left;padding:6px}td{padding:6px;border-bottom:1px solid #ddd}.foot{margin-top:20px;color:#777;font-size:9px}.print{padding:10px 16px;background:#173F35;color:white;border:0;border-radius:8px;margin:15px 0}@media print{.print{display:none}}</style></head><body><div class=head><img src="'+LOGO+'"><h1>Meu Time • Regional CE+PI</h1><div class=sub>'+period+' • Filtro: '+filter+' • Filiais: '+sel.join(', ')+' • Gerado em '+new Date().toLocaleString('pt-BR')+'</div></div>'+sections+'<div class=foot>App. eStore CE+PI • Fran Lima</div><button class=print onclick="window.print()">Salvar / imprimir PDF</button><script>setTimeout(()=>window.print(),500)<\/script><!-- REGIONAL ZERO FIX V20 2026-09-21 -->
+<script>
+async function loadRegionalStoreV20(st){
+ let key=PER+'|'+st;if(TEAM_STORE_DATA_V19[key])return TEAM_STORE_DATA_V19[key];
+ let rows=[];
+ try{
+   let j=await api({action:'ranking_period',matricula:U.u.id,period:PER,store:st,month:PER==='month'?RANK_MONTH:undefined});
+   rows=Array.isArray(j.store)?j.store:[];
+ }catch(e){}
+ // O ranking pode trazer somente quem vendeu. Para a filial do usuário, o dashboard possui o time completo,
+ // então fazemos merge para que colaboradores zerados não desapareçam.
+ if(String(st)===String(U.u.st)){
+   let full=Array.isArray(U.team?.[PER])?U.team[PER]:[];
+   let map=new Map(rows.map(x=>[String(x.id),x]));
+   full.forEach(x=>{let id=String(x.id);map.set(id,{...(map.get(id)||{}),...x,st:x.st||st})});
+   rows=[...map.values()];
+ }
+ TEAM_STORE_DATA_V19[key]=rows.map(r=>({...r,st:r.st||st}));
+ return TEAM_STORE_DATA_V19[key];
+}
+loadRegionalStoreV19=loadRegionalStoreV20;
+function regionalReportsHtmlV20(){
+ let sel=selectedStoresV19();if(!sel.length)return '<div class="notice">Selecione pelo menos uma filial para visualizar o relatório.</div>';
+ return '<div id=regionalReportsV19>'+sel.map(st=>{let key=PER+'|'+st,rows=TEAM_STORE_DATA_V19[key];
+ if(!rows)return '<div class=storeReportV19><div class=storeReportHeadV19><b>Filial '+st+'</b></div><div class=storeLoadV19>Carregando relação de colaboradores...</div></div>';
+ let filtered=filterCollabsV19(rows).sort((a,b)=>(+b.c||0)-(+a.c||0)),sales=rows.reduce((s,x)=>s+(+x.c||0),0);
+ let warning=(TEAM_FILTER==='zero'&&!filtered.length&&String(st)!==String(U.u.st))?'<div class=storeLoadV19><b>Sem zerados retornados pela base desta filial.</b><br><span class=muted>A consulta regional ainda não devolveu o cadastro completo dos colaboradores sem venda.</span></div>':'';
+ return '<div class=storeReportV19><div class=storeReportHeadV19><b>Filial '+st+'</b><span>'+filtered.length+' colaborador(es) • '+money(sales)+' captado</span></div>'+(filtered.length?filtered.map((u,i)=>{let zero=(+u.c||0)<=0,part=sales?(+u.c||0)/sales*100:0;return '<div class=collabRowV19><div class=name>'+photo(u.id,preferredName(u.id,u.name))+'<div><b>'+(zero?'—':(i+1)+'º')+' '+esc(preferredName(u.id,u.name))+'</b><div class=muted>Matr. '+esc(u.id)+' • '+num(u.o)+' pedidos • '+part.toFixed(1).replace('.',',')+'% da loja</div></div></div><div class=vals><b>'+money(u.c)+'</b><span>'+money(u.a)+' aprovado</span><br><span class="statusTag '+(zero?'zero':'sold')+'">'+(zero?'Zerado':'Com venda')+'</span></div></div>'}).join(''):warning||'<div class=storeLoadV19>Nenhum colaborador encontrado para este filtro.</div>')+'</div>'}).join('')+'</div>';
+}
+regionalReportsHtmlV19=regionalReportsHtmlV20;
+</script>
+</body></html>');w.document.close();
 }
 </script>
 </body></html>');w.document.close()}
