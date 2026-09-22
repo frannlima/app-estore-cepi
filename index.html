@@ -68,6 +68,48 @@ window.home=function(){var sup=typeof isSupervisor==='function'?isSupervisor():t
 var oldMenu=window.menu;window.menu=function(){var d=document.getElementById('drawer');if(!d)return oldMenu&&oldMenu();var admin=(typeof isAdmin==='function'&&isAdmin());d.innerHTML='<div class="v21sheet"><div class="v21brand">RIACHUELO</div><div class="v21app">App. eStore CE+PI</div><div class="v21user">'+esc(U?.u?.name||'')+'<small>'+esc((U?.u?.store_code||'')+' • '+(U?.u?.store_name||''))+'</small></div><div class="v21sec">Principal</div>'+nav('⌂','Início','home',1)+nav('▥','Meu Resultado','result')+nav('◎','Metas','metas')+'<div class="v21sec">Gestão</div>'+nav('▤','Minha Filial','store')+nav('♙','Meu Time','team')+nav('♕','Ranking','ranking')+nav('▣','Pool / Comissão','commission')+nav('◷','Hora a Hora','hourly')+'<div class="v21sec">Informações</div>'+nav('◇','Cupons e Campanhas','campaigns')+nav('ⓘ','Informações Importantes','info')+nav('♧','Chat / Suporte','support')+(admin?nav('☷','Administrativo','admin'):'')+'<div class="v21foot">Moda que inspira o Brasil.<br>Fran Lima</div></div>';d.classList.add('open')}
 function nav(i,t,to,on){return '<button class="'+(on?'on':'')+'" onclick="go(\''+to+'\');document.getElementById(\'drawer\').classList.remove(\'open\')"><span class="ni">'+i+'</span><span>'+t+'</span><span class="ar">›</span></button>'}
 })();
+</script><style id="V22-FORCE-ACTIVE-UI">
+/* force the approved mobile visual over legacy render */
+#view>.hero{display:none!important}
+#view>.menus{display:none!important}
+#view>.footer{display:none!important}
+#view .homeApprovedV22{display:block!important}
+.top{background:#fff!important;color:#173F35!important;height:66px!important;padding:10px 14px!important}
+.top .logo{filter:none!important;width:145px!important;height:38px!important;object-fit:contain!important}
+.top .iconbtn{background:transparent!important;color:#173F35!important}
+.homeApprovedV22{font-family:Arial,Helvetica,sans-serif}.homeApprovedV22 h1{font-size:25px;margin:5px 0 3px}.homeApprovedV22 .hi{font-weight:900;font-size:17px}.homeApprovedV22 .loc{color:#6e7773;font-size:12px;margin:3px 0 14px}.homeApprovedV22 .featured{width:100%;border:0;border-radius:14px;background:#075b48;color:#fff;min-height:62px;padding:12px 15px;display:flex;gap:12px;align-items:center;text-align:left;font-weight:900}.homeApprovedV22 .featured i{font-style:normal;font-size:25px}.homeApprovedV22 .featured em{font-style:normal;margin-left:auto;font-size:24px}.homeApprovedV22 .qt{font-size:17px;font-weight:900;margin:11px 0 7px}.homeApprovedV22 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}.homeApprovedV22 .tiles button{border:0;border-radius:14px;min-height:77px;padding:10px;display:grid;grid-template-columns:32px 1fr 14px;align-items:center;text-align:left;color:white}.homeApprovedV22 .tiles .ico{font-size:23px}.homeApprovedV22 .tiles b{font-size:13px;display:block;line-height:1.05}.homeApprovedV22 .tiles small{font-size:9px;display:block;margin-top:4px;line-height:1.15}.homeApprovedV22 .green{background:#075b48}.homeApprovedV22 .orange{background:#DE7C00;color:#173F35!important}.homeApprovedV22 .wine{background:#76232F}.homeApprovedV22 .sage{background:#466964}.homeApprovedV22 .sand{background:#D6D2C4;color:#173F35!important}.homeApprovedV22 .signature{text-align:center;font-size:10px;color:#777;margin:13px 0}
+.drawer.v22drawer{padding:0!important}.drawer.v22drawer>button{display:none!important}.v22menu{padding:16px 13px 22px}.v22menu .brand{font-size:27px;font-weight:900;letter-spacing:2px}.v22menu .appname{font-size:17px;font-weight:900;margin:3px 0 14px}.v22menu .person{display:flex;align-items:center;gap:10px;padding:5px 3px 12px}.v22menu .avatar22{width:45px;height:45px;border-radius:50%;background:#e2f1e9;display:grid;place-items:center;font-weight:900}.v22menu .person small{display:block;color:#777;margin-top:2px}.v22menu .section{font-size:10px;font-weight:900;color:#777;text-transform:uppercase;margin:8px 7px 4px}.v22menu button{width:100%;border:0;background:white;color:#173F35;padding:9px 8px;border-radius:9px;display:grid;grid-template-columns:29px 1fr 13px;text-align:left;align-items:center}.v22menu button.sel{background:#e7f2ec;border-left:4px solid #08705a;font-weight:900}.v22menu .ico{font-size:19px}.v22menu .foot{border-top:1px solid #ddd;text-align:center;font-size:10px;color:#777;margin-top:10px;padding-top:12px;line-height:1.7}
+</style><script>
+(function(){
+ function E(s){return String(s==null?'':s).replace(/[&<>"']/g,function(x){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]})}
+ function go22(x){try{window.go(x)}catch(e){}}
+ function tile(c,i,t,sub,to){return '<button class="'+c+'" data-go22="'+to+'"><span class="ico">'+i+'</span><span><b>'+t+'</b><small>'+sub+'</small></span><span>›</span></button>'}
+ function home22(){
+  var u=(window.U&&U.u)||{},nm=(u.name||'Fran').split(' ')[0],store=u.store_code||'108',sn=u.store_name||'Fortaleza Iguatemi';
+  return '<div class="homeApprovedV22"><h1>App. eStore CE+PI</h1><div class="hi">Olá, '+E(nm)+'</div><div class="loc">'+E(store)+' • '+E(sn)+'</div><button class="featured" data-go22="ranking"><i>♕</i><span>Destaques da semana</span><em>›</em></button><div class="qt">Acesso rápido</div><div class="tiles">'+
+  tile('green','▥','Meu Resultado','Desempenho individual','result')+tile('orange','◎','Metas','Acompanhe sua meta','metas')+
+  tile('wine','▤','Minha Filial','Resultado da operação','store')+tile('sage','♙','Meu Time','Equipe e participação','team')+
+  tile('orange','♕','Ranking','Filial e regional','ranking')+tile('wine','◇','Cupons e Campanhas','Regras e incentivos','campaigns')+
+  tile('sage','▣','Pool / Comissão','Estimativas e incentivos','commission')+tile('green','◷','Hora a Hora','Evolução das vendas','hourly')+
+  tile('sand','ⓘ','Informações Importantes','Atualizações eStore','info')+tile('sage','♧','Chat / Suporte','Fale com o suporte','support')+
+  '</div><div class="signature">Fran Lima</div></div>';
+ }
+ function injectHome(){var v=document.getElementById('view');if(!v)return;var h=v.querySelector('.homeApprovedV22');if(!h){v.insertAdjacentHTML('afterbegin',home22())}}
+ function item(i,t,to,sel){return '<button class="'+(sel?'sel':'')+'" data-go22="'+to+'"><span class="ico">'+i+'</span><span>'+t+'</span><span>›</span></button>'}
+ function buildMenu(){
+  var d=document.getElementById('drawer');if(!d)return;var u=(window.U&&U.u)||{},name=u.name||'Fran Lima',initials=name.split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase(),admin=typeof window.isAdmin==='function'&&window.isAdmin();
+  d.classList.add('v22drawer');d.innerHTML='<div class="v22menu"><div class="brand">RIACHUELO</div><div class="appname">App. eStore CE+PI</div><div class="person"><div class="avatar22">'+E(initials)+'</div><div><b>'+E(name)+'</b><small>'+E(u.store_code||'108')+' • '+E(u.store_name||'Fortaleza Iguatemi')+'</small></div></div><div class="section">Principal</div>'+
+  item('⌂','Início','home',1)+item('▥','Meu Resultado','result')+item('◎','Metas','metas')+'<div class="section">Gestão</div>'+
+  item('▤','Minha Filial','store')+item('♙','Meu Time','team')+item('♕','Ranking','ranking')+item('▣','Pool / Comissão','commission')+item('◷','Hora a Hora','hourly')+
+  '<div class="section">Informações</div>'+item('◇','Cupons e Campanhas','campaigns')+item('ⓘ','Informações Importantes','info')+item('♧','Chat / Suporte','support')+(admin?item('☷','Administrativo','admin'):'')+
+  '<div class="foot">Moda que inspira o Brasil.<br>Fran Lima</div></div>';
+ }
+ document.addEventListener('click',function(e){var b=e.target.closest('[data-go22]');if(!b)return;var x=b.getAttribute('data-go22');var d=document.getElementById('drawer');if(d)d.classList.remove('open');go22(x)});
+ var origRender=window.render;if(typeof origRender==='function')window.render=function(){var r=origRender.apply(this,arguments);setTimeout(function(){if(document.getElementById('shell')&&!document.getElementById('shell').classList.contains('hide'))injectHome()},0);return r};
+ var origGo=window.go;if(typeof origGo==='function')window.go=function(x){if(x==='home'){var v=document.getElementById('view');if(v){v.innerHTML=home22();window.scrollTo(0,0);return}}return origGo.apply(this,arguments)};
+ var origMenu=window.menu;window.menu=function(){buildMenu();var d=document.getElementById('drawer');if(d)d.classList.add('open');else if(origMenu)origMenu()};
+ setInterval(function(){var sh=document.getElementById('shell');if(sh&&!sh.classList.contains('hide')){var v=document.getElementById('view');if(v&&!v.querySelector('.homeApprovedV22')&&(/Vamos juntos|Destaques eStore CE\+PI/.test(v.textContent||'')))injectHome()}},700);
+})();
 </script></body></html>');w.document.close();setTimeout(()=>w.print(),350)} /* REGIONAL COLLAB V21 */
 let REG_TEAM_CACHE={},REG_TEAM_SELECTED=[],TEAM_REG_LOADING=false;
 function regStores(){return Object.keys(COMMON?.stores||{}).sort()}
