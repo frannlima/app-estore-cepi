@@ -99,3 +99,36 @@ body{background:var(--bg)}
 /* V19 — Meu Time Regional compacto */
 .teamToolbarV19{display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:12px;align-items:end;margin-bottom:14px}.teamToolbarV19 small{display:block;font-size:11px;color:#65746f;margin-bottom:5px}.teamToolbarV19 .btn{white-space:nowrap}.regionalCompactV19{margin-top:18px}.regionalCompactV19 .table{max-height:430px;overflow:auto;border:1px solid #ece9e2;border-radius:16px}.regionalCompactV19 table{margin:0}.regionalCompactV19 th{position:sticky;top:0;background:#f5f3ee;z-index:1}.miniBtnV19{border:0;border-radius:999px;background:#173F35;color:#fff;padding:7px 10px;font-size:10px;font-weight:800;white-space:nowrap}
 @media(max-width:700px){.teamToolbarV19{grid-template-columns:1fr}.teamToolbarV19 .btn{width:100%}.regionalCompactV19 .table{max-height:360px}.regionalCompactV19 table{min-width:650px}}
+
+/* V20 — interface premium aprovada 22/09 */
+body{background:#f7f5f0;color:#102f2a}
+.top{background:#fff!important;color:#102f2a!important;box-shadow:0 1px 0 #e6e2d9!important;padding:12px 16px!important}
+.top .logo{filter:none!important;width:150px!important;height:36px!important;margin:auto!important}
+.top .iconbtn{background:transparent!important;color:#102f2a!important;font-size:23px!important;padding:7px!important}
+.notifyBellV14{color:#102f2a!important}
+.wrap{max-width:720px!important;padding:18px 16px 102px!important}
+.homePremiumV20{padding:2px 0 8px}
+.homePremiumV20 h1{font-size:27px;line-height:1.05;margin:7px 0 5px;color:#102f2a}
+.homePremiumV20 .helloV20{font-size:18px;font-weight:900;margin-top:4px}
+.homePremiumV20 .storeV20{font-size:13px;color:#68746f;margin-top:3px}
+.weekFeatureV20{width:100%;border:0;border-radius:16px;background:#0f5a49;color:#fff;min-height:66px;padding:13px 17px;display:grid;grid-template-columns:42px 1fr 24px;align-items:center;text-align:left;margin:15px 0 13px;box-shadow:0 8px 18px #173f3518}
+.weekFeatureV20 .icoV20{font-size:27px}.weekFeatureV20 b{font-size:16px}.weekFeatureV20 .arrV20{font-size:25px;text-align:right}
+.quickTitleV20{font-size:17px;font-weight:900;margin:4px 0 8px}
+.menuGridV20{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.menuGridV20 button{border:0;border-radius:15px;min-height:78px;padding:11px 12px;display:grid;grid-template-columns:37px 1fr 17px;align-items:center;text-align:left;color:#fff;box-shadow:0 5px 13px #173f3512}
+.menuGridV20 .miV20{font-size:25px}.menuGridV20 b{display:block;font-size:14px;line-height:1.05}.menuGridV20 small{display:block;font-size:10px;line-height:1.2;margin-top:4px;opacity:.9;font-weight:500}.menuGridV20 .maV20{font-size:21px;text-align:right}
+.menuGridV20 .green{background:#0f5a49}.menuGridV20 .sage{background:#466964}.menuGridV20 .orange{background:#DE7C00;color:#172e29}.menuGridV20 .wine{background:#76232F}.menuGridV20 .sand{background:#D6D2C4;color:#173F35}
+.homeSignV20{text-align:center;font-size:11px;color:#6e7773;margin:16px 0 0}
+.bottom{border-top:1px solid #e5e1d8!important;box-shadow:0 -4px 14px #173f3508!important}
+.bottom button{padding:10px 2px 9px!important}.bottom button span,.bottom button b{font-size:20px!important;display:block!important;margin-bottom:3px}.bottom button:first-child{background:#edf5f1!important;color:#173F35!important;border-radius:14px 14px 0 0}
+.drawer{padding:0!important;width:min(355px,90vw)!important}.drawer .sheet{padding:18px 14px 24px!important}
+.menuBrandV20{font-size:28px;letter-spacing:2px;font-weight:900;padding:4px 8px 3px}.menuAppV20{font-size:18px;font-weight:900;padding:0 8px 14px}
+.menuHeadV20{display:flex;gap:11px;align-items:center;padding:8px 8px 15px}.menuHeadV20 b,.menuHeadV20 small{display:block}.menuHeadV20 small{color:#6c7672;margin-top:3px}
+.menuSectionV20{font-size:11px;font-weight:900;color:#7a817e;padding:11px 10px 5px;text-transform:uppercase}
+.drawer .sheet>button{border:0!important;border-radius:10px!important;padding:10px 11px!important;margin:1px 0!important;display:grid!important;grid-template-columns:31px 1fr 16px!important;align-items:center!important;color:#173F35!important;background:#fff!important;font-weight:500!important}
+.drawer .sheet>button.activeV20{background:#e9f3ee!important;border-left:4px solid #0f6b56!important;font-weight:900!important}
+.drawer .sheet>button .navIcoV20{font-size:20px}.drawer .sheet>button .navArrV20{text-align:right;color:#66736f}
+.drawer .sheet>button.logoutBtn{color:#76232F!important;margin-top:10px!important;border-top:1px solid #eee!important}
+.menuFootV20{text-align:center;color:#777;font-size:11px;border-top:1px solid #e5e1d8;margin-top:9px;padding-top:13px;line-height:1.8}
+.login{background:linear-gradient(180deg,#173F35 0 9%,#f7f5f0 9% 100%)!important}.loginbox{border-radius:22px!important;box-shadow:0 12px 35px #173f3514!important;padding:30px 24px!important}.loginbox h1{font-size:27px!important;color:#102f2a}.loginbox .field{height:58px;border-radius:13px!important}.loginbox .btn{height:58px;border-radius:13px!important;font-size:17px}.loginlogo{max-height:150px;object-fit:contain}
+@media(max-width:430px){.wrap{padding-left:13px!important;padding-right:13px!important}.homePremiumV20 h1{font-size:25px}.menuGridV20 button{min-height:75px;padding:10px}.menuGridV20 b{font-size:13px}}
