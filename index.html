@@ -15,7 +15,7 @@ const $=q=>document.querySelector(q), money=v=>v==null?'—':new Intl.NumberForm
 const labels={day:'Dia',week:'Semana',month:'Mês',year:'Ano'};
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function menu(){document.querySelector('.drawer').classList.toggle('open')}
-function tabs(){return '<div class=tabs>'+Object.entries(labels).map(([k,v])=>'<button class="'+(PER===k?'on':'')+'" onclick="PER=\''+k+'\';go(CUR)">'+v+'</button>').join('')+'</div>'}
+function tabs(){return '<div class=tabs>'+Object.entries(labels).filter(([k])=>k!=='year').map(([k,v])=>'<button class="'+(PER===k?'on':'')+'" onclick="PER=\''+k+'\';go(CUR)">'+v+'</button>').join('')+'</div>'}
 function rankingTabs(){return '<div class=tabs>'+Object.entries(labels).map(([k,v])=>k==='month'&&PER==='month'?monthSelector():'<button class="'+(PER===k?'on':'')+'" onclick="PER=\''+k+'\';go(\'ranking\');if(PER===\'year\')loadHistoricalRanking()">'+v+'</button>').join('')+'</div>'}
 function initials(n){return String(n||'?').trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()}
 function preferredName(id,name){return CONTENT.preferredNames?.[String(id)]||name} function photo(id,name,cls='avatar'){name=preferredName(id,name);let p=CONTENT.profilePhotos?.[String(id)];return p?'<img class="'+cls+'" src="'+esc(p)+'" alt="">':'<div class="'+cls+'">'+initials(name)+'</div>'}
