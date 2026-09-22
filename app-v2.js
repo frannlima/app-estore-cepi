@@ -921,3 +921,25 @@ async function saveMetaV18(id){
 }
 const _metasBaseV18=metasV4;
 metasV4=function(){const h=_metasBaseV18();return supV3()?h+metaManagerV18():h}
+
+
+/* ===== HOTFIX 2026-09-21: login não depende da API auxiliar ===== */
+login=async function(){
+  const btn=document.querySelector('#login .btn');
+  const err=document.getElementById('err');
+  if(btn){btn.disabled=true;btn.textContent='Entrando...'}
+  if(err)err.textContent='';
+  try{
+    await _loginV15();
+    if(U){
+      Promise.resolve().then(()=>loadEDayV15()).catch(()=>{});
+      Promise.resolve().then(()=>loadNotificationsV14()).catch(()=>{});
+      if(supV3())Promise.resolve().then(()=>loadPoolRankV16()).catch(()=>{});
+    }
+  }catch(e){
+    if(err)err.textContent='Não foi possível abrir o App. Tente novamente.';
+    console.error('Login hotfix:',e);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='Entrar'}
+  }
+};
