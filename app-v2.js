@@ -576,18 +576,101 @@ async function loadHourlyV5(){
 }
 function setHourlySortV5(v){HOURLY_SORT=v;renderHourlyV5()}
 function hourlySortValueV5(x){return HOURLY_SORT==='sales'?x.captured:HOURLY_SORT==='share'?x.share:x.att}
+
+function hourlySnapshotV6(j){
+ const stores=j?.stores||[], regional={
+  meta:stores.reduce((s,x)=>s+Number(x.metaValue||0),0),
+  captured:stores.reduce((s,x)=>s+Number(x.captured||0),0),
+  orders:stores.reduce((s,x)=>s+Number(x.orders||0),0),
+  orderTarget:stores.reduce((s,x)=>s+Number(x.orderTarget||0),0),
+  storeSales:stores.reduce((s,x)=>s+Number(x.storeSales||0),0)
+ };
+ regional.att=regional.meta?regional.captured/regional.meta:0;
+ regional.share=regional.storeSales?regional.captured/regional.storeSales:0;
+ regional.active=stores.filter(x=>Number(x.captured||0)>0).length;
+ regional.updated=stores.filter(x=>x.updated_at).length;
+ return regional;
+}
+function hourlyPreviousV6(j){
+ try{
+  const key='estore_hourly_history_'+String(j.result_date), now=hourlySnapshotV6(j);
+  const sig=(j.stores||[]).map(x=>String(x.st)+':'+Number(x.captured||0)+':'+Number(x.orders||0)+':'+String(x.updated_at||'')).join('|');
+  let h=JSON.parse(localStorage.getItem(key)||'[]');
+  const last=h[h.length-1];
+  if(!last||last.sig!==sig){h.push({sig,ts:Date.now(),regional:now,stores:(j.stores||[]).map(x=>({st:String(x.st),captured:Number(x.captured||0),orders:Number(x.orders||0),share:Number(x.share||0),att:Number(x.att||0)}))});h=h.slice(-24);localStorage.setItem(key,JSON.stringify(h))}
+  return h.length>1?h[h.length-2]:null;
+ }catch(e){return null}
+}
+function deltaMarkV6(cur,prev,kind='number'){
+ if(prev==null||!Number.isFinite(Number(prev)))return '<small class=hourDeltaV6>sem hora anterior</small>';
+ const d=Number(cur)-Number(prev), arrow=d>0?'▲':d<0?'▼':'—', cls=d>0?'up':d<0?'down':'flat';
+ let value='';
+ if(kind==='money')value=(d>=0?'+':'')+money(d);
+ else if(kind==='orders')value=(d>=0?'+':'')+num(d)+' pedidos';
+ else if(kind==='pp')value=(d>=0?'+':'')+(d*100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' p.p.';
+ else value=(d>=0?'+':'')+num(d);
+ return '<small class="hourDeltaV6 '+cls+'">'+arrow+' '+value+' vs. última atualização</small>';
+}
+function hourStatusV6(r){
+ if(!r.updated_at)return {cls:'notfed',dot:'●',label:'NÃO ALIMENTOU'};
+ if(Number(r.captured||0)<=0)return {cls:'zero',dot:'●',label:'ZERADA'};
+ if(Number(r.att||0)>=.8)return {cls:'course',dot:'●',label:'EM CURSO'};
+ return {cls:'attention',dot:'●',label:'ATENÇÃO'};
+}
 function renderHourlyV5(){
- const j=HOURLY_CACHE;if(!j)return;const stores=j.stores||[],regional={meta:stores.reduce((s,x)=>s+x.metaValue,0),captured:stores.reduce((s,x)=>s+x.captured,0),orders:stores.reduce((s,x)=>s+x.orders,0),orderTarget:stores.reduce((s,x)=>s+x.orderTarget,0),storeSales:stores.reduce((s,x)=>s+x.storeSales,0)},active=stores.filter(x=>x.updated_at).length;
- const sorted=[...stores].sort((a,b)=>hourlySortValueV5(b)-hourlySortValueV5(a));
- $('#hourlyDashboardV5').innerHTML=`<div class=card><div class=sectionHeadV3><div><div class=title>Consolidado CE+PI</div><small>${new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR')}</small></div><button class=hourShareBtnV5 onclick="shareHourlyV5()">Compartilhar tela</button></div><div class=metricGridV3><div class="metricCardV3 mGreenV3"><span>Meta Regional</span><b>${money(regional.meta)}</b></div><div class="metricCardV3 mRoseV3"><span>Realizado</span><b>${money(regional.captured)}</b></div><div class="metricCardV3 mOrangeV3"><span>Atingimento</span><b>${regional.meta?pct(regional.captured/regional.meta):'—'}</b></div><div class="metricCardV3 mSandV3"><span>Pedidos</span><b>${num(regional.orders)} / ${num(regional.orderTarget)}</b></div><div class="metricCardV3 mGreenV3"><span>Share Regional</span><b>${regional.storeSales?pct(regional.captured/regional.storeSales):'—'}</b></div><div class="metricCardV3 mSandV3"><span>Filiais atualizadas</span><b>${num(active)} / 19</b></div></div><div class=hourSortV5><button class="${HOURLY_SORT==='att'?'on':''}" onclick="setHourlySortV5('att')">Atingimento</button><button class="${HOURLY_SORT==='sales'?'on':''}" onclick="setHourlySortV5('sales')">Venda</button><button class="${HOURLY_SORT==='share'?'on':''}" onclick="setHourlySortV5('share')">Share</button></div><div class=table><table><tr><th>Ranking</th><th>Filial</th><th>Captado</th><th>Meta</th><th>Ating.</th><th>Pedidos</th><th>Share</th><th>Atualização</th></tr>${sorted.map((x,i)=>{const p=perfV3(x.att);return `<tr class="${p.cls}Row"><td>${i+1}º</td><td><b>${x.st}</b></td><td>${money(x.captured)}</td><td>${money(x.metaValue)}</td><td>${pct(x.att)}</td><td>${num(x.orders)}/${num(x.orderTarget)}</td><td>${x.storeSales?pct(x.share):'—'}</td><td>${x.updated_at?new Date(x.updated_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'—'}</td></tr>`}).join('')}</table></div></div>`;
+ const j=HOURLY_CACHE;if(!j)return;
+ const stores=j.stores||[],regional=hourlySnapshotV6(j),prev=hourlyPreviousV6(j),p=prev?.regional||null;
+ const sorted=[...stores].sort((a,b)=>Number(b.captured||0)-Number(a.captured||0));
+ const top=sorted.slice(0,3),notFed=stores.filter(x=>!x.updated_at).map(x=>x.st),zero=stores.filter(x=>Number(x.captured||0)<=0).map(x=>x.st);
+ $('#hourlyDashboardV5').innerHTML='<div class="card hourlyExecutiveV6"><div class=sectionHeadV3><div><div class=title>Consolidado CE+PI</div><small>'+new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR')+' • Moda que inspira o Brasil</small></div><button class=hourShareBtnV5 onclick="shareHourlyV5()">Compartilhar dashboard</button></div>'+
+ '<div class=hourKpisV6>'+
+ '<div class="hourKpiV6 primary"><span>Venda captada</span><b>'+money(regional.captured)+'</b>'+deltaMarkV6(regional.captured,p?.captured,'money')+'</div>'+
+ '<div class=hourKpiV6><span>Pedidos</span><b>'+num(regional.orders)+' / '+num(regional.orderTarget)+'</b>'+deltaMarkV6(regional.orders,p?.orders,'orders')+'</div>'+
+ '<div class=hourKpiV6><span>Meta Regional</span><b>'+money(regional.meta)+'</b>'+deltaMarkV6(regional.meta,p?.meta,'money')+'</div>'+
+ '<div class=hourKpiV6><span>Atingimento</span><b>'+(regional.meta?pct(regional.att):'—')+'</b>'+deltaMarkV6(regional.att,p?.att,'pp')+'</div>'+
+ '<div class=hourKpiV6><span>Share Regional</span><b>'+(regional.storeSales?pct(regional.share):'—')+'</b>'+deltaMarkV6(regional.share,p?.share,'pp')+'</div>'+
+ '<div class=hourKpiV6><span>Lojas com venda</span><b>'+num(regional.active)+' / 19</b>'+deltaMarkV6(regional.active,p?.active)+'</div></div>'+
+ '<div class=hourTopV6><div class=hourBlockTitleV6>Top do Momento</div><div class=hourTopGridV6>'+top.map((r,i)=>'<div><strong>'+(i+1)+'º</strong><b>Loja '+escV3(r.st)+'</b><span>'+money(r.captured)+'</span></div>').join('')+'</div></div>'+
+ '<div class=hourBlockTitleV6>Desempenho por Loja <small>Ordenado por venda captada • todas as 19 lojas</small></div><div class="table hourTableV6"><table><tr><th>Loja</th><th>Captado</th><th>Pedidos</th><th>Atingimento</th><th>Share</th><th>Desvio</th><th>Status</th></tr>'+
+ sorted.map(r=>{const s=hourStatusV6(r),dev=Number(r.captured||0)-Number(r.metaValue||0),share=Number(r.share||0);return '<tr class="hourRowV6 '+s.cls+'"><td><b>'+escV3(r.st)+'</b></td><td>'+money(r.captured)+'</td><td>'+num(r.orders)+'/'+num(r.orderTarget)+'</td><td>'+pct(r.att)+'</td><td class="'+(share===0?'shareZeroV6':'')+'">'+(r.storeSales?pct(share):'0,00%')+'</td><td class="'+(dev>=0?'devPosV6':'devNegV6')+'">'+money(dev)+'</td><td><span class="hourLightV6 '+s.cls+'">'+s.dot+' '+s.label+'</span></td></tr>'}).join('')+'</table></div>'+
+ (notFed.length?'<div class=hourAlertV6><b>⚠ Lojas que ainda não alimentaram o Hora a Hora</b><span>'+notFed.join(' • ')+'</span></div>':'')+
+ '<div class=hourFooterV6><span>Moda que inspira o Brasil</span><b>Fran Lima</b></div></div>';
+}
+function hourlyCaptionV6(j){
+ const stores=j.stores||[],r=hourlySnapshotV6(j),notFed=stores.filter(x=>!x.updated_at).map(x=>x.st),zero=stores.filter(x=>Number(x.captured||0)<=0).map(x=>x.st),hh=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+ return '📊 PARCIAL eStore | '+hh+'\n\n'+
+ '💰 Venda captada: '+money(r.captured)+'\n'+
+ '🎯 Meta Regional: '+money(r.meta)+'\n'+
+ '📈 Atingimento: '+(r.meta?pct(r.att):'—')+'\n'+
+ '🛍️ Pedidos: '+num(r.orders)+' / '+num(r.orderTarget)+'\n'+
+ '🏬 Lojas com venda: '+num(r.active)+' / 19\n\n'+
+ '⚠️ Ainda não alimentaram o Hora a Hora:\n'+(notFed.length?notFed.join(' • '):'Nenhuma')+'\n\n'+
+ '🔴 Lojas zeradas na parcial:\n'+(zero.length?zero.join(' • '):'Nenhuma')+'\n\n'+
+ '🚀 Vamos acelerar a próxima hora!';
 }
 async function shareHourlyV5(){
- if(!HOURLY_CACHE)return;const j=HOURLY_CACHE,stores=[...(j.stores||[])].sort((a,b)=>b.att-a.att),regional={meta:stores.reduce((s,x)=>s+x.metaValue,0),captured:stores.reduce((s,x)=>s+x.captured,0),orders:stores.reduce((s,x)=>s+x.orders,0),orderTarget:stores.reduce((s,x)=>s+x.orderTarget,0),sales:stores.reduce((s,x)=>s+x.storeSales,0)},c=document.createElement('canvas');c.width=1080;c.height=1900;const x=c.getContext('2d');
- x.fillStyle='#f8f7f4';x.fillRect(0,0,c.width,c.height);x.fillStyle='#173F35';x.fillRect(0,0,1080,250);x.fillStyle='white';x.font='bold 48px Arial';x.fillText('eStore CE+PI | Hora a Hora',60,82);x.font='30px Arial';x.fillText('Parcial '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+' • '+new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR'),60,135);x.fillText('Meta Regional: '+money(regional.meta)+'  |  Pedidos: '+num(regional.orders)+'/'+num(regional.orderTarget),60,190);
- x.fillStyle='#173F35';x.font='bold 32px Arial';x.fillText('Realizado '+money(regional.captured)+' • Ating. '+(regional.meta?pct(regional.captured/regional.meta):'—')+' • Share '+(regional.sales?pct(regional.captured/regional.sales):'—'),60,315);
- let y=375;x.font='bold 24px Arial';for(let i=0;i<stores.length;i++){const r=stores[i];x.fillStyle=i%2?'#ffffff':'#f0f2ee';x.fillRect(50,y-28,980,62);x.fillStyle='#173F35';x.fillText((i+1)+'º',70,y);x.fillText(r.st,145,y);x.fillText(money(r.captured),250,y);x.fillText(pct(r.att),500,y);x.fillText(num(r.orders)+'/'+num(r.orderTarget),665,y);x.fillText(r.storeSales?pct(r.share):'—',850,y);y+=70}x.fillStyle='#173F35';x.font='bold 22px Arial';x.fillText('Fran Lima',60,1840);
- const text='🎯 *eStore CE+PI | PARCIAL '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+' — '+new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR')+'*\\n\\n💰 *Meta Regional:* '+money(regional.meta)+'\\n💵 *Realizado:* '+money(regional.captured)+'\\n📈 *Atingimento:* '+(regional.meta?pct(regional.captured/regional.meta):'—')+'\\n🛍️ *Pedidos:* '+num(regional.orders)+' / '+num(regional.orderTarget)+'\\n🎫 *Ticket referência:* R$ 400\\n\\n'+stores.map(r=>'*'+r.st+'* | '+num(r.orders)+'/'+num(r.orderTarget)+' | '+pct(r.att)+(r.storeSales?' | '+pct(r.share):'')).join('\\n');
- shareCanvas(c,text);
+ if(!HOURLY_CACHE)return;
+ const j=HOURLY_CACHE,stores=[...(j.stores||[])].sort((a,b)=>Number(b.captured||0)-Number(a.captured||0)),r=hourlySnapshotV6(j),prev=hourlyPreviousV6(j)?.regional||null;
+ const c=document.createElement('canvas');c.width=1080;c.height=1920;const x=c.getContext('2d');
+ x.fillStyle='#F8F7F4';x.fillRect(0,0,1080,1920);x.fillStyle='#173F35';x.fillRect(0,0,1080,210);
+ const logo=document.querySelector('header img');if(logo&&logo.complete){try{x.drawImage(logo,60,42,230,92)}catch(e){}}
+ x.fillStyle='#fff';x.textAlign='right';x.font='700 38px Arial';x.fillText('HORA A HORA | '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),1020,78);x.font='24px Arial';x.fillText('Moda que inspira o Brasil',1020,124);x.fillText(new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR'),1020,162);x.textAlign='left';
+ const k=[['VENDA CAPTADA',money(r.captured),deltaMarkText(r.captured,prev?.captured,'money')],['PEDIDOS',num(r.orders)+' / '+num(r.orderTarget),deltaMarkText(r.orders,prev?.orders,'orders')],['META REGIONAL',money(r.meta),''],['ATINGIMENTO',r.meta?pct(r.att):'—',deltaMarkText(r.att,prev?.att,'pp')],['SHARE REGIONAL',r.storeSales?pct(r.share):'—',deltaMarkText(r.share,prev?.share,'pp')],['LOJAS COM VENDA',num(r.active)+' / 19',deltaMarkText(r.active,prev?.active,'number')]];
+ let ky=245;k.forEach((a,i)=>{const col=i%3,row=Math.floor(i/3),xx=55+col*335,yy=ky+row*150;x.fillStyle='#fff';x.fillRect(xx,yy,305,126);x.fillStyle='#466964';x.font='700 18px Arial';x.fillText(a[0],xx+18,yy+30);x.fillStyle='#173F35';x.font='700 30px Arial';x.fillText(a[1],xx+18,yy+70);x.font='16px Arial';x.fillStyle=a[2].startsWith('▲')?'#287A55':a[2].startsWith('▼')?'#B23A3A':'#6B6B68';x.fillText(a[2],xx+18,yy+101)});
+ const top=stores.slice(0,3);x.fillStyle='#173F35';x.font='700 25px Arial';x.fillText('TOP DO MOMENTO',55,575);top.forEach((a,i)=>{x.fillStyle=['#D6D2C4','#E68699','#DE7C00'][i];x.fillRect(55+i*335,600,305,72);x.fillStyle='#173F35';x.font='700 20px Arial';x.fillText((i+1)+'º  Loja '+a.st,72+i*335,628);x.font='700 19px Arial';x.fillText(money(a.captured),72+i*335,655)});
+ x.fillStyle='#173F35';x.font='700 24px Arial';x.fillText('DESEMPENHO POR LOJA',55,725);x.font='15px Arial';x.fillText('Loja     Captado       Ped.     Ating.    Share      Desvio        Status',55,760);
+ let y=795;x.font='17px Arial';stores.forEach((a,i)=>{const s=hourStatusV6(a),dev=Number(a.captured||0)-Number(a.metaValue||0);x.fillStyle=s.cls==='notfed'?'#FFF1E3':s.cls==='zero'?'#FDECEC':i%2?'#FFFFFF':'#F0F2EE';x.fillRect(45,y-25,990,50);x.fillStyle='#173F35';x.fillText(a.st,58,y);x.fillText(money(a.captured),118,y);x.fillText(num(a.orders)+'/'+num(a.orderTarget),300,y);x.fillText(pct(a.att),390,y);x.fillStyle=Number(a.share||0)===0?'#B42318':'#173F35';x.fillText(a.storeSales?pct(a.share):'0,00%',505,y);x.fillStyle=dev>=0?'#287A55':'#B42318';x.fillText(money(dev),620,y);x.fillStyle=s.cls==='course'?'#287A55':s.cls==='attention'?'#DE7C00':'#D92D20';x.font='700 15px Arial';x.fillText('● '+s.label,785,y);x.font='17px Arial';y+=54});
+ const nf=stores.filter(a=>!a.updated_at).map(a=>a.st);x.fillStyle='#FFF1E3';x.fillRect(45,1830,990,55);x.fillStyle='#76232F';x.font='700 18px Arial';x.fillText('⚠ Ainda não alimentaram: '+(nf.length?nf.join(' • '):'Nenhuma'),62,1864);x.fillStyle='#173F35';x.font='16px Arial';x.fillText('Moda que inspira o Brasil',55,1910);x.textAlign='right';x.fillText('Fran Lima',1025,1910);
+ const caption=hourlyCaptionV6(j);
+ c.toBlob(async blob=>{if(!blob)return;const file=new File([blob],'parcial-estore-hora-a-hora.png',{type:'image/png'});try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text:caption,title:'Parcial eStore'});return}}catch(e){if(e?.name==='AbortError')return}try{await navigator.clipboard.writeText(caption)}catch(e){};shareCanvas(c,caption)},'image/png');
+}
+function deltaMarkText(cur,prev,kind){
+ if(prev==null||!Number.isFinite(Number(prev)))return '— sem hora anterior';
+ const d=Number(cur)-Number(prev),a=d>0?'▲':d<0?'▼':'—';
+ if(kind==='money')return a+' '+(d>=0?'+':'')+money(d);
+ if(kind==='orders')return a+' '+(d>=0?'+':'')+num(d)+' pedidos';
+ if(kind==='pp')return a+' '+(d>=0?'+':'')+(d*100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' p.p.';
+ return a+' '+(d>=0?'+':'')+num(d);
 }
 
 function refreshNavV5(){
