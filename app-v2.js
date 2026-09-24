@@ -1155,3 +1155,49 @@ home=function(){
 
 /* V25: compatibilidade pós-importação administrativa */
 if(typeof window.render!=='function')window.render=function(){try{if(typeof go==='function')go(CUR||'adminv3')}catch(e){location.reload()}};
+
+
+/* V26 — Meu Time executivo + dashboard/card compartilhável */
+let TEAM_FILTER_V26='all',TEAM_DASH_V26=false;
+function setTeamFilterV26(v){TEAM_FILTER_V26=v;go('teamv3')}
+function toggleTeamDashV26(){TEAM_DASH_V26=!TEAM_DASH_V26;go('teamv3')}
+function teamStatsV26(){
+ const people=teamRowsV19(),yes=people.filter(x=>Number(x.c||0)>0),zero=people.filter(x=>Number(x.c||0)<=0),captured=people.reduce((s,x)=>s+Number(x.c||0),0),orders=people.reduce((s,x)=>s+Number(x.o||0),0);
+ return {people,yes,zero,captured,orders,disp:people.length?zero.length/people.length:0};
+}
+function teamDashboardV26(){
+ const all=regionalPeopleV19(),stores=teamStoresV19().map(st=>teamStoreSummaryV19(st,all)).sort((a,b)=>b.c-a.c),zero=[...stores].sort((a,b)=>b.zero-a.zero).slice(0,5),top=stores.slice(0,5);
+ return '<div class="teamDashV26">'+
+ '<div class="teamDashHeadV26"><div><small>MEU TIME • REGIONAL CE+PI</small><b>'+escV3(pLabel[PER])+'</b></div><span>Moda que inspira o Brasil</span></div>'+
+ '<div class="teamSplitV26"><section><h3>Top filiais • Venda captada</h3>'+top.map((x,i)=>'<div class="teamLineV26"><b>'+(i+1)+'º '+escV3(x.st)+'</b><span>'+money(x.c)+'</span></div>').join('')+'</section>'+
+ '<section class="alert"><h3>Filiais com mais zerados</h3>'+zero.map(x=>'<div class="teamLineV26"><b>'+escV3(x.st)+'</b><span>'+num(x.zero)+'</span></div>').join('')+'</section></div>'+
+ '<div class="teamTableV26"><h3>Resumo por filial</h3><div class=table><table><tr><th>Loja</th><th>Colab.</th><th>Com venda</th><th>Zerados</th><th>Venda captada</th></tr>'+stores.map(x=>'<tr><td><b>'+escV3(x.st)+'</b></td><td>'+num(x.active+x.zero)+'</td><td>'+num(x.active)+'</td><td class="'+(x.zero?'zero':'')+'">'+num(x.zero)+'</td><td>'+money(x.c)+'</td></tr>').join('')+'</table></div></div></div>';
+}
+function teamV26(){
+ if(!supV3())return '<div class=card><div class=title>Meu Time</div><p>Conteúdo disponível para liderança.</p></div>';
+ if(!admV3()&&TEAM_STORE_V19==='regional')TEAM_STORE_V19=String(U.u.st);
+ const stores=teamStoresV19(),s=teamStatsV26(),selected=TEAM_STORE_V19!=='regional';
+ let rows=[...s.people].sort((a,b)=>Number(b.c||0)-Number(a.c||0));
+ if(TEAM_FILTER_V26==='sold')rows=rows.filter(x=>Number(x.c||0)>0);if(TEAM_FILTER_V26==='zero')rows=rows.filter(x=>Number(x.c||0)<=0);
+ return '<div class=pageTitleV3><span>Meu Time</span></div><div class="card teamExecV26">'+
+ '<div class=teamToolbarV19><div><small>Visão</small><select class=field onchange="setTeamStoreV19(this.value)">'+(admV3()?'<option value="regional" '+(TEAM_STORE_V19==='regional'?'selected':'')+'>Regional CE+PI</option>':'')+stores.map(st=>'<option value="'+escV3(st)+'" '+(TEAM_STORE_V19===st?'selected':'')+'>Filial '+escV3(st)+'</option>').join('')+'</select></div><button class=btn onclick="exportTeamExcelV19()">Exportar Excel</button></div>'+tabs()+
+ '<div class=teamKpisV26><div><span>Colaboradores</span><b>'+num(s.people.length)+'</b></div><div><span>Com venda</span><b>'+num(s.yes.length)+'</b></div><div class=rose><span>Zerados</span><b>'+num(s.zero.length)+'</b></div><div><span>Dispersão</span><b>'+pct(s.disp)+'</b></div><div class=wide><span>Venda captada</span><b>'+money(s.captured)+'</b></div><div><span>Pedidos</span><b>'+num(s.orders)+'</b></div></div>'+
+ '<div class=teamFilterV26><button class="'+(TEAM_FILTER_V26==='all'?'on':'')+'" onclick="setTeamFilterV26(\'all\')">Todos</button><button class="'+(TEAM_FILTER_V26==='sold'?'on':'')+'" onclick="setTeamFilterV26(\'sold\')">Com venda</button><button class="'+(TEAM_FILTER_V26==='zero'?'on':'')+'" onclick="setTeamFilterV26(\'zero\')">Zerados</button></div>'+
+ (selected?'<div class=teamPeopleV26>'+rows.map(x=>'<div class="'+(Number(x.c||0)>0?'sold':'zero')+'">'+avatarForV5(x.id,x.name,'xs')+'<span><b>'+escV3(x.name)+'</b><small>'+escV3(String(x.id))+' • '+num(x.o||0)+' pedidos</small></span><strong>'+money(x.c||0)+'</strong><em>'+(Number(x.c||0)>0?'Com venda':'Zerado')+'</em></div>').join('')+'</div>':teamDashboardV26())+
+ '<div class=teamActionsV26><button onclick="toggleTeamDashV26()">▣ '+(TEAM_DASH_V26?'Ocultar dashboard':'Visualizar dashboard')+'</button><button onclick="shareTeamCardV26()">Compartilhar</button></div>'+
+ (TEAM_DASH_V26&&selected?teamDashboardV26():'')+'</div>';
+}
+teamV3=teamV26;
+async function shareTeamCardV26(){
+ const all=regionalPeopleV19(),stores=(TEAM_STORE_V19==='regional'?teamStoresV19():[TEAM_STORE_V19]).map(st=>teamStoreSummaryV19(st,all)).sort((a,b)=>b.c-a.c),s=teamStatsV26();
+ const c=document.createElement('canvas');c.width=1080;c.height=1500;const x=c.getContext('2d'),green='#173F35',sage='#466964',sand='#D6D2C4',gray='#DAD9D6',rose='#F5DDE2',red='#76232F',orange='#DE7C00';
+ x.fillStyle='#F8F7F4';x.fillRect(0,0,c.width,c.height);x.fillStyle=green;x.fillRect(0,0,1080,190);
+ const logo=document.querySelector('header img');if(logo&&logo.complete){try{x.drawImage(logo,55,38,250,95)}catch(e){}}
+ x.fillStyle='#fff';x.textAlign='right';x.font='700 34px Arial, sans-serif';x.fillText('MEU TIME | '+(TEAM_STORE_V19==='regional'?'REGIONAL CE+PI':'FILIAL '+TEAM_STORE_V19),1020,70);x.font='24px Arial, sans-serif';x.fillText(pLabel[PER]+' • Moda que inspira o Brasil',1020,115);x.textAlign='left';
+ const k=[['COLABORADORES',s.people.length],['COM VENDA',s.yes.length],['ZERADOS',s.zero.length],['DISPERSÃO',pct(s.disp)],['VENDA CAPTADA',money(s.captured)],['PEDIDOS',s.orders]];k.forEach((a,i)=>{const col=i%3,row=Math.floor(i/3),xx=55+col*330,yy=225+row*125;x.fillStyle=i===2?rose:(i===4?sand:'#fff');x.beginPath();x.roundRect(xx,yy,300,100,18);x.fill();x.fillStyle=sage;x.font='700 16px Arial, sans-serif';x.fillText(a[0],xx+18,yy+30);x.fillStyle=green;x.font='700 29px Arial, sans-serif';x.fillText(String(a[1]),xx+18,yy+70)});
+ let y=500;x.fillStyle=green;x.font='700 25px Arial, sans-serif';x.fillText('Resumo por filial',55,y);y+=45;x.font='700 17px Arial, sans-serif';['LOJA','COLAB.','COM VENDA','ZERADOS','VENDA CAPTADA'].forEach((v,i)=>x.fillText(v,[55,170,310,500,680][i],y));y+=18;
+ for(const r of stores.slice(0,19)){x.fillStyle=r.zero/(r.active+r.zero||1)>.7?'#FFF0F0':'#fff';x.beginPath();x.roundRect(45,y,990,48,8);x.fill();x.fillStyle=green;x.font='700 18px Arial, sans-serif';x.fillText(r.st,60,y+31);x.font='18px Arial, sans-serif';x.fillText(String(r.active+r.zero),185,y+31);x.fillText(String(r.active),330,y+31);x.fillStyle=r.zero?red:green;x.fillText(String(r.zero),520,y+31);x.fillStyle=green;x.fillText(money(r.c),690,y+31);y+=53;if(y>1390)break}
+ x.fillStyle=green;x.font='18px Arial, sans-serif';x.fillText('Moda que inspira o Brasil',55,1460);x.textAlign='right';x.fillText('App. eStore CE+PI',1020,1460);
+ const text='📊 *MEU TIME eStore | '+(TEAM_STORE_V19==='regional'?'REGIONAL CE+PI':'FILIAL '+TEAM_STORE_V19)+'*\\n'+pLabel[PER]+'\\n👥 Colaboradores: '+s.people.length+'\\n✅ Com venda: '+s.yes.length+'\\n🔴 Zerados: '+s.zero.length+'\\n📉 Dispersão: '+pct(s.disp)+'\\n💰 Venda captada: '+money(s.captured)+'\\n🛍️ Pedidos: '+s.orders;
+ shareCanvas(c,text);
+}
