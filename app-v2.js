@@ -1152,3 +1152,6 @@ home=function(){
    homeTileV20('sage','♧','Chat / Suporte','Fale com o suporte','support')+
   '</div><div class="homeSignV20">Fran Lima</div></div>';
 };
+
+/* V25: compatibilidade pós-importação administrativa */
+if(typeof window.render!=='function')window.render=function(){try{if(typeof go==='function')go(CUR||'adminv3')}catch(e){location.reload()}};
