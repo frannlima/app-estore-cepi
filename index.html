@@ -7,7 +7,7 @@ html,body{height:auto!important;min-height:100%;overflow-x:hidden!important;over
 .hourDash{overflow:hidden}.hourDashHead{display:flex;justify-content:space-between;gap:12px;align-items:center;padding-bottom:14px;border-bottom:1px solid #e5e4df}.hourStamp{font-size:12px;font-weight:800;color:#466964;text-align:right}.hourKpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}.hourKpi{background:#f3f4f1;border-radius:18px;padding:14px;min-width:0}.hourKpi span,.hourKpi small{display:block;color:#466964}.hourKpi b{display:block;font-size:22px;margin:5px 0;color:#173f35}.hourKpi em{font-style:normal;font-weight:900;font-size:13px}.hourKpi .up{color:#18855b}.hourKpi .down{color:#c93535}.hourProgress{margin-top:14px;padding:14px;border-radius:18px;background:#f8f7f3}.hourProgress>div:first-child{display:flex;justify-content:space-between}.hourProgress .bar{height:9px;background:#dad9d6;border-radius:9px;margin-top:9px;overflow:hidden}.hourProgress .bar i{display:block;height:100%;background:#173f35;border-radius:9px}.hourTable{margin-top:16px;overflow-x:auto}.hourTr{display:grid;grid-template-columns:52px 110px 110px 90px 90px 80px;gap:8px;align-items:center;padding:10px 8px;border-bottom:1px solid #ecebe7;font-size:12px;min-width:590px}.hourTh{background:#f0efe9;border-radius:12px;font-weight:900}.hourTr.good{border-left:4px solid #18855b}.hourTr.warn{border-left:4px solid #de7c00}.hourTr.bad{border-left:4px solid #c93535}
 </style><style id="premium-ui-24">
 body{background:#f8f7f3}.top{background:#fff;color:#173F35;box-shadow:0 1px 0 #ddd;height:64px}.top .logo{filter:none;width:145px;height:38px;margin-left:auto}.top .iconbtn{background:transparent;color:#173F35;font-size:20px}.wrap{max-width:620px;padding:18px 14px 92px}.premiumHome h1{font-size:25px;margin:2px 0 4px}.hello{font-size:17px}.storeLine{font-size:12px;color:#777;margin:3px 0 14px}.weekFeature{width:100%;border:0;border-radius:14px;background:#075b48;color:#fff;min-height:62px;padding:12px 15px;display:grid;grid-template-columns:34px 1fr 15px;align-items:center;text-align:left}.weekFeature span{font-size:25px}.weekFeature i,.premiumTile i{font-style:normal;font-size:21px}.quick{font-size:17px;font-weight:900;margin:11px 0 7px}.premiumGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.premiumTile{border:0;border-radius:14px;min-height:78px;padding:10px;color:#fff;display:grid;grid-template-columns:32px 1fr 13px;align-items:center;text-align:left}.premiumTile .tileIcon{font-size:23px}.premiumTile b{display:block;font-size:13px;line-height:1.05}.premiumTile small{display:block;font-size:9px;line-height:1.15;margin-top:4px}.premiumTile.green{background:#075b48}.premiumTile.orange{background:#DE7C00;color:#173F35}.premiumTile.wine{background:#76232F}.premiumTile.sage{background:#466964}.premiumTile.sand{background:#D6D2C4;color:#173F35}.homeSign{text-align:center;font-size:10px;color:#777;margin-top:14px}.drawer{width:min(360px,88vw);padding:20px 16px;background:#fff}.drawer .title{font-size:22px;margin-bottom:14px}.drawer button{border:0;border-bottom:1px solid #eee;background:#fff;color:#173F35;padding:12px 10px;text-align:left;font-size:15px}.drawer button:first-of-type{background:#e8f2ed;border-left:4px solid #08705a;border-radius:8px;font-weight:900}.bottom{background:#fff;border-top:1px solid #ddd}.bottom button{color:#173F35}.bottom button:first-child{background:#e8f2ed;border-radius:13px 13px 0 0}@media(max-width:390px){.premiumTile{min-height:72px;padding:8px}.premiumTile b{font-size:12px}.premiumHome h1{font-size:23px}}
-</style><meta name="app-build" content="TEAM-CARD-29"><style id="login-fashion-v26">
+</style><meta name="app-build" content="META-CARD-30"><style id="login-fashion-v26">
 #login.login{position:relative;min-height:100svh;padding:22px;overflow:hidden;background:#102d29}
 #login.login:before{content:"";position:absolute;inset:0;background:
 linear-gradient(90deg,rgba(9,31,29,.93) 0%,rgba(9,31,29,.78) 42%,rgba(9,31,29,.16) 70%,rgba(9,31,29,.08) 100%),
@@ -113,7 +113,7 @@ async function loadMetaAssignments(){try{let d=new Date().toLocaleDateString('en
 async function shareMetaCard(dayTarget,hc,orderTarget){
  if(!dayTarget)return alert('Meta da operação não localizada.');
  if(!hc)return alert('Informe e salve o HC disponível antes de compartilhar a meta.');
- let individual=dayTarget/hc,indOrders=Math.max(1,Math.ceil(orderTarget/hc)),d=new Date(),date=d.toLocaleDateString('pt-BR',{timeZone:'America/Fortaleza'}),st=String(U.u.st||''),W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;let x=cv.getContext('2d');
+ let individual=dayTarget/hc,indOrders=Math.max(1,Math.ceil(orderTarget/hc)),d=new Date(),date=d.toLocaleDateString('pt-BR',{timeZone:'America/Fortaleza'}),st=String(U.u.st||''),W=1080,H=1710,cv=document.createElement('canvas');cv.width=W;cv.height=H;let x=cv.getContext('2d');
  const G='#173F35',G2='#466964',BG='#F7F5EF',BEIGE='#D6D2C4',ORANGE='#DE7C00',WHITE='#FFFFFF',INK='#173F35';
  function rr(px,py,pw,ph,r,fill){x.fillStyle=fill;x.beginPath();x.roundRect(px,py,pw,ph,r);x.fill()}
  function tx(t,px,py,sz,w='400',col=INK,align='left'){x.fillStyle=col;x.font=w+' '+sz+'px Arial, sans-serif';x.textAlign=align;x.fillText(t,px,py);x.textAlign='left'}
@@ -124,10 +124,25 @@ async function shareMetaCard(dayTarget,hc,orderTarget){
  rr(55,620,465,230,24,ORANGE);tx('META DE PEDIDOS',90,680,23,'700',WHITE);tx(String(orderTarget),90,775,70,'700',WHITE);tx('pedidos no dia',90,815,22,'400',WHITE);
  rr(545,620,480,230,24,WHITE);tx('META POR COLABORADOR',580,680,22,'700',G2);tx(money(individual),580,755,43,'700',G);tx(indOrders+' pedidos por colaborador',580,810,22,'700',G);
  x.strokeStyle=BEIGE;x.lineWidth=2;x.beginPath();x.moveTo(55,905);x.lineTo(1025,905);x.stroke();
- tx('ESQUADRÃO DO CLIENTE',55,980,22,'700',ORANGE);tx('Nosso foco hoje é o cliente.',55,1040,42,'700',G);tx('Juntos, fazemos mais!',55,1095,42,'700',G);
- rr(55,1145,970,90,20,BEIGE);tx('VENDA MAIS',105,1200,19,'700',G);tx('•',320,1200,20,'700',ORANGE);tx('ENCANTE SEMPRE',365,1200,19,'700',G);tx('•',625,1200,20,'700',ORANGE);tx('FAÇA ACONTECER',670,1200,19,'700',G);
- tx('Fran Lima',1025,1300,18,'400',G2,'right');tx('Moda que inspira o Brasil',55,1300,18,'400',G2);
- let caption=['🎯 *META eStore | HOJE — '+date+'*','','💰 *Meta da loja:* '+money(dayTarget),'🛍️ *Meta de pedidos:* '+orderTarget,'👥 *HC disponível:* '+hc,'','👤 *Meta por colaborador:* '+money(individual),'🛒 *Pedidos por colaborador:* '+indOrders,'','🎯 *Esquadrão do Cliente*','Nosso foco hoje é o cliente. Juntos, fazemos mais!'].join('\n');
+ tx('ESQUADRÃO DO CLIENTE',55,950,22,'700',ORANGE);
+ let squad=new Image();squad.src='./esquadrao-cliente.webp?v=20260925-01';
+ try{
+   await squad.decode();
+   let boxX=250,boxY=975,boxW=580,boxH=527,ratio=Math.min(boxW/squad.naturalWidth,boxH/squad.naturalHeight),dw=squad.naturalWidth*ratio,dh=squad.naturalHeight*ratio,dx=boxX+(boxW-dw)/2,dy=boxY+(boxH-dh)/2;
+   x.save();x.beginPath();x.roundRect(boxX,boxY,boxW,boxH,24);x.clip();x.drawImage(squad,dx,dy,dw,dh);x.restore();
+ }catch(e){
+   rr(250,975,580,527,24,BEIGE);tx('Esquadrão do Cliente',540,1235,32,'700',G,'center');
+ }
+ rr(55,1525,970,105,20,BEIGE);
+ const vals=[
+   ['VONTADE DE','CRESCER'],
+   ['NINGUÉM FAZ','NADA SOZINHO'],
+   ['O SIMPLES É','INCRÍVEL'],
+   ['TALENTO É','CONQUISTA']
+ ];
+ vals.forEach((v,i)=>{let cx=55+121.25+i*242.5;tx(v[0],cx,1570,16,'700',G,'center');tx(v[1],cx,1596,16,'700',G,'center')});
+ tx('Moda que inspira o Brasil',55,1675,18,'400',G2);
+ let caption=['🎯 *META eStore | HOJE — '+date+'*','','💰 *Meta da loja:* '+money(dayTarget),'🛍️ *Meta de pedidos:* '+orderTarget,'👥 *HC disponível:* '+hc,'','👤 *Meta por colaborador:* '+money(individual),'🛒 *Pedidos por colaborador:* '+indOrders,'','🎯 *Esquadrão do Cliente*','','*Nossos valores:*','Vontade de crescer • Ninguém faz nada sozinho • O simples é incrível • Talento é conquista'].join('\n');
  cv.toBlob(async b=>{if(!b)return;let file=new File([b],'Meta_eStore_Loja_'+st+'_'+date.replaceAll('/','-')+'.png',{type:'image/png'});try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({title:'Meta eStore | Loja '+st,text:caption,files:[file]});return}}catch(e){if(e?.name==='AbortError')return}try{await navigator.clipboard.writeText(caption)}catch(e){}let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);alert('Card gerado. A legenda foi copiada para compartilhar no WhatsApp.')},'image/png',.96)
 }
 
