@@ -1,5 +1,5 @@
 /* V34 bootstrap: reutiliza o runtime principal já carregado pelo index */
-var ESTORE_API=(typeof API!=='undefined'?API:'https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-api');
+var ESTORE_API=window.API||'https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-api';
 
 
 /* App eStore CE+PI — interface v3 baseada no modelo aprovado */
