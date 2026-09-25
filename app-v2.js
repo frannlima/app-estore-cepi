@@ -1365,3 +1365,24 @@ function managementStoreV29(p,stCode){
 storeP=function(){const base=(typeof st==='function'?st()?.p?.[PER]:null)||{},m=managementStoreV29(PER,U?.u?.st);if(!m)return base;const ee=Number(base.ee??base.ef??0)||0;return {...base,...m,ee,ef:Number(base.ef??ee)||ee,att:ee?m.c/ee:0,gap:m.c-ee,share:m.storeSales?m.c/m.storeSales:Number(base.share||0)}};
 eDayDataV3=function(){const x=person(),details=[];for(const [d,rows] of latestDailyRowsV28(PER)){if(new Date(d+'T12:00:00').getDay()!==1)continue;const mine=rows.filter(r=>normMatV27(r?.id??r?.matricula)===normMatV27(U?.u?.id)),approved=mine.reduce((s,r)=>s+employeeNumsV29(r).a,0),commission=mine.reduce((s,r)=>s+employeeNumsV29(r).com,0);if(approved||commission)details.push({d,approved,commission})}const eCommission=details.reduce((s,r)=>s+r.commission,0);return {approved:Number(x.a||0),commission:Number(x.com||0),eApproved:details.reduce((s,r)=>s+r.approved,0),eCommission,regularCommission:Math.max(0,Number(x.com||0)-eCommission),details}};
 rankInfoV13=function(){const reg=(hasLivePeriodV28(PER)?employeeRowsV29(PER):(COMMON?.top?.[PER]||[])).slice().sort((a,b)=>Number(b.c||0)-Number(a.c||0)),me=normMatV27(U?.u?.id),ri=reg.findIndex(x=>normMatV27(x.id)===me),code=String(U?.u?.st||'').replace(/\D/g,'').replace(/^0+/,'');const fil=reg.filter(x=>storeCodeV28(x)===code),fi=fil.findIndex(x=>normMatV27(x.id)===me);return {regional:ri>=0?ri+1:null,filial:fi>=0?fi+1:null,topRegional:ri>=0&&ri<10,topFilial:fi>=0&&fi<3}};
+
+
+/* ===== V30 2026-09-25: comissão eDay + integridade de fontes ===== */
+const EDAY_START_V30='2026-08-01';
+let EDAY_END_V30=null; // campanha ativa; definir somente quando houver encerramento oficial
+function isEDayV30(d){if(!d||d<EDAY_START_V30||(EDAY_END_V30&&d>EDAY_END_V30))return false;return new Date(d+'T12:00:00').getDay()===1}
+function employeeRowsV30(p){
+ const map=new Map();
+ for(const [d,rows] of latestDailyRowsV28(p))for(const r of rows){
+  const id=normMatV27(r?.id??r?.matricula);if(!id)continue;const n=employeeNumsV29(r),z=map.get(id)||{id:r?.id??r?.matricula,name:r?.name??r?.nome??'',st:storeCodeV28(r),c:0,a:0,o:0,com:0,eday:0};
+  z.name=r?.name??r?.nome??z.name;z.st=storeCodeV28(r)||z.st;z.c+=n.c;z.a+=n.a;z.o+=n.o;
+  // relatório já contém 3%; no eDay substitui a comissão daquele movimento por 10% da aprovada
+  const finalCom=isEDayV30(d)?n.a*.10:n.com;z.com+=finalCom;if(isEDayV30(d))z.eday+=finalCom;map.set(id,z);
+ }
+ return [...map.values()];
+}
+liveRowsV28=employeeRowsV30;
+person=function(){if(!hasLivePeriodV28(PER))return U?.p?.[PER]||{};return employeeRowsV30(PER).find(x=>normMatV27(x.id)===normMatV27(U?.u?.id))||{c:0,a:0,o:0,com:0,eday:0}};
+eDayDataV3=function(){const x=person(),details=[];for(const [d,rows] of latestDailyRowsV28(PER)){if(!isEDayV30(d))continue;const mine=rows.filter(r=>normMatV27(r?.id??r?.matricula)===normMatV27(U?.u?.id)),approved=mine.reduce((s,r)=>s+employeeNumsV29(r).a,0);if(approved>0)details.push({d,approved,commission:+(approved*.10).toFixed(2)})}const eApproved=details.reduce((s,r)=>s+r.approved,0),eCommission=details.reduce((s,r)=>s+r.commission,0);return {approved:Number(x.a||0),commission:Number(x.com||0),eApproved,eCommission,regularCommission:Math.max(0,Number(x.com||0)-eCommission),details}};
+rankInfoV13=function(){const reg=(hasLivePeriodV28(PER)?employeeRowsV30(PER):(COMMON?.top?.[PER]||[])).filter(x=>Number(x.c||0)>0).sort((a,b)=>Number(b.c||0)-Number(a.c||0)),me=normMatV27(U?.u?.id),ri=reg.findIndex(x=>normMatV27(x.id)===me),code=String(U?.u?.st||'').replace(/\D/g,'').replace(/^0+/,'');const fil=reg.filter(x=>storeCodeV28(x)===code),fi=fil.findIndex(x=>normMatV27(x.id)===me);return {regional:ri>=0?ri+1:null,filial:fi>=0?fi+1:null,topRegional:ri>=0&&ri<10,topFilial:fi>=0&&fi<3}};
+function auditSourcesV30(){const issues=[];for(const p of ['day','week','month','year']){const em=employeeRowsV30(p);const dup=new Set(),seen=new Set();for(const r of em){const id=normMatV27(r.id);if(seen.has(id))dup.add(id);seen.add(id)}if(dup.size)issues.push(p+': matrículas duplicadas '+[...dup].join(','));for(const [d,rows] of managementRowsV29(p)){for(const r of rows){if(!storeCodeV28(r))issues.push(p+'/'+d+': Gestão/Lojas sem filial')}}}return issues}
