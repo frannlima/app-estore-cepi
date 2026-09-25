@@ -7,7 +7,7 @@ html,body{height:auto!important;min-height:100%;overflow-x:hidden!important;over
 .hourDash{overflow:hidden}.hourDashHead{display:flex;justify-content:space-between;gap:12px;align-items:center;padding-bottom:14px;border-bottom:1px solid #e5e4df}.hourStamp{font-size:12px;font-weight:800;color:#466964;text-align:right}.hourKpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}.hourKpi{background:#f3f4f1;border-radius:18px;padding:14px;min-width:0}.hourKpi span,.hourKpi small{display:block;color:#466964}.hourKpi b{display:block;font-size:22px;margin:5px 0;color:#173f35}.hourKpi em{font-style:normal;font-weight:900;font-size:13px}.hourKpi .up{color:#18855b}.hourKpi .down{color:#c93535}.hourProgress{margin-top:14px;padding:14px;border-radius:18px;background:#f8f7f3}.hourProgress>div:first-child{display:flex;justify-content:space-between}.hourProgress .bar{height:9px;background:#dad9d6;border-radius:9px;margin-top:9px;overflow:hidden}.hourProgress .bar i{display:block;height:100%;background:#173f35;border-radius:9px}.hourTable{margin-top:16px;overflow-x:auto}.hourTr{display:grid;grid-template-columns:52px 110px 110px 90px 90px 80px;gap:8px;align-items:center;padding:10px 8px;border-bottom:1px solid #ecebe7;font-size:12px;min-width:590px}.hourTh{background:#f0efe9;border-radius:12px;font-weight:900}.hourTr.good{border-left:4px solid #18855b}.hourTr.warn{border-left:4px solid #de7c00}.hourTr.bad{border-left:4px solid #c93535}
 </style><style id="premium-ui-24">
 body{background:#f8f7f3}.top{background:#fff;color:#173F35;box-shadow:0 1px 0 #ddd;height:64px}.top .logo{filter:none;width:145px;height:38px;margin-left:auto}.top .iconbtn{background:transparent;color:#173F35;font-size:20px}.wrap{max-width:620px;padding:18px 14px 92px}.premiumHome h1{font-size:25px;margin:2px 0 4px}.hello{font-size:17px}.storeLine{font-size:12px;color:#777;margin:3px 0 14px}.weekFeature{width:100%;border:0;border-radius:14px;background:#075b48;color:#fff;min-height:62px;padding:12px 15px;display:grid;grid-template-columns:34px 1fr 15px;align-items:center;text-align:left}.weekFeature span{font-size:25px}.weekFeature i,.premiumTile i{font-style:normal;font-size:21px}.quick{font-size:17px;font-weight:900;margin:11px 0 7px}.premiumGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.premiumTile{border:0;border-radius:14px;min-height:78px;padding:10px;color:#fff;display:grid;grid-template-columns:32px 1fr 13px;align-items:center;text-align:left}.premiumTile .tileIcon{font-size:23px}.premiumTile b{display:block;font-size:13px;line-height:1.05}.premiumTile small{display:block;font-size:9px;line-height:1.15;margin-top:4px}.premiumTile.green{background:#075b48}.premiumTile.orange{background:#DE7C00;color:#173F35}.premiumTile.wine{background:#76232F}.premiumTile.sage{background:#466964}.premiumTile.sand{background:#D6D2C4;color:#173F35}.homeSign{text-align:center;font-size:10px;color:#777;margin-top:14px}.drawer{width:min(360px,88vw);padding:20px 16px;background:#fff}.drawer .title{font-size:22px;margin-bottom:14px}.drawer button{border:0;border-bottom:1px solid #eee;background:#fff;color:#173F35;padding:12px 10px;text-align:left;font-size:15px}.drawer button:first-of-type{background:#e8f2ed;border-left:4px solid #08705a;border-radius:8px;font-weight:900}.bottom{background:#fff;border-top:1px solid #ddd}.bottom button{color:#173F35}.bottom button:first-child{background:#e8f2ed;border-radius:13px 13px 0 0}@media(max-width:390px){.premiumTile{min-height:72px;padding:8px}.premiumTile b{font-size:12px}.premiumHome h1{font-size:23px}}
-</style><meta name="app-build" content="LOGIN-FIX-27"><style id="login-fashion-v26">
+</style><meta name="app-build" content="TEAM-CARD-28"><style id="login-fashion-v26">
 #login.login{position:relative;min-height:100svh;padding:22px;overflow:hidden;background:#102d29}
 #login.login:before{content:"";position:absolute;inset:0;background:
 linear-gradient(90deg,rgba(9,31,29,.93) 0%,rgba(9,31,29,.78) 42%,rgba(9,31,29,.16) 70%,rgba(9,31,29,.08) 100%),
@@ -442,46 +442,83 @@ TEAM_LOGO_H_IMG.src=TEAM_LOGO_H_SRC;
 const teamCardCanvasBase=teamCardCanvas;
 teamCardCanvas=function(){
  let d=teamCardData();if(!d||!d.regional)return teamCardCanvasBase();
- let stores=d.j.stores||[],rowH=60,tableStart=820,legendY=tableStart+stores.length*rowH+62,W=1400,H=Math.max(1900,legendY+120);
+ let stores=d.j.stores||[],W=1080,rowH=54,tableHeadY=610,firstRowY=654,legendH=58;
+ let H=Math.max(1260,firstRowY+stores.length*rowH+legendH+54);
  let cv=document.createElement('canvas'),x=cv.getContext('2d');cv.width=W;cv.height=H;
- const g='#173F35',s='#466964',bg='#F7F5EF',wine='#76232F',orange='#DE7C00',pink='#FBEAEC',warn='#FFF3E1',good='#EDF3F0';
- const nf=v=>new Intl.NumberFormat('pt-BR').format(+v||0),pc=v=>new Intl.NumberFormat('pt-BR',{style:'percent',minimumFractionDigits:1,maximumFractionDigits:1}).format(+v||0),rr=(a,b,w,h,r,f)=>{x.fillStyle=f;x.beginPath();if(x.roundRect)x.roundRect(a,b,w,h,r);else x.rect(a,b,w,h);x.fill()};
+ const g='#173F35',s='#466964',bg='#F7F5EF',wine='#76232F',orange='#DE7C00',pink='#F9E7E8',warn='#FFF1D7',good='#E8F1E9',line='#D8D7D1';
+ const nf=v=>new Intl.NumberFormat('pt-BR').format(+v||0);
+ const pc=v=>new Intl.NumberFormat('pt-BR',{style:'percent',minimumFractionDigits:1,maximumFractionDigits:1}).format(+v||0);
+ const rr=(a,b,w,h,r,f)=>{x.fillStyle=f;x.beginPath();if(x.roundRect)x.roundRect(a,b,w,h,r);else{x.rect(a,b,w,h)}x.fill()};
  x.fillStyle=bg;x.fillRect(0,0,W,H);
 
- if(TEAM_LOGO_H_IMG.complete&&TEAM_LOGO_H_IMG.naturalWidth){
-   x.drawImage(TEAM_LOGO_H_IMG,65,62,500,80);
- }else return null;
+ if(!(TEAM_LOGO_H_IMG.complete&&TEAM_LOGO_H_IMG.naturalWidth))return null;
+ const logoRatio=TEAM_LOGO_H_IMG.naturalWidth/TEAM_LOGO_H_IMG.naturalHeight;
+ const logoW=390,logoH=Math.min(88,logoW/logoRatio);
+ x.drawImage(TEAM_LOGO_H_IMG,58,58,logoW,logoH);
 
- x.fillStyle='#D6D2C4';x.fillRect(620,50,2,120);
- x.textAlign='left';x.fillStyle=g;x.font='700 50px Arial';x.fillText('MEU TIME',680,88);
- x.font='700 26px Arial';x.fillText('REGIONAL CE+PI',680,132);
+ x.fillStyle=line;x.fillRect(500,48,2,118);
+ x.textAlign='left';x.fillStyle=g;x.font='700 43px Arial';x.fillText('MEU TIME',548,82);
+ x.font='700 24px Arial';x.fillText('REGIONAL CE+PI',548,120);
  let dt=d.j.endDate?new Date(d.j.endDate+'T12:00:00').toLocaleDateString('pt-BR'):'';
- x.font='22px Arial';x.fillStyle=s;x.fillText((({day:'Dia',week:'Semana',month:'Mês',year:'Ano'})[PER])+(dt?' • '+dt:''),680,168);
+ let pLabel=({day:'Dia',week:'Semana',month:'Mês',year:'Ano'})[PER]||'Período';
+ x.font='22px Arial';x.fillStyle=s;x.fillText(pLabel+(dt?' • '+dt:''),548,154);
 
- let rate=d.rows.length?d.sold.length/d.rows.length:0,pot=stores.reduce((v,q)=>v+(+q.zeros||0)*((+q.orders||0)?(+q.captured||0)/(+q.orders||1):0),0);
- let cards=[['COLABORADORES',nf(d.rows.length),g,'#fff'],['COM VENDA',nf(d.sold.length)+' • '+pc(rate),s,'#fff'],['ZERADOS',nf(d.zeros.length)+' • '+pc(1-rate),wine,pink],['VENDA CAPTADA',money(d.capt),g,'#fff'],['PEDIDOS',nf(d.orders),g,'#fff'],['POTENCIAL TOTAL',money(pot),orange,'#FFF8E8']];
- cards.forEach((a,i)=>{let col=i%3,row=Math.floor(i/3),xx=65+col*430,yy=225+row*130;rr(xx,yy,390,105,20,a[3]);x.textAlign='center';x.fillStyle=a[2];x.font='700 16px Arial';x.fillText(a[0],xx+195,yy+30);x.font='700 28px Arial';x.fillText(a[1],xx+195,yy+70)});
+ let total=d.rows.length,soldN=d.sold.length,zeroN=d.zeros.length,rate=total?soldN/total:0;
+ let pot=stores.reduce((v,q)=>v+(+q.zeros||0)*((+q.orders||0)?(+q.captured||0)/(+q.orders||1):0),0);
+ let cards=[
+   ['COLABORADORES',nf(total),g,'#FFFFFF'],
+   ['COM VENDA',nf(soldN)+' • '+pc(rate),g,'#FFFFFF'],
+   ['ZERADOS',nf(zeroN)+' • '+pc(1-rate),wine,pink],
+   ['VENDA CAPTADA',money(d.capt),g,'#FFFFFF'],
+   ['PEDIDOS',nf(d.orders),g,'#FFFFFF'],
+   ['POTENCIAL TOTAL',money(pot),orange,'#FFF8E9']
+ ];
+ const cardX=[58,386,714],cardY=[205,327],cardW=308,cardH=96;
+ cards.forEach((a,i)=>{
+   let col=i%3,row=Math.floor(i/3),xx=cardX[col],yy=cardY[row];
+   rr(xx,yy,cardW,cardH,18,a[3]);
+   x.textAlign='center';x.fillStyle=a[2];x.font='700 14px Arial';x.fillText(a[0],xx+cardW/2,yy+29);
+   x.font='700 25px Arial';x.fillText(a[1],xx+cardW/2,yy+67);
+ });
 
- x.textAlign='left';x.fillStyle=g;x.font='700 32px Arial';x.fillText('PAINEL POR FILIAL',65,600);
- x.fillStyle=s;x.font='20px Arial';x.fillText('Potencial = zerados × ticket médio da própria filial',65,636);
+ x.textAlign='left';x.fillStyle=g;x.font='700 30px Arial';x.fillText('PAINEL POR FILIAL',58,472);
+ x.fillStyle=s;x.font='19px Arial';x.fillText('Potencial = zerados × ticket médio da própria filial',58,505);
 
- let cs=[65,145,245,405,505,635,765,1040],hs=['LOJA','HC','COM VENDA','%','ZERADOS','%','TICKET MÉDIO','POTENCIAL'];
- x.font='700 16px Arial';x.fillStyle=g;hs.forEach((h,i)=>x.fillText(h,cs[i],685));
- let y=tableStart-100;
+ const cols=[
+   {x:64,label:'LOJA'},
+   {x:127,label:'HC'},
+   {x:190,label:'COM VENDA'},
+   {x:330,label:'%'},
+   {x:400,label:'ZERADOS'},
+   {x:508,label:'%'},
+   {x:595,label:'TICKET MÉDIO'},
+   {x:820,label:'POTENCIAL'}
+ ];
+ x.font='700 13px Arial';x.fillStyle=g;
+ cols.forEach(c=>x.fillText(c.label,c.x,tableHeadY));
+
+ let y=firstRowY;
  stores.forEach(q=>{
-   let hc=+q.total||0,sv=+q.sold||0,z=+q.zeros||0,pv=hc?sv/hc:0,pz=hc?z/hc:0,tm=(+q.orders||0)?(+q.captured||0)/(+q.orders||1):0,p=z*tm;
-   rr(50,y-28,1300,54,10,pz>=.7?pink:pz>=.5?warn:good);
-   let vals=[q.st,nf(hc),nf(sv),pc(pv),nf(z),pc(pz),money(tm),money(p)];
-   vals.forEach((v,i)=>{x.font=(i===0||i===4||i===5||i===7)?'700 18px Arial':'18px Arial';x.fillStyle=(i===4||i===5)?(pz>=.7?wine:pz>=.5?orange:g):g;x.fillText(String(v),cs[i],y+6)});
+   let hc=+q.total||0,sv=+q.sold||0,z=+q.zeros||0,pv=hc?sv/hc:0,pz=hc?z/hc:0;
+   let tm=(+q.orders||0)?(+q.captured||0)/(+q.orders||1):0,p=z*tm;
+   let band=pz>=.70?pink:pz>=.50?warn:good;
+   rr(54,y-34,972,46,9,band);
+   let vals=[String(q.st),nf(hc),nf(sv),pc(pv),nf(z),pc(pz),money(tm),money(p)];
+   vals.forEach((v,i)=>{
+     const emphasis=i===0||i===4||i===5||i===7;
+     x.font=(emphasis?'700 ':'400 ')+'16px Arial';
+     x.fillStyle=(i===4||i===5)?(pz>=.70?wine:pz>=.50?orange:g):g;
+     x.fillText(String(v),cols[i].x,y-5);
+   });
    y+=rowH;
  });
 
- const footY=y+20;
- rr(50,footY,1300,54,12,'#F0EEE7');
- x.font='17px Arial';x.textAlign='left';x.fillStyle=s;x.fillText('● Verde: menor dispersão',70,footY+34);
- x.fillStyle=orange;x.fillText('● Laranja: atenção',355,footY+34);
- x.fillStyle=wine;x.fillText('● Vinho: maior dispersão',620,footY+34);
- x.textAlign='right';x.fillStyle=g;x.font='18px Arial';x.fillText('Moda que inspira o Brasil',1330,footY+34);
+ const legendY=y+2;
+ rr(54,legendY,972,50,12,'#F0EFEA');
+ x.font='15px Arial';x.textAlign='left';
+ x.fillStyle=wine;x.fillText('●',72,legendY+31);x.fillStyle=s;x.fillText('Vermelho: maior dispersão',92,legendY+31);
+ x.fillStyle=orange;x.fillText('●',382,legendY+31);x.fillStyle=s;x.fillText('Laranja: atenção',402,legendY+31);
+ x.fillStyle='#78A67C';x.fillText('●',650,legendY+31);x.fillStyle=s;x.fillText('Verde: menor dispersão',670,legendY+31);
  return cv
 };
 </script><script>
