@@ -423,8 +423,8 @@ function emergencyLogin(ev){
   if(btn){btn.textContent='Entrando...';btn.disabled=true}
   if(err)err.textContent='Carregando...';
   try{
-    if(typeof window.login==='function'){
-      Promise.resolve(window.login()).catch(function(e){
+    if(typeof login==='function'){
+      Promise.resolve(login()).catch(function(e){
         console.error('login',e);
         if(err)err.textContent='Não foi possível carregar o acesso. Tente novamente.';
         if(btn){btn.textContent='Entrar';btn.disabled=false}
