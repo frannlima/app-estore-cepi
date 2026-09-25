@@ -1338,3 +1338,30 @@ rankInfoV13=rankInfoV28;
 function eDayDataV28(){const x=personV28(),details=[];for(const [d,rows] of latestDailyRowsV28(PER)){if(new Date(d+'T12:00:00').getDay()!==1)continue;const a=rows.filter(r=>normMatV27(r?.id??r?.matricula)===normMatV27(U?.u?.id)).reduce((s,r)=>s+rowNumsV28(r).a,0);if(a>0)details.push({d,approved:a,commission:+(a*.10).toFixed(2)})}const eCommission=details.reduce((s,r)=>s+r.commission,0);return {approved:Number(x.a||0),commission:Number(x.com||0),eApproved:details.reduce((s,r)=>s+r.approved,0),eCommission,regularCommission:Math.max(0,Number(x.com||0)-eCommission),details}}
 eDayDataV3=eDayDataV28;
 const _goV28=go;go=function(v){if(U?.u?.id&&['home','result','store','ranking','metas','metasv4'].includes(v)){loadContentV3().then(()=>{try{_goV28(v)}catch(e){console.error('V28 render',e)}}).catch(()=>{});}return _goV28(v)};
+
+
+/* ===== V29 2026-09-25: contrato definitivo de fontes dos relatórios =====
+ Colaborador: relatório por colaborador, chave matrícula, comissão vem pronta do relatório.
+ Filial: relatório Gestão/Lojas (management). Nunca somar colaboradores para formar filial. */
+function commissionV29(r){return Number(r?.com??r?.commission??r?.comissao??r?.comissão??r?.comissao_estimada??r?.commission_estimated??0)||0}
+function employeeNumsV29(r){const n=rowNumsV28(r);return {...n,com:commissionV29(r)}}
+function employeeRowsV29(p){
+ const map=new Map();
+ for(const [d,rows] of latestDailyRowsV28(p))for(const r of rows){const id=normMatV27(r?.id??r?.matricula);if(!id)continue;const n=employeeNumsV29(r),z=map.get(id)||{id:r?.id??r?.matricula,name:r?.name??r?.nome??'',st:storeCodeV28(r),c:0,a:0,o:0,com:0};z.name=r?.name??r?.nome??z.name;z.st=storeCodeV28(r)||z.st;z.c+=n.c;z.a+=n.a;z.o+=n.o;z.com+=n.com;map.set(id,z)}
+ return [...map.values()];
+}
+liveRowsV28=employeeRowsV29;
+person=function(){if(!hasLivePeriodV28(PER))return U?.p?.[PER]||{};return employeeRowsV29(PER).find(x=>normMatV27(x.id)===normMatV27(U?.u?.id))||{c:0,a:0,o:0,com:0}};
+function managementRowsV29(p){
+ const byDate=new Map();
+ for(const up of (APP_DELTA?.updates||[])){const d=String(up?.result_date||'');if(!periodHasDateV27(d,p))continue;const rows=Array.isArray(up?.management)?up.management:[];if(rows.length)byDate.set(d,rows)}
+ return [...byDate.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
+}
+function managementStoreV29(p,stCode){
+ const code=String(stCode||'').replace(/\D/g,'').replace(/^0+/,'');let found=false,out={c:0,a:0,o:0,storeSales:0};
+ for(const [,rows] of managementRowsV29(p)){for(const r of rows){if(storeCodeV28(r)!==code)continue;found=true;const n=rowNumsV28(r);out.c+=n.c;out.a+=n.a;out.o+=n.o;out.storeSales+=Number(r?.storeSales??r?.store_sales??r?.venda_loja??r?.vendaLoja??r?.totalSales??r?.venda_total??0)||0}}
+ return found?out:null;
+}
+storeP=function(){const base=(typeof st==='function'?st()?.p?.[PER]:null)||{},m=managementStoreV29(PER,U?.u?.st);if(!m)return base;const ee=Number(base.ee??base.ef??0)||0;return {...base,...m,ee,ef:Number(base.ef??ee)||ee,att:ee?m.c/ee:0,gap:m.c-ee,share:m.storeSales?m.c/m.storeSales:Number(base.share||0)}};
+eDayDataV3=function(){const x=person(),details=[];for(const [d,rows] of latestDailyRowsV28(PER)){if(new Date(d+'T12:00:00').getDay()!==1)continue;const mine=rows.filter(r=>normMatV27(r?.id??r?.matricula)===normMatV27(U?.u?.id)),approved=mine.reduce((s,r)=>s+employeeNumsV29(r).a,0),commission=mine.reduce((s,r)=>s+employeeNumsV29(r).com,0);if(approved||commission)details.push({d,approved,commission})}const eCommission=details.reduce((s,r)=>s+r.commission,0);return {approved:Number(x.a||0),commission:Number(x.com||0),eApproved:details.reduce((s,r)=>s+r.approved,0),eCommission,regularCommission:Math.max(0,Number(x.com||0)-eCommission),details}};
+rankInfoV13=function(){const reg=(hasLivePeriodV28(PER)?employeeRowsV29(PER):(COMMON?.top?.[PER]||[])).slice().sort((a,b)=>Number(b.c||0)-Number(a.c||0)),me=normMatV27(U?.u?.id),ri=reg.findIndex(x=>normMatV27(x.id)===me),code=String(U?.u?.st||'').replace(/\D/g,'').replace(/^0+/,'');const fil=reg.filter(x=>storeCodeV28(x)===code),fi=fil.findIndex(x=>normMatV27(x.id)===me);return {regional:ri>=0?ri+1:null,filial:fi>=0?fi+1:null,topRegional:ri>=0&&ri<10,topFilial:fi>=0&&fi<3}};
