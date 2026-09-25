@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v29';
-const SHELL=['./','./index.html','./manifest.webmanifest','./icon.svg'];
+const CACHE='estore-cepi-shell-v30';
+const SHELL=['./','./index.html','./manifest.webmanifest','./icon.svg','./riachuelo-horizontal-oficial.png'];
 
 self.addEventListener('install',event=>{
   self.skipWaiting();
