@@ -1201,3 +1201,96 @@ async function shareTeamCardV26(){
  const text='📊 *MEU TIME eStore | '+(TEAM_STORE_V19==='regional'?'REGIONAL CE+PI':'FILIAL '+TEAM_STORE_V19)+'*\\n'+pLabel[PER]+'\\n👥 Colaboradores: '+s.people.length+'\\n✅ Com venda: '+s.yes.length+'\\n🔴 Zerados: '+s.zero.length+'\\n📉 Dispersão: '+pct(s.disp)+'\\n💰 Venda captada: '+money(s.captured)+'\\n🛍️ Pedidos: '+s.orders;
  shareCanvas(c,text);
 }
+
+
+/* ===== V27 HOTFIX 2026-09-24: resultado individual vinculado à matrícula =====
+   Regra: a matrícula autenticada é a única chave para consolidar resultado.
+   APP_DELTA contém as cargas posteriores à base histórica do login. */
+function normMatV27(v){return String(v??'').replace(/\D/g,'').replace(/^0+/,'')||String(v??'').trim()}
+function sameUserV27(v){return normMatV27(v)===normMatV27(U?.u?.id)}
+function periodHasDateV27(d,p){
+  const asof=String(APP_DELTA?.asof||COMMON?.asof||localIsoV4());
+  if(!d||!asof)return false;
+  if(p==='day')return d===asof;
+  if(p==='month')return d.slice(0,7)===asof.slice(0,7);
+  if(p==='year')return d.slice(0,4)===asof.slice(0,4);
+  const monday=x=>{const z=new Date(x+'T12:00:00'),k=(z.getDay()+6)%7;z.setDate(z.getDate()-k);return z.toISOString().slice(0,10)};
+  return monday(d)===monday(asof);
+}
+function deltaUserV27(p){
+  const byDate=new Map();
+  for(const up of (APP_DELTA?.updates||[])){
+    const d=String(up.result_date||''); if(!periodHasDateV27(d,p))continue;
+    const rows=(up.collaborators||[]).filter(r=>sameUserV27(r.id??r.matricula));
+    if(!rows.length)continue;
+    const row=rows.reduce((z,r)=>({
+      c:z.c+Number(r.c??r.captada??0),
+      a:z.a+Number(r.a??r.aprovada??0),
+      o:z.o+Number(r.o??r.pedidos??0)
+    }),{c:0,a:0,o:0});
+    byDate.set(d,row);
+  }
+  const out={c:0,a:0,o:0,com:0};
+  for(const [d,r] of byDate){
+    out.c+=r.c;out.a+=r.a;out.o+=r.o;
+    const monday=new Date(d+'T12:00:00').getDay()===1;
+    out.com+=r.a*(monday?.10:.03);
+  }
+  return out;
+}
+function personV27(){
+  const b=U?.p?.[PER]||{},d=deltaUserV27(PER);
+  return {...b,c:Number(b.c||0)+d.c,a:Number(b.a||0)+d.a,o:Number(b.o||0)+d.o,com:Number(b.com||0)+d.com};
+}
+person=personV27;
+
+function liveRegionalRowsV27(p){
+  const base=(COMMON?.top?.[p]||[]).map(x=>({...x,c:Number(x.c||0),a:Number(x.a||0),o:Number(x.o||0)}));
+  const map=new Map(base.map(x=>[normMatV27(x.id),x]));
+  const dateRows=new Map();
+  for(const up of (APP_DELTA?.updates||[])){
+    const d=String(up.result_date||'');if(!periodHasDateV27(d,p))continue;
+    const daily=new Map();
+    for(const r of (up.collaborators||[])){
+      const k=normMatV27(r.id??r.matricula);if(!k)continue;
+      const z=daily.get(k)||{id:r.id??r.matricula,name:r.name??r.nome??'',st:r.st??r.store??r.loja??'',c:0,a:0,o:0};
+      z.c+=Number(r.c??r.captada??0);z.a+=Number(r.a??r.aprovada??0);z.o+=Number(r.o??r.pedidos??0);daily.set(k,z);
+    }
+    dateRows.set(d,daily);
+  }
+  for(const daily of dateRows.values())for(const [k,r] of daily){
+    const z=map.get(k)||{id:r.id,name:r.name,st:r.st,c:0,a:0,o:0};
+    z.name=r.name||z.name;z.st=r.st||z.st;z.c=Number(z.c||0)+r.c;z.a=Number(z.a||0)+r.a;z.o=Number(z.o||0)+r.o;map.set(k,z);
+  }
+  return [...map.values()].sort((a,b)=>Number(b.c||0)-Number(a.c||0));
+}
+rankInfoV13=function(){
+ const reg=liveRegionalRowsV27(PER),ri=reg.findIndex(x=>sameUserV27(x.id));
+ const fil=reg.filter(x=>String(x.st)===String(U?.u?.st)).sort((a,b)=>Number(b.c||0)-Number(a.c||0)),fi=fil.findIndex(x=>sameUserV27(x.id));
+ return {regional:ri>=0?ri+1:null,filial:fi>=0?fi+1:null,topRegional:ri>=0&&ri<10,topFilial:fi>=0&&fi<3};
+};
+
+eDayDataV3=function(){
+ const x=personV27(),approved=Math.max(0,Number(x.a||0)),commission=Math.max(0,Number(x.com||0));
+ const details=[],seen=new Set();
+ for(const up of (APP_DELTA?.updates||[])){
+   const d=String(up.result_date||'');if(!periodHasDateV27(d,PER)||seen.has(d)||new Date(d+'T12:00:00').getDay()!==1)continue;
+   seen.add(d);const a=(up.collaborators||[]).filter(r=>sameUserV27(r.id??r.matricula)).reduce((s,r)=>s+Number(r.a??r.aprovada??0),0);
+   if(a>0)details.push({d,approved:a,commission:+(a*.10).toFixed(2)});
+ }
+ let eApproved=(commission-approved*.03)/.07;eApproved=clampV3(Number.isFinite(eApproved)?eApproved:0,0,approved);
+ const eCommission=+(eApproved*.10).toFixed(2);
+ return {approved,commission,eApproved,eCommission,regularCommission:Math.max(0,commission-eCommission),details};
+};
+
+async function refreshUserDataV27(){
+ if(!U?.u?.id)return;
+ await loadContentV3();
+}
+const _goV27=go;
+go=function(v){
+ if(U?.u?.id&&['home','result','ranking','metas','metasv4'].includes(v)){
+   refreshUserDataV27().then(()=>{try{_goV27(v)}catch(e){console.error('V27 render',e)}}).catch(()=>{});
+ }
+ return _goV27(v);
+};
