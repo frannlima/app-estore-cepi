@@ -1294,3 +1294,47 @@ go=function(v){
  }
  return _goV27(v);
 };
+
+
+/* ===== V28 2026-09-24: fonte única para Resultado + Minha Filial + Rankings ===== */
+function storeCodeV28(r){return String(r?.st??r?.store??r?.store_code??r?.loja??r?.filial??'').replace(/\D/g,'').replace(/^0+/,'')}
+function rowNumsV28(r){return {c:Number(r?.c??r?.captada??r?.captured??0)||0,a:Number(r?.a??r?.aprovada??r?.approved??0)||0,o:Number(r?.o??r?.pedidos??r?.orders??0)||0}}
+function latestDailyRowsV28(p){
+ const byDate=new Map();
+ for(const up of (APP_DELTA?.updates||[])){
+  const d=String(up?.result_date||'');if(!periodHasDateV27(d,p))continue;
+  const rows=Array.isArray(up?.collaborators)?up.collaborators:[];
+  if(rows.length)byDate.set(d,rows);
+ }
+ return [...byDate.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
+}
+function liveRowsV28(p){
+ const dates=latestDailyRowsV28(p),map=new Map();
+ for(const [d,rows] of dates)for(const r of rows){
+  const id=normMatV27(r?.id??r?.matricula);if(!id)continue;const n=rowNumsV28(r),z=map.get(id)||{id:r?.id??r?.matricula,name:r?.name??r?.nome??'',st:storeCodeV28(r),c:0,a:0,o:0,com:0};
+  z.name=r?.name??r?.nome??z.name;z.st=storeCodeV28(r)||z.st;z.c+=n.c;z.a+=n.a;z.o+=n.o;z.com+=n.a*(new Date(d+'T12:00:00').getDay()===1?.10:.03);map.set(id,z);
+ }
+ return [...map.values()];
+}
+function hasLivePeriodV28(p){return latestDailyRowsV28(p).length>0}
+function personV28(){
+ if(!hasLivePeriodV28(PER))return U?.p?.[PER]||{};
+ const r=liveRowsV28(PER).find(x=>normMatV27(x.id)===normMatV27(U?.u?.id));return r||{c:0,a:0,o:0,com:0};
+}
+person=personV28;
+function storePV28(){
+ const base=(typeof st==='function'?st()?.p?.[PER]:null)||{}, code=String(U?.u?.st||'').replace(/\D/g,'').replace(/^0+/,'');
+ if(!hasLivePeriodV28(PER))return base;
+ const rows=liveRowsV28(PER).filter(r=>storeCodeV28(r)===code),sum=rows.reduce((z,r)=>({c:z.c+r.c,a:z.a+r.a,o:z.o+r.o}),{c:0,a:0,o:0});
+ const ee=Number(base.ee??base.ef??0)||0,shareDen=Number(base.storeSales??base.totalSales??base.vendaLoja??0)||0;
+ return {...base,...sum,ee,ef:Number(base.ef??ee)||ee,att:ee?sum.c/ee:0,gap:sum.c-ee,share:shareDen?sum.c/shareDen:Number(base.share||0),top:[...rows].sort((a,b)=>b.c-a.c)};
+}
+storeP=storePV28;
+function rankInfoV28(){
+ const reg=(hasLivePeriodV28(PER)?liveRowsV28(PER):(COMMON?.top?.[PER]||[])).slice().sort((a,b)=>Number(b.c||0)-Number(a.c||0)),me=normMatV27(U?.u?.id),ri=reg.findIndex(x=>normMatV27(x.id)===me),code=String(U?.u?.st||'').replace(/\D/g,'').replace(/^0+/,'');
+ const fil=reg.filter(x=>storeCodeV28(x)===code),fi=fil.findIndex(x=>normMatV27(x.id)===me);return {regional:ri>=0?ri+1:null,filial:fi>=0?fi+1:null,topRegional:ri>=0&&ri<10,topFilial:fi>=0&&fi<3};
+}
+rankInfoV13=rankInfoV28;
+function eDayDataV28(){const x=personV28(),details=[];for(const [d,rows] of latestDailyRowsV28(PER)){if(new Date(d+'T12:00:00').getDay()!==1)continue;const a=rows.filter(r=>normMatV27(r?.id??r?.matricula)===normMatV27(U?.u?.id)).reduce((s,r)=>s+rowNumsV28(r).a,0);if(a>0)details.push({d,approved:a,commission:+(a*.10).toFixed(2)})}const eCommission=details.reduce((s,r)=>s+r.commission,0);return {approved:Number(x.a||0),commission:Number(x.com||0),eApproved:details.reduce((s,r)=>s+r.approved,0),eCommission,regularCommission:Math.max(0,Number(x.com||0)-eCommission),details}}
+eDayDataV3=eDayDataV28;
+const _goV28=go;go=function(v){if(U?.u?.id&&['home','result','store','ranking','metas','metasv4'].includes(v)){loadContentV3().then(()=>{try{_goV28(v)}catch(e){console.error('V28 render',e)}}).catch(()=>{});}return _goV28(v)};
