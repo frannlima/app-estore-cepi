@@ -1,3 +1,6 @@
+/* V34 bootstrap: reutiliza o runtime principal já carregado pelo index */
+const ESTORE_API=(typeof API!=='undefined'?API:'https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-api');
+
 
 /* App eStore CE+PI — interface v3 baseada no modelo aprovado */
 let APP_CONTENT={importantInfo:[],campaigns:[]};
