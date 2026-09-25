@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v31';
-const SHELL=['./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon.svg','./riachuelo-horizontal-oficial.png'];
+const CACHE='estore-cepi-shell-v32';
+const SHELL=['./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon.svg','./riachuelo-horizontal-oficial.png'];
 
 self.addEventListener('install',event=>{
   self.skipWaiting();
