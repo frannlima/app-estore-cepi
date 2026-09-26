@@ -369,17 +369,54 @@ function line(y){x.strokeStyle=GRAY;x.lineWidth=1;x.beginPath();x.moveTo(55,y);x
 x.fillStyle=G;x.fillRect(0,0,W,190);
 let brandImg=new Image();brandImg.src=LOGO;try{await brandImg.decode()}catch(e){}
 x.drawImage(brandImg,55,35,150,110);txt('eStore • CE+PI',250,78,42,'700',WHITE);txt('HORA A HORA  |  REGIONAL',250,126,24,'400',WHITE);txt('Moda que inspira o Brasil',1540,64,22,'400',WHITE,'right');txt(d.split('-').reverse().join('/')+'  •  '+now,1540,110,23,'700',WHITE,'right');
-txt('VISÃO EXECUTIVA',55,245,19,'700',G2);
+txt('INDICADORES DA REGIONAL',55,235,19,'700',G2);
 let prev=null;try{let hist=JSON.parse(localStorage.getItem('estore_hh_share_'+d)||'[]'),sig=rows.map(r=>r.st+':'+r.captured+':'+r.orders+':'+(r.updated_at||'')).join('|');if(!hist.length||hist[hist.length-1].sig!==sig){hist.push({sig,total,orders,att,share,active:active.length});hist=hist.slice(-20);localStorage.setItem('estore_hh_share_'+d,JSON.stringify(hist))}prev=hist.length>1?hist[hist.length-2]:null}catch(e){}
 function dv(cur,old,type){if(old==null)return '— sem hora anterior';let dlt=cur-old,a=dlt>0?'▲':dlt<0?'▼':'—';if(type==='money')return a+' '+(dlt>=0?'+':'')+money(dlt);if(type==='pp')return a+' '+(dlt>=0?'+':'')+(dlt*100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' p.p.';return a+' '+(dlt>=0?'+':'')+Math.round(dlt)}
-let cards=[['VENDA CAPTADA',money(total),dv(total,prev&&prev.total,'money')],['PEDIDOS',orders+' / '+orderMeta,dv(orders,prev&&prev.orders,'num')],['META REGIONAL',money(meta),'—'],['ATINGIMENTO',pct(att),dv(att,prev&&prev.att,'pp')],['SHARE REGIONAL',pct(share),dv(share,prev&&prev.share,'pp')],['LOJAS COM VENDA',active.length+' / 19',dv(active.length,prev&&prev.active,'num')]];
-cards.forEach((k,i)=>{let col=i%3,row=Math.floor(i/3),px=55+col*500,py=270+row*150;rr(px,py,460,125,18,WHITE);x.fillStyle=i===0?G:G2;x.fillRect(px,py,7,125);txt(k[0],px+28,py+31,17,'700',G2);txt(k[1],px+28,py+75,31,'700',G);let dc=String(k[2]).startsWith('▲')?'#287A55':String(k[2]).startsWith('▼')?RED:G2;txt(k[2],px+28,py+104,15,'700',dc)});
-txt('TOP DO MOMENTO',55,590,19,'700',G2);rank.slice(0,3).forEach((r,i)=>{let px=55+i*500;rr(px,615,460,90,16,i===0?BEIGE:i===1?'#F4E3E7':'#F8E6D2');txt((i+1)+'º  LOJA '+r.st,px+22,650,20,'700',G);txt(money(+r.captured||0),px+22,683,20,'700',G)});
-txt('PULSO DA REGIONAL',55,750,19,'700',G2);
-rr(55,775,1490,150,18,WHITE);
+function storePretty(st){
+  const overrides={'350':'Fortaleza Presidente Kennedy','552':'Eusébio Terrazo'};
+  if(overrides[String(st)])return String(st)+' - '+overrides[String(st)];
+  let raw=String(COMMON?.stores?.[String(st)]?.name||'').trim();
+  raw=raw.replace(new RegExp('^L?'+String(st)+'\\s*[-–•:]?\\s*','i'),'').replace(/^(CE|PI|MA)\s+/i,'').replace(/\s+SH$/i,'').replace(/\s+CT\s*\((GRD|PEQ)\)$/i,' Centro').replace(/\s+CT$/i,' Centro').trim();
+  if(!raw)return String(st);
+  raw=raw.toLocaleLowerCase('pt-BR').replace(/(^|\s|-)\p{L}/gu,m=>m.toLocaleUpperCase('pt-BR'));
+  return String(st)+' - '+raw;
+}
+function fitTxt(t,maxW,size=17,weight='700'){
+  t=String(t||'');x.font=weight+' '+size+'px Arial, sans-serif';
+  if(x.measureText(t).width<=maxW)return t;
+  while(t.length>3&&x.measureText(t+'…').width>maxW)t=t.slice(0,-1);
+  return t+'…';
+}
+function medal(px,py,i){
+  const mc=['#DE7C00','#DAD9D6','#D37C32'];
+  x.fillStyle=mc[i]||BEIGE;x.beginPath();x.arc(px,py,24,0,Math.PI*2);x.fill();
+  x.strokeStyle=i===1?'#9D9B96':'#A65B00';x.lineWidth=3;x.stroke();
+  x.fillStyle=mc[i]||BEIGE;x.beginPath();x.moveTo(px-14,py+18);x.lineTo(px-7,py+42);x.lineTo(px,py+30);x.lineTo(px+8,py+42);x.lineTo(px+14,py+18);x.closePath();x.fill();
+  txt(String(i+1),px,py+7,22,'700',G,'center');
+}
+let cards=[
+ ['VENDA CAPTADA',money(total),dv(total,prev&&prev.total,'money'),'◆','#173F35',WHITE],
+ ['PEDIDOS',orders+' / '+orderMeta,dv(orders,prev&&prev.orders,'num'),'▣','#AE535C',WHITE],
+ ['META REGIONAL',money(meta),'—','◎','#DAD9D6',G],
+ ['ATINGIMENTO',pct(att),dv(att,prev&&prev.att,'pp'),'▥','#D6D2C4',G],
+ ['SHARE REGIONAL',pct(share),dv(share,prev&&prev.share,'pp'),'◉','#DE7C00',WHITE],
+ ['LOJAS COM VENDA',active.length+' / 19',dv(active.length,prev&&prev.active,'num'),'▤','#E45D50',WHITE]
+];
+cards.forEach((k,i)=>{let px=55+i*249,py=260,cw=232,ch=125;rr(px,py,cw,ch,16,k[4]);let fg=k[5];x.globalAlpha=.18;rr(px+14,py+18,42,42,11,fg);x.globalAlpha=1;txt(k[3],px+35,py+48,20,'700',fg,'center');txt(k[0],px+68,py+34,14,'700',fg);txt(k[1],px+68,py+73,24,'700',fg);txt(k[2],px+68,py+103,13,'700',fg)});
+txt('TOP DO MOMENTO',55,440,19,'700',G2);
+rank.slice(0,3).forEach((r,i)=>{let px=55+i*500,bg=i===0?'#D6D2C4':i===1?'#E68699':'#D37C32';rr(px,465,460,110,16,bg);medal(px+45,510,i);txt((i+1)+'º',px+86,500,18,'700',i===1?'#76232F':G);txt(fitTxt(storePretty(r.st),330,18,'700'),px+128,500,18,'700',G);txt(money(+r.captured||0),px+86,545,24,'700',G)});
+txt('PULSO DA REGIONAL',55,625,19,'700',G2);
 let zero=19-active.length,remaining=Math.max(0,meta-total),remOrders=Math.max(0,orderMeta-orders);
-let pulse=[['LOJAS COM VENDA',active.length+' / 19',Math.round(active.length/19*100)+'% ativas'],['LOJAS ZERADAS',String(zero),zero?'Prioridade de ativação':'Regional 100% ativa'],['FALTA PARA META',money(remaining),att>=1?'Meta alcançada':'Venda captada'],['PEDIDOS RESTANTES',String(remOrders),orders+'/'+orderMeta+' realizados']];
-pulse.forEach((p,i)=>{let px=85+i*365;if(i)x.fillStyle=GRAY,x.fillRect(px-25,795,1,100);txt(p[0],px,810,17,'700',G2);txt(p[1],px,855,34,'700',i===1&&zero?RED:G);txt(p[2],px,885,17,'400',G2)});
+let topShare=[...rows].filter(r=>(+r.captured||0)>0).sort((a,b)=>(+b.share||0)-(+a.share||0))[0]||null,topVolume=rank[0]||null;
+let pulseCards=[
+ ['TOP SHARE',topShare?storePretty(topShare.st):'—',topShare?pct(+topShare.share||0):'—','#DAD9D6','♕'],
+ ['MAIOR VOLUME',topVolume?storePretty(topVolume.st):'—',topVolume?money(+topVolume.captured||0):'—','#E68699','▥'],
+ ['ATENÇÃO / LOJAS ZERADAS',zero?zero+' lojas':'Regional 100% ativa',zero?'sem venda na parcial':'Todas as lojas com venda','#D37C32','⚠']
+];
+pulseCards.forEach((p,i)=>{let px=55+i*500;rr(px,650,460,125,16,p[3]);x.globalAlpha=.16;rr(px+18,670,48,48,24,G);x.globalAlpha=1;txt(p[4],px+42,703,22,'700',G,'center');txt(p[0],px+84,682,15,'700',G);txt(fitTxt(p[1],335,18,'700'),px+84,715,18,'700',G);txt(p[2],px+84,748,18,'700',G)});
+rr(55,805,1490,70,14,WHITE);
+let pulse=[['LOJAS COM VENDA',active.length+' / 19'],['LOJAS ZERADAS',String(zero)],['FALTA PARA META',money(remaining)],['PEDIDOS RESTANTES',String(remOrders)]];
+pulse.forEach((p,i)=>{let px=85+i*365;if(i){x.fillStyle=GRAY;x.fillRect(px-24,820,1,40)}txt(p[0],px,831,14,'700',G2);txt(p[1],px,860,20,'700',i===1&&zero?RED:G)});
 txt('DESEMPENHO POR LOJA',55,970,22,'700',G);txt('Ordenado por venda captada • todas as 19 lojas',1545,970,17,'400',G2,'right');
 rr(55,995,1490,780,18,WHITE);
 let cols=[85,205,450,690,890,1070,1250,1430],heads=['LOJA','CAPTADO','META 1%','ATING.','PEDIDOS','SHARE','STATUS',''];
