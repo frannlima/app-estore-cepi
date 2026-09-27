@@ -326,7 +326,7 @@ function storeView(){
  '<div class="storeKpiV40 '+orderClass+'"><span class=lab>DESVIO DE PEDIDOS</span><b>'+(orderGap>=0?'+ ':'')+num(orderGap)+'</b><small>'+(orderTarget?(orderGap/orderTarget*100).toFixed(1).replace('.',',')+'%':'—')+'</small></div>'+
  '<div class=storeKpiV40><span class=lab>META DO '+storePeriodLabelV40(PER).toUpperCase()+'</span><b>'+money(ee)+'</b><small>Ticket histórico '+money(ticket)+'</small></div>'+
  '</div>'+
- '<button class="btn storeShareV40" onclick="shareStoreResultV40()">↗ Compartilhar resultado</button>'+asof+'</div>';
+ (isLead()?'<button class="btn storeShareV40" onclick="shareStoreResultV40()">↗ Compartilhar resultado</button>':'')+asof+'</div>';
  let chart='<div class="card storeChartCardV40"><div class=storeChartHeadV40><div><div class=title>Venda captada por dia</div><div class=muted>Toque em uma barra para ver o detalhe da data</div></div><div class=muted>'+storePeriodLabelV40(PER)+'</div></div>'+performanceChart(hist,ee,x.asof)+storeDayStatusV40(hist,ee,x.asof)+(PER==='week'&&low?'<div class="notice '+((+low[1]||0)<=0?'danger':'')+'"><b>Menor performance da semana</b><br>'+fmtChartDate(low[0])+' • '+money(low[1])+'</div>':'')+'</div>';
  return top+chart
 }
@@ -341,7 +341,7 @@ function storeChartTipV40(label,value,target){
 }
 function performanceChart(hist,target,asof){
  if(!hist.length)return '<div class=muted>Sem histórico diário suficiente para o período selecionado.</div>';
- let vals=hist.map(x=>+x[1]||0),days=hist.length,daily=days?target/days:0,max=Math.max(...vals,daily,1)*1.15,w=760,h=300,left=48,right=24,top=26,bottom=48,plotH=h-top-bottom,plotW=w-left-right,slot=plotW/days,bw=Math.min(24,Math.max(8,slot*.58)),best=Math.max(...vals);
+ let vals=hist.map(x=>+x[1]||0),days=hist.length,statusDays=storeDayStatusDataV40(hist,target,asof),daily=(statusDays.length?target/statusDays.length:(days?target/days:0)),max=Math.max(...vals,daily,1)*1.15,w=760,h=300,left=48,right=24,top=26,bottom=48,plotH=h-top-bottom,plotW=w-left-right,slot=plotW/days,bw=Math.min(24,Math.max(8,slot*.58)),best=Math.max(...vals);
  let grid=[0,.25,.5,.75,1].map(r=>{let yy=top+plotH*(1-r),val=max*r;return '<line class=gridLine x1="'+left+'" y1="'+yy+'" x2="'+(w-right)+'" y2="'+yy+'"></line><text class=axisText x="'+(left-6)+'" y="'+(yy+3)+'" text-anchor="end">'+(val>=1000?(val/1000).toFixed(0)+'k':Math.round(val))+'</text>'}).join('');
  let bars=hist.map((z,i)=>{let v=+z[1]||0,bh=Math.max(v>0?3:1,(v/max)*plotH),xx=left+i*slot+(slot-bw)/2,yy=top+plotH-bh,label=fmtChartDate(z[0]),cls=v<=0?'bar zero':v===best?'bar best':'bar';return '<g onclick="storeChartTipV40(\''+label+'\','+v+','+daily+')" style="cursor:pointer"><rect class="'+cls+'" x="'+xx+'" y="'+yy+'" width="'+bw+'" height="'+bh+'" rx="6"><title>'+label+' • '+money(v)+'</title></rect><text class=axisText x="'+(xx+bw/2)+'" y="'+(h-20)+'" text-anchor="middle">'+label.slice(0,2)+'</text></g>'}).join('');
  let ly=top+plotH-(daily/max)*plotH;
@@ -359,7 +359,7 @@ function storeDayStatusDataV40(hist,target,asof){
 function storeDayStatusV40(hist,target,asof){
  if(PER!=='month')return '';
  let a=storeDayStatusDataV40(hist,target,asof),best=a.filter(x=>x.v>0).sort((x,y)=>y.v-x.v).slice(0,3),att=a.filter(x=>x.status==='att'||x.status==='zero'),strip=a.map(x=>'<div class="storeStatusDayV40 '+(x.status==='att'?'att':x.status==='zero'?'zero':x.status==='no'?'no':'')+'" title="'+fmtChartDate(x.iso)+' • '+money(x.v)+'">'+String(+x.iso.slice(8))+'</div>').join('');
- let bestTxt=best.length?best.map(x=>String(+x.iso.slice(8)).padStart(2,'0')).join(', ')+'/09':'—',attTxt=att.length?att.map(x=>String(+x.iso.slice(8)).padStart(2,'0')).join(', ')+'/09':'Nenhum';
+ let mm=(asof?String(asof).slice(5,7):String(new Date().getMonth()+1).padStart(2,'0')),bestTxt=best.length?best.map(x=>String(+x.iso.slice(8)).padStart(2,'0')+'/'+mm).join(', '):'—',attTxt=att.length?att.map(x=>String(+x.iso.slice(8)).padStart(2,'0')+'/'+mm).join(', '):'Nenhum';
  return '<div class=storeDayStatusV40><h4>⚠ Dias de atenção / possível zerado</h4><div class=storeStatusStripV40>'+strip+'</div><div class=storeStatusLegendV40><span style="--c:#dfe8e4">Normal</span><span style="--c:#F6C27A">Atenção (baixo)</span><span style="--c:#E03C31">Possível zerado</span><span style="--c:#DAD9D6">Sem registro</span></div><div class=storeInsightV40><div><b>Melhores dias</b>'+bestTxt+'</div><div><b>Dias de atenção</b>'+attTxt+'</div><div><b>Oportunidade</b>Atuar nos dias abaixo do ritmo para reduzir o gap da filial.</div></div></div>'
 }
 async function shareStoreResultV40(){
