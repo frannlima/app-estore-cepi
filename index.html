@@ -581,7 +581,7 @@ async function shareSupervisorHighlightsV48(){
    cv.toBlob(async b=>{
      if(!b)return;
      let file=new File([b],'Supervisores_Destaques_CEPI_'+period+'_HD.png',{type:'image/png'});
-     let caption='⭐ *Supervisores Destaques no eStore CE+PI | '+supervisorPeriodLabelV46(period)+'*'';
+     let caption='⭐ *Supervisores Destaques no eStore CE+PI | '+supervisorPeriodLabelV46(period)+'*';
      try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({title:'Supervisores Destaques • CE+PI',text:caption,files:[file]});return}}catch(e){if(e?.name==='AbortError')return}
      try{await navigator.clipboard.writeText(caption)}catch(e){}
      let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1800);
