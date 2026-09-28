@@ -523,6 +523,7 @@ async function saveRitualV52(){
   mobile_caixa:!!document.getElementById('ritCaixaV52')?.checked,
   mobile_adv:!!document.getElementById('ritAdvV52')?.checked,
   deviation:ritualParseNumberV52(document.getElementById('ritDevV52')?.value),
+  deviation_entered:!!String(document.getElementById('ritDevV52')?.value||'').trim(),
   coupon:String(document.getElementById('ritCouponV52')?.value||'').trim()
  };
  b.insertAdjacentHTML('afterbegin','<div id=ritSavingV52 class=notice>Conferindo sua operação...</div>');
@@ -539,7 +540,7 @@ async function adminRitualV52(){
  await loadAdminRitualV52()
 }
 async function loadAdminRitualV52(){
- let el=document.getElementById('ritReportBodyV52');if(!el)return,date=document.getElementById('ritReportDateV52')?.value||ritualTodayV52();
+ let el=document.getElementById('ritReportBodyV52');if(!el)return;let date=document.getElementById('ritReportDateV52')?.value||ritualTodayV52();
  el.innerHTML='Carregando relatório...';
  try{
   let j=await api({action:'ritual_report',matricula:U.u.id,date});RITUAL_REPORT_V52=j;
