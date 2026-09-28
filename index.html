@@ -354,7 +354,8 @@ var(--login-bg-image,url("https://rchloblogprod.akamaized.net/wp-content/virada-
 .supervisorRankTitleV46{display:flex;align-items:center;gap:11px;margin-bottom:11px}.supervisorMetricIconV46{width:49px;height:49px;display:grid;place-items:center;border-radius:15px;font-size:24px;font-weight:900}
 .supervisorMetricIconV46.sales{background:#DE7C00;color:#fff}.supervisorMetricIconV46.share{background:#173F35;color:#fff}.supervisorMetricIconV46.orders{background:#76232F;color:#fff}.supervisorMetricIconV46.disp{background:#173F35;color:#fff}
 .supervisorRankTitleV46 b{display:block;color:#173F35;font-size:17px}.supervisorRankTitleV46 small{display:block;color:#7b8581;margin-top:2px}
-.supervisorRankRowV46{display:grid;grid-template-columns:38px minmax(0,1fr) minmax(78px,auto);gap:8px;align-items:center;padding:11px 0;border-top:1px solid #efede8;overflow:hidden}.supervisorRankRowV46:first-of-type{border-top:0}
+.supervisorRankRowV46{display:grid;grid-template-columns:38px 58px minmax(0,1fr) minmax(78px,auto);gap:8px;align-items:center;padding:11px 0;border-top:1px solid #efede8;overflow:hidden}.supervisorRankRowV46:first-of-type{border-top:0}
+.supervisorPhotoStackV50{width:58px;min-width:58px;height:42px;display:flex;align-items:center;position:relative}.supervisorPhotoV50,.supervisorPhotoFallbackV50,.supervisorPhotoMoreV50{width:38px;height:38px;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:#D6D2C4;color:#173F35;font-size:10px;font-weight:900;border:2px solid #fff;box-shadow:0 3px 8px rgba(23,63,53,.18);overflow:hidden}.supervisorPhotoStackV50 .supervisorPhotoV50:not(:first-child),.supervisorPhotoStackV50 .supervisorPhotoFallbackV50:not(:first-child){margin-left:-17px}.supervisorPhotoMoreV50{width:28px;height:28px;font-size:9px;margin-left:-13px;background:#173F35;color:#fff;z-index:4}.supervisorPhotoFallbackV50{font-size:9px}
 .supervisorMedalV46{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#173F35;border:2px solid rgba(0,0,0,.08);box-shadow:inset 0 1px 3px #fff9;font-size:12px}
 .supervisorMedalV46.m1{background:linear-gradient(145deg,#fff1b5,#E6A51A)}.supervisorMedalV46.m2{background:linear-gradient(145deg,#f8f8f8,#adb4b7)}.supervisorMedalV46.m3{background:linear-gradient(145deg,#f6c5a0,#c06b34)}
 .supervisorRankPersonV46{min-width:0;overflow:hidden}.supervisorRankPersonV46 b{display:block;font-size:11.5px;line-height:1.18;color:#173F35;white-space:normal;overflow-wrap:break-word}.supervisorRankPersonV46 small{display:block;color:#7a8581;font-size:9.5px;line-height:1.2;margin-top:4px;white-space:normal}.supervisorRankValueV46{text-align:right;font-size:13.5px;font-weight:900;color:#173F35;white-space:nowrap;min-width:78px}.supervisorDispValueV49{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;line-height:1}.supervisorDispValueV49 small{font-size:9px;font-weight:650;color:#7a8581;white-space:nowrap}.supervisorDispValueV49 b{font-size:16px;line-height:1.05;font-weight:950;color:#173F35;margin-top:4px}
@@ -368,7 +369,7 @@ var(--login-bg-image,url("https://rchloblogprod.akamaized.net/wp-content/virada-
 @media(max-width:620px){
  .supervisorBrandV48 img{width:180px;max-width:62%;height:46px}.supervisorHeadTextV46 h1{font-size:25px}.supervisorStarBoxV46{width:74px;height:74px;flex-basis:74px}.supervisorStarV46{font-size:51px}
  .supervisorHeroV46{min-height:220px;padding:23px}.supervisorHeroCopyV46{max-width:68%}.supervisorHeroCopyV46 h2{font-size:26px}.supervisorHeroStarV46{font-size:120px;right:0;top:26px}.supervisorHeroPodiumV46{width:132px;right:2%}
- .supervisorRankGridV46{grid-template-columns:1fr}.supervisorShareBoxV48{align-items:flex-start;flex-direction:column}.supervisorShareBoxV48 .btn{width:100%}
+ .supervisorRankGridV46{grid-template-columns:1fr}.supervisorRankRowV46{grid-template-columns:38px 54px minmax(0,1fr) minmax(74px,auto)}.supervisorPhotoStackV50{width:54px;min-width:54px}.supervisorPhotoV50,.supervisorPhotoFallbackV50{width:36px;height:36px}.supervisorShareBoxV48{align-items:flex-start;flex-direction:column}.supervisorShareBoxV48 .btn{width:100%}
 }
 </style>
 </head><body>
@@ -458,6 +459,17 @@ function supervisorNamesV48(r){
  if(a.length===1)return a[0];
  return a.slice(0,-1).join(', ')+' e '+a[a.length-1]
 }
+function supervisorEligibleListV50(r){
+ return (r?.supervisors||[]).filter(u=>supervisorEligibleRoleV49(u.role))
+}
+function supervisorPhotosV50(r){
+ let a=supervisorEligibleListV50(r),show=a.slice(0,3),extra=Math.max(0,a.length-show.length);
+ if(!show.length)return '<span class=supervisorPhotoStackV50><span class=supervisorPhotoFallbackV50>SUP</span></span>';
+ return '<span class=supervisorPhotoStackV50>'+show.map((u,i)=>photo(u.id,u.name,'supervisorPhotoV50')).join('')+(extra?'<span class=supervisorPhotoMoreV50>+'+extra+'</span>':'')+'</span>'
+}
+function loadSupervisorImgV50(url){
+ return new Promise(resolve=>{if(!url)return resolve(null);let im=new Image();im.crossOrigin='anonymous';im.onload=()=>resolve(im);im.onerror=()=>resolve(null);im.src=url})
+}
 function supervisorHighlights(){
  let tabs=['day','week','month','year'].map(p=>'<button class="'+(SUPERVISOR_PERIOD_V46===p?'on':'')+'" onclick="SUPERVISOR_PERIOD_V46=\''+p+'\';SUPERVISOR_DATA_V46=null;go(\'supervisors\')">'+supervisorPeriodLabelV46(p)+'</button>').join('');
  return '<div class=supervisorPageV46>'+
@@ -487,7 +499,7 @@ function supervisorMetricCardV46(title,subtitle,cls,icon,rows,type){
  return '<div class=supervisorRankCardV46><div class=supervisorRankTitleV46><span class="supervisorMetricIconV46 '+cls+'">'+icon+'</span><div><b>'+title+'</b><small>'+subtitle+'</small></div></div>'+
  (list.length?list.map((r,i)=>{
    let names=supervisorNamesV48(r),store=String(r.st)+' - '+supervisorPrettyStoreV46(r.st,r.name);
-   return '<div class=supervisorRankRowV46><span class="supervisorMedalV46 m'+(i+1)+'">'+(i+1)+'º</span><span class=supervisorRankPersonV46><b>'+esc(names)+'</b><small>'+esc(store)+'</small></span><span class=supervisorRankValueV46>'+supervisorMetricHtmlV49(r,type)+'</span></div>'
+   return '<div class=supervisorRankRowV46><span class="supervisorMedalV46 m'+(i+1)+'">'+(i+1)+'º</span>'+supervisorPhotosV50(r)+'<span class=supervisorRankPersonV46><b>'+esc(names)+'</b><small>'+esc(store)+'</small></span><span class=supervisorRankValueV46>'+supervisorMetricHtmlV49(r,type)+'</span></div>'
  }).join(''):'<div class=supervisorRankEmptyV46>Sem dados suficientes para este período.</div>')+'</div>'
 }
 async function loadSupervisorHighlights(){
@@ -557,21 +569,34 @@ async function supervisorShareCardV48(){
    ['Menor Dispersão','◉',G,d.dispersion||[],'disp']
  ];
  let sy=455;
- sections.forEach((sec,si)=>{
+ for(let si=0;si<sections.length;si++){
+   const sec=sections[si];
    rr(35,sy,1010,286,24,WHITE);
    rr(58,sy+26,76,76,20,sec[2]);tx(sec[1],96,sy+78,34,'700',WHITE,'center');
    tx(sec[0],154,sy+57,27,'700',G);tx(si===3?'Top 3 Lojas • menor quantidade sem venda':'Top 3 Lojas • por entrega',154,sy+85,15,'400',G2);
    supervisorPodiumV48(c,64,sy+129,.78);
-   (sec[3]||[]).slice(0,3).forEach((r,i)=>{
-     let yy=sy+126+i*50;
+   const rows=(sec[3]||[]).slice(0,3);
+   for(let i=0;i<rows.length;i++){
+     const r=rows[i],yy=sy+126+i*50;
      let medal=i===0?'#F3B330':i===1?'#C9CED1':'#CF8248';
-     c.fillStyle=medal;c.beginPath();c.arc(398,yy+14,20,0,Math.PI*2);c.fill();tx((i+1)+'º',398,yy+20,12,'700',G,'center');
-     let names=fit(supervisorNamesV48(r),315,14,'700'),store=fit(String(r.st)+' - '+supervisorPrettyStoreV46(r.st,r.name),315,11,'400');
-     tx(names,430,yy+11,14,'700',G);tx(store,430,yy+30,11,'400',G2);
+     c.fillStyle=medal;c.beginPath();c.arc(372,yy+14,20,0,Math.PI*2);c.fill();tx((i+1)+'º',372,yy+20,12,'700',G,'center');
+
+     const sups=supervisorEligibleListV50(r).slice(0,3);
+     for(let sidx=0;sidx<sups.length;sidx++){
+       const u=sups[sidx],px=410+sidx*26,py=yy+14,src=CONTENT.profilePhotos?.[String(u.id)]||'',im=await loadSupervisorImgV50(src);
+       c.save();c.beginPath();c.arc(px,py,16,0,Math.PI*2);c.clip();
+       if(im)c.drawImage(im,px-16,py-16,32,32);
+       else{c.fillStyle=SAND;c.fillRect(px-16,py-16,32,32);tx(initials(preferredName(u.id,u.name)),px,py+4,9,'700',G,'center')}
+       c.restore();c.strokeStyle=WHITE;c.lineWidth=2;c.beginPath();c.arc(px,py,16,0,Math.PI*2);c.stroke();
+     }
+     if(!sups.length){c.fillStyle=SAND;c.beginPath();c.arc(410,yy+14,16,0,Math.PI*2);c.fill();tx('SUP',410,yy+18,8,'700',G,'center')}
+
+     let names=fit(supervisorNamesV48(r),300,14,'700'),store=fit(String(r.st)+' - '+supervisorPrettyStoreV46(r.st,r.name),300,11,'400');
+     tx(names,500,yy+11,14,'700',G);tx(store,500,yy+30,11,'400',G2);
      if(sec[4]==='disp'){tx(pct(r.disp),1000,yy+15,18,'700',G,'right');tx(num(r.zeros)+' sem venda',1000,yy+32,10,'400',G2,'right')}else tx(supervisorMetricValueV48(r,sec[4]),1000,yy+19,15,'700',G,'right');
-   });
+   }
    sy+=304
- });
+ }
  tx('Atualizado até '+(d.asof?fmtChartDate(d.asof):'—'),1000,1723,12,'400',G2,'right');
  return cv
 }
