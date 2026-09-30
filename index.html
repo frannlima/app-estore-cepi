@@ -506,13 +506,25 @@ function fcaMissingHistoryV65(d){
   const c=d.coverage||{},prev=c.previous||{},current=c.closed||{},sum=d.summary||{};
   const issue=esc(d.comparisonIssue||'Sem comparativo semanal certificado.');
   const prevWeek='Semana '+(d.previousWeekNumber||'—'),curWeek='Semana '+(d.weekNumber||'—');
-  const source='<div class="fcaDeadlineV61 closed" style="border-left:5px solid #DE7C00"><b>Comparação aguardando referência oficial</b><p style="margin:7px 0">'+issue+'</p><p style="margin:7px 0">O App separa os resultados pela data do Gerencial/Lojas, preservando o acumulado anual. A semana anterior não será tratada como Share 0%, e nenhuma loja será priorizada sem a comparação validada.</p><small>'+prevWeek+': '+Number(prev.official_stores||0)+' shares de lojas oficiais • '+curWeek+': '+Number(current.official_stores||0)+' shares oficiais • '+Number(c.comparable||0)+' lojas comparáveis.</small></div>';
+  const source='<div class="fcaDeadlineV61 closed" style="border-left:5px solid #DE7C00"><b>Comparação aguardando share semanal validado</b><p style="margin:7px 0">'+issue+'</p><p style="margin:7px 0">O App separa os resultados pela data do Gerencial/Lojas, preservando o acumulado anual. A semana anterior não será tratada como Share 0%, e nenhuma loja será priorizada sem a comparação validada.</p><small>'+prevWeek+': '+Number(prev.share_verified_stores||0)+' shares comprovados • '+curWeek+': '+Number(current.share_verified_stores||0)+' shares comprovados • '+Number(c.comparable||0)+' lojas comparáveis.</small></div>';
   const metrics='<div class=fcaKpisV61 style="margin:12px 0"><div class=fcaKpiV61><span>Share • '+curWeek+'</span><b>'+pct(sum.share)+'</b><small>Referência da semana encerrada</small></div><div class=fcaKpiV61><span>Venda Captada</span><b>'+money(sum.captured)+'</b><small>Fonte: Gerencial/Lojas</small></div><div class=fcaKpiV61><span>Pedidos</span><b>'+num(sum.orders)+'</b></div><div class=fcaKpiV61><span>Ticket</span><b>'+money(sum.ticket)+'</b></div></div>';
+  // Volume gerencial por semana é exibido separadamente; nunca vira Share presumido.
+  const volumeRows=(d.volumeRetractions||[]).slice(0,5).map((x,i)=>
+    '<div class=fcaRankLineV61><span class=fcaRankNoV61>'+(i+1)+'</span><span><b>'+
+    esc(fcaStoreTitleV61(x))+'</b><small>'+prevWeek+': '+money(x.previous_captured)+
+    ' → '+curWeek+': '+money(x.captured)+'</small></span><span class="fcaRankValueV61 down">'+
+    money(x.captured_delta)+'</span></div>').join('');
+  const volume='<div class=fcaSectionV61><div class=fcaSectionHeadV61><div>'+
+    '<b>Pré-análise • Captação semanal</b><small>Maiores quedas em reais com histórico gerencial comparável. '+
+    'Esta lista NÃO é a priorização por retração de Share.</small></div></div>'+
+    (volumeRows||'<p class=muted>Não há captação semanal suficiente para comparar as filiais com segurança.</p>')+
+    '<small>Filiais com volume comparável: '+Number(d.volumeCoverage?.comparable||0)+
+    '/19. As cinco prioridades FCA serão definidas somente pelo Share validado.</small></div>';
   let admin='';
   if(isAdmin()&&!isDemo()){
     admin='<details class="fcaSectionV61" style="padding:16px"><summary style="cursor:pointer;font-weight:700">Inserir fechamento oficial de Share semanal • Administrador</summary><p>Informe o Share (%) das 19 filiais e da Regional, exatamente como consta no relatório gerencial semanal. Uma linha por filial: <b>073;0,15%</b>. Ao final: <b>REGIONAL;0,30%</b>. Exige senha do administrador principal.</p><div style="display:grid;gap:10px"><label>Semana de referência<select id=fcaImportWeekV65 class=field><option value="'+esc(d.previousWeekStart)+'">'+prevWeek+' • '+fcaDateV61(d.previousWeekStart)+'</option><option value="'+esc(d.weekStart)+'">'+curWeek+' • '+fcaDateV61(d.weekStart)+'</option></select></label><textarea id=fcaImportSharesV65 rows=11 class=field placeholder="073;0,15%\n084;0,30%\n...\nREGIONAL;0,30%"></textarea><button class=btn onclick="fcaImportSharesV65()">Validar e incorporar semana</button><small id=fcaImportStatusV65></small></div></details>';
   }
-  return source+metrics+'<div class=fcaSectionV61><div class=fcaSectionHeadV61><div><b>Shares atuais disponíveis</b><small>O ranking de retração será liberado após completar a referência semanal anterior.</small></div></div>'+fcaTopShareV61(d.topShare||[])+'</div>'+admin;
+  return source+metrics+volume+'<div class=fcaSectionV61><div class=fcaSectionHeadV61><div><b>Shares atuais disponíveis</b><small>O ranking de retração será liberado após completar a referência semanal anterior.</small></div></div>'+fcaTopShareV61(d.topShare||[])+'</div>'+admin;
 }
 async function fcaImportSharesV65(){
   if(!isAdmin()||isDemo())return;
