@@ -2260,4 +2260,177 @@ function emergencyLogin(ev){
 .adminCampaignV71{margin-top:8px}.adminActionsV71{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.adminColumnsV71{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.adminColumnsV71>section{background:#faf9f6;border:1px solid #e5e2da;border-radius:17px;padding:12px}.adminColumnsV71 h3{margin:0 0 9px;color:#173F35}.adminCampaignRowV71{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;background:#fff;border:1px solid #ebe8e1;border-radius:12px;padding:8px;margin-bottom:7px}.adminCampaignRowV71>div{display:grid;gap:2px}.adminCampaignRowV71 b{font-size:10px;color:#173F35}.adminCampaignRowV71 small{font-size:8px;color:#78837f}.adminCampaignRowV71 button{border:0;border-radius:8px;background:#edf2ef;color:#173F35;padding:7px;font-size:8px;font-weight:800}.adminCampaignRowV71 button.danger{background:#f8e8e8;color:#8c2d2d}.adminStatusV71{font-size:7px!important;font-weight:900;border-radius:999px;padding:3px 6px;width:max-content}.adminStatusV71.live{background:#e4f1e9;color:#176747}.adminStatusV71.off{background:#edeae5;color:#746f68}.adminEditorV71{background:#f4f3ef;border-radius:16px;padding:13px;margin:12px 0}.adminEditorV71 h3{margin:0 0 10px;color:#173F35}.adminEditorV71 label{font-size:9px;color:#61706b}.adminDatesV71{display:grid;grid-template-columns:1fr 1fr;gap:8px}.adminActiveV71{display:flex!important;align-items:center;gap:7px;margin:8px 0 12px;color:#173F35!important}
 @media(max-width:700px){.adminColumnsV71{grid-template-columns:1fr}.campaignTabsV71{gap:4px}.campaignInfoV71{grid-template-columns:1fr 1fr}.campaignPopupImgV71{height:285px}}
 </style>
+
+<!-- V72-2026-10-01-REAL-PRIZES-POPUPS -->
+<script>
+(function(){
+const PRIZES_V72={
+ samsung:'https://images.samsung.com/is/image/samsung/p6pim/br/sm-a075mzkgzto/gallery/br-galaxy-a07-sm-a075-sm-a075mzkgzto-548807702?%241164_776_PNG%24=',
+ boom4:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dwe154c3b4/LS_JBL_BOOMBOX_4_HERO_BLACK_0019_x4.png?sh=535&sw=535',
+ boom3:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dw10cb1df1/1_JBL_BOOMBOX_3_HERO_BLACK_33216_x2.png?sh=535&sw=535',
+ tune720:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dwbfa524ed/01.JBL_Tune_720BT_ProductImage_Hero_Black.png?sh=535&sw=535'
+};
+let CAMPAIGN_TAB_V72='campaigns';
+
+function todayV72(){try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}}
+function activeV72(x){if(!x||x.active===false)return false;let d=todayV72(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return (!s||d>=s)&&(!e||d<=e)}
+function campaignV72(){return (CONTENT?.campaigns||[]).filter(activeV72).sort((a,b)=>String(b.start_at||'').localeCompare(String(a.start_at||'')))[0]||null}
+function couponsV72(){return (CONTENT?.coupons||[]).filter(activeV72).sort((a,b)=>String(a.code||a.title||'').localeCompare(String(b.code||b.title||'')))}
+function popupsV72(){return (CONTENT?.popups||[]).filter(activeV72).sort((a,b)=>String(b.start_at||'').localeCompare(String(a.start_at||'')))}
+function dateLabelV72(v){if(!v)return '';try{return new Date(String(v).slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR')}catch(e){return String(v)}}
+function periodV72(x){if(x?.period)return esc(x.period);let s=x?.start_at||'',e=x?.end_at||'';return (s?dateLabelV72(s):'Início livre')+(e?' a '+dateLabelV72(e):'')}
+window.campaignTabV72=function(v){CAMPAIGN_TAB_V72=v;go('campaigns')};
+
+function prizeTileV72(src,name,sub){
+ return '<div class="prizeTileV72"><div class="prizeImgV72"><img src="'+src+'" alt="'+esc(name)+'" loading="eager"></div><b>'+esc(name)+'</b><span>'+esc(sub||'')+'</span></div>'
+}
+function campaignVisualV72(mode){
+ let compact=mode==='feed'?' feed':'';
+ return '<div class="campaignRealCardV72'+compact+'">'+
+   '<div class="campaignRealWavesV72"></div>'+
+   '<div class="campaignRealCopyV72"><small>CAMPANHA • 01 A 31 DE OUTUBRO</small><h2>eStore no <span>Volume Máximo</span></h2><p>Aumente o som das vendas.</p><strong>Prêmios reais JBL e Samsung</strong></div>'+
+   '<div class="campaignRealPrizesV72">'+
+      prizeTileV72(PRIZES_V72.samsung,'Samsung A07','4G • 128GB')+
+      prizeTileV72(PRIZES_V72.boom4,'JBL Boombox 4','Lideranças')+
+      prizeTileV72(PRIZES_V72.boom3,'JBL Boombox 3','Gerentes de Loja')+
+      prizeTileV72(PRIZES_V72.tune720,'JBL Tune 720BT','Vendedores')+
+   '</div>'+
+   '<div class="campaignEqualizerV72">'+Array.from({length:12},(_,i)=>'<i style="height:'+(18+i*4)+'px"></i>').join('')+'</div>'+
+ '</div>';
+}
+window.campaignVisualV72=campaignVisualV72;
+
+function tabsV72(){
+ let a=[['campaigns','📣','Campanhas'],['coupons','🎟️','Cupons'],['prizes','🎁','Premiação'],['sell','📈','Como vender']];
+ return '<div class="campaignTabsV72">'+a.map(i=>'<button class="'+(CAMPAIGN_TAB_V72===i[0]?'on':'')+'" onclick="campaignTabV72(&quot;'+i[0]+'&quot;)"><b>'+i[1]+'</b><span>'+i[2]+'</span></button>').join('')+'</div>';
+}
+function mainV72(){
+ let x=campaignV72();if(!x)return '<div class="campaignEmptyV72"><b>Nenhuma campanha ativa.</b><span>As campanhas aparecem automaticamente conforme a vigência definida no ADM.</span></div>';
+ return campaignVisualV72('page')+
+ '<h3 class="campaignTitleV72">Campanha em destaque</h3>'+
+ '<div class="campaignInfoGridV72"><div><b>👥 Quem participa</b><span>Gerentes regionais, gerentes de loja e vendedores.</span></div><div><b>📅 Período</b><span>'+periodV72(x)+'</span></div><div><b>🎯 Critério</b><span>'+esc(x.mechanics||'Aumente o som das vendas e acompanhe seu resultado.')+'</span></div><div><b>🏆 Premiação</b><span>'+esc(x.employeeBenefit||'Prêmios JBL e Samsung para os destaques da campanha.')+'</span></div></div>'+
+ '<h3 class="campaignTitleV72">Principais prêmios</h3>'+
+ '<div class="prizeGridV72">'+
+   prizeTileV72(PRIZES_V72.samsung,'Samsung A07','1º a 3º • Vendedores')+
+   prizeTileV72(PRIZES_V72.boom4,'JBL Boombox 4','Gerentes Regionais')+
+   prizeTileV72(PRIZES_V72.boom3,'JBL Boombox 3','Gerentes de Loja')+
+   prizeTileV72(PRIZES_V72.tune720,'JBL Tune 720BT','Faixas de premiação')+
+ '</div>'+
+ '<button class="campaignShareV72" onclick="shareCampaignV72()">↗ Compartilhar campanha</button>';
+}
+function couponV72(){
+ let a=couponsV72();
+ return '<h3 class="campaignTitleV72">Cupons e benefícios</h3>'+
+ (a.length?a.map(x=>'<div class="couponV72"><div><b>'+esc(x.code||x.title||'CUPOM')+'</b><span>'+esc(x.title||'')+'</span></div><section><p>✓ '+esc(x.description||x.text||'')+'</p><p>✓ Não acumulativo</p>'+(x.end_at?'<small>Válido até '+dateLabelV72(x.end_at)+'</small>':'')+'</section></div>').join(''):'<div class="campaignEmptyV72">Nenhum cupom ativo.</div>')+
+ '<h3 class="campaignTitleV72">Regras importantes</h3><div class="rulesV72"><div>🚚<span>Frete grátis</span></div><div>💳<span>10x sem juros</span></div><div>🎟️<span>Não acumula cupons</span></div><div>🏬<span>Não vender pelo eStore o que há em loja</span></div></div>'+
+ '<div class="sellBannerV72"><div><b>Mais possibilidades para o cliente</b><span>Quando não tiver o produto em loja, ofereça pelo eStore.</span></div><strong>🛒</strong></div>';
+}
+function prizesV72(){
+ return '<h3 class="campaignTitleV72">Premiação completa</h3><div class="prizeGridV72 full">'+
+   prizeTileV72(PRIZES_V72.samsung,'Samsung A07 4G 128GB','1º a 3º')+
+   prizeTileV72(PRIZES_V72.tune720,'JBL Tune 720BT','4º e 5º')+
+   prizeTileV72('./october-volume-maximo.svg','JBL Wave Beam 2','6º')+
+   prizeTileV72('./october-volume-maximo.svg','JBL Wave Buds 2','7º')+
+   prizeTileV72('./october-volume-maximo.svg','JBL Go 4','8º e 9º')+
+   prizeTileV72('./october-volume-maximo.svg','JBL T520 BT','10º a 15º')+
+ '</div><div class="leaderPrizeV72"><div><b>📻 Gerentes Regionais</b><span>JBL Boombox 4 • 3 premiados</span></div><div><b>📻 Gerentes de Loja</b><span>JBL Boombox 3 • 3 premiados</span></div></div>';
+}
+function sellV72(){
+ let t=[['01','Amplie as possibilidades','Quando a loja não tiver tamanho, cor ou produto, use o eStore para não perder a venda.'],['02','Apresente os benefícios','Reforce frete grátis, parcelamento e cupons ativos.'],['03','Use o App com o cliente','Pesquise e conduza a compra de forma simples.'],['04','Transforme objeção em solução','Prazo, variedade e disponibilidade podem fechar a venda.']];
+ return '<h3 class="campaignTitleV72">Como vender mais no eStore</h3><div class="stepsV72">'+t.map(x=>'<div><i>'+x[0]+'</i><section><b>'+x[1]+'</b><p>'+x[2]+'</p></section></div>').join('')+'</div>';
+}
+campaigns=function(){
+ let body=CAMPAIGN_TAB_V72==='coupons'?couponV72():CAMPAIGN_TAB_V72==='prizes'?prizesV72():CAMPAIGN_TAB_V72==='sell'?sellV72():mainV72();
+ return '<div class="card campaignShellV72"><div class="title">Cupons e Campanhas</div>'+tabsV72()+body+'</div>';
+};
+window.shareCampaignV72=async function(){
+ let x=campaignV72(),txt=(x?.title||'eStore no Volume Máximo')+' | '+periodV72(x)+'\\nEsses prêmios podem ser seus. Confira a campanha de outubro no App. eStore CE+PI.';
+ if(navigator.share){try{await navigator.share({title:'eStore CE+PI',text:txt});return}catch(e){}}
+ window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+};
+
+function removeOldPopupV72(){document.getElementById('highlightsPopup')?.remove();document.getElementById('campaignPopupV37')?.remove()}
+window.closePopupV72=removeOldPopupV72;
+function showCampaignPopupV72(x){
+ removeOldPopupV72();
+ let el=document.createElement('div');el.id='highlightsPopup';el.className='popupOverlayV72';
+ el.innerHTML='<div class="popupWavesV72 w1"></div><div class="popupWavesV72 w2"></div><div class="popupWavesV72 w3"></div><div class="popupCardV72">'+
+   '<button class="popupCloseV72" onclick="closePopupV72()">×</button>'+
+   '<div class="popupRadioV72"><span>◖</span><div class="popupEqV72"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="r">◗</span></div>'+
+   '<div class="popupPrizeStageV72"><div class="popupPrizeV72 samsung"><img src="'+PRIZES_V72.samsung+'" alt="Samsung A07"></div><div class="popupPrizeV72 boom4"><img src="'+PRIZES_V72.boom4+'" alt="JBL Boombox 4"></div><div class="popupPrizeV72 boom3"><img src="'+PRIZES_V72.boom3+'" alt="JBL Boombox 3"></div><div class="popupPrizeV72 tune"><img src="'+PRIZES_V72.tune720+'" alt="JBL Tune 720BT"></div><div class="popupGoldRingV72"></div></div>'+
+   '<div class="popupCopyV72"><small>CAMPANHA • 01 A 31 DE OUTUBRO</small><h2>Esses prêmios<br>podem ser seus.</h2><h3>Vai ficar de fora?</h3><p>Participe da campanha de outubro e concorra a prêmios JBL e Samsung. Confira a mecânica e aproveite a oportunidade.</p><button class="popupPrimaryV72" onclick="closePopupV72();go(&quot;campaigns&quot;)">Quero conferir <span>→</span></button><button class="popupSecondaryV72" onclick="closePopupV72()">Agora não</button><img src="./riachuelo-horizontal-oficial.png" class="popupLogoV72" alt="Riachuelo"></div>'+
+ '</div>';
+ document.body.appendChild(el);
+}
+function showMessagePopupV72(p){
+ removeOldPopupV72();let el=document.createElement('div');el.id='highlightsPopup';el.className='popupOverlayV72';
+ let img=p.image_url?'<img class="messagePopupImageV72" src="'+esc(p.image_url)+'" alt="">':'';
+ let action=p.link_url?'<a class="popupPrimaryV72" href="'+esc(p.link_url)+'" target="_blank" rel="noopener">'+esc(p.link_label||'Saiba mais')+' <span>→</span></a>':'<button class="popupPrimaryV72" onclick="closePopupV72()">Entendi</button>';
+ el.innerHTML='<div class="messagePopupCardV72"><button class="popupCloseV72 dark" onclick="closePopupV72()">×</button>'+img+'<div class="messagePopupCopyV72"><small>COMUNICADO eSTORE</small><h2>'+esc(p.title||'Informação importante')+'</h2><p>'+esc(p.text||p.description||'')+'</p>'+action+'<button class="popupSecondaryV72 light" onclick="closePopupV72()">Agora não</button></div></div>';
+ document.body.appendChild(el);
+}
+showHighlightsPopup=async function(){
+ if(!U)return;
+ try{await refreshExtras()}catch(e){}
+ let camp=campaignV72();
+ if(camp){
+   let key='estoreCampaignPopupV72:'+String(camp.id||camp.title)+':'+String(U.u.id);
+   try{if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'1')}catch(e){}
+   showCampaignPopupV72(camp);return;
+ }
+ let p=popupsV72()[0];if(!p)return;
+ let key='estoreMessagePopupV72:'+String(p.id||p.title)+':'+String(U.u.id);
+ try{if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'1')}catch(e){}
+ showMessagePopupV72(p);
+};
+
+const _refreshExtrasV72=refreshExtras;
+refreshExtras=async function(){
+ await _refreshExtrasV72();
+ try{
+   let c=await api({action:'content_get',matricula:U.u.id,demo:isDemo()});
+   CONTENT.popups=c.popups||[];
+   CONTENT.campaigns=c.campaigns||CONTENT.campaigns||[];
+   CONTENT.coupons=c.coupons||CONTENT.coupons||[];
+ }catch(e){}
+};
+
+const _communityPostHtmlV72=communityPostHtml;
+communityPostHtml=function(x){
+ if(String(x.title||'').trim().toLowerCase()==='estore no volume máximo'){
+   let y={...x,media_url:'',media_type:''},html=_communityPostHtmlV72(y);
+   return html.replace('<div class=communitySocialV46>',campaignVisualV72('feed')+'<div class=communitySocialV46>');
+ }
+ return _communityPostHtmlV72(x);
+};
+
+const _adminCampaignV72=adminCampaign;
+adminCampaign=async function(){
+ await _adminCampaignV72();
+ let j=window.ADMCONTENT||{},p=j.popups||[],work=document.getElementById('adminWork');if(!work)return;
+ let rows=p.length?p.map(x=>'<div class="popupAdminRowV72"><div><b>'+esc(x.title||'Comunicado')+'</b><small>'+(x.start_at?'De '+dateLabelV72(x.start_at):'Início imediato')+' • '+(x.end_at?'até '+dateLabelV72(x.end_at):'sem término')+'</small><span class="'+(activeV72(x)?'live':'off')+'">'+(activeV72(x)?'No ar':'Fora da vigência')+'</span></div><button onclick="editPopupV72(&quot;'+esc(String(x.id||''))+'&quot;)">Editar</button><button class="danger" onclick="deletePopupV72(&quot;'+esc(String(x.id||''))+'&quot;)">Excluir</button></div>').join(''):'<div class="muted">Nenhum pop-up adicional cadastrado.</div>';
+ work.insertAdjacentHTML('beforeend','<div class="card popupAdminV72"><div class="title">Gestão de Pop-ups e Comunicados</div><div class="muted">Inclua cards e mensagens importantes, defina início e fim da exibição e controle o que aparece para os colaboradores.</div><button class="btn" style="margin-top:12px" onclick="editPopupV72(&quot;&quot;)">+ Novo pop-up</button><div id="popupEditorV72"></div><div class="popupAdminListV72">'+rows+'</div></div>');
+};
+window.editPopupV72=function(id){
+ let a=window.ADMCONTENT?.popups||[],x=a.find(z=>String(z.id)===String(id))||{},e=document.getElementById('popupEditorV72');if(!e)return;
+ e.innerHTML='<div class="adminEditorV71"><h3>'+(id?'Editar':'Novo')+' pop-up</h3><input id="popupIdV72" type="hidden" value="'+esc(String(x.id||''))+'"><label>Título<input id="popupTitleV72" class="field" value="'+esc(x.title||'')+'" placeholder="Título da mensagem"></label><div class="adminDatesV71"><label>Início<input id="popupStartV72" type="date" class="field" value="'+esc(String(x.start_at||'').slice(0,10))+'"></label><label>Fim<input id="popupEndV72" type="date" class="field" value="'+esc(String(x.end_at||'').slice(0,10))+'"></label></div><label>Mensagem<textarea id="popupTextV72" class="field" rows="4">'+esc(x.text||x.description||'')+'</textarea></label><label>Imagem / card<input id="popupImageV72" class="field" value="'+esc(x.image_url||'')+'" placeholder="URL da imagem ou card"></label><label>Link de destino<input id="popupLinkV72" class="field" value="'+esc(x.link_url||'')+'" placeholder="https://..."></label><label>Texto do botão<input id="popupLabelV72" class="field" value="'+esc(x.link_label||'Saiba mais')+'"></label><label class="adminActiveV71"><input id="popupActiveV72" type="checkbox" '+(x.active!==false?'checked':'')+'> Comunicação ativa</label><button class="btn" onclick="savePopupV72()">Salvar pop-up</button></div>';
+ e.scrollIntoView({behavior:'smooth',block:'start'});
+};
+window.savePopupV72=async function(){
+ let item={id:document.getElementById('popupIdV72')?.value||undefined,title:(document.getElementById('popupTitleV72')?.value||'').trim(),text:(document.getElementById('popupTextV72')?.value||'').trim(),description:(document.getElementById('popupTextV72')?.value||'').trim(),start_at:document.getElementById('popupStartV72')?.value||'',end_at:document.getElementById('popupEndV72')?.value||'',image_url:(document.getElementById('popupImageV72')?.value||'').trim(),link_url:(document.getElementById('popupLinkV72')?.value||'').trim(),link_label:(document.getElementById('popupLabelV72')?.value||'Saiba mais').trim(),active:document.getElementById('popupActiveV72')?.checked!==false};
+ if(!item.title)return alert('Informe o título.');
+ try{await api({action:'content_item_save',matricula:U.u.id,password:adminPwd(),kind:'popup',item});await refreshExtras();await adminCampaign()}catch(e){alert(e.message||'Não foi possível salvar.')}
+};
+window.deletePopupV72=async function(id){
+ if(!confirm('Excluir este pop-up?'))return;
+ try{await api({action:'content_item_delete',matricula:U.u.id,password:adminPwd(),kind:'popup',id});await refreshExtras();await adminCampaign()}catch(e){alert(e.message||'Não foi possível excluir.')}
+};
+})();
+</script>
+<style>
+.campaignShellV72{padding:16px!important}.campaignTabsV72{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px 0;margin:12px 0 15px;border-top:1px solid #ebe8e1;border-bottom:1px solid #ebe8e1}.campaignTabsV72 button{border:0;background:transparent;border-radius:14px;padding:9px 3px;color:#53635e;display:grid;place-items:center;gap:3px;font-size:9px;font-weight:800}.campaignTabsV72 button b{font-size:20px}.campaignTabsV72 button.on{background:#173F35;color:#fff;box-shadow:0 7px 18px #173f3530}.campaignRealCardV72{position:relative;min-height:310px;overflow:hidden;border-radius:23px;background:radial-gradient(circle at 75% 45%,#335f4d 0,#173F35 36%,#0d332b 70%);color:#fff;padding:22px;display:grid;grid-template-columns:.92fr 1.08fr;gap:12px;box-shadow:0 14px 30px #173f3524}.campaignRealCardV72.feed{min-height:270px;margin:12px 0}.campaignRealWavesV72{position:absolute;right:-90px;top:-50px;width:480px;height:480px;border-radius:50%;border:2px solid #dcb76844;box-shadow:0 0 0 55px #dcb76822,0 0 0 110px #dcb76812}.campaignRealCopyV72{position:relative;z-index:2;align-self:center}.campaignRealCopyV72 small{color:#f1d49a;font-size:9px;font-weight:900;letter-spacing:.1em}.campaignRealCopyV72 h2{font-size:30px;line-height:1.05;margin:10px 0 8px}.campaignRealCopyV72 h2 span{display:block;color:#f1d49a}.campaignRealCopyV72 p{font-size:13px;margin:0 0 8px;color:#f1f2ed}.campaignRealCopyV72 strong{font-size:10px;color:#f1d49a}.campaignRealPrizesV72{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:7px;align-self:center}.prizeTileV72{background:#fff;border-radius:14px;padding:7px;text-align:center;color:#173F35;box-shadow:0 5px 14px #00000016;overflow:hidden}.prizeImgV72{height:76px;display:grid;place-items:center;background:#fff;border-radius:10px}.prizeImgV72 img{width:100%;height:100%;object-fit:contain!important;object-position:center!important}.prizeTileV72 b{display:block;font-size:9px;margin-top:5px;line-height:1.1}.prizeTileV72 span{display:block;font-size:7px;color:#6e7a76;margin-top:2px}.campaignEqualizerV72{position:absolute;left:22px;bottom:16px;display:flex;align-items:end;gap:4px;height:55px;opacity:.7}.campaignEqualizerV72 i{display:block;width:6px;border-radius:4px;background:linear-gradient(#f1d49a,#DE7C00)}.campaignTitleV72{font-size:17px;color:#173F35;margin:18px 2px 10px}.campaignInfoGridV72{display:grid;grid-template-columns:1fr 1fr;gap:8px}.campaignInfoGridV72>div{background:#f3f2ed;border-radius:15px;padding:11px;display:grid;gap:4px;min-height:84px}.campaignInfoGridV72 b{color:#173F35;font-size:10px}.campaignInfoGridV72 span{font-size:9px;line-height:1.35;color:#596a64}.prizeGridV72{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.prizeGridV72.full{grid-template-columns:repeat(3,1fr)}.campaignShareV72{width:100%;margin-top:14px;border:0;border-radius:15px;background:#173F35;color:#fff;padding:14px;font-weight:900}.couponV72{display:grid;grid-template-columns:.9fr 1.1fr;border-radius:17px;overflow:hidden;background:#f7efdf;margin-bottom:9px}.couponV72>div{background:#173F35;color:#fff;padding:16px 12px;display:grid;align-content:center}.couponV72 b{font-size:21px}.couponV72 span{font-size:9px}.couponV72 section{padding:12px;color:#173F35;font-size:9px}.couponV72 p{margin:4px 0}.couponV72 small{color:#7a7165}.rulesV72{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.rulesV72 div{background:#f2f2ee;border-radius:13px;min-height:80px;display:grid;place-items:center;text-align:center;font-size:20px;padding:7px}.rulesV72 span{font-size:8px;color:#344942}.sellBannerV72{background:#f5ead8;border-radius:17px;padding:14px;margin:14px 0;display:flex;align-items:center;justify-content:space-between}.sellBannerV72>div{display:grid;gap:4px}.sellBannerV72 b{color:#173F35;font-size:13px}.sellBannerV72 span{font-size:9px;color:#61706b}.sellBannerV72 strong{font-size:34px}.leaderPrizeV72{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.leaderPrizeV72>div{background:#173F35;color:#fff;border-radius:15px;padding:12px;display:grid;gap:4px}.leaderPrizeV72 b{font-size:10px}.leaderPrizeV72 span{font-size:8px;color:#e9e4d9}.stepsV72{display:grid;gap:8px}.stepsV72>div{background:#fff;border:1px solid #e6e3dc;border-radius:16px;padding:12px;display:flex;gap:9px}.stepsV72 i{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#f1d49a;color:#173F35;font-style:normal;font-weight:900;flex:0 0 32px}.stepsV72 section{flex:1}.stepsV72 b{font-size:11px;color:#173F35}.stepsV72 p{font-size:9px;color:#62716c;margin:4px 0 0;line-height:1.4}.campaignEmptyV72{background:#f4f3ee;border-radius:16px;padding:20px;text-align:center;color:#173F35;display:grid;gap:5px}.campaignEmptyV72 span{font-size:9px;color:#6f7b77}
+.popupOverlayV72{position:fixed;inset:0;z-index:10080;background:#071613da;backdrop-filter:blur(7px);display:grid;place-items:center;padding:16px;overflow:hidden}.popupCardV72{position:relative;width:min(420px,95vw);max-height:94vh;overflow:auto;background:#0d332b;border:1px solid #f1d49a66;border-radius:29px;box-shadow:0 30px 80px #0008}.popupCloseV72{position:absolute;right:12px;top:12px;z-index:8;width:37px;height:37px;border-radius:50%;border:1px solid #ffffff66;background:#fff;color:#173F35;font-size:23px}.popupCloseV72.dark{background:#173F35;color:#fff}.popupRadioV72{position:absolute;top:15px;left:50%;transform:translateX(-50%);z-index:7;display:flex;align-items:center;gap:7px;background:#08251fdd;color:#f1d49a;border:1px solid #f1d49a55;border-radius:999px;padding:7px 11px}.popupRadioV72>span{font-size:17px}.popupRadioV72>span.r{transform:scaleX(-1)}.popupEqV72{height:19px;display:flex;align-items:center;gap:3px}.popupEqV72 i{width:3px;border-radius:3px;background:#DE7C00;animation:eq72 .9s ease-in-out infinite}.popupEqV72 i:nth-child(1){height:7px}.popupEqV72 i:nth-child(2){height:15px;animation-delay:.1s}.popupEqV72 i:nth-child(3){height:10px;animation-delay:.2s}.popupEqV72 i:nth-child(4){height:19px;animation-delay:.3s}.popupEqV72 i:nth-child(5){height:11px;animation-delay:.4s}.popupEqV72 i:nth-child(6){height:16px;animation-delay:.5s}.popupEqV72 i:nth-child(7){height:8px;animation-delay:.6s}.popupPrizeStageV72{position:relative;height:330px;background:radial-gradient(circle at 60% 55%,#6b7c42 0,#214e3d 38%,#0d332b 72%);overflow:hidden}.popupGoldRingV72{position:absolute;left:48%;top:48%;width:270px;height:270px;border-radius:50%;border:2px solid #e6bd6044;transform:translate(-50%,-50%);box-shadow:0 0 0 45px #e6bd6025,0 0 0 90px #e6bd6012}.popupPrizeV72{position:absolute;z-index:3;background:#fff;border-radius:18px;display:grid;place-items:center;box-shadow:0 12px 24px #0004;padding:5px}.popupPrizeV72 img{width:100%;height:100%;object-fit:contain!important}.popupPrizeV72.samsung{width:118px;height:155px;left:44%;top:56px;transform:translateX(-50%)}.popupPrizeV72.boom4{width:185px;height:120px;left:47px;bottom:42px}.popupPrizeV72.boom3{width:155px;height:105px;right:34px;top:98px}.popupPrizeV72.tune{width:110px;height:110px;right:38px;bottom:22px}.popupCopyV72{text-align:left;padding:18px 20px 21px;color:#fff}.popupCopyV72 small{font-size:8px;color:#f1d49a;font-weight:900;letter-spacing:.11em}.popupCopyV72 h2{font-size:31px;line-height:1.01;margin:8px 0 2px}.popupCopyV72 h3{font-size:27px;color:#f1d49a;margin:0 0 10px}.popupCopyV72 p{font-size:11px;color:#D6D2C4;line-height:1.45;margin:0 0 14px}.popupPrimaryV72,.popupSecondaryV72{width:100%;border-radius:15px;padding:13px;font-weight:900;text-align:center;text-decoration:none;display:flex;justify-content:center;gap:7px;box-sizing:border-box}.popupPrimaryV72{border:0;background:#efbd61;color:#173F35}.popupSecondaryV72{margin-top:8px;border:1px solid #f1d49a77;background:transparent;color:#fff}.popupSecondaryV72.light{color:#173F35;border-color:#d7d5cf}.popupLogoV72{display:block;width:105px;max-height:38px;object-fit:contain;margin:16px auto 0;filter:brightness(0) invert(1)}.popupWavesV72{position:absolute;left:50%;top:50%;width:380px;height:380px;border-radius:50%;border:2px solid #f1d49a2e;animation:wave72 2.7s ease-out infinite}.popupWavesV72.w2{animation-delay:.9s}.popupWavesV72.w3{animation-delay:1.8s}.messagePopupCardV72{position:relative;width:min(410px,94vw);max-height:92vh;overflow:auto;background:#fff;border-radius:26px;box-shadow:0 30px 80px #0007}.messagePopupImageV72{width:100%;max-height:340px;object-fit:contain;background:#f4f3ee}.messagePopupCopyV72{padding:20px}.messagePopupCopyV72 small{font-size:8px;color:#DE7C00;font-weight:900;letter-spacing:.1em}.messagePopupCopyV72 h2{color:#173F35;margin:7px 0;font-size:23px}.messagePopupCopyV72 p{color:#52645f;font-size:12px;line-height:1.5;white-space:pre-wrap}.popupAdminV72{margin-top:14px}.popupAdminListV72{display:grid;gap:7px;margin-top:12px}.popupAdminRowV72{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;background:#faf9f6;border:1px solid #e6e2da;border-radius:12px;padding:9px}.popupAdminRowV72>div{display:grid;gap:2px}.popupAdminRowV72 b{font-size:10px;color:#173F35}.popupAdminRowV72 small{font-size:8px;color:#78837f}.popupAdminRowV72 span{font-size:7px;font-weight:900;border-radius:999px;padding:3px 6px;width:max-content}.popupAdminRowV72 span.live{background:#e3f0e8;color:#176747}.popupAdminRowV72 span.off{background:#edeae5;color:#746f68}.popupAdminRowV72 button{border:0;border-radius:8px;background:#edf2ef;color:#173F35;padding:7px;font-size:8px;font-weight:800}.popupAdminRowV72 button.danger{background:#f8e8e8;color:#8c2d2d}
+@keyframes wave72{0%{opacity:.8;transform:translate(-50%,-50%) scale(.55)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.55)}}@keyframes eq72{0%,100%{transform:scaleY(.45);opacity:.55}50%{transform:scaleY(1);opacity:1}}
+@media(max-width:520px){.campaignRealCardV72{grid-template-columns:1fr;min-height:460px}.campaignRealCopyV72{padding-right:40px}.campaignRealPrizesV72{grid-template-columns:1fr 1fr}.prizeGridV72{grid-template-columns:1fr 1fr}.campaignInfoGridV72{grid-template-columns:1fr 1fr}.popupPrizeStageV72{height:300px}.popupPrizeV72.boom4{left:24px}.popupPrizeV72.boom3{right:22px}.popupPrizeV72.tune{right:25px}}
+</style>
 </body></html>
