@@ -2268,7 +2268,11 @@ const PRIZES_V72={
  samsung:'https://images.samsung.com/is/image/samsung/p6pim/br/sm-a075mzkgzto/gallery/br-galaxy-a07-sm-a075-sm-a075mzkgzto-548807702?%241164_776_PNG%24=',
  boom4:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dwe154c3b4/LS_JBL_BOOMBOX_4_HERO_BLACK_0019_x4.png?sh=535&sw=535',
  boom3:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dw10cb1df1/1_JBL_BOOMBOX_3_HERO_BLACK_33216_x2.png?sh=535&sw=535',
- tune720:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dwbfa524ed/01.JBL_Tune_720BT_ProductImage_Hero_Black.png?sh=535&sw=535'
+ tune720:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dwbfa524ed/01.JBL_Tune_720BT_ProductImage_Hero_Black.png?sh=535&sw=535',
+ waveBeam2:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dwb3516f7c/01.JBL_Wave%20Beam%202_Product%20Image_Hero_Black.png?sh=535&sw=535',
+ waveBuds2:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dw11b858ba/01.LS_JBL_Wave%20Buds%202_Product%20Image_Hero_Black.png?sh=535&sw=535',
+ go4:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dw96fc93ec/JBL_GO_4_HERO_BLACK_48156_x4.png?sh=535&sw=535',
+ tune520:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dwc23d813b/01.JBL_Tune_520BT_ProductImage_Hero_Black.png?sh=535&sw=535'
 };
 let CAMPAIGN_TAB_V72='campaigns';
 
@@ -2329,10 +2333,10 @@ function prizesV72(){
  return '<h3 class="campaignTitleV72">Premiação completa</h3><div class="prizeGridV72 full">'+
    prizeTileV72(PRIZES_V72.samsung,'Samsung A07 4G 128GB','1º a 3º')+
    prizeTileV72(PRIZES_V72.tune720,'JBL Tune 720BT','4º e 5º')+
-   prizeTileV72('./october-volume-maximo.svg','JBL Wave Beam 2','6º')+
-   prizeTileV72('./october-volume-maximo.svg','JBL Wave Buds 2','7º')+
-   prizeTileV72('./october-volume-maximo.svg','JBL Go 4','8º e 9º')+
-   prizeTileV72('./october-volume-maximo.svg','JBL T520 BT','10º a 15º')+
+   prizeTileV72(PRIZES_V72.waveBeam2,'JBL Wave Beam 2','6º')+
+   prizeTileV72(PRIZES_V72.waveBuds2,'JBL Wave Buds 2','7º')+
+   prizeTileV72(PRIZES_V72.go4,'JBL Go 4','8º e 9º')+
+   prizeTileV72(PRIZES_V72.tune520,'JBL T520 BT','10º a 15º')+
  '</div><div class="leaderPrizeV72"><div><b>📻 Gerentes Regionais</b><span>JBL Boombox 4 • 3 premiados</span></div><div><b>📻 Gerentes de Loja</b><span>JBL Boombox 3 • 3 premiados</span></div></div>';
 }
 function sellV72(){
