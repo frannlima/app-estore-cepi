@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-label="Campanha eStore no Volume Máximo - Outubro">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#102f29"/>
+    <stop offset=".55" stop-color="#173F35"/>
+    <stop offset="1" stop-color="#274f46"/>
+  </linearGradient>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#f1d49a"/>
+    <stop offset=".5" stop-color="#DE7C00"/>
+    <stop offset="1" stop-color="#b95e00"/>
+  </linearGradient>
+  <linearGradient id="cream" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#fffdf8"/>
+    <stop offset="1" stop-color="#D6D2C4"/>
+  </linearGradient>
+  <radialGradient id="glow">
+    <stop offset="0" stop-color="#f4c978" stop-opacity=".45"/>
+    <stop offset="1" stop-color="#f4c978" stop-opacity="0"/>
+  </radialGradient>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#071713" flood-opacity=".42"/>
+  </filter>
+  <filter id="soft">
+    <feGaussianBlur stdDeviation="8"/>
+  </filter>
+</defs>
+<rect width="1200" height="600" rx="36" fill="url(#bg)"/>
+<circle cx="915" cy="300" r="245" fill="url(#glow)"/>
+<g fill="none" stroke="#e8c77f" opacity=".26" stroke-width="3">
+  <circle cx="905" cy="300" r="122"/><circle cx="905" cy="300" r="165"/><circle cx="905" cy="300" r="208"/>
+</g>
+<g opacity=".55" fill="#f0d092">
+  <rect x="720" y="172" width="9" height="66" rx="5"/><rect x="741" y="146" width="9" height="92" rx="5"/>
+  <rect x="762" y="122" width="9" height="116" rx="5"/><rect x="783" y="161" width="9" height="77" rx="5"/>
+  <rect x="804" y="138" width="9" height="100" rx="5"/><rect x="825" y="182" width="9" height="56" rx="5"/>
+  <rect x="846" y="154" width="9" height="84" rx="5"/>
+</g>
+<g opacity=".14" fill="#f0d092">
+  <circle cx="1030" cy="82" r="5"/><circle cx="1090" cy="142" r="3"/><circle cx="1118" cy="390" r="5"/>
+  <circle cx="690" cy="86" r="4"/><circle cx="650" cy="420" r="3"/><circle cx="1000" cy="510" r="4"/>
+</g>
+<g font-family="Arial, Helvetica, sans-serif">
+  <text x="78" y="92" fill="#f0d7a4" font-size="22" font-weight="700" letter-spacing="2">CAMPANHA • 01 A 31 DE OUTUBRO</text>
+  <text x="78" y="170" fill="#ffffff" font-size="62" font-weight="800">eStore no</text>
+  <text x="78" y="236" fill="#f1d49a" font-size="72" font-weight="900">Volume Máximo</text>
+  <text x="78" y="286" fill="#ffffff" opacity=".92" font-size="24" font-weight="700">Aumente o som das vendas.</text>
+  <text x="78" y="330" fill="#D6D2C4" font-size="20">Gerentes regionais, gerentes de loja e vendedores</text>
+  <text x="78" y="360" fill="#D6D2C4" font-size="20">concorrem a prêmios JBL e Samsung.</text>
+  <g transform="translate(78 412)">
+    <rect width="222" height="54" rx="27" fill="url(#cream)"/>
+    <text x="111" y="35" text-anchor="middle" fill="#173F35" font-size="18" font-weight="800">CONFIRA A CAMPANHA</text>
+  </g>
+  <text x="78" y="525" fill="#ffffff" opacity=".7" font-size="17">App. eStore CE+PI • Moda que inspira o Brasil</text>
+</g>
+<g transform="translate(720 222)" filter="url(#shadow)">
+  <rect x="40" y="78" width="330" height="165" rx="46" fill="#101514"/>
+  <rect x="58" y="95" width="294" height="130" rx="36" fill="#202927"/>
+  <circle cx="123" cy="160" r="52" fill="#0d1211" stroke="#4b5d58" stroke-width="8"/>
+  <circle cx="123" cy="160" r="26" fill="#24312e"/>
+  <circle cx="286" cy="160" r="52" fill="#0d1211" stroke="#4b5d58" stroke-width="8"/>
+  <circle cx="286" cy="160" r="26" fill="#24312e"/>
+  <rect x="180" y="130" width="48" height="48" rx="9" fill="#f15a24"/>
+  <text x="204" y="161" text-anchor="middle" fill="#fff" font-family="Arial" font-size="14" font-weight="800">JBL</text>
+  <path d="M84 78 C110 8 302 8 328 78" fill="none" stroke="#121817" stroke-width="27" stroke-linecap="round"/>
+  <path d="M88 78 C118 25 294 25 324 78" fill="none" stroke="#3f4d49" stroke-width="7" stroke-linecap="round"/>
+</g>
+<g transform="translate(1030 170)" filter="url(#shadow)">
+  <rect width="112" height="226" rx="23" fill="#111a18" stroke="#5f736d" stroke-width="4"/>
+  <rect x="10" y="20" width="92" height="183" rx="15" fill="#dce9e4"/>
+  <rect x="29" y="52" width="54" height="54" rx="16" fill="#173F35"/>
+  <text x="56" y="85" text-anchor="middle" fill="#fff" font-family="Arial" font-size="17" font-weight="800">eStore</text>
+  <rect x="27" y="126" width="58" height="9" rx="5" fill="#466964"/>
+  <rect x="27" y="146" width="44" height="9" rx="5" fill="#DE7C00"/>
+</g>
+<g transform="translate(880 130)" stroke="#151d1b" fill="none" stroke-linecap="round" filter="url(#shadow)">
+  <path d="M0 82 C0 -22 140 -22 140 82" stroke-width="22"/>
+  <rect x="-12" y="73" width="35" height="82" rx="17" fill="#1a2421" stroke="none"/>
+  <rect x="117" y="73" width="35" height="82" rx="17" fill="#1a2421" stroke="none"/>
+</g>
+<g transform="translate(1075 425)" filter="url(#shadow)">
+  <ellipse cx="0" cy="0" rx="48" ry="33" fill="#15201d"/>
+  <ellipse cx="0" cy="-4" rx="33" ry="18" fill="#25322f"/>
+  <circle cx="-18" cy="-7" r="8" fill="#f15a24"/><circle cx="18" cy="-7" r="8" fill="#f15a24"/>
+</g>
+</svg>
