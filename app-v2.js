@@ -1515,3 +1515,154 @@ go=function(v){
 `;
   document.head.appendChild(s);
 })();
+
+
+/* ===== V37 2026-10-01: campanha outubro + Conexão eStore + pop-up sonoro ===== */
+const CAMPAIGN_OCT_V37={
+  title:'eStore no Volume Máximo',
+  start:'2026-10-01',
+  end:'2026-10-31',
+  art:'./october-volume-maximo.svg'
+};
+let CONNECTION_V37=[];
+
+function campaignActiveV37(){
+  const d=(typeof localIsoV4==='function'?localIsoV4():new Date().toISOString().slice(0,10));
+  return d>=CAMPAIGN_OCT_V37.start&&d<=CAMPAIGN_OCT_V37.end;
+}
+function campaignHomeV37(){
+  if(!campaignActiveV37())return '';
+  return '<section class="campaignHomeV37" onclick="go(\'connectionv37\')" role="button" tabindex="0" aria-label="Abrir campanha eStore no Volume Máximo">'+
+    '<div class="campaignHomeGlowV37"></div>'+
+    '<img src="'+CAMPAIGN_OCT_V37.art+'" alt="Campanha eStore no Volume Máximo">'+
+    '<div class="campaignHomeActionV37"><span class="campaignLiveV37"><i></i> CAMPANHA DE OUTUBRO</span><b>Conferir campanha</b><span>›</span></div>'+
+  '</section>';
+}
+const _homeV37=home;
+home=function(){
+  const base=_homeV37();
+  const hero=campaignHomeV37();
+  if(!hero)return base;
+  const mark='<button class="weekFeatureV20"';
+  return base.includes(mark)?base.replace(mark,hero+mark):hero+base;
+};
+
+function connectionCampaignV37(){
+  return '<article class="connectionCampaignV37">'+
+    '<div class="connectionBrandV37"><span class="connectionAvatarV37">eS</span><div><b>eStore CE+PI</b><small>Campanha • Outubro 2026</small></div><span class="connectionPinV37">●</span></div>'+
+    '<div class="connectionArtV37"><img src="'+CAMPAIGN_OCT_V37.art+'" alt="eStore no Volume Máximo"></div>'+
+    '<div class="connectionCopyV37"><h2>🔊 eStore no Volume Máximo chegou!</h2><p>Durante outubro, vamos aumentar o som das vendas e transformar cada oportunidade em resultado. Gerentes regionais, gerentes de loja e vendedores concorrem a prêmios JBL e Samsung.</p>'+
+    '<div class="connectionTagsV37"><span>#eStoreNoVolumeMáximo</span><span>#Outubro</span><span>#JBL</span><span>#Samsung</span></div></div>'+
+  '</article>';
+}
+function connectionV37(){
+  return '<div class="pageTitleV3"><span>Conexão eStore</span></div>'+
+    '<div class="connectionTabsV37"><button class="on">Todos</button><button>Campanhas</button><button>Boas práticas</button></div>'+
+    connectionCampaignV37()+
+    '<div id="connectionFeedV37"><div class="card"><p class="muted">Carregando publicações da regional...</p></div></div>';
+}
+function communityPostHtmlV37(x){
+  const media=x.media_url?'<div class="connectionPostMediaV37"><img src="'+escV3(x.media_url)+'" alt=""></div>':'';
+  const comments=Number(x.comment_count||0),likes=Number(x.like_count||0),liked=x.liked_by_me===true;
+  return '<article class="connectionPostV37">'+
+    '<div class="connectionBrandV37"><span class="connectionAvatarV37">'+escV3(String(x.author_name||'eS').trim().slice(0,2).toUpperCase())+'</span><div><b>'+escV3(x.author_name||'eStore CE+PI')+'</b><small>Filial '+escV3(x.store_code||'CE+PI')+'</small></div></div>'+
+    '<h3>'+escV3(x.title||'Conexão eStore')+'</h3>'+
+    media+
+    (x.body?'<p>'+escV3(x.body)+'</p>':'')+
+    '<div class="connectionActionsV37"><button class="'+(liked?'liked':'')+'" onclick="toggleCommunityLikeV37(\''+escV3(String(x.id))+'\')">♥ '+likes+'</button><span>💬 '+comments+'</span></div>'+
+  '</article>';
+}
+async function loadConnectionV37(){
+  const box=document.getElementById('connectionFeedV37');if(!box||!U?.u?.id)return;
+  try{
+    const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:'community_get',matricula:String(U.u.id)})});
+    const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Não foi possível carregar o Conexão eStore.');
+    CONNECTION_V37=Array.isArray(j.items)?j.items:[];
+    const other=CONNECTION_V37.filter(x=>String(x.title||'')!==CAMPAIGN_OCT_V37.title);
+    box.innerHTML=other.length?other.map(communityPostHtmlV37).join(''):'<div class="card"><p class="muted">A campanha de outubro já está em destaque. Novas publicações aparecerão aqui.</p></div>';
+  }catch(e){box.innerHTML='<div class="card"><p class="muted">Conexão eStore temporariamente indisponível.</p></div>'}
+}
+async function toggleCommunityLikeV37(id){
+  try{
+    const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'community_like',matricula:String(U.u.id),post_id:String(id)})});
+    const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Falha ao curtir.');
+    await loadConnectionV37();
+  }catch(e){alert(String(e.message||e))}
+}
+
+function closeCampaignPopupV37(openConnection){
+  const el=document.getElementById('campaignPopupV37');if(el)el.remove();
+  if(openConnection)go('connectionv37');
+}
+function showCampaignPopupV37(){
+  if(!campaignActiveV37()||!U?.u?.id||document.getElementById('campaignPopupV37'))return;
+  const el=document.createElement('div');
+  el.id='campaignPopupV37';el.className='campaignOverlayV37';
+  el.innerHTML='<div class="campaignWaveV37 w1"></div><div class="campaignWaveV37 w2"></div><div class="campaignWaveV37 w3"></div>'+
+    '<div class="campaignModalV37" role="dialog" aria-modal="true" aria-label="Campanha eStore no Volume Máximo">'+
+      '<button class="campaignCloseV37" onclick="closeCampaignPopupV37(false)" aria-label="Fechar">×</button>'+
+      '<div class="campaignRadioTopV37"><span class="campaignHeadphoneV37">◖</span><div class="campaignEqV37"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="campaignHeadphoneV37 right">◗</span></div>'+
+      '<img src="'+CAMPAIGN_OCT_V37.art+'" alt="Campanha eStore no Volume Máximo">'+
+      '<div class="campaignModalCopyV37"><span>🔊 ATENÇÃO, TIME!</span><h2>Outubro está no Volume Máximo</h2><p>A campanha eStore do mês já começou. Confira a mecânica, mobilize sua loja e fique de olho nas premiações.</p>'+
+      '<button onclick="closeCampaignPopupV37(true)">Conferir campanha <b>→</b></button></div>'+
+    '</div>';
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('show'));
+}
+
+const _refreshNavV37=refreshNavV5;
+refreshNavV5=function(){
+  _refreshNavV37();
+  const sh=document.querySelector('#drawer .sheet');
+  if(sh&&!sh.querySelector('[data-connection-v37]')){
+    const buttons=[...sh.querySelectorAll('button')];
+    const before=buttons.find(b=>/Cupons e Campanhas/i.test(b.textContent||''))||buttons.find(b=>/Informações Importantes/i.test(b.textContent||''));
+    const html='<button data-connection-v37="1" onclick="go(\'connectionv37\')">◉ Conexão eStore</button>';
+    if(before)before.insertAdjacentHTML('beforebegin',html);else sh.insertAdjacentHTML('beforeend',html);
+  }
+};
+refreshNavV3=refreshNavV5;
+
+const _goV37=go;
+go=function(v){
+  if(v==='connectionv37'){
+    CUR=v;document.querySelector('#drawer')?.classList.remove('open');
+    const view=document.querySelector('#view');if(view)view.innerHTML=connectionV37();
+    window.scrollTo(0,0);setTimeout(loadConnectionV37,0);
+    if(U?.u?.id&&typeof loadNotificationsV14==='function')Promise.resolve(loadNotificationsV14()).catch(()=>{});
+    return;
+  }
+  return _goV37(v);
+};
+
+const _loginV37=login;
+login=async function(){
+  await _loginV37();
+  if(U?.u?.id){
+    refreshNavV5();
+    setTimeout(showCampaignPopupV37,650);
+  }
+};
+
+(function(){
+  if(document.getElementById('campaign-v37-style'))return;
+  const s=document.createElement('style');s.id='campaign-v37-style';
+  s.textContent=
+'.campaignHomeV37{position:relative;display:block;margin:14px 0 16px;border:0;border-radius:24px;overflow:hidden;background:#173F35;box-shadow:0 14px 34px rgba(16,47,41,.18);cursor:pointer}'+
+'.campaignHomeV37 img{display:block;width:100%;aspect-ratio:2/1;object-fit:cover}'+
+'.campaignHomeGlowV37{position:absolute;inset:-30%;background:radial-gradient(circle at 76% 48%,rgba(222,124,0,.22),transparent 34%);pointer-events:none;animation:campaignGlowV37 2.4s ease-in-out infinite}'+
+'.campaignHomeActionV37{position:absolute;left:14px;right:14px;bottom:12px;display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:rgba(11,34,29,.82);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:14px;padding:10px 12px;font-size:12px}'+
+'.campaignHomeActionV37>b{color:#f5dfaf;font-size:12px}.campaignHomeActionV37>span:last-child{font-size:20px}.campaignLiveV37{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:800;letter-spacing:.08em}.campaignLiveV37 i{width:7px;height:7px;border-radius:50%;background:#DE7C00;box-shadow:0 0 0 0 rgba(222,124,0,.6);animation:campaignLivePulseV37 1.4s infinite}'+
+'.connectionTabsV37{display:flex;gap:8px;overflow:auto;margin:0 0 12px;padding-bottom:2px}.connectionTabsV37 button{border:1px solid #d8d7d1;background:#fff;color:#466964;padding:8px 13px;border-radius:999px;font-weight:700;white-space:nowrap}.connectionTabsV37 button.on{background:#173F35;color:#fff;border-color:#173F35}'+
+'.connectionCampaignV37,.connectionPostV37{background:#fff;border:1px solid #e7e5df;border-radius:22px;padding:14px;margin-bottom:14px;box-shadow:0 8px 24px rgba(23,63,53,.08)}'+
+'.connectionBrandV37{display:flex;align-items:center;gap:10px;margin-bottom:12px}.connectionBrandV37>div{display:grid;gap:2px;flex:1}.connectionBrandV37 small{font-size:10px;color:#7b8582}.connectionAvatarV37{width:36px;height:36px;border-radius:50%;background:#173F35;color:#fff;display:grid;place-items:center;font-weight:800;font-size:12px}.connectionPinV37{color:#DE7C00;font-size:10px}'+
+'.connectionArtV37,.connectionPostMediaV37{border-radius:18px;overflow:hidden;background:#173F35}.connectionArtV37 img,.connectionPostMediaV37 img{display:block;width:100%;height:auto}.connectionCopyV37 h2,.connectionPostV37 h3{color:#173F35;margin:13px 0 8px;font-size:18px}.connectionCopyV37 p,.connectionPostV37 p{color:#4d5d58;line-height:1.5;font-size:13px;margin:0 0 12px}.connectionTagsV37{display:flex;gap:6px;flex-wrap:wrap}.connectionTagsV37 span{background:#f2f0e8;color:#466964;border-radius:999px;padding:6px 9px;font-size:9px;font-weight:700}'+
+'.connectionActionsV37{display:flex;gap:16px;border-top:1px solid #eeeae3;padding-top:10px;margin-top:10px;color:#6f7b77;font-size:12px}.connectionActionsV37 button{border:0;background:transparent;color:#6f7b77;font-weight:700;padding:0}.connectionActionsV37 button.liked{color:#9b2f43}'+
+'.campaignOverlayV37{position:fixed;inset:0;z-index:99999;background:rgba(7,22,19,.82);backdrop-filter:blur(8px);display:grid;place-items:center;padding:18px;opacity:0;transition:opacity .25s ease;overflow:hidden}.campaignOverlayV37.show{opacity:1}.campaignModalV37{position:relative;width:min(440px,94vw);max-height:92vh;overflow:auto;background:#0f2f28;border:1px solid rgba(240,215,164,.36);border-radius:28px;box-shadow:0 30px 80px rgba(0,0,0,.42);transform:translateY(18px) scale(.97);transition:transform .28s ease}.campaignOverlayV37.show .campaignModalV37{transform:none}.campaignModalV37>img{display:block;width:100%;height:auto;border-radius:26px 26px 0 0}'+
+'.campaignCloseV37{position:absolute;z-index:4;right:12px;top:12px;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.28);background:rgba(11,34,29,.78);color:#fff;font-size:24px;line-height:32px}.campaignModalCopyV37{padding:18px 20px 22px;color:#fff}.campaignModalCopyV37>span{color:#f1d49a;font-size:10px;font-weight:900;letter-spacing:.12em}.campaignModalCopyV37 h2{margin:7px 0 8px;font-size:22px}.campaignModalCopyV37 p{margin:0 0 16px;color:#D6D2C4;font-size:13px;line-height:1.5}.campaignModalCopyV37 button{width:100%;border:0;border-radius:15px;background:#f1d49a;color:#173F35;font-weight:900;padding:13px 16px;font-size:13px;display:flex;justify-content:center;gap:8px}'+
+'.campaignRadioTopV37{position:absolute;z-index:3;left:50%;top:15px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;color:#f1d49a;background:rgba(10,33,28,.78);border:1px solid rgba(241,212,154,.24);border-radius:999px;padding:7px 11px}.campaignHeadphoneV37{font-size:18px;font-weight:900}.campaignHeadphoneV37.right{transform:scaleX(-1)}.campaignEqV37{height:22px;display:flex;align-items:center;gap:3px}.campaignEqV37 i{display:block;width:3px;border-radius:3px;background:#DE7C00;animation:eqV37 .9s ease-in-out infinite}.campaignEqV37 i:nth-child(1){height:8px}.campaignEqV37 i:nth-child(2){height:16px;animation-delay:.1s}.campaignEqV37 i:nth-child(3){height:11px;animation-delay:.2s}.campaignEqV37 i:nth-child(4){height:21px;animation-delay:.3s}.campaignEqV37 i:nth-child(5){height:13px;animation-delay:.4s}.campaignEqV37 i:nth-child(6){height:18px;animation-delay:.5s}.campaignEqV37 i:nth-child(7){height:9px;animation-delay:.6s}'+
+'.campaignWaveV37{position:absolute;left:50%;top:50%;width:420px;height:420px;border:2px solid rgba(241,212,154,.22);border-radius:50%;transform:translate(-50%,-50%) scale(.6);animation:waveV37 2.7s ease-out infinite}.campaignWaveV37.w2{animation-delay:.9s}.campaignWaveV37.w3{animation-delay:1.8s}'+
+'@keyframes waveV37{0%{opacity:.8;transform:translate(-50%,-50%) scale(.55)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.55)}}@keyframes eqV37{0%,100%{transform:scaleY(.45);opacity:.55}50%{transform:scaleY(1);opacity:1}}@keyframes campaignGlowV37{0%,100%{opacity:.65}50%{opacity:1}}@keyframes campaignLivePulseV37{0%{box-shadow:0 0 0 0 rgba(222,124,0,.55)}70%{box-shadow:0 0 0 8px rgba(222,124,0,0)}100%{box-shadow:0 0 0 0 rgba(222,124,0,0)}}'+
+'@media(max-width:560px){.campaignHomeActionV37{grid-template-columns:1fr auto}.campaignHomeActionV37 .campaignLiveV37{grid-column:1/-1}.connectionCampaignV37,.connectionPostV37{border-radius:18px}.campaignModalV37{width:min(410px,96vw)}}';
+  document.head.appendChild(s);
+})();
