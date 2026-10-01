@@ -1670,3 +1670,231 @@ login=async function(){
 '@media(max-width:560px){.campaignHomeActionV37{grid-template-columns:1fr auto}.campaignHomeActionV37 .campaignLiveV37{grid-column:1/-1}.connectionCampaignV37,.connectionPostV37{border-radius:18px}.campaignModalV37{width:min(410px,96vw)}}';
   document.head.appendChild(s);
 })();
+
+
+/* ===== V38 2026-10-01: Cupons e Campanhas interativo + gestão por vigência ===== */
+let CC_TAB_V38='campaigns';
+
+function todayV38(){
+  return typeof localIsoV4==='function'?localIsoV4():new Date().toISOString().slice(0,10);
+}
+function activeWindowV38(x){
+  if(!x||x.active===false)return false;
+  const d=todayV38(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);
+  return (!s||d>=s)&&(!e||d<=e);
+}
+function activeCampaignsV38(){
+  return (APP_CONTENT.campaigns||[]).filter(activeWindowV38).sort((a,b)=>String(b.start_at||'').localeCompare(String(a.start_at||'')));
+}
+function activeCouponsV38(){
+  return (APP_CONTENT.coupons||[]).filter(activeWindowV38).sort((a,b)=>String(a.code||a.title||'').localeCompare(String(b.code||b.title||'')));
+}
+function currentCampaignV38(){
+  return activeCampaignsV38()[0]||null;
+}
+function campaignArtV38(x){
+  return escV3(String(x?.image_url||'./october-volume-maximo.svg'));
+}
+function campaignPeriodV38(x){
+  if(x?.period)return escV3(x.period);
+  const s=String(x?.start_at||''),e=String(x?.end_at||'');
+  if(!s&&!e)return 'Período não informado';
+  const f=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('pt-BR')}catch(_){return d}};
+  return (s?f(s):'Início livre')+(e?' a '+f(e):'');
+}
+function setCcTabV38(v){CC_TAB_V38=v;go('campaigns')}
+
+async function loadContentV3(){
+  try{
+    const body={action:'content_get',matricula:String(U?.u?.id||''),demo:String(U?.u?.id||'')==='0000000'};
+    const [cr,dr]=await Promise.all([
+      fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify(body)}),
+      fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:'delta'})})
+    ]);
+    const x=await cr.json(),d=await dr.json();
+    if(cr.ok&&x.ok){
+      APP_CONTENT={
+        importantInfo:Array.isArray(x.importantInfo)?x.importantInfo:[],
+        campaigns:Array.isArray(x.campaigns)?x.campaigns:[],
+        coupons:Array.isArray(x.coupons)?x.coupons:[],
+        media:Array.isArray(x.media)?x.media:[]
+      };
+      APP_PROFILE_PHOTOS=x.profilePhotos||APP_PROFILE_PHOTOS||{};
+      if(typeof APP_PREFERRED_NAMES!=='undefined')APP_PREFERRED_NAMES=x.preferredNames||APP_PREFERRED_NAMES||{};
+    }
+    if(dr.ok&&d.ok)APP_DELTA=d;
+    if(typeof applyMediaV4==='function')applyMediaV4();
+  }catch(e){console.warn('Conteúdo dinâmico:',e)}
+}
+
+function ccTabsV38(){
+  const items=[['campaigns','📣','Campanhas'],['coupons','🎟','Cupons'],['prizes','🎁','Premiação'],['sell','▥','Como vender']];
+  return '<div class="ccTabsV38">'+items.map(i=>'<button class="'+(CC_TAB_V38===i[0]?'on':'')+'" onclick="setCcTabV38(\''+i[0]+'\')"><b>'+i[1]+'</b><span>'+i[2]+'</span></button>').join('')+'</div>';
+}
+function campaignOverviewV38(){
+  const x=currentCampaignV38();
+  if(!x)return '<div class="ccEmptyV38"><b>Nenhuma campanha ativa agora.</b><span>As campanhas aparecem automaticamente conforme a vigência definida no ADM.</span></div>';
+  return '<div class="ccHeroV38"><img src="'+campaignArtV38(x)+'" alt="'+escV3(x.title||'Campanha eStore')+'"><button onclick="setCcTabV38(\'prizes\')">Ver campanha <span>→</span></button></div>'+
+    '<div class="ccTitleV38">Campanha em destaque</div>'+
+    '<div class="ccCampaignCardV38"><img src="'+campaignArtV38(x)+'" alt=""><div><b>'+escV3(x.title||'Campanha eStore')+'</b><span>'+campaignPeriodV38(x)+'</span></div></div>'+
+    '<div class="ccInfoGridV38">'+
+      '<div><i>♙</i><span><b>Quem participa</b>Gerentes regionais, gerentes de loja e vendedores.</span></div>'+
+      '<div><i>▣</i><span><b>Período</b>'+campaignPeriodV38(x)+'</span></div>'+
+      '<div><i>◎</i><span><b>Critério</b>Aumente o som das vendas e concorra às premiações.</span></div>'+
+      '<div><i>🏆</i><span><b>Premiação</b>JBL e Samsung para os melhores resultados.</span></div>'+
+    '</div>'+
+    '<div class="ccTitleV38">Destaques da campanha</div>'+
+    '<div class="ccHighlightGridV38"><button onclick="setCcTabV38(\'prizes\')"><span>📻</span><b>Lideranças</b><small>6 premiados</small><em>›</em></button><button onclick="setCcTabV38(\'prizes\')"><span>🎧</span><b>Vendedores</b><small>45 premiados</small><em>›</em></button></div>'+
+    '<button class="ccShareV38" onclick="shareCcV38(\'campaign\')">↗ Compartilhar campanha</button>';
+}
+function couponCardV38(x){
+  const code=escV3(x.code||x.title||'CUPOM'),title=escV3(x.title||x.description||''),desc=escV3(x.description||x.text||'');
+  return '<div class="ccCouponV38"><div class="ccCouponCodeV38"><b>'+code+'</b><span>'+title+'</span></div><div class="ccCouponRulesV38"><span>● '+desc+'</span><span>● Não acumula com outros cupons</span>'+(x.end_at?'<small>Válido até '+new Date(x.end_at+'T12:00:00').toLocaleDateString('pt-BR')+'</small>':'')+'</div></div>';
+}
+function couponsV38(){
+  const a=activeCouponsV38();
+  return '<div class="ccTitleV38">Cupons e benefícios</div>'+
+    (a.length?a.map(couponCardV38).join(''):'<div class="ccEmptyV38"><b>Nenhum cupom ativo.</b><span>Os cupons aparecem conforme a vigência definida no ADM.</span></div>')+
+    '<div class="ccTitleV38">Regras importantes</div>'+
+    '<div class="ccRulesGridV38"><div><b>🚚</b><span>Frete grátis</span></div><div><b>▭</b><span>10x sem juros</span></div><div><b>♧</b><span>Não acumula cupons</span></div><div><b>▥</b><span>Não vender pelo eStore o que há em loja</span></div></div>'+
+    '<div class="ccSellBannerV38"><div><b>Mais possibilidades para o seu cliente</b><span>Quando não tiver o produto em loja, ofereça pelo eStore.</span><button onclick="setCcTabV38(\'sell\')">Acesse e venda</button></div><div>🛒</div></div>'+
+    '<div class="ccTitleV38">Dicas rápidas</div>'+
+    '<div class="ccTipsV38"><div><b>♙</b><span>Abordagem e script</span></div><div><b>▯</b><span>Uso do App eStore</span></div><div><b>⬡</b><span>Quebra de objeções</span></div><div><b>↗</b><span>Oportunidades de venda</span></div></div>'+
+    '<button class="ccShareV38" onclick="shareCcV38(\'coupons\')">↗ Compartilhar cupons</button>';
+}
+function prizesV38(){
+  return '<div class="ccTitleV38">Premiação • eStore no Volume Máximo</div>'+
+    '<section class="ccPrizeSectionV38"><div class="ccPrizeHeadV38"><span>📻</span><div><b>Lideranças</b><small>6 premiados</small></div></div>'+
+      '<div class="ccPrizeRowV38"><b>Gerentes Regionais</b><span>3 premiados • maior share eStore</span><strong>JBL Boombox 4</strong></div>'+
+      '<div class="ccPrizeRowV38"><b>Gerentes de Loja</b><span>3 premiados • maior share por grupo de porte</span><strong>JBL Boombox 3</strong></div></section>'+
+    '<section class="ccPrizeSectionV38"><div class="ccPrizeHeadV38"><span>🎧</span><div><b>Vendedores</b><small>45 premiados • valor aprovado por grupo de porte</small></div></div>'+
+      '<div class="ccPrizeRowV38"><b>1º a 3º</b><strong>Samsung A07 4G 128GB</strong></div>'+
+      '<div class="ccPrizeRowV38"><b>4º e 5º</b><strong>JBL Tune 720 BT</strong></div>'+
+      '<div class="ccPrizeRowV38"><b>6º</b><strong>JBL Wave Beam 2</strong></div>'+
+      '<div class="ccPrizeRowV38"><b>7º</b><strong>JBL Wave Buds 2</strong></div>'+
+      '<div class="ccPrizeRowV38"><b>8º e 9º</b><strong>JBL Go 4</strong></div>'+
+      '<div class="ccPrizeRowV38"><b>10º a 15º</b><strong>JBL T520 BT</strong></div></section>'+
+    '<button class="ccShareV38" onclick="shareCcV38(\'campaign\')">↗ Compartilhar campanha</button>';
+}
+function sellMoreV38(){
+  const tips=[
+    ['01','Amplie as possibilidades','Quando a loja não tiver tamanho, cor ou produto, use o eStore para não perder a venda.'],
+    ['02','Apresente a facilidade','Mostre frete grátis, parcelamento e cupons ativos durante a abordagem.'],
+    ['03','Use o App junto do cliente','Pesquise o produto, confirme as opções e conduza a compra de forma simples.'],
+    ['04','Transforme objeção em solução','Prazo, variedade e disponibilidade podem virar argumentos para fechar a venda.']
+  ];
+  return '<div class="ccTitleV38">Como vender mais no eStore</div><div class="ccStepsV38">'+tips.map(t=>'<div><span>'+t[0]+'</span><section><b>'+t[1]+'</b><p>'+t[2]+'</p></section></div>').join('')+'</div>'+
+  '<div class="ccSellBannerV38"><div><b>Venda que não se perde, vira oportunidade.</b><span>Use o eStore como extensão da sua loja.</span></div><div>📲</div></div>';
+}
+campaignsV3=function(){
+  const body=CC_TAB_V38==='coupons'?couponsV38():CC_TAB_V38==='prizes'?prizesV38():CC_TAB_V38==='sell'?sellMoreV38():campaignOverviewV38();
+  return '<div class="ccPageV38"><div class="pageTitleV3"><span>Cupons e Campanhas</span></div>'+ccTabsV38()+body+'</div>';
+};
+
+async function shareCcV38(type){
+  const x=currentCampaignV38(),coupons=activeCouponsV38();
+  const txt=type==='coupons'
+    ?'Cupons eStore ativos:\n'+coupons.map(v=>'• '+(v.code||v.title)+': '+(v.description||v.text||'')).join('\n')
+    :'eStore no Volume Máximo | Outubro\nAumente o som das vendas! Confira a campanha, critérios e premiações no App. eStore CE+PI.';
+  if(navigator.share){try{await navigator.share({title:'eStore CE+PI',text:txt});return}catch(e){}}
+  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+}
+
+function removeLegacyPromoV38(root=document){
+  try{
+    const nodes=root.querySelectorAll?root.querySelectorAll('div,section,aside'):[]; 
+    for(const el of nodes){
+      const t=String(el.textContent||'').toLowerCase();
+      const legacy=t.includes('já está sabendo da novidade no estore')||t.includes('campanha relâmpago')||(t.includes('giftty card')&&t.includes('300'))||(t.includes('gift card')&&t.includes('300'));
+      if(!legacy)continue;
+      let cur=el,fixed=null;
+      for(let i=0;cur&&i<7;i++,cur=cur.parentElement){
+        try{if(getComputedStyle(cur).position==='fixed'){fixed=cur;break}}catch(_){}
+      }
+      if(fixed)fixed.remove();
+    }
+  }catch(e){}
+}
+const LEGACY_OBSERVER_V38=new MutationObserver(ms=>{
+  for(const m of ms)for(const n of m.addedNodes||[])if(n.nodeType===1)removeLegacyPromoV38(n);
+});
+window.addEventListener('DOMContentLoaded',()=>{
+  if(document.body)LEGACY_OBSERVER_V38.observe(document.body,{childList:true,subtree:true});
+  setTimeout(()=>removeLegacyPromoV38(document),250);
+});
+
+campaignActiveV37=function(){return !!currentCampaignV38()};
+showCampaignPopupV37=function(){
+  removeLegacyPromoV38(document);
+  const x=currentCampaignV38();
+  if(!x||document.getElementById('campaignPopupV37'))return;
+  const el=document.createElement('div');el.id='campaignPopupV37';el.className='campaignOverlayV37';
+  el.innerHTML='<div class="campaignWaveV37 w1"></div><div class="campaignWaveV37 w2"></div><div class="campaignWaveV37 w3"></div>'+
+    '<div class="campaignModalV38" role="dialog" aria-modal="true">'+
+      '<button class="campaignCloseV37" onclick="closeCampaignPopupV37(false)">×</button>'+
+      '<div class="campaignRadioV38"><div class="campaignHeadsetV38">◖</div><div class="campaignEqV37"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="campaignHeadsetV38 right">◗</div></div>'+
+      '<div class="campaignPopupArtV38"><img src="'+campaignArtV38(x)+'" alt="'+escV3(x.title||'Campanha')+'"></div>'+
+      '<div class="campaignPopupCopyV38"><small>CAMPANHA • '+campaignPeriodV38(x)+'</small><h2>'+escV3(x.title||'Campanha eStore')+'</h2><b>Aumente o som das vendas.</b><p>Gerentes regionais, gerentes de loja e vendedores concorrem a prêmios JBL e Samsung.</p>'+
+      '<button class="campaignPrimaryV38" onclick="closeCampaignPopupV37(false);go(\'campaigns\')">Quero conferir <span>→</span></button>'+
+      '<button class="campaignSecondaryV38" onclick="closeCampaignPopupV37(false)">Agora não</button>'+
+      '<img class="campaignBrandV38" src="./riachuelo-horizontal-oficial.png" alt="Riachuelo"></div>'+
+    '</div>';
+  document.body.appendChild(el);requestAnimationFrame(()=>el.classList.add('show'));
+};
+
+function ccAdminV38(){
+  if(!admV3())return '';
+  const camps=APP_CONTENT.campaigns||[],coupons=APP_CONTENT.coupons||[];
+  const status=x=>activeWindowV38(x)?'<span class="ccStatusV38 active">No ar</span>':(x.active===false?'<span class="ccStatusV38 off">Inativo</span>':'<span class="ccStatusV38 off">Fora da vigência</span>');
+  return '<div id="campaignCouponAdminV38" class="card ccAdminV38"><div class="title">Gestão • Cupons e Campanhas</div><p class="muted">Inclua, edite e defina a vigência. O App exibe automaticamente apenas comunicações ativas dentro do período.</p>'+
+    '<input id="ccPwdV38" class="field" type="password" placeholder="Senha ADM">'+
+    '<div class="ccAdminColsV38"><section><div class="ccAdminTitleV38"><b>Campanhas</b><button onclick="clearCampaignFormV38()">+ Nova</button></div>'+
+      '<input id="ccCampIdV38" type="hidden"><input id="ccCampTitleV38" class="field" placeholder="Nome da campanha"><div class="ccDateGridV38"><label>Início<input id="ccCampStartV38" class="field" type="date"></label><label>Fim<input id="ccCampEndV38" class="field" type="date"></label></div>'+
+      '<textarea id="ccCampDescV38" class="field" rows="3" placeholder="Descrição / chamada"></textarea><textarea id="ccCampMechanicsV38" class="field" rows="3" placeholder="Mecânica / critério"></textarea><textarea id="ccCampEmployeeV38" class="field" rows="2" placeholder="Premiação / benefício"></textarea><input id="ccCampImageV38" class="field" placeholder="URL da imagem (opcional)"><label class="ccCheckV38"><input id="ccCampActiveV38" type="checkbox" checked> Comunicação ativa</label><button class="btn" onclick="saveCampaignV38()">Salvar campanha</button><div id="ccCampOutV38"></div>'+
+      '<div class="ccAdminListV38">'+camps.map(x=>'<div><section><b>'+escV3(x.title||'Campanha')+'</b><small>'+campaignPeriodV38(x)+'</small>'+status(x)+'</section><button onclick="editCampaignV38(\''+escV3(String(x.id))+'\')">Editar</button><button class="danger" onclick="deleteCcV38(\'campaign\',\''+escV3(String(x.id))+'\')">Excluir</button></div>').join('')+'</div></section>'+
+    '<section><div class="ccAdminTitleV38"><b>Cupons</b><button onclick="clearCouponFormV38()">+ Novo</button></div>'+
+      '<input id="ccCouponIdV38" type="hidden"><input id="ccCouponCodeV38" class="field" placeholder="Código do cupom"><input id="ccCouponTitleV38" class="field" placeholder="Título / benefício"><div class="ccDateGridV38"><label>Início<input id="ccCouponStartV38" class="field" type="date"></label><label>Fim<input id="ccCouponEndV38" class="field" type="date"></label></div><textarea id="ccCouponDescV38" class="field" rows="3" placeholder="Regras do cupom"></textarea><label class="ccCheckV38"><input id="ccCouponActiveV38" type="checkbox" checked> Cupom ativo</label><button class="btn" onclick="saveCouponV38()">Salvar cupom</button><div id="ccCouponOutV38"></div>'+
+      '<div class="ccAdminListV38">'+coupons.map(x=>'<div><section><b>'+escV3(x.code||x.title||'Cupom')+'</b><small>'+escV3(x.title||'')+'</small>'+status(x)+'</section><button onclick="editCouponV38(\''+escV3(String(x.id))+'\')">Editar</button><button class="danger" onclick="deleteCcV38(\'coupon\',\''+escV3(String(x.id))+'\')">Excluir</button></div>').join('')+'</div></section></div></div>';
+}
+function clearCampaignFormV38(){['ccCampIdV38','ccCampTitleV38','ccCampStartV38','ccCampEndV38','ccCampDescV38','ccCampMechanicsV38','ccCampEmployeeV38','ccCampImageV38'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});const a=document.getElementById('ccCampActiveV38');if(a)a.checked=true}
+function clearCouponFormV38(){['ccCouponIdV38','ccCouponCodeV38','ccCouponTitleV38','ccCouponStartV38','ccCouponEndV38','ccCouponDescV38'].forEach(id=>{const e=document.getElementById(id);if(e)e.value=''});const a=document.getElementById('ccCouponActiveV38');if(a)a.checked=true}
+function editCampaignV38(id){const x=(APP_CONTENT.campaigns||[]).find(v=>String(v.id)===String(id));if(!x)return;document.getElementById('ccCampIdV38').value=x.id||'';document.getElementById('ccCampTitleV38').value=x.title||'';document.getElementById('ccCampStartV38').value=x.start_at||x.start||'';document.getElementById('ccCampEndV38').value=x.end_at||x.end||'';document.getElementById('ccCampDescV38').value=x.description||x.text||'';document.getElementById('ccCampMechanicsV38').value=x.mechanics||'';document.getElementById('ccCampEmployeeV38').value=x.employeeBenefit||'';document.getElementById('ccCampImageV38').value=x.image_url||'';document.getElementById('ccCampActiveV38').checked=x.active!==false;document.getElementById('ccCampTitleV38').scrollIntoView({behavior:'smooth',block:'center'})}
+function editCouponV38(id){const x=(APP_CONTENT.coupons||[]).find(v=>String(v.id)===String(id));if(!x)return;document.getElementById('ccCouponIdV38').value=x.id||'';document.getElementById('ccCouponCodeV38').value=x.code||'';document.getElementById('ccCouponTitleV38').value=x.title||'';document.getElementById('ccCouponStartV38').value=x.start_at||x.start||'';document.getElementById('ccCouponEndV38').value=x.end_at||x.end||'';document.getElementById('ccCouponDescV38').value=x.description||x.text||'';document.getElementById('ccCouponActiveV38').checked=x.active!==false;document.getElementById('ccCouponCodeV38').scrollIntoView({behavior:'smooth',block:'center'})}
+async function saveCampaignV38(){
+  const out=document.getElementById('ccCampOutV38'),password=document.getElementById('ccPwdV38')?.value||'';
+  const item={id:document.getElementById('ccCampIdV38')?.value||undefined,title:document.getElementById('ccCampTitleV38')?.value.trim(),start_at:document.getElementById('ccCampStartV38')?.value||'',end_at:document.getElementById('ccCampEndV38')?.value||'',description:document.getElementById('ccCampDescV38')?.value.trim(),text:document.getElementById('ccCampDescV38')?.value.trim(),mechanics:document.getElementById('ccCampMechanicsV38')?.value.trim(),employeeBenefit:document.getElementById('ccCampEmployeeV38')?.value.trim(),image_url:document.getElementById('ccCampImageV38')?.value.trim(),active:document.getElementById('ccCampActiveV38')?.checked!==false};
+  if(!item.title){out.innerHTML='<p class="bad">Informe o nome da campanha.</p>';return}
+  try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'content_item_save',kind:'campaign',matricula:String(U.u.id),password,item})});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Falha ao salvar.');APP_CONTENT.campaigns=j.value||[];out.innerHTML='<div class="notice">Campanha salva e vigência aplicada.</div>';setTimeout(()=>go('adminv3'),500)}catch(e){out.innerHTML='<p class="bad">'+escV3(e.message||e)+'</p>'}
+}
+async function saveCouponV38(){
+  const out=document.getElementById('ccCouponOutV38'),password=document.getElementById('ccPwdV38')?.value||'';
+  const item={id:document.getElementById('ccCouponIdV38')?.value||undefined,code:document.getElementById('ccCouponCodeV38')?.value.trim(),title:document.getElementById('ccCouponTitleV38')?.value.trim(),start_at:document.getElementById('ccCouponStartV38')?.value||'',end_at:document.getElementById('ccCouponEndV38')?.value||'',description:document.getElementById('ccCouponDescV38')?.value.trim(),text:document.getElementById('ccCouponDescV38')?.value.trim(),active:document.getElementById('ccCouponActiveV38')?.checked!==false};
+  if(!item.code){out.innerHTML='<p class="bad">Informe o código do cupom.</p>';return}
+  try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'content_item_save',kind:'coupon',matricula:String(U.u.id),password,item})});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Falha ao salvar.');APP_CONTENT.coupons=j.value||[];out.innerHTML='<div class="notice">Cupom salvo e vigência aplicada.</div>';setTimeout(()=>go('adminv3'),500)}catch(e){out.innerHTML='<p class="bad">'+escV3(e.message||e)+'</p>'}
+}
+async function deleteCcV38(kind,id){
+  const password=document.getElementById('ccPwdV38')?.value||'';if(!password){alert('Informe a senha ADM.');return}
+  if(!confirm('Excluir este item?'))return;
+  try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'content_item_delete',kind,matricula:String(U.u.id),password,id})});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Falha ao excluir.');if(kind==='campaign')APP_CONTENT.campaigns=j.value||[];else APP_CONTENT.coupons=j.value||[];go('adminv3')}catch(e){alert(String(e.message||e))}
+}
+const _adminV38=adminV3;
+adminV3=function(){
+  let base=_adminV38();
+  base=base.replaceAll("document.getElementById('admCamp3').scrollIntoView()","document.getElementById('campaignCouponAdminV38').scrollIntoView()");
+  return base+ccAdminV38();
+};
+
+(function(){
+  if(document.getElementById('cc-v38-style'))return;
+  const s=document.createElement('style');s.id='cc-v38-style';
+  s.textContent=
+'#admCamp3{display:none!important}.ccPageV38{padding-bottom:16px}.ccTabsV38{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:#fff;border:1px solid #e8e5df;border-radius:24px;padding:8px;margin-bottom:12px;position:sticky;top:4px;z-index:10}.ccTabsV38 button{border:0;background:transparent;border-radius:16px;color:#52625d;padding:9px 4px;display:grid;gap:3px;place-items:center;font-size:10px;font-weight:700}.ccTabsV38 button b{font-size:19px}.ccTabsV38 button.on{background:#173F35;color:#fff;box-shadow:0 8px 20px rgba(23,63,53,.18)}'+
+'.ccHeroV38{position:relative;border-radius:24px;overflow:hidden;background:#173F35;box-shadow:0 12px 28px rgba(23,63,53,.14);margin-bottom:16px}.ccHeroV38 img{display:block;width:100%;aspect-ratio:2/1;object-fit:cover}.ccHeroV38 button{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);border:0;border-radius:999px;padding:10px 18px;background:#f1d49a;color:#173F35;font-weight:900;white-space:nowrap}.ccTitleV38{font-size:18px;font-weight:900;color:#173F35;margin:17px 4px 10px}.ccCampaignCardV38{display:grid;grid-template-columns:1.15fr .85fr;border-radius:20px;overflow:hidden;background:#fff;border:1px solid #e7e4dd}.ccCampaignCardV38 img{width:100%;height:125px;object-fit:cover}.ccCampaignCardV38>div{display:flex;flex-direction:column;justify-content:center;padding:12px;color:#173F35}.ccCampaignCardV38 b{font-size:16px}.ccCampaignCardV38 span{font-size:11px;color:#71807b;margin-top:5px}'+
+'.ccInfoGridV38{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px}.ccInfoGridV38>div{display:flex;gap:9px;align-items:flex-start;background:#f3f2ed;border-radius:16px;padding:12px;min-height:86px}.ccInfoGridV38 i{font-style:normal;color:#DE7C00;font-size:21px}.ccInfoGridV38 span{font-size:10px;color:#4c5d57;line-height:1.35}.ccInfoGridV38 b{display:block;font-size:11px;color:#173F35;margin-bottom:4px}.ccHighlightGridV38{display:grid;grid-template-columns:1fr 1fr;gap:9px}.ccHighlightGridV38 button{border:0;border-radius:18px;padding:14px;background:#173F35;color:#fff;display:grid;grid-template-columns:auto 1fr auto;grid-template-rows:auto auto;align-items:center;text-align:left;gap:2px 8px}.ccHighlightGridV38 button:nth-child(2){background:#f4ead8;color:#173F35}.ccHighlightGridV38 span{grid-row:1/3;font-size:26px}.ccHighlightGridV38 b{font-size:12px}.ccHighlightGridV38 small{font-size:9px;opacity:.78}.ccHighlightGridV38 em{grid-row:1/3;grid-column:3;font-style:normal;font-size:20px}.ccShareV38{width:100%;border:0;background:#173F35;color:#fff;border-radius:16px;padding:14px;margin-top:14px;font-weight:900;font-size:13px}'+
+'.ccCouponV38{display:grid;grid-template-columns:.9fr 1.1fr;background:#f8f0df;border-radius:18px;overflow:hidden;margin-bottom:10px;border:1px solid #ece7dc}.ccCouponCodeV38{background:#173F35;color:#fff;padding:18px 14px;display:flex;flex-direction:column;justify-content:center}.ccCouponCodeV38 b{font-size:24px}.ccCouponCodeV38 span{font-size:10px;margin-top:3px}.ccCouponRulesV38{padding:13px;display:grid;gap:7px;color:#173F35;font-size:10px;align-content:center}.ccCouponRulesV38 small{color:#81786d}.ccRulesGridV38,.ccTipsV38{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.ccRulesGridV38>div,.ccTipsV38>div{background:#f2f2ee;border-radius:14px;padding:10px 5px;text-align:center;display:grid;gap:7px;align-content:center;min-height:82px}.ccRulesGridV38 b,.ccTipsV38 b{font-size:20px;color:#173F35}.ccRulesGridV38 span,.ccTipsV38 span{font-size:8px;color:#354a43}.ccSellBannerV38{display:flex;align-items:center;justify-content:space-between;background:#f5ead8;border-radius:19px;padding:15px;margin:15px 0}.ccSellBannerV38>div:first-child{display:grid;gap:4px}.ccSellBannerV38 b{color:#173F35;font-size:15px}.ccSellBannerV38 span{font-size:10px;color:#566660}.ccSellBannerV38 button{border:0;border-radius:999px;background:#173F35;color:#fff;font-size:9px;font-weight:800;padding:8px 13px;margin-top:5px;width:max-content}.ccSellBannerV38>div:last-child{font-size:38px}'+
+'.ccPrizeSectionV38{background:#fff;border:1px solid #e7e4dd;border-radius:20px;padding:14px;margin-bottom:12px}.ccPrizeHeadV38{display:flex;gap:10px;align-items:center;margin-bottom:12px}.ccPrizeHeadV38>span{font-size:28px}.ccPrizeHeadV38>div{display:grid}.ccPrizeHeadV38 b{font-size:16px;color:#173F35}.ccPrizeHeadV38 small{font-size:9px;color:#76847f}.ccPrizeRowV38{display:grid;grid-template-columns:1fr auto;gap:4px 8px;border-top:1px solid #eeeae3;padding:10px 2px}.ccPrizeRowV38 b{color:#173F35;font-size:11px}.ccPrizeRowV38 span{grid-column:1/-1;font-size:9px;color:#74817c}.ccPrizeRowV38 strong{color:#173F35;font-size:10px;text-align:right}.ccStepsV38{display:grid;gap:9px}.ccStepsV38>div{display:flex;gap:10px;background:#fff;border:1px solid #e7e4dd;border-radius:18px;padding:13px}.ccStepsV38>div>span{width:34px;height:34px;border-radius:50%;background:#f1d49a;color:#173F35;display:grid;place-items:center;font-weight:900}.ccStepsV38 section{flex:1}.ccStepsV38 b{color:#173F35;font-size:13px}.ccStepsV38 p{margin:5px 0 0;color:#64736e;font-size:10px;line-height:1.45}.ccEmptyV38{background:#fff;border:1px solid #e7e4dd;border-radius:18px;padding:22px;text-align:center;color:#173F35;display:grid;gap:6px}.ccEmptyV38 span{font-size:10px;color:#6f7b77}'+
+'.campaignModalV38{position:relative;width:min(430px,94vw);max-height:94vh;overflow:auto;background:#0c2d27;border:1px solid rgba(241,212,154,.45);border-radius:30px;box-shadow:0 30px 80px rgba(0,0,0,.48);transform:translateY(18px) scale(.97);transition:.28s}.campaignOverlayV37.show .campaignModalV38{transform:none}.campaignPopupArtV38{height:330px;overflow:hidden;background:#173F35}.campaignPopupArtV38 img{width:100%;height:100%;object-fit:cover}.campaignRadioV38{position:absolute;z-index:4;top:18px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(8,31,26,.84);border:1px solid rgba(241,212,154,.32);border-radius:999px;padding:7px 12px;color:#f1d49a}.campaignHeadsetV38{font-size:18px;font-weight:900}.campaignHeadsetV38.right{transform:scaleX(-1)}.campaignPopupCopyV38{padding:17px 20px 20px;text-align:center;color:#fff}.campaignPopupCopyV38 small{font-size:9px;color:#f1d49a;letter-spacing:.12em;font-weight:900}.campaignPopupCopyV38 h2{font-size:28px;line-height:1.02;margin:9px 0 5px;color:#fff}.campaignPopupCopyV38>b{color:#f1d49a;font-size:14px}.campaignPopupCopyV38 p{color:#D6D2C4;font-size:12px;line-height:1.45;margin:10px 0 15px}.campaignPrimaryV38,.campaignSecondaryV38{width:100%;border-radius:16px;padding:13px;font-weight:900;font-size:13px}.campaignPrimaryV38{border:0;background:#efbd61;color:#173F35}.campaignSecondaryV38{margin-top:9px;border:1px solid rgba(241,212,154,.55);background:transparent;color:#fff}.campaignBrandV38{display:block;max-width:128px;max-height:42px;object-fit:contain;margin:18px auto 0;filter:brightness(0) invert(1);opacity:.92}'+
+'.ccAdminV38{margin-top:16px}.ccAdminColsV38{display:grid;grid-template-columns:1fr 1fr;gap:16px}.ccAdminColsV38>section{border:1px solid #e5e1d8;border-radius:18px;padding:13px;background:#fbfaf7}.ccAdminTitleV38{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.ccAdminTitleV38 b{color:#173F35}.ccAdminTitleV38 button{border:0;background:#173F35;color:#fff;border-radius:999px;padding:7px 11px;font-weight:800}.ccDateGridV38{display:grid;grid-template-columns:1fr 1fr;gap:8px}.ccDateGridV38 label{font-size:9px;color:#61706b}.ccCheckV38{display:flex;align-items:center;gap:7px;font-size:10px;color:#173F35;margin:8px 0 12px}.ccAdminListV38{display:grid;gap:7px;margin-top:12px}.ccAdminListV38>div{display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;background:#fff;border:1px solid #ebe8e1;border-radius:13px;padding:9px}.ccAdminListV38 section{display:grid;gap:2px}.ccAdminListV38 b{font-size:10px;color:#173F35}.ccAdminListV38 small{font-size:8px;color:#7a8581}.ccAdminListV38 button{border:0;border-radius:8px;background:#eef2f0;color:#173F35;font-weight:800;font-size:8px;padding:7px}.ccAdminListV38 button.danger{background:#f8e9e9;color:#8b2d2d}.ccStatusV38{font-size:7px!important;font-weight:900;width:max-content;padding:3px 6px;border-radius:999px}.ccStatusV38.active{background:#e3f0e8;color:#1e6648}.ccStatusV38.off{background:#eeeae5;color:#746f68}'+
+'@media(max-width:680px){.ccAdminColsV38{grid-template-columns:1fr}.ccTabsV38{top:2px}.ccRulesGridV38,.ccTipsV38{gap:5px}.ccInfoGridV38{grid-template-columns:1fr 1fr}.campaignPopupArtV38{height:300px}}';
+  document.head.appendChild(s);
+})();
