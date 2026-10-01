@@ -1818,10 +1818,12 @@ function removeLegacyPromoV38(root=document){
 const LEGACY_OBSERVER_V38=new MutationObserver(ms=>{
   for(const m of ms)for(const n of m.addedNodes||[])if(n.nodeType===1)removeLegacyPromoV38(n);
 });
-window.addEventListener('DOMContentLoaded',()=>{
-  if(document.body)LEGACY_OBSERVER_V38.observe(document.body,{childList:true,subtree:true});
+function startLegacyGuardV38(){
+  if(!document.body)return;
+  try{LEGACY_OBSERVER_V38.observe(document.body,{childList:true,subtree:true})}catch(e){}
   setTimeout(()=>removeLegacyPromoV38(document),250);
-});
+}
+if(document.body)startLegacyGuardV38();else window.addEventListener('DOMContentLoaded',startLegacyGuardV38);
 
 campaignActiveV37=function(){return !!currentCampaignV38()};
 showCampaignPopupV37=function(){
