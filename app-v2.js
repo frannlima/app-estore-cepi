@@ -1540,7 +1540,11 @@ function campaignHomeV37(){
 }
 const _homeV37=home;
 home=function(){
-  const base=_homeV37();
+  let base=_homeV37();
+  if(typeof homeTileV20==='function'&&base.includes('</div><div class="homeSignV20">')){
+    const tile=homeTileV20('sage','◉','Conexão eStore','Campanhas e boas práticas','connectionv37');
+    base=base.replace('</div><div class="homeSignV20">',tile+'</div><div class="homeSignV20">');
+  }
   const hero=campaignHomeV37();
   if(!hero)return base;
   const mark='<button class="weekFeatureV20"';
