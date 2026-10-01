@@ -1496,7 +1496,12 @@ go=function(v){
 
 
 
-/* V36 histórico mensal */
+/* V36 histórico mensal • estilos */
+(function(){
+  if(document.getElementById('result-history-v36-style'))return;
+  const s=document.createElement('style');
+  s.id='result-history-v36-style';
+  s.textContent=`
 .resultHistoryCardV36{margin-top:12px}
 .resultHistoryHeadV36{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .resultHistoryHeadV36 .field{margin:0;min-width:180px;max-width:260px}
@@ -1507,4 +1512,6 @@ go=function(v){
 .historyPeriodV36 span.partial{background:#fff1df;color:#9a5a00}
 .historyMetaV36{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:10px 2px 12px;color:#66736f;font-size:10px}
 @media(max-width:560px){.resultHistoryHeadV36{align-items:stretch}.resultHistoryHeadV36 .field{max-width:none;width:100%}.historyMetaV36{display:grid}}
-
+`;
+  document.head.appendChild(s);
+})();
