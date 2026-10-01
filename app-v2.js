@@ -1427,3 +1427,84 @@ filialRankRowsV32=function(p=PER,code=String(U?.u?.st||'')){return (U?.team?.[p]
 regionalStoresV32=function(p=PER){return Object.keys(COMMON?.stores||{}).map(code=>({...(COMMON.stores?.[code]?.p?.[p]||{}),st:String(code).padStart(3,'0')}))};
 rankInfoV13=function(){const reg=regionalRankRowsV32(PER),me=normMatV27(U?.u?.id),ri=reg.findIndex(x=>normMatV27(x.id)===me),fil=filialRankRowsV32(PER),fi=fil.findIndex(x=>normMatV27(x.id)===me);return {regional:ri>=0?ri+1:null,filial:fi>=0?fi+1:null,topRegional:ri>=0&&ri<10,topFilial:fi>=0&&fi<3}};
 poolCalcV33=function(){const p=storeP(),eligible=(U?.pool?.eligible||[]),approved=Number(p.a||0),pool=approved*.03,sim=eligible.length?pool/eligible.length:0;return {approved,pool,eligible,sim}};
+
+
+/* ===== V36 2026-10-01: histórico mensal de comissão ===== */
+let RESULT_HISTORY_V36=null;
+let RESULT_HISTORY_MONTH_V36='';
+
+function monthLabelV36(ym){
+  if(!/^\d{4}-\d{2}$/.test(String(ym||'')))return String(ym||'');
+  const d=new Date(String(ym)+'-01T12:00:00');
+  return d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'}).replace(/^./,s=>s.toUpperCase());
+}
+function resultHistoryShellV36(){
+  return '<div class="card resultHistoryCardV36" id=resultHistoryV36><div class=title>Histórico mensal</div><p class=muted>Carregando seus resultados e comissões anteriores...</p></div>';
+}
+function resultHistoryHtmlV36(month){
+  const data=RESULT_HISTORY_V36,rows=data?.months||[];
+  if(!rows.length)return '<div class=title>Histórico mensal</div><div class=notice>Não há meses com histórico de vendas para esta matrícula.</div>';
+  const selected=rows.find(x=>x.month===month)||rows[0];
+  RESULT_HISTORY_MONTH_V36=selected.month;
+  const currentMonth=typeof localIsoV4==='function'?localIsoV4().slice(0,7):new Date().toISOString().slice(0,7);
+  const closed=selected.month<currentMonth;
+  const stores=(selected.stores||[]).join(' • ')||String(U?.u?.st||'');
+  return '<div class=resultHistoryHeadV36><div><div class=title>Histórico mensal</div><p class=muted>Consulte seus resultados e sua comissão por competência.</p></div>'+
+    '<select class="field historyMonthSelectV36" onchange="renderResultHistoryV36(this.value)">'+
+      rows.map(x=>'<option value="'+escV3(x.month)+'" '+(x.month===selected.month?'selected':'')+'>'+escV3(monthLabelV36(x.month))+'</option>').join('')+
+    '</select></div>'+
+    '<div class=historyPeriodV36><b>'+escV3(monthLabelV36(selected.month))+'</b><span class="'+(closed?'closed':'partial')+'">'+(closed?'Mês fechado':'Mês em andamento')+'</span></div>'+
+    '<div class=metricGridV3>'+
+      '<div class="metricCardV3 mGreenV3"><span>Venda captada</span><b>'+money(selected.captured)+'</b></div>'+
+      '<div class="metricCardV3 mRoseV3"><span>Venda aprovada</span><b>'+money(selected.approved)+'</b></div>'+
+      '<div class="metricCardV3 mOrangeV3"><span>Pedidos</span><b>'+num(selected.orders)+'</b></div>'+
+      '<div class="metricCardV3 mSandV3"><span>Comissão normal • 3%</span><b>'+money(selected.normalCommission)+'</b><small>Sobre aprovado fora do eDay</small></div>'+
+      '<div class="metricCardV3 mOrangeV3"><span>Comissão eDay • 10%</span><b>'+money(selected.edayCommission)+'</b><small>Segundas elegíveis desde ago/2026</small></div>'+
+      '<div class="metricCardV3 mGreenV3"><span>Comissão total</span><b>'+money(selected.totalCommission)+'</b><small>Normal + eDay</small></div>'+
+    '</div>'+
+    '<div class=historyMetaV36><span>Filial(is) no período: <b>'+escV3(stores)+'</b></span><span>Fonte: histórico consolidado por matrícula</span></div>'+
+    '<div class=notice><b>Histórico preservado.</b><br>Os meses anteriores permanecem disponíveis e as novas cargas atualizam somente a competência correspondente.</div>';
+}
+function renderResultHistoryV36(month){
+  const box=document.querySelector('#resultHistoryV36');if(!box)return;
+  box.innerHTML=resultHistoryHtmlV36(month||RESULT_HISTORY_MONTH_V36);
+}
+async function loadResultHistoryV36(force=false){
+  const box=document.querySelector('#resultHistoryV36');if(!box||!U?.u?.id)return;
+  if(RESULT_HISTORY_V36&&!force){renderResultHistoryV36(RESULT_HISTORY_MONTH_V36);return}
+  box.innerHTML='<div class=title>Histórico mensal</div><p class=muted>Consultando histórico consolidado...</p>';
+  try{
+    const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:'commission_history',matricula:String(U.u.id)})});
+    const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Não foi possível carregar o histórico.');
+    RESULT_HISTORY_V36=j;
+    if(!RESULT_HISTORY_MONTH_V36||!(j.months||[]).some(x=>x.month===RESULT_HISTORY_MONTH_V36))RESULT_HISTORY_MONTH_V36=j.months?.[0]?.month||'';
+    renderResultHistoryV36(RESULT_HISTORY_MONTH_V36);
+  }catch(e){
+    box.innerHTML='<div class=title>Histórico mensal</div><div class="notice danger">Não foi possível consultar o histórico neste momento.<br>'+escV3(e.message||e)+'</div>';
+  }
+}
+const _resultV36=result;
+result=function(){
+  const base=_resultV36();
+  return base+(PER==='month'?resultHistoryShellV36():'');
+};
+const _goV36=go;
+go=function(v){
+  _goV36(v);
+  if(v==='result'&&PER==='month')setTimeout(()=>loadResultHistoryV36(),0);
+};
+
+
+
+/* V36 histórico mensal */
+.resultHistoryCardV36{margin-top:12px}
+.resultHistoryHeadV36{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.resultHistoryHeadV36 .field{margin:0;min-width:180px;max-width:260px}
+.historyPeriodV36{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0 10px;padding:10px 12px;border-radius:14px;background:#f5f4ef;border:1px solid #e2e0d9}
+.historyPeriodV36 b{color:#173F35;font-size:14px}
+.historyPeriodV36 span{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:5px 8px;border-radius:999px}
+.historyPeriodV36 span.closed{background:#e8f0ec;color:#173F35}
+.historyPeriodV36 span.partial{background:#fff1df;color:#9a5a00}
+.historyMetaV36{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:10px 2px 12px;color:#66736f;font-size:10px}
+@media(max-width:560px){.resultHistoryHeadV36{align-items:stretch}.resultHistoryHeadV36 .field{max-width:none;width:100%}.historyMetaV36{display:grid}}
+
