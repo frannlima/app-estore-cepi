@@ -1,4 +1,4 @@
-const CACHE='estore-cepi-shell-v63';
+const CACHE='estore-cepi-shell-v64';
 const SHELL=['./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon.svg','./riachuelo-horizontal-oficial.png'];
 
 self.addEventListener('install',event=>{
