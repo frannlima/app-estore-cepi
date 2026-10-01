@@ -1826,6 +1826,19 @@ function startLegacyGuardV38(){
 if(document.body)startLegacyGuardV38();else window.addEventListener('DOMContentLoaded',startLegacyGuardV38);
 
 campaignActiveV37=function(){return !!currentCampaignV38()};
+campaignHomeV37=function(){
+  const x=currentCampaignV38();if(!x)return '';
+  return '<section class="campaignHomeV37" onclick="go(\'campaigns\')" role="button" tabindex="0" aria-label="Abrir campanha '+escV3(x.title||'eStore')+'">'+
+    '<div class="campaignHomeGlowV37"></div><img src="'+campaignArtV38(x)+'" alt="'+escV3(x.title||'Campanha eStore')+'">'+
+    '<div class="campaignHomeActionV37"><span class="campaignLiveV37"><i></i> CAMPANHA ATIVA</span><b>'+escV3(x.title||'Conferir campanha')+'</b><span>›</span></div></section>';
+};
+connectionCampaignV37=function(){
+  const x=currentCampaignV38();if(!x)return '';
+  return '<article class="connectionCampaignV37"><div class="connectionBrandV37"><span class="connectionAvatarV37">eS</span><div><b>eStore CE+PI</b><small>Campanha • '+campaignPeriodV38(x)+'</small></div><span class="connectionPinV37">●</span></div>'+
+    '<div class="connectionArtV37"><img src="'+campaignArtV38(x)+'" alt="'+escV3(x.title||'Campanha eStore')+'"></div>'+
+    '<div class="connectionCopyV37"><h2>🔊 '+escV3(x.title||'Campanha eStore')+'</h2><p>'+escV3(x.description||x.text||'Confira a campanha ativa no eStore.')+'</p>'+
+    '<div class="connectionTagsV37"><span>#eStore</span><span>#Campanha</span><span>#CEPI</span></div></div></article>';
+};
 showCampaignPopupV37=function(){
   removeLegacyPromoV38(document);
   const x=currentCampaignV38();
@@ -1836,7 +1849,7 @@ showCampaignPopupV37=function(){
       '<button class="campaignCloseV37" onclick="closeCampaignPopupV37(false)">×</button>'+
       '<div class="campaignRadioV38"><div class="campaignHeadsetV38">◖</div><div class="campaignEqV37"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="campaignHeadsetV38 right">◗</div></div>'+
       '<div class="campaignPopupArtV38"><img src="'+campaignArtV38(x)+'" alt="'+escV3(x.title||'Campanha')+'"></div>'+
-      '<div class="campaignPopupCopyV38"><small>CAMPANHA • '+campaignPeriodV38(x)+'</small><h2>'+escV3(x.title||'Campanha eStore')+'</h2><b>Aumente o som das vendas.</b><p>Gerentes regionais, gerentes de loja e vendedores concorrem a prêmios JBL e Samsung.</p>'+
+      '<div class="campaignPopupCopyV38"><small>CAMPANHA • '+campaignPeriodV38(x)+'</small><h2>'+escV3(x.title||'Campanha eStore')+'</h2><b>Aumente o som das vendas.</b><p>'+escV3(x.employeeBenefit||x.description||x.text||'Confira os detalhes e aproveite a campanha.')+'</p>'+
       '<button class="campaignPrimaryV38" onclick="closeCampaignPopupV37(false);go(\'campaigns\')">Quero conferir <span>→</span></button>'+
       '<button class="campaignSecondaryV38" onclick="closeCampaignPopupV37(false)">Agora não</button>'+
       '<img class="campaignBrandV38" src="./riachuelo-horizontal-oficial.png" alt="Riachuelo"></div>'+
