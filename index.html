@@ -2551,7 +2551,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v89';
+  const BUILD='v90';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2586,8 +2586,8 @@ window.deletePopupV72=async function(id){
   };
   let TAB75='campaigns';
   const LOGO75='./assets/riachuelo-logo-exact-v75.svg';
-  const CARD75='./assets/campaign-hero-v84.svg?build=v89';
-  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v89';
+  const CARD75='./assets/campaign-hero-v84.svg?build=v90';
+  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v90';
   const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
   const active75=x=>{if(!x||x.active===false)return false;const d=today75(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return(!s||d>=s)&&(!e||d<=e)};
@@ -2813,8 +2813,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART83='./assets/campaign-share-v76.svg?build=v89';
-  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v89';
+  const ART83='./assets/campaign-share-v76.svg?build=v90';
+  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v90';
 
   function closeV83(){
     document.getElementById('campaignPopV83')?.remove();
@@ -2964,8 +2964,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART84='./assets/campaign-hero-v84.svg?build=v89';
-  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v89';
+  const ART84='./assets/campaign-hero-v84.svg?build=v90';
+  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v90';
 
   function close84(){
     document.getElementById('campaignPopV84')?.remove();
@@ -3278,5 +3278,157 @@ window.deletePopupV72=async function(id){
 })();
 </script>
 
+
+<!-- V90-CAMPAIGN-SHARE-BANNER -->
+<script>
+(function(){
+  function loadCampaignImgV90(src){
+    return new Promise((resolve,reject)=>{
+      const im=new Image();
+      im.crossOrigin='anonymous';
+      im.referrerPolicy='no-referrer';
+      im.onload=()=>resolve(im);
+      im.onerror=()=>reject(new Error('Falha ao carregar '+src));
+      im.src=new URL(src,location.href).href;
+    });
+  }
+  function rr90(g,x,y,w,h,r,fill,stroke){
+    const q=Math.min(r,w/2,h/2);
+    g.beginPath();
+    g.moveTo(x+q,y);g.arcTo(x+w,y,x+w,y+h,q);g.arcTo(x+w,y+h,x,y+h,q);
+    g.arcTo(x,y+h,x,y,q);g.arcTo(x,y,x+w,y,q);g.closePath();
+    if(fill){g.fillStyle=fill;g.fill()}
+    if(stroke){g.strokeStyle=stroke;g.lineWidth=1.5;g.stroke()}
+  }
+  function text90(g,t,x,y,size,weight,color,align='left'){
+    g.font=weight+' '+size+'px Arial, Helvetica, sans-serif';
+    g.fillStyle=color;g.textAlign=align;g.textBaseline='alphabetic';g.fillText(t,x,y);
+  }
+  function wrap90(g,t,x,y,maxW,lineH,size,weight,color,maxLines=3,align='left'){
+    g.font=weight+' '+size+'px Arial, Helvetica, sans-serif';g.fillStyle=color;g.textAlign=align;
+    const words=String(t).split(/\s+/);let line='',lines=[];
+    for(const word of words){
+      const test=line?line+' '+word:word;
+      if(g.measureText(test).width>maxW&&line){lines.push(line);line=word}else line=test;
+    }
+    if(line)lines.push(line);
+    lines=lines.slice(0,maxLines);
+    lines.forEach((ln,i)=>g.fillText(ln,x,y+i*lineH));
+    return y+lines.length*lineH;
+  }
+  function fitContain90(g,img,x,y,w,h,pad=0){
+    const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height;
+    const sc=Math.min((w-pad*2)/iw,(h-pad*2)/ih);
+    const dw=iw*sc,dh=ih*sc;
+    g.drawImage(img,x+(w-dw)/2,y+(h-dh)/2,dw,dh);
+  }
+  function whiteLogo90(logo){
+    const off=document.createElement('canvas');
+    off.width=logo.naturalWidth||1000;off.height=logo.naturalHeight||184;
+    const og=off.getContext('2d');
+    og.drawImage(logo,0,0,off.width,off.height);
+    og.globalCompositeOperation='source-in';og.fillStyle='#fff';og.fillRect(0,0,off.width,off.height);
+    return off;
+  }
+
+  window.shareCampaign75=async function(){
+    const asset=k=>API+'?asset='+encodeURIComponent(k)+'&v=90';
+    try{
+      const [logo,samsung,tune720,waveBeam2,waveBuds2,go4,tune520]=await Promise.all([
+        loadCampaignImgV90('./assets/riachuelo-logo-exact-v75.svg?build=v90'),
+        loadCampaignImgV90(asset('samsung')),
+        loadCampaignImgV90(asset('tune720')),
+        loadCampaignImgV90(asset('waveBeam2')),
+        loadCampaignImgV90(asset('waveBuds2')),
+        loadCampaignImgV90(asset('go4')),
+        loadCampaignImgV90(asset('tune520'))
+      ]);
+
+      const c=document.createElement('canvas');c.width=1536;c.height=1024;
+      const g=c.getContext('2d',{alpha:false});
+      g.fillStyle='#f3f1eb';g.fillRect(0,0,1536,1024);
+
+      // HERO
+      rr90(g,20,20,1496,450,24,'#0a3f35');
+      const heroGrad=g.createRadialGradient(1050,235,40,1050,235,420);
+      heroGrad.addColorStop(0,'rgba(235,200,90,.46)');heroGrad.addColorStop(.45,'rgba(95,125,72,.20)');heroGrad.addColorStop(1,'rgba(0,0,0,0)');
+      g.fillStyle=heroGrad;g.fillRect(20,20,1496,450);
+
+      const wl=whiteLogo90(logo);g.drawImage(wl,90,50,265,22);
+      text90(g,'CAMPANHA • 01 A 31 DE OUTUBRO',92,132,22,'800','#f2cf73');
+      text90(g,'eStore no',92,198,64,'800','#ffffff');
+      text90(g,'Volume Máximo',92,258,67,'900','#f2c95f');
+      text90(g,'Aumente o som das vendas.',92,297,33,'800','#ffffff');
+      text90(g,'Todos os vendedores elegíveis à comissão',92,337,20,'400','#ffffff');
+      text90(g,'eStore do Brasil concorrem a prêmios JBL e Samsung.',92,366,20,'400','#ffffff');
+      rr90(g,92,391,294,50,25,'#f5c95f');
+      text90(g,'CONFIRA A CAMPANHA  ›',239,425,18,'900','#173F35','center');
+
+      // stage / products
+      g.strokeStyle='rgba(248,209,103,.75)';g.lineWidth=2.5;g.beginPath();g.arc(1040,244,178,0,Math.PI*2);g.stroke();
+      const stage=g.createRadialGradient(1040,432,10,1040,432,280);stage.addColorStop(0,'rgba(255,217,98,.70)');stage.addColorStop(.45,'rgba(219,181,68,.26)');stage.addColorStop(1,'rgba(0,0,0,0)');
+      g.fillStyle=stage;g.beginPath();g.ellipse(1040,430,360,58,0,0,Math.PI*2);g.fill();
+      fitContain90(g,samsung,730,80,330,350,8);
+      fitContain90(g,tune720,995,95,350,335,0);
+      for(let i=0;i<8;i++){const h=65+i*24;g.fillStyle='rgba(230,191,71,'+(0.42+i*.045)+')';g.fillRect(1325+i*20,415-h,10,h)}
+
+      // INFO CARDS
+      const cards=[
+        {x:22,title:'Quem participa',icon:'●●●',body:'Todos os vendedores elegíveis à comissão eStore do Brasil.'},
+        {x:412,title:'Critério',icon:'◎',body:'Os 15 maiores valores aprovados no eStore, em cada grupo de porte, levam prêmio.'},
+        {x:802,title:'Premiação',icon:'🏆',body:'45 premiados no total\n15 por grupo de porte.'},
+        {x:1152,title:'Grupos de porte',icon:'▂▅▇',body:'P+PP     M     G+GG+EXX\nMesma premiação para os três grupos.'}
+      ];
+      for(const a of cards){
+        rr90(g,a.x,488,a.x===1152?362:376,154,17,'#faf9f5','#dfddd7');
+        text90(g,a.icon,a.x+34,548,35,'900','#173F35');
+        text90(g,a.title,a.x+112,535,25,'900','#173F35');
+        const lines=a.body.split('\n');
+        lines.forEach((ln,ii)=>wrap90(g,ln,a.x+112,574+ii*30,a.x===1152?220:235,27,18,ii===0&&a.title==='Premiação'?'700':'400','#173F35',2));
+      }
+
+      // PRIZE PANEL
+      rr90(g,22,662,1492,342,18,'#fbf7ee','#e6ded0');
+      text90(g,'🏆',62,710,38,'700','#d99a16');
+      text90(g,'Premiação dos Vendedores',140,710,37,'900','#102f29');
+      text90(g,'Os 15 melhores em valor aprovado de cada grupo de porte de lojas levam prêmio. Mesma premiação para os três grupos.',140,741,18,'400','#173F35');
+
+      const prizes=[
+        {rank:'1º a 3º',name:'Samsung A07 4G',sub:'128GB',img:samsung},
+        {rank:'4º e 5º',name:'JBL Tune 720 BT',sub:'',img:tune720},
+        {rank:'6º',name:'JBL Wave Beam 2',sub:'',img:waveBeam2},
+        {rank:'7º',name:'JBL Wave Buds 2',sub:'',img:waveBuds2},
+        {rank:'8º e 9º',name:'JBL Go 4',sub:'',img:go4},
+        {rank:'10º a 15º',name:'JBL T520 BT',sub:'',img:tune520}
+      ];
+      const gap=16,pw=224,startX=44;
+      prizes.forEach((p,i)=>{
+        const x=startX+i*(pw+gap);
+        rr90(g,x,766,pw,218,14,'#ffffff','#e5e1d8');
+        rr90(g,x,766,94+(p.rank.length>7?24:0),40,11,'#efb22b');
+        text90(g,p.rank,x+14,792,18,'900','#ffffff');
+        fitContain90(g,p.img,x+14,804,pw-28,125,2);
+        text90(g,p.name,x+pw/2,951,17,'900','#102f29','center');
+        if(p.sub)text90(g,p.sub,x+pw/2,973,15,'700','#102f29','center');
+      });
+
+      const blob=await new Promise((resolve,reject)=>c.toBlob(b=>b?resolve(b):reject(new Error('Falha ao gerar banner.')),'image/jpeg',.96));
+      const file=new File([blob],'campanha-estore-volume-maximo-outubro.jpg',{type:'image/jpeg'});
+      if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
+        await navigator.share({files:[file],title:'eStore no Volume Máximo',text:'Confira a campanha eStore no Volume Máximo.'});
+        return;
+      }
+      const u=URL.createObjectURL(blob),a=document.createElement('a');
+      a.href=u;a.download=file.name;document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(u),2500);
+      alert('Banner da campanha preparado para compartilhamento.');
+    }catch(e){
+      console.warn('share campaign v90',e);
+      alert('Não foi possível gerar o banner agora. Tente novamente.');
+    }
+  };
+  window.shareCampaignV72=window.shareCampaign75;
+})();
+</script>
 </body>
 </html>
