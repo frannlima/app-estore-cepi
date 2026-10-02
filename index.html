@@ -2551,7 +2551,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v68';
+  const BUILD='v70';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2584,6 +2584,7 @@ window.deletePopupV72=async function(id){
     tune520:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dwc23d813b/01.JBL_Tune_520BT_ProductImage_Hero_Black.png?sh=535&sw=535'
   };
   let TAB75='campaigns';
+  const CARD75='./assets/campaign-share-v75.jpg?build=v70';
   const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
   const active75=x=>{if(!x||x.active===false)return false;const d=today75(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return(!s||d>=s)&&(!e||d<=e)};
@@ -2623,7 +2624,7 @@ window.deletePopupV72=async function(id){
       prize75(P75.tune520,'JBL T520 BT','10º a 15º')+
     '</div></section>';
   }
-  function main75(){return hero75()+info75()+prizePanel75()+'<button class="share75" onclick="shareCampaign75()">↗ <b>Compartilhar campanha</b></button>'}
+  function main75(){return '<section class="approvedCardWrap75"><img class="approvedCardImg75" src="'+CARD75+'" alt="Campanha eStore no Volume Máximo • Premiação dos Colaboradores"></section><button class="share75" onclick="shareCampaign75()">↗ <b>Compartilhar campanha</b></button>'}
   function coupon75(){
     const a=coupons75();
     return '<section class="simplePanel75"><h3>Cupons e benefícios</h3>'+(a.length?a.map(x=>'<article class="coupon75"><div><b>'+esc75(x.code||x.title||'CUPOM')+'</b><span>'+esc75(x.title||'')+'</span></div><p>'+esc75(x.description||x.text||'')+'</p></article>').join(''):'<p class="empty75">Nenhum cupom ativo neste período.</p>')+'</section>';
@@ -2679,35 +2680,30 @@ window.deletePopupV72=async function(id){
     return c;
   }
   window.shareCampaign75=async function(){
-    let host=null;
     try{
-      host=document.createElement('div');host.className='shareRender75';host.innerHTML=hero75()+info75()+prizePanel75();document.body.appendChild(host);
-      await waitImgs75(host);
-      const h2c=await loadH2C75();
-      const canvas=await h2c(host,{backgroundColor:'#f7f6f2',scale:1.5,useCORS:true,allowTaint:false,logging:false});
-      await new Promise((resolve,reject)=>canvas.toBlob(async blob=>{
-        try{
-          if(!blob)throw new Error('Falha ao gerar card');
-          const file=new File([blob],'campanha-estore-outubro.png',{type:'image/png'});
-          if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
-            await navigator.share({files:[file],title:'eStore no Volume Máximo',text:'Campanha de outubro • eStore CE+PI'});resolve();return;
-          }
-          const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='campanha-estore-outubro.png';a.click();setTimeout(()=>URL.revokeObjectURL(u),2000);resolve();
-        }catch(e){reject(e)}
-      },'image/png',.95));
+      const url=new URL(CARD75,location.href).href;
+      const res=await fetch(url,{cache:'no-store'});
+      if(!res.ok)throw new Error('Não foi possível carregar o card da campanha.');
+      const blob=await res.blob();
+      const file=new File([blob],'campanha-estore-volume-maximo-outubro.jpg',{type:'image/jpeg'});
+      if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
+        await navigator.share({
+          files:[file],
+          title:'eStore no Volume Máximo',
+          text:'Esses prêmios podem ser seus. Confira a campanha de outubro no App. eStore CE+PI.'
+        });
+        return;
+      }
+      const a=document.createElement('a');
+      const objectUrl=URL.createObjectURL(blob);
+      a.href=objectUrl;a.download='campanha-estore-volume-maximo-outubro.jpg';
+      document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(objectUrl),2500);
+      alert('O card da campanha foi preparado como imagem para compartilhamento.');
     }catch(e){
-      try{
-        const canvas=fallbackCanvas75();
-        await new Promise((resolve,reject)=>canvas.toBlob(async blob=>{
-          try{
-            const file=new File([blob],'campanha-estore-outubro.png',{type:'image/png'});
-            if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]})))await navigator.share({files:[file],title:'eStore no Volume Máximo'});
-            else{const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='campanha-estore-outubro.png';a.click();setTimeout(()=>URL.revokeObjectURL(u),2000)}
-            resolve();
-          }catch(err){reject(err)}
-        },'image/png',.94));
-      }catch(err){alert('Não foi possível gerar o card agora. Tente novamente.')}
-    }finally{host?.remove()}
+      console.warn('share campaign card',e);
+      window.open(new URL(CARD75,location.href).href,'_blank');
+    }
   };
   window.shareCampaignV72=shareCampaign75;
 
@@ -2715,12 +2711,7 @@ window.deletePopupV72=async function(id){
     const baseCommunity=communityPostHtml;
     communityPostHtml=function(x){
       if(String(x?.title||'').trim().toLowerCase()==='estore no volume máximo'){
-        const y={...x,title:'Campanha de Outubro',media_url:'',media_type:''};
-        let html=baseCommunity(y);
-        html=html.replace('Campanha de Outubro','eStore no Volume Máximo');
-        const social='<div class=communitySocialV46>';
-        if(html.includes(social))html=html.replace(social,hero75()+social);
-        return html;
+        return baseCommunity({...x,media_url:CARD75,media_type:'image/jpeg'});
       }
       return baseCommunity(x);
     };
@@ -2736,5 +2727,10 @@ window.deletePopupV72=async function(id){
 .popOverlay75{position:fixed;inset:0;z-index:12000;background:rgba(4,16,13,.82);backdrop-filter:blur(7px);display:grid;place-items:center;padding:14px;overflow:hidden}.popCard75{position:relative;width:min(420px,94vw);max-height:94vh;overflow:auto;background:linear-gradient(180deg,#0d382e,#082b24);border:1px solid rgba(255,255,255,.75);border-radius:28px;color:#fff;box-shadow:0 28px 75px rgba(0,0,0,.52)}.popClose75{position:absolute;right:10px;top:10px;z-index:10;width:38px;height:38px;border:0;border-radius:50%;background:#fff;color:#111;font-size:25px}.popCopy75{padding:24px 22px 8px}.popCopy75 small{color:#f1d49a;font-size:9px;font-weight:950;letter-spacing:.08em}.popCopy75 h2{font-size:34px;line-height:.98;margin:10px 0 0}.popCopy75 h3{color:#f5d272;font-size:28px;line-height:1;margin:2px 0 10px}.popCopy75 p{font-size:11.5px;line-height:1.42;color:#eeeae2;margin:0}.popStage75{position:relative;height:300px;overflow:hidden;background:radial-gradient(circle at 50% 46%,rgba(246,197,78,.35),transparent 55%)}.goldStage75{position:absolute;left:50%;bottom:4px;transform:translateX(-50%);width:330px;height:90px;border-radius:50%;background:linear-gradient(#f7d56d,#ae6a00);box-shadow:0 0 28px rgba(244,195,75,.48),inset 0 12px 12px rgba(255,242,173,.5)}.pp{position:absolute;z-index:4}.pp img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 9px 9px rgba(0,0,0,.33))}.pp.phone{width:105px;height:176px;left:36%;top:22px;transform:translateX(-50%)}.pp.headset{width:175px;height:168px;right:4px;top:43px}.pp.beam{width:105px;height:92px;left:20px;bottom:37px}.pp.buds{width:103px;height:88px;left:120px;bottom:7px}.pp.go{width:112px;height:86px;right:24px;bottom:13px}.popEq75{position:absolute;left:12px;right:12px;bottom:8px;height:72px;display:flex;align-items:end;justify-content:space-between;opacity:.5}.popEq75 i{width:5px;border-radius:4px;background:linear-gradient(#f6dc8f,#DE7C00)}.popButtons75{padding:0 22px 21px}.popButtons75 button{width:100%;border-radius:16px;padding:13px;font-size:14px;font-weight:900}.popButtons75 .yes{border:0;background:linear-gradient(90deg,#ffe797,#f3c55f);color:#173F35}.popButtons75 .yes b{font-size:21px}.popButtons75 .no{margin-top:9px;border:1px solid rgba(255,255,255,.78);background:transparent;color:#fff}.sound75{position:absolute;left:50%;top:50%;width:390px;height:390px;border:2px solid rgba(241,212,154,.18);border-radius:50%;animation:sound75 2.7s ease-out infinite}.sound75.s2{animation-delay:.9s}.sound75.s3{animation-delay:1.8s}@keyframes sound75{0%{opacity:.8;transform:translate(-50%,-50%) scale(.55)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.55)}}
 .shareRender75{position:fixed;left:-10000px;top:0;width:720px;background:#f7f6f2;padding:18px;z-index:-1}.shareRender75 .hero75{aspect-ratio:2.25/1}.shareRender75 .heroText75 h2{font-size:48px}.shareRender75 .heroText75 p{font-size:22px}.shareRender75 .heroText75>span{font-size:15px}.shareRender75 .heroText75 small{font-size:14px}.shareRender75 .info75 article{min-height:120px;padding:16px}.shareRender75 .info75 b{font-size:14px}.shareRender75 .info75 p{font-size:12px}.shareRender75 .prizePanel75 h3{font-size:30px}.shareRender75 .prizePanel75 header p{font-size:14px}.shareRender75 .prizePhoto75{height:170px}.shareRender75 .prizeCard75>b{font-size:14px;min-height:28px}.shareRender75 .prizeCard75 small,.shareRender75 .rank75{font-size:12px}
 @media(max-width:480px){.campaignPage75{padding:8px 9px 15px}.tabs75 button{min-height:68px}.heroText75 h2{font-size:22px}.heroText75 p{font-size:10px}.heroText75>span{font-size:7px}.heroText75 button{font-size:7px;padding:7px 10px}.heroBadge75{font-size:6px}.info75{gap:5px}.info75 article{padding:8px 6px;min-height:86px}.prizePanel75{padding:12px 8px}.prizeGrid75{gap:6px}.prizePhoto75{height:82px}.prizeCard75{padding:7px 4px 8px}.prizeCard75>b{font-size:7.5px}.prizeCard75 small{font-size:6.5px}.rank75{font-size:7.5px}.popCopy75 h2{font-size:31px}.popCopy75 h3{font-size:26px}.popStage75{height:285px}}
+</style>
+
+<style id="campaign-v70-fixes">
+.approvedCardWrap75{background:#fff;border-radius:22px;overflow:hidden;border:1px solid #ece7dd;box-shadow:0 8px 24px rgba(23,63,53,.08);margin:0 0 12px}.approvedCardImg75{display:block;width:100%;height:auto;object-fit:contain;background:#fff}.campaignPage75{padding:10px 12px 18px}.tabs75{margin-bottom:13px}.share75{display:flex;align-items:center;justify-content:center;gap:8px;min-height:54px;font-size:13px}.communityMedia img[src*="campaign-share-v75"],.communityPostMediaV37 img[src*="campaign-share-v75"]{object-fit:contain!important;background:#fff!important}
+@media(max-width:480px){.campaignPage75{padding:8px 9px 15px}.approvedCardWrap75{border-radius:18px}.share75{min-height:52px;font-size:12px}}
 </style>
 </body></html>
