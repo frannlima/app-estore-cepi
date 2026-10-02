@@ -11,5 +11,5 @@
   </defs>
   <image href="campaign-share-v75.jpg" xlink:href="campaign-share-v75.jpg" x="0" y="0" width="1536" height="1024" preserveAspectRatio="none"/>
   <rect x="62" y="33" width="345" height="70" fill="url(#logoPatch)"/>
-  <image href="../riachuelo-horizontal-oficial.png" xlink:href="../riachuelo-horizontal-oficial.png" x="88" y="39" width="305" height="56" preserveAspectRatio="xMinYMid meet" filter="url(#whiteLogo)"/>
+  <image href="riachuelo-logo-exact-v75.svg" xlink:href="riachuelo-logo-exact-v75.svg" x="88" y="39" width="305" height="56" preserveAspectRatio="xMinYMid meet"/>
 </svg>
