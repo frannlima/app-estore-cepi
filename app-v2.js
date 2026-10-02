@@ -2163,3 +2163,38 @@ adminV3=function(){
     bootCampaignV82();
   }
 })();
+
+
+/* ===== V86 2026-10-02: popup campanha com banner aprovado ===== */
+CAMPAIGN_OCT_V37.art='./assets/campaign-popup-v86.svg?v=86';
+
+showCampaignPopupV37=function(){
+  if(!campaignActiveV37()||!U?.u?.id||document.getElementById('campaignPopupV37'))return;
+  const el=document.createElement('div');
+  el.id='campaignPopupV37';
+  el.className='campaignOverlayV37 campaignOverlayV86';
+  el.innerHTML=
+    '<div class="campaignModalV86" role="dialog" aria-modal="true" aria-label="Campanha eStore outubro">'+
+      '<button class="campaignCloseV86" onclick="event.stopPropagation();closeCampaignPopupV37(false)" aria-label="Fechar">×</button>'+
+      '<button class="campaignBannerV86" onclick="closeCampaignPopupV37(true)" aria-label="Conhecer a mecânica da campanha">'+
+        '<img src="./assets/campaign-popup-v86.svg?v=86" alt="Já pensou em transformar suas vendas no eStore em um Samsung ou JBL?">'+
+      '</button>'+
+    '</div>';
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('show'));
+};
+
+(function(){
+  if(document.getElementById('campaign-v86-style'))return;
+  const st=document.createElement('style');
+  st.id='campaign-v86-style';
+  st.textContent=
+    '.campaignOverlayV86{padding:16px;background:rgba(2,22,18,.74);backdrop-filter:blur(8px)}'+
+    '.campaignOverlayV86 .campaignModalV86{position:relative;width:min(94vw,560px);max-height:92vh;margin:auto;border-radius:28px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.42);transform:translateY(16px) scale(.97);opacity:0;transition:.24s ease;background:#0b4037}'+
+    '.campaignOverlayV86.show .campaignModalV86{transform:none;opacity:1}'+
+    '.campaignBannerV86{display:block;width:100%;padding:0;border:0;background:transparent;cursor:pointer}'+
+    '.campaignBannerV86 img{display:block;width:100%;height:auto;max-height:92vh;object-fit:contain;background:#0b4037}'+
+    '.campaignCloseV86{position:absolute;z-index:5;right:22px;top:22px;width:54px;height:54px;border-radius:50%;border:1.5px solid rgba(255,255,255,.9);background:rgba(5,37,32,.58);color:#fff;font-size:34px;line-height:1;font-weight:300;display:grid;place-items:center;cursor:pointer;box-shadow:0 5px 16px rgba(0,0,0,.18)}'+
+    '@media(max-width:560px){.campaignOverlayV86{padding:10px}.campaignOverlayV86 .campaignModalV86{width:min(96vw,520px);border-radius:22px}.campaignCloseV86{right:16px;top:16px;width:48px;height:48px;font-size:30px}}';
+  document.head.appendChild(st);
+})();
