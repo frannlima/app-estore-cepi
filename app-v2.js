@@ -1913,3 +1913,155 @@ adminV3=function(){
 '@media(max-width:680px){.ccAdminColsV38{grid-template-columns:1fr}.ccTabsV38{top:2px}.ccRulesGridV38,.ccTipsV38{gap:5px}.ccInfoGridV38{grid-template-columns:1fr 1fr}.campaignPopupArtV38{height:300px}}';
   document.head.appendChild(s);
 })();
+
+
+/* V76_CAMPAIGN_CARD_2026
+   Mantém a mecânica da campanha de outubro e aplica o wordmark Riachuelo 2026
+   no card do menu Campanhas e no arquivo de compartilhamento.
+*/
+(function(){
+  const V76_LOGO = 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Logotipo_da_Riachuelo_%282026%29.svg/500px-Logotipo_da_Riachuelo_%282026%29.svg.png';
+  const V76_LOCAL_LOGO = './riachuelo-horizontal-oficial.png';
+  const P76 = {
+    samsung:'https://images.samsung.com/is/image/samsung/p6pim/br/sm-a075mlgjzto/gallery/br-galaxy-a07-sm-a075-541551-sm-a075mlgjzto-548184945?$Q80_1368_AMP_PNG$',
+    tune720:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dwf4654304/JBL_TUNE_720BT_Product%20Image_Hero_Black.png?sw=680&sh=680',
+    beam2:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dw514588d2/JBL_Wave_Beam_2_Product_Image_Hero_Black.png?sw=680&sh=680',
+    buds2:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dw2f05619c/JBL_Wave_Buds_2_Product_Image_Hero_Black.png?sw=680&sh=680',
+    go4:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dw475cf507/JBL_GO_4_HERO_BLACK_ORANGE_47835_x3.png?sw=680&sh=680',
+    t520:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dw38654710/JBL_Tune_520BT_Product%20Image_Hero_Black.png?sw=680&sh=680'
+  };
+
+  function p76(src, alt, cls){
+    return '<img class="'+(cls||'')+'" crossorigin="anonymous" referrerpolicy="no-referrer" src="'+src+'" alt="'+alt+'" onerror="this.style.opacity=\'0\'">';
+  }
+
+  function card76HTML(){
+    return [
+      '<div class="campaign76card" data-campaign76-card="1">',
+        '<section class="c76hero">',
+          '<div class="c76copy">',
+            '<div class="c76logoBox"><img class="c76logo" crossorigin="anonymous" referrerpolicy="no-referrer" src="'+V76_LOGO+'" alt="Riachuelo" onerror="this.onerror=null;this.src=\''+V76_LOCAL_LOGO+'\'"></div>',
+            '<div class="c76eyebrow">CAMPANHA • 01 A 31 DE OUTUBRO</div>',
+            '<div class="c76title"><span>eStore no</span><strong>Volume Máximo</strong></div>',
+            '<div class="c76sub">Aumente o som das vendas.</div>',
+            '<p>Todos os vendedores elegíveis à comissão eStore do Brasil concorrem a prêmios JBL e Samsung.</p>',
+            '<div class="c76cta">CONFIRA A CAMPANHA <b>›</b></div>',
+          '</div>',
+          '<div class="c76visual">',
+            '<div class="c76halo"></div>',
+            p76(P76.samsung,'Samsung A07 4G','c76phone'),
+            p76(P76.tune720,'JBL Tune 720 BT','c76head'),
+            '<div class="c76bars"><i></i><i></i><i></i><i></i><i></i></div>',
+            '<div class="c76stage"></div>',
+          '</div>',
+        '</section>',
+        '<section class="c76facts">',
+          '<div class="c76fact"><span class="c76ico">●●●</span><div><b>Quem participa</b><p>Todos os vendedores elegíveis à comissão eStore do <strong>Brasil.</strong></p></div></div>',
+          '<div class="c76fact"><span class="c76ico">◎</span><div><b>Critério</b><p>Os 15 maiores valores aprovados no eStore, em cada grupo de porte, levam prêmio.</p></div></div>',
+          '<div class="c76fact"><span class="c76ico">♛</span><div><b>Premiação</b><p><strong>45 premiados</strong> no total<br><strong>15 por grupo de porte.</strong></p></div></div>',
+          '<div class="c76fact c76porte"><span class="c76ico">▂▅▇</span><div><b>Grupos de porte</b><div class="c76pills"><span>P+PP</span><span>M</span><span>G+GG+EXX</span></div><p>Mesma premiação para os três grupos.</p></div></div>',
+        '</section>',
+        '<section class="c76prizes">',
+          '<div class="c76prizeHead"><span>🏆</span><div><b>Premiação dos Vendedores</b><p>Os 15 melhores em valor aprovado de cada grupo de porte de lojas levam prêmio. Mesma premiação para os três grupos.</p></div></div>',
+          '<div class="c76grid">',
+            '<div class="c76item"><em>1º a 3º</em>'+p76(P76.samsung,'Samsung A07 4G')+'<b>Samsung A07 4G</b><small>128GB</small></div>',
+            '<div class="c76item"><em>4º e 5º</em>'+p76(P76.tune720,'JBL Tune 720 BT')+'<b>JBL Tune 720 BT</b></div>',
+            '<div class="c76item"><em>6º</em>'+p76(P76.beam2,'JBL Wave Beam 2')+'<b>JBL Wave Beam 2</b></div>',
+            '<div class="c76item"><em>7º</em>'+p76(P76.buds2,'JBL Wave Buds 2')+'<b>JBL Wave Buds 2</b></div>',
+            '<div class="c76item"><em>8º e 9º</em>'+p76(P76.go4,'JBL Go 4')+'<b>JBL Go 4</b></div>',
+            '<div class="c76item"><em>10º a 15º</em>'+p76(P76.t520,'JBL T520 BT')+'<b>JBL T520 BT</b></div>',
+          '</div>',
+        '</section>',
+      '</div>'
+    ].join('');
+  }
+
+  function css76(){
+    if(document.getElementById('campaign76-style')) return;
+    const s=document.createElement('style');
+    s.id='campaign76-style';
+    s.textContent=[
+      '.campaign76card{--g:#082f2d;--g2:#123f37;--gold:#f2c449;--cream:#f5f1e8;width:100%;aspect-ratio:3/2;box-sizing:border-box;padding:1.15%;background:linear-gradient(180deg,#f7f4ee 0%,#f0ece3 100%);border-radius:18px;overflow:hidden;color:#092c2a;font-family:Inter,Arial,sans-serif;display:grid;grid-template-rows:45.5% 17% 35%;gap:1.25%;}',
+      '.c76hero{position:relative;overflow:hidden;border-radius:16px;background:radial-gradient(circle at 66% 42%,rgba(245,201,80,.32),transparent 26%),linear-gradient(112deg,#042f2d 0%,#073a35 46%,#0a493a 100%);display:grid;grid-template-columns:45% 55%;min-height:0;}',
+      '.c76copy{padding:3.7% 3.8%;position:relative;z-index:2;color:#fff}.c76logoBox{width:47%;height:12%;display:flex;align-items:center;margin-bottom:5.5%}.c76logo{width:100%;height:100%;object-fit:contain;object-position:left center;filter:brightness(0) invert(1)}',
+      '.c76eyebrow{font-weight:900;font-size:clamp(8px,1.25vw,18px);letter-spacing:.02em;color:#f0c84f;margin-bottom:1.4%}.c76title{line-height:.92;margin:0 0 1.8%}.c76title span,.c76title strong{display:block;font-size:clamp(22px,4.25vw,56px);letter-spacing:-.035em}.c76title span{font-weight:750}.c76title strong{font-weight:950;color:#f3c34c}.c76sub{font-size:clamp(11px,1.72vw,25px);font-weight:800;margin-bottom:2.3%}.c76copy p{font-size:clamp(8px,1.15vw,17px);line-height:1.28;max-width:92%;margin:0 0 4%}.c76cta{display:inline-flex;align-items:center;gap:.45em;background:linear-gradient(180deg,#f6d05e,#efb938);color:#092c2a;border-radius:999px;font-weight:950;font-size:clamp(8px,1vw,15px);padding:2.25% 7.5%}.c76cta b{font-size:1.35em}',
+      '.c76visual{position:relative;min-width:0}.c76halo{position:absolute;left:9%;top:12%;width:60%;height:75%;border:1.8px solid rgba(255,210,85,.7);border-radius:50%;box-shadow:0 0 34px rgba(255,216,107,.28)}.c76stage{position:absolute;left:2%;bottom:-5%;width:72%;height:11%;border-radius:50%;background:radial-gradient(ellipse,#c7a847 0%,#5e6438 44%,#174637 76%,transparent 77%);box-shadow:0 -2px 12px rgba(255,214,95,.65)}',
+      '.c76phone{position:absolute;left:12%;bottom:5%;width:31%;height:84%;object-fit:contain;z-index:2;filter:drop-shadow(0 12px 12px rgba(0,0,0,.3))}.c76head{position:absolute;right:11%;bottom:4%;width:48%;height:88%;object-fit:contain;z-index:3;filter:drop-shadow(0 12px 12px rgba(0,0,0,.3))}.c76bars{position:absolute;right:1.5%;bottom:10%;width:20%;height:56%;display:flex;align-items:flex-end;gap:7%;z-index:1}.c76bars i{display:block;flex:1;background:linear-gradient(180deg,#f3c24d,#335d42);border-radius:2px 2px 0 0}.c76bars i:nth-child(1){height:43%}.c76bars i:nth-child(2){height:58%}.c76bars i:nth-child(3){height:70%}.c76bars i:nth-child(4){height:82%}.c76bars i:nth-child(5){height:96%}',
+      '.c76facts{display:grid;grid-template-columns:1.05fr 1.15fr 1fr 1.08fr;gap:.8%;min-height:0}.c76fact{background:#fbfaf6;border:1px solid rgba(22,63,53,.09);border-radius:13px;box-shadow:0 5px 14px rgba(13,53,45,.04);padding:5.5% 5%;display:grid;grid-template-columns:19% 1fr;gap:5%;align-items:start;min-width:0}.c76ico{font-weight:950;color:#073b35;font-size:clamp(12px,2vw,31px);letter-spacing:-.18em;line-height:1}.c76fact b{font-size:clamp(9px,1.22vw,18px);font-weight:950}.c76fact p{font-size:clamp(7px,.88vw,13px);line-height:1.3;margin:7% 0 0}.c76pills{display:flex;gap:4%;margin-top:7%}.c76pills span{background:#ece3cc;border-radius:999px;padding:4% 8%;font-size:clamp(6px,.72vw,11px);font-weight:900;white-space:nowrap}',
+      '.c76prizes{background:#f9f7f1;border:1px solid rgba(22,63,53,.08);border-radius:15px;padding:1.6% 1.5%;min-height:0;display:grid;grid-template-rows:26% 1fr;gap:2%}.c76prizeHead{display:flex;align-items:flex-start;gap:1.2%;min-height:0}.c76prizeHead>span{font-size:clamp(13px,2vw,30px)}.c76prizeHead b{font-size:clamp(13px,2.05vw,31px);font-weight:950;letter-spacing:-.025em}.c76prizeHead p{font-size:clamp(7px,.9vw,13px);margin:1% 0 0}.c76grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1.15%;min-height:0}.c76item{position:relative;background:#fff;border:1px solid rgba(22,63,53,.08);border-radius:11px;padding:10% 5% 4%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:0;overflow:hidden}.c76item em{position:absolute;left:0;top:0;background:linear-gradient(135deg,#f7c64c,#e9a926);color:#fff;font-style:normal;font-weight:950;font-size:clamp(7px,.87vw,13px);padding:5% 9%;border-radius:0 0 12px 0}.c76item img{width:90%;height:68%;object-fit:contain;filter:drop-shadow(0 6px 5px rgba(0,0,0,.13))}.c76item b{font-size:clamp(7px,.88vw,13px);font-weight:950;line-height:1.08;text-align:center;margin-top:1.2%}.c76item small{font-size:clamp(6px,.74vw,11px);font-weight:800;margin-top:1%}',
+      '.campaign76Shell{width:100%;margin:0 0 12px}.campaign76ShareHost{position:fixed;left:-10000px;top:0;width:1200px;height:800px;z-index:-1}.campaign76ShareHost .campaign76card{width:1200px;height:800px;aspect-ratio:auto;border-radius:24px}',
+      '@media(max-width:640px){.campaign76card{border-radius:12px;padding:1%;gap:1%;}.c76hero{border-radius:10px}.c76fact{border-radius:8px}.c76prizes{border-radius:9px}.c76item{border-radius:7px}.c76copy{padding:3%}.c76logoBox{width:50%;margin-bottom:4%}}'
+    ].join('');
+    document.head.appendChild(s);
+  }
+
+  function patchCampaign76(root){
+    css76();
+    const scope=root||document;
+    scope.querySelectorAll('.approvedCardWrap75').forEach(function(wrap){
+      if(wrap.dataset.campaign76Done==='1') return;
+      wrap.dataset.campaign76Done='1';
+      wrap.classList.add('campaign76Shell');
+      wrap.innerHTML=card76HTML();
+    });
+  }
+
+  async function loadH2C76(){
+    if(window.html2canvas) return window.html2canvas;
+    await new Promise(function(resolve,reject){
+      const old=document.querySelector('script[data-h2c-v76]');
+      if(old){ old.addEventListener('load',resolve,{once:true}); old.addEventListener('error',reject,{once:true}); return; }
+      const s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+      s.async=true; s.dataset.h2cV76='1'; s.onload=resolve; s.onerror=reject; document.head.appendChild(s);
+    });
+    return window.html2canvas;
+  }
+
+  async function waitImgs76(root){
+    const imgs=Array.from(root.querySelectorAll('img'));
+    await Promise.all(imgs.map(function(im){
+      if(im.complete) return Promise.resolve();
+      return new Promise(function(res){ im.addEventListener('load',res,{once:true}); im.addEventListener('error',res,{once:true}); setTimeout(res,5000); });
+    }));
+  }
+
+  window.shareCampaign75 = async function(){
+    let host=null;
+    try{
+      css76();
+      host=document.createElement('div');
+      host.className='campaign76ShareHost';
+      host.innerHTML=card76HTML();
+      document.body.appendChild(host);
+      await waitImgs76(host);
+      const h2c=await loadH2C76();
+      const canvas=await h2c(host.querySelector('.campaign76card'),{backgroundColor:'#f5f1e8',scale:1.35,useCORS:true,allowTaint:false,logging:false});
+      const blob=await new Promise(function(resolve){canvas.toBlob(resolve,'image/png',0.98);});
+      if(!blob) throw new Error('Falha ao gerar o card.');
+      const file=new File([blob],'campanha-estore-volume-maximo-riachuelo.png',{type:'image/png'});
+      if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],title:'eStore no Volume Máximo'});
+      }else{
+        const a=document.createElement('a');
+        a.href=URL.createObjectURL(blob); a.download=file.name; a.click();
+        setTimeout(function(){URL.revokeObjectURL(a.href);},3000);
+      }
+    }catch(err){
+      console.warn('[V76] Falha no compartilhamento visual',err);
+      if(typeof window.toast==='function') window.toast('Não foi possível gerar o card agora. Tente novamente.');
+      else alert('Não foi possível gerar o card agora. Tente novamente.');
+    }finally{
+      if(host) host.remove();
+    }
+  };
+  window.shareCampaignV72 = window.shareCampaign75;
+
+  function boot76(){
+    patchCampaign76(document);
+    const obs=new MutationObserver(function(){patchCampaign76(document);});
+    obs.observe(document.documentElement,{childList:true,subtree:true});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot76,{once:true});
+  else boot76();
+})();
