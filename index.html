@@ -1245,8 +1245,32 @@ async function previewTeamCard(){try{let c=teamCardCanvas();if(!c)return alert('
 async function shareTeamCard(){try{let c=teamCardCanvas();if(!c)return alert('Aguarde o carregamento dos dados do Meu Time.');let b=await new Promise(r=>c.toBlob(r,'image/png'));if(!b)throw new Error('Falha ao gerar imagem');let f=new File([b],'Meu_Time_eStore.png',{type:'image/png'});if(navigator.share){try{if(!navigator.canShare||navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Meu Time • eStore'});return}}catch(e){if(e&&e.name==='AbortError')return}}let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}catch(e){console.error('Compartilhar Meu Time:',e);alert('Não foi possível compartilhar o card. Tente novamente.') }}
 let RANK_MONTH=new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'}).slice(0,7),COMM_MONTH=RANK_MONTH;
 function monthSelector(){let y=+RANK_MONTH.slice(0,4)||2026,opts='';for(let i=1;i<=12;i++){let v=y+'-'+String(i).padStart(2,'0'),lab=new Date(y,i-1,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'});opts+='<option value="'+v+'" '+(v===RANK_MONTH?'selected':'')+'>'+lab.replace(/^./,x=>x.toUpperCase())+'</option>'}return '<select class="on" aria-label="Mês do ranking" style="min-width:0;max-width:180px;padding:10px 30px 10px 14px;border-radius:999px;background:#173F35;color:white;font-weight:800;border:0" onchange="RANK_MONTH=this.value;loadHistoricalRanking()">'+opts+'</select>'}
-function ranking(){let canShare=PER==='day'||PER==='week'||PER==='month',period=PER==='month'?new Date(RANK_MONTH+'-01T12:00:00').toLocaleDateString('pt-BR',{month:'long',year:'numeric'}):PER==='day'?new Date().toLocaleDateString('pt-BR',{timeZone:'America/Fortaleza'}):rankPeriod(),share=canShare?'<div class="card shareHub"><div class=shareHubHead><div class=title>Compartilhe os destaques</div><div class=muted>Gere e compartilhe o card oficial com os Top 10 do período.</div></div><div class=shareCards>'+shareTile('regional','REGIONAL CE+PI',period,1)+shareTile('store','FILIAL '+esc(U.u.st),period,1)+'</div></div>':'';return '<div class=card><div class=title>Ranking Regional CE+PI</div>'+rankingTabs()+'<div id=rankMonthStatus class=muted></div><div id=regionalRank><div class="notice">Atualizando ranking...</div></div></div><div class=card><div class=title>Ranking Filial '+esc(U.u.st)+'</div><div id=storeRank><div class="notice">Atualizando ranking...</div></div></div>'+share}
-function shareTile(scope,title,period,has){return '<div class=shareTile><div class=shareTileHead><span>'+title+'</span><span>'+rankPeriod()+'</span></div><div class=shareMock><img src="'+LOGO+'" alt="Riachuelo"><div class=top10>TOP 10</div><b>destaques em venda eStore</b><div class=muted>'+esc(period)+'</div><div style="font-size:34px;margin-top:12px">🥈 🏆 🥉</div></div><div class=shareActions>'+(has?'<button class=btn onclick="shareRanking(\''+scope+'\')">Compartilhar no WhatsApp</button><button class="btn ghost" onclick="previewRanking(\''+scope+'\')">Visualizar card</button>':'<div class=muted>Sem dados neste período.</div>')+'</div></div>'}
+function rankReferenceDateV93(){
+  const iso=new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'});
+  const d=new Date(iso+'T12:00:00-03:00');
+  d.setDate(d.getDate()-1);
+  return d;
+}
+function rankIsoWeekV93(d){
+  const x=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  const day=x.getUTCDay()||7;
+  x.setUTCDate(x.getUTCDate()+4-day);
+  const y0=new Date(Date.UTC(x.getUTCFullYear(),0,1));
+  return Math.ceil((((x-y0)/86400000)+1)/7);
+}
+function rankPeriodLabelV93(){
+  if(PER==='day')return rankReferenceDateV93().toLocaleDateString('pt-BR');
+  if(PER==='week')return 'Semana '+rankIsoWeekV93(rankReferenceDateV93());
+  if(PER==='month'){
+    const d=new Date(RANK_MONTH+'-01T12:00:00');
+    const m=d.toLocaleDateString('pt-BR',{month:'long'});
+    return m.charAt(0).toUpperCase()+m.slice(1);
+  }
+  if(PER==='year')return String(new Date().getFullYear());
+  return rankPeriod();
+}
+function ranking(){let canShare=PER==='day'||PER==='week'||PER==='month',period=rankPeriodLabelV93(),share=canShare?'<div class="card shareHub"><div class=shareHubHead><div class=title>Compartilhe os destaques</div><div class=muted>Gere e compartilhe o card oficial com os Top 10 do período.</div></div><div class=shareCards>'+shareTile('regional','REGIONAL CE+PI',period,1)+shareTile('store','FILIAL '+esc(U.u.st),period,1)+'</div></div>':'';return '<div class=card><div class=title>Ranking Regional CE+PI</div>'+rankingTabs()+'<div id=rankMonthStatus class=muted></div><div id=regionalRank><div class="notice">Atualizando ranking...</div></div></div><div class=card><div class=title>Ranking Filial '+esc(U.u.st)+'</div><div id=storeRank><div class="notice">Atualizando ranking...</div></div></div>'+share}
+function shareTile(scope,title,period,has){return '<div class=shareTile><div class=shareTileHead><span>'+title+'</span><span>'+esc(period)+'</span></div><div class=shareMock><img src="'+LOGO+'" alt="Riachuelo"><div class=top10>TOP 10</div><b>destaques em venda eStore</b><div class=muted>'+esc(period)+'</div><div style="font-size:34px;margin-top:12px">🥈 🏆 🥉</div></div><div class=shareActions>'+(has?'<button class=btn onclick="shareRanking(\''+scope+'\')">Compartilhar no WhatsApp</button><button class="btn ghost" onclick="previewRanking(\''+scope+'\')">Visualizar card</button>':'<div class=muted>Sem dados neste período.</div>')+'</div></div>'}
 async function previewRanking(scope){let c=await rankCard(scope),url=c.toDataURL('image/png'),m=document.createElement('div');m.className='previewModal';m.innerHTML='<div class=box><img src="'+url+'" alt="Prévia do card"><div class=toolbar><button class=btn onclick="shareRanking(\''+scope+'\')">Compartilhar</button><button class="btn ghost" onclick="this.closest(\'.previewModal\').remove()">Fechar</button></div></div>';m.onclick=e=>{if(e.target===m)m.remove()};document.body.appendChild(m)}
 async function loadHistoricalRanking(){
  if(window.__rankLoading)return;window.__rankLoading=true;
@@ -1269,10 +1293,88 @@ async function loadHistoricalRanking(){
 function rankPeriod(){return ({day:'Dia',week:'Semana',month:'Mês',year:'Ano'})[PER]||'Período'}
 function canvasImage(src){return new Promise(ok=>{if(!src)return ok(null);let im=new Image();im.crossOrigin='anonymous';im.onload=()=>ok(im);im.onerror=()=>ok(null);im.src=src})}
 function circlePhoto(x,im,cx,cy,r,fallback){x.save();x.beginPath();x.arc(cx,cy,r,0,Math.PI*2);x.clip();if(im)x.drawImage(im,cx-r,cy-r,r*2,r*2);else{x.fillStyle='#D6D2C4';x.fillRect(cx-r,cy-r,r*2,r*2);x.fillStyle='#173F35';x.textAlign='center';x.font='700 '+Math.round(r*.65)+'px sans-serif';x.fillText(initials(fallback),cx,cy+Math.round(r*.22))}x.restore()}
-async function rankCard(scope){let arr=(scope==='regional'?(COMMON.top?.[PER]||[]):[...teamList()]).filter(x=>(+x.c||0)>0).sort((a,b)=>(+b.c||0)-(+a.c||0)),top=arr.slice(0,10),period=PER==='month'?new Date(RANK_MONTH+'-01T12:00:00').toLocaleDateString('pt-BR',{month:'long',year:'numeric'}):PER==='day'?new Date().toLocaleDateString('pt-BR',{timeZone:'America/Fortaleza'}):rankPeriod(),title='Top 10 destaques em venda eStore • '+period,sub=scope==='regional'?'Regional CE+PI':'Filial '+U.u.st,W=1080,H=1450,c=document.createElement('canvas');c.width=W;c.height=H;let x=c.getContext('2d'),green='#173F35',cream='#F4F1E8',gold='#C99A2E',wine='#76232F';x.fillStyle=cream;x.fillRect(0,0,W,H);x.fillStyle=green;x.fillRect(0,0,W,225);
-let logo=await canvasImage(LOGO);if(logo)x.drawImage(logo,60,35,105,105);x.fillStyle='#fff';x.textAlign='left';x.font='700 42px sans-serif';x.fillText(title,195,82);x.font='30px sans-serif';x.fillText(sub,195,132);x.font='23px sans-serif';x.fillText('Moda que inspira o Brasil',195,174);
-let imgs=await Promise.all(top.map(u=>canvasImage(CONTENT.profilePhotos?.[String(u.id)])));let podium=[1,0,2],px=[95,400,705],py=[420,330,455],ph=[185,275,150];podium.forEach((idx,j)=>{let u=top[idx];if(!u)return;circlePhoto(x,imgs[idx],px[j]+140,py[j]-68,58,preferredName(u.id,u.name));x.fillStyle=j===1?gold:(j===0?'#466964':wine);x.fillRect(px[j],py[j],280,ph[j]);x.fillStyle='#fff';x.textAlign='center';x.font='700 36px sans-serif';x.fillText('🏆 '+(idx+1)+'º',px[j]+140,py[j]+48);x.font='700 23px sans-serif';x.fillText(String(preferredName(u.id,u.name)||'').split(' ').slice(0,2).join(' '),px[j]+140,py[j]+88);x.font='700 25px sans-serif';x.fillText(money(u.c),px[j]+140,py[j]+126);x.font='19px sans-serif';x.fillText(scope==='regional'?'Filial '+u.st:num(u.o)+' pedidos',px[j]+140,py[j]+160)});
-x.textAlign='left';let y=700;top.slice(3,10).forEach((u,k)=>{x.fillStyle='#fff';x.fillRect(55,y-48,970,82);circlePhoto(x,imgs[k+3],91,y-7,29,preferredName(u.id,u.name));x.fillStyle=gold;x.textAlign='center';x.font='700 25px sans-serif';x.fillText('★',135,y);x.fillStyle=green;x.textAlign='left';x.font='700 24px sans-serif';x.fillText((k+4)+'º  '+String(preferredName(u.id,u.name)||'').slice(0,26),165,y-7);x.fillStyle='#6b6b6b';x.font='19px sans-serif';x.fillText(scope==='regional'?'Filial '+u.st:num(u.o)+' pedidos',165,y+19);x.fillStyle=green;x.textAlign='right';x.font='700 24px sans-serif';x.fillText(money(u.c),995,y);y+=94});x.textAlign='left';x.fillStyle=green;x.font='22px sans-serif';x.fillText('App. eStore CE+PI',60,1405);return c}
+async function rankCard(scope){
+  let arr=(scope==='regional'?(COMMON.top?.[PER]||[]):[...teamList()])
+    .filter(x=>(+x.c||0)>0).sort((a,b)=>(+b.c||0)-(+a.c||0)),
+    top=arr.slice(0,10),period=rankPeriodLabelV93(),
+    sub=scope==='regional'?'Regional CE+PI':'Filial '+U.u.st,
+    W=1080,H=1450,c=document.createElement('canvas');
+  c.width=W;c.height=H;
+  let x=c.getContext('2d'),green='#173F35',cream='#F4F1E8',gold='#C99A2E',wine='#76232F',sage='#466964';
+  x.fillStyle=cream;x.fillRect(0,0,W,H);
+
+  function fitTextV93(text,maxWidth,startSize,minSize,weight='700'){
+    let size=startSize;
+    do{x.font=weight+' '+size+'px sans-serif';if(x.measureText(text).width<=maxWidth)break;size-=1}while(size>minSize);
+    return size;
+  }
+  function centeredNameV93(name,cx,y,maxW){
+    const words=String(name||'').trim().split(/\s+/);
+    let lines=[''];
+    for(const w of words){
+      const test=(lines[lines.length-1]+' '+w).trim();
+      x.font='700 20px sans-serif';
+      if(x.measureText(test).width>maxW&&lines[lines.length-1])lines.push(w);
+      else lines[lines.length-1]=test;
+      if(lines.length===2&&x.measureText(lines[1]).width>maxW)break;
+    }
+    if(lines.length>2)lines=lines.slice(0,2);
+    x.fillStyle='#fff';x.textAlign='center';
+    lines.forEach((ln,i)=>{
+      const sz=fitTextV93(ln,maxW,20,15,'700');
+      x.font='700 '+sz+'px sans-serif';
+      x.fillText(ln,cx,y+i*24);
+    });
+    return lines.length;
+  }
+
+  // Cabeçalho: título e período em linhas independentes para não cortar texto.
+  x.fillStyle=green;x.fillRect(0,0,W,225);
+  let logo=await canvasImage(LOGO);
+  if(logo)x.drawImage(logo,50,42,105,105);
+  x.fillStyle='#fff';x.textAlign='left';x.font='700 38px sans-serif';
+  x.fillText('Top 10 destaques em venda eStore',185,72);
+  x.fillStyle='#F1D49A';x.font='700 30px sans-serif';x.fillText(period,185,116);
+  x.fillStyle='#fff';x.font='27px sans-serif';x.fillText(sub,185,158);
+  x.font='20px sans-serif';x.fillText('Moda que inspira o Brasil',185,194);
+
+  let imgs=await Promise.all(top.map(u=>canvasImage(CONTENT.profilePhotos?.[String(u.id)])));
+
+  // Pódio com caixas iguais, respiro e nomes enquadrados em até 2 linhas.
+  const podium=[1,0,2],px=[55,390,725],py=[405,330,430],pw=300,ph=245;
+  podium.forEach((idx,j)=>{
+    let u=top[idx];if(!u)return;
+    const cx=px[j]+pw/2;
+    circlePhoto(x,imgs[idx],cx,py[j]-58,56,preferredName(u.id,u.name));
+    x.fillStyle=j===1?gold:(j===0?sage:wine);
+    x.fillRect(px[j],py[j],pw,ph);
+    x.fillStyle='#fff';x.textAlign='center';x.font='700 32px sans-serif';
+    x.fillText('🏆 '+(idx+1)+'º',cx,py[j]+43);
+    const lines=centeredNameV93(preferredName(u.id,u.name),cx,py[j]+82,pw-34);
+    const valueY=py[j]+82+(lines===2?50:30);
+    x.font='700 24px sans-serif';x.fillText(money(u.c),cx,valueY);
+    x.font='18px sans-serif';x.fillText(scope==='regional'?'Filial '+u.st:num(u.o)+' pedidos',cx,valueY+34);
+  });
+
+  // 4º ao 10º: nome ajusta o tamanho ao espaço sem invadir o valor.
+  x.textAlign='left';
+  let y=720;
+  top.slice(3,10).forEach((u,k)=>{
+    x.fillStyle='#fff';x.fillRect(45,y-47,990,84);
+    circlePhoto(x,imgs[k+3],84,y-5,28,preferredName(u.id,u.name));
+    x.fillStyle=gold;x.textAlign='center';x.font='700 23px sans-serif';x.fillText('★',127,y+1);
+    const prefix=(k+4)+'º  ';
+    const full=prefix+String(preferredName(u.id,u.name)||'');
+    const nameSize=fitTextV93(full,610,22,15,'700');
+    x.fillStyle=green;x.textAlign='left';x.font='700 '+nameSize+'px sans-serif';x.fillText(full,155,y-8);
+    x.fillStyle='#6b6b6b';x.font='18px sans-serif';x.fillText(scope==='regional'?'Filial '+u.st:num(u.o)+' pedidos',155,y+18);
+    x.fillStyle=green;x.textAlign='right';x.font='700 22px sans-serif';x.fillText(money(u.c),1005,y);
+    y+=92;
+  });
+
+  x.textAlign='left';x.fillStyle=green;x.font='20px sans-serif';x.fillText('App. eStore CE+PI',55,1404);
+  return c
+}
 async function shareRanking(scope){let c=await rankCard(scope);c.toBlob(async blob=>{if(!blob)return;let suffix=PER==='month'?RANK_MONTH:PER,file=new File([blob],'top10-estore-'+scope+'-'+suffix+'.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:'Top 10 destaques em venda eStore • '+rankPeriod()});return}catch(e){}}let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)},'image/png')}
 function campaigns(){let dynamic=CONTENT.campaigns||[];return '<div class=card><div class=title>Cupons e Campanhas</div><div class=notice><b>ESTORE10 — 10%</b><br>Cupom de 10%. Não acumulativo.</div><div class=notice><b>ESTORE20 — 20%</b><br>20% na primeira compra pelo App. Não acumulativo.</div></div><div class=card><div class=title>Campanha e-Store • Giftty Card R$ 300</div><div class=muted>12/09 a 26/09</div><div class=notice><b>Quem participa</b><br>Todos os vendedores elegíveis à comissão eStore do Brasil.</div><div class=grid><div class=kpi>Grupo 1<b>Full Riachu</b><span>3 vencedores • 1 por porte</span></div><div class=kpi>Grupo 2<b>Novos formatos</b><span>3 vencedores • 1 por porte</span></div></div><div class=notice><b>Portes</b><br>P (P + PP) • M • G (G, GG, EXX)</div><div class=notice><b>Critério</b><br>O maior valor aprovado no eStore, por porte, leva o prêmio.</div><div class=notice success><b>🏆 Prêmio</b><br>1 Giftty Card de R$ 300,00 para cada campeão.</div></div><div class=card><div class=title>Como vender mais no eStore</div><div class=notice><b>1. Amplie as possibilidades</b><br>Quando a loja não tiver tamanho, cor ou modelo, consulte o eStore antes de encerrar o atendimento.</div><div class=notice><b>2. Apresente os benefícios</b><br>Reforce frete grátis, possibilidade de parcelamento em até 10x e os cupons disponíveis quando aplicáveis.</div><div class=notice><b>3. Use o cupom como argumento</b><br>ESTORE10 oferece 10%. ESTORE20 oferece 20% na primeira compra pelo App. Os cupons não são cumulativos.</div><div class=notice><b>4. Acompanhe venda aprovada</b><br>Na campanha, o critério é o maior valor aprovado por porte. Priorize conversão com qualidade e acompanhe seu resultado.</div></div>'+(dynamic.length?'<div class=card><div class=title>Outras campanhas</div>'+dynamic.map(x=>'<div class=notice><b>'+esc(x.title||x.name||'Campanha')+'</b><br>'+esc(x.text||x.description||x.rules||'Consulte as regras vigentes.')+'</div>').join('')+'</div>':'')}function info(){let a=CONTENT.importantInfo||[];return '<div class=card><div class=title>Informações importantes eStore</div>'+(a.length?a.map(x=>'<div class=notice><b>'+esc(x.title||'Atualização')+'</b><br>'+esc(x.text||x.message||x)+'</div>').join(''):'<div class=muted>Nenhuma atualização publicada.</div>')+'</div>'}
 function edayToday(){let d=new Date(new Date().toLocaleString('en-US',{timeZone:'America/Fortaleza'})),iso=new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'}),days=Array.isArray(EDAY.weekdays)?EDAY.weekdays:[1];return EDAY.active===true&&days.includes(d.getDay())&&(!EDAY.start||iso>=EDAY.start)&&(!EDAY.end||iso<=EDAY.end)}
@@ -2551,7 +2653,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v92';
+  const BUILD='v93';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2586,8 +2688,8 @@ window.deletePopupV72=async function(id){
   };
   let TAB75='campaigns';
   const LOGO75='./assets/riachuelo-logo-exact-v75.svg';
-  const CARD75='./assets/campaign-hero-v84.svg?build=v92';
-  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v92';
+  const CARD75='./assets/campaign-hero-v84.svg?build=v93';
+  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v93';
   const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
   const active75=x=>{if(!x||x.active===false)return false;const d=today75(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return(!s||d>=s)&&(!e||d<=e)};
@@ -2813,8 +2915,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART83='./assets/campaign-share-v76.svg?build=v92';
-  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v92';
+  const ART83='./assets/campaign-share-v76.svg?build=v93';
+  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v93';
 
   function closeV83(){
     document.getElementById('campaignPopV83')?.remove();
@@ -2964,8 +3066,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART84='./assets/campaign-hero-v84.svg?build=v92';
-  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v92';
+  const ART84='./assets/campaign-hero-v84.svg?build=v93';
+  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v93';
 
   function close84(){
     document.getElementById('campaignPopV84')?.remove();
@@ -3335,7 +3437,7 @@ window.deletePopupV72=async function(id){
     const asset=k=>API+'?asset='+encodeURIComponent(k)+'&v=90';
     try{
       const [logo,samsung,tune720,waveBeam2,waveBuds2,go4,tune520]=await Promise.all([
-        loadCampaignImgV90('./assets/riachuelo-logo-exact-v75.svg?build=v92'),
+        loadCampaignImgV90('./assets/riachuelo-logo-exact-v75.svg?build=v93'),
         loadCampaignImgV90(asset('samsung')),
         loadCampaignImgV90(asset('tune720')),
         loadCampaignImgV90(asset('waveBeam2')),
