@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v78';
-const BUILD='v78';
+const CACHE='estore-cepi-shell-v79';
+const BUILD='v79';
 const SHELL=['./assets/riachuelo-logo-exact-v75.svg','./assets/campaign-share-v76.svg','./assets/campaign-share-v75.jpg','./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon.svg','./riachuelo-horizontal-oficial.png'];
 
 self.addEventListener('install',event=>{
