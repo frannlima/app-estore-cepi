@@ -2551,7 +2551,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v87';
+  const BUILD='v88';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2586,8 +2586,8 @@ window.deletePopupV72=async function(id){
   };
   let TAB75='campaigns';
   const LOGO75='./assets/riachuelo-logo-exact-v75.svg';
-  const CARD75='./assets/campaign-hero-v84.svg?build=v87';
-  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v87';
+  const CARD75='./assets/campaign-hero-v84.svg?build=v88';
+  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v88';
   const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
   const active75=x=>{if(!x||x.active===false)return false;const d=today75(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return(!s||d>=s)&&(!e||d<=e)};
@@ -2813,8 +2813,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART83='./assets/campaign-share-v76.svg?build=v87';
-  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v87';
+  const ART83='./assets/campaign-share-v76.svg?build=v88';
+  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v88';
 
   function closeV83(){
     document.getElementById('campaignPopV83')?.remove();
@@ -2964,8 +2964,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART84='./assets/campaign-hero-v84.svg?build=v87';
-  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v87';
+  const ART84='./assets/campaign-hero-v84.svg?build=v88';
+  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v88';
 
   function close84(){
     document.getElementById('campaignPopV84')?.remove();
@@ -3115,7 +3115,7 @@ window.deletePopupV72=async function(id){
 </script>
 
 
-<!-- V87-CAMPAIGN-POPUP-FINAL -->
+<!-- V88-CAMPAIGN-POPUP-NO-LOGO -->
 <style id="campaign-v87-style">
 .campaignPopV87{
   position:fixed;inset:0;z-index:1000002;display:grid;place-items:center;
@@ -3141,12 +3141,8 @@ window.deletePopupV72=async function(id){
   letter-spacing:-.035em
 }
 .campaignPopQuestionV87 strong{color:#f2c554}
-.campaignPopBrandTopV87{
-  display:block;width:min(330px,50%);height:38px;object-fit:contain;
-  object-position:left center;margin:2px 0 4px 28px
-}
 .campaignPrizeStageV87{
-  position:relative;height:440px;margin:0 16px 8px;overflow:hidden
+  position:relative;height:440px;margin:14px 16px 8px;overflow:hidden
 }
 .campaignPrizeGlowV87{
   position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);
@@ -3179,17 +3175,12 @@ window.deletePopupV72=async function(id){
   background:linear-gradient(180deg,#ffd86d,#f3bb3d);
   color:#173F35;font-size:15px;font-weight:950;cursor:pointer
 }
-.campaignPopBrandBottomV87{
-  display:block;width:min(430px,64%);height:45px;object-fit:contain;
-  margin:19px auto 0
-}
 @media(max-width:520px){
   .campaignPopV87{padding:6px}
   .campaignPopCardV87{width:96vw;border-radius:22px}
   .campaignPopCloseV87{right:14px;top:14px;width:46px;height:46px;font-size:29px}
   .campaignPopQuestionV87{padding:22px 64px 9px 20px;font-size:24px}
-  .campaignPopBrandTopV87{margin-left:20px;width:48%;height:30px}
-  .campaignPrizeStageV87{height:352px;margin:0 7px 5px}
+    .campaignPrizeStageV87{height:352px;margin:12px 7px 5px}
   .campaignPrizeGlowV87{width:75%;top:49%}
   .campaignPrizeV87.phone{left:22%;top:16px;width:48%;height:278px}
   .campaignPrizeV87.phone img{transform:scale(1.48)}
@@ -3199,12 +3190,10 @@ window.deletePopupV72=async function(id){
   .campaignPopFooterV87{padding:2px 16px 17px}
   .campaignPopFooterV87 p{font-size:13px;margin-bottom:13px}
   .campaignPopCtaV87{padding:15px;font-size:13px}
-  .campaignPopBrandBottomV87{height:34px;margin-top:15px;width:66%}
-}
+  }
 </style>
 <script>
 (function(){
-  const LOGO87='./assets/riachuelo-logo-exact-v75.svg?build=v87';
   const asset87=function(k){return API+'?asset='+encodeURIComponent(k)+'&v=87'};
   const P87={
     samsung:asset87('samsung'),
@@ -3242,7 +3231,7 @@ window.deletePopupV72=async function(id){
     if(document.getElementById('campaignPopV87'))return;
 
     const uid=String(U?.u?.id||U?.id||'user');
-    const key='estoreCampaignPopupV87:'+uid;
+    const key='estoreCampaignPopupV88:'+uid;
     if(!force){
       try{if(sessionStorage.getItem(key))return}catch(e){}
     }
@@ -3255,7 +3244,7 @@ window.deletePopupV72=async function(id){
       '<div class="campaignPopCardV87" role="dialog" aria-modal="true" aria-label="Campanha eStore de outubro">'+
         '<button class="campaignPopCloseV87" onclick="closeCampaignPopV87()" aria-label="Fechar">×</button>'+
         '<div class="campaignPopQuestionV87">Já pensou em transformar suas vendas no eStore em <strong>um Samsung ou JBL?</strong></div>'+
-        '<img class="campaignPopBrandTopV87" src="'+LOGO87+'" alt="Riachuelo">'+
+        '+
         '<div class="campaignPrizeStageV87">'+
           '<div class="campaignPrizeGlowV87"></div>'+
           '<div class="campaignPrizeStageBaseV87"></div>'+
@@ -3267,7 +3256,7 @@ window.deletePopupV72=async function(id){
         '<div class="campaignPopFooterV87">'+
           '<p>Conheça a mecânica, acompanhe os critérios e veja como concorrer às premiações de outubro.</p>'+
           '<button class="campaignPopCtaV87" onclick="openCampaignMechanicsV87()">CONHECER A MECÂNICA <b>→</b></button>'+
-          '<img class="campaignPopBrandBottomV87" src="'+LOGO87+'" alt="Riachuelo">'+
+          '+
         '</div>'+
       '</div>';
     document.body.appendChild(d);
