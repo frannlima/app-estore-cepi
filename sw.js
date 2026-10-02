@@ -1,4 +1,5 @@
-const CACHE='estore-cepi-shell-v67';
+const CACHE='estore-cepi-shell-v68';
+const BUILD='v68';
 const SHELL=['./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon.svg','./riachuelo-horizontal-oficial.png'];
 
 self.addEventListener('install',event=>{
@@ -13,6 +14,15 @@ self.addEventListener('activate',event=>{
     caches.keys()
       .then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))
       .then(()=>self.clients.claim())
+      .then(()=>self.clients.matchAll({type:'window',includeUncontrolled:true}))
+      .then(clients=>Promise.all(clients.map(client=>{
+        try{
+          const u=new URL(client.url);
+          if(u.origin!==self.location.origin)return Promise.resolve();
+          u.searchParams.set('build',BUILD);
+          return client.navigate(u.toString()).catch(()=>{});
+        }catch(e){return Promise.resolve();}
+      })))
   );
 });
 
