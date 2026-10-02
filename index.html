@@ -2551,7 +2551,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v73';
+  const BUILD='v74';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2586,7 +2586,8 @@ window.deletePopupV72=async function(id){
   };
   let TAB75='campaigns';
   const LOGO75='./riachuelo-horizontal-oficial.png';
-  const CARD75='./assets/campaign-share-v75.jpg?build=v70';
+  const CARD75='./assets/campaign-share-v76.svg?build=v74';
+  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v74';
   const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
   const active75=x=>{if(!x||x.active===false)return false;const d=today75(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return(!s||d>=s)&&(!e||d<=e)};
@@ -2695,50 +2696,33 @@ window.deletePopupV72=async function(id){
     return c;
   }
   window.shareCampaign75=async function(){
-    let host=null;
+    const loadImg=src=>new Promise((resolve,reject)=>{
+      const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Falha ao carregar imagem.'));im.src=new URL(src,location.href).href;
+    });
     try{
-      host=document.createElement('div');
-      host.className='shareRender75';
-      host.innerHTML=hero75()+info75()+prizePanel75();
-      document.body.appendChild(host);
-      await waitImgs75(host);
-      const h2c=await loadH2C75();
-      const canvas=await h2c(host,{backgroundColor:'#f7f6f2',scale:1.5,useCORS:true,allowTaint:false,logging:false});
-      await new Promise((resolve,reject)=>canvas.toBlob(async blob=>{
-        try{
-          if(!blob)throw new Error('Falha ao gerar card');
-          const file=new File([blob],'campanha-estore-volume-maximo-outubro.png',{type:'image/png'});
-          if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
-            await navigator.share({
-              files:[file],
-              title:'eStore no Volume Máximo',
-              text:'Esses prêmios podem ser seus. Confira a campanha de outubro no App. eStore CE+PI.'
-            });
-            resolve();return;
-          }
-          const url=URL.createObjectURL(blob),a=document.createElement('a');
-          a.href=url;a.download='campanha-estore-volume-maximo-outubro.png';
-          document.body.appendChild(a);a.click();a.remove();
-          setTimeout(()=>URL.revokeObjectURL(url),2500);
-          resolve();
-        }catch(e){reject(e)}
-      },'image/png',.95));
+      const [card,logo]=await Promise.all([loadImg(CARD_SOURCE75),loadImg(LOGO75)]);
+      const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=1024;
+      const g=canvas.getContext('2d',{alpha:false});
+      g.drawImage(card,0,0,1536,1024);
+      const patch=g.createLinearGradient(62,0,407,0);
+      patch.addColorStop(0,'#012625');patch.addColorStop(.55,'#002b29');patch.addColorStop(1,'#003130');
+      g.fillStyle=patch;g.fillRect(62,33,345,70);
+      const off=document.createElement('canvas');off.width=logo.naturalWidth||1000;off.height=logo.naturalHeight||184;
+      const og=off.getContext('2d');og.drawImage(logo,0,0,off.width,off.height);
+      og.globalCompositeOperation='source-in';og.fillStyle='#fff';og.fillRect(0,0,off.width,off.height);
+      g.drawImage(off,88,39,305,56);
+      const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('Falha ao gerar card.')),'image/jpeg',.96));
+      const file=new File([blob],'campanha-estore-volume-maximo-outubro.jpg',{type:'image/jpeg'});
+      if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
+        await navigator.share({files:[file],title:'eStore no Volume Máximo',text:'Esses prêmios podem ser seus. Confira a campanha de outubro no App. eStore CE+PI.'});
+        return;
+      }
+      const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2500);
+      alert('O card da campanha foi preparado como imagem para compartilhamento.');
     }catch(e){
       console.warn('share campaign card',e);
-      const canvas=fallbackCanvas75();
-      await new Promise((resolve,reject)=>canvas.toBlob(async blob=>{
-        try{
-          if(!blob)throw new Error('Falha ao gerar card');
-          const file=new File([blob],'campanha-estore-volume-maximo-outubro.png',{type:'image/png'});
-          if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
-            await navigator.share({files:[file],title:'eStore no Volume Máximo'});resolve();return;
-          }
-          const url=URL.createObjectURL(blob),a=document.createElement('a');
-          a.href=url;a.download='campanha-estore-volume-maximo-outubro.png';a.click();
-          setTimeout(()=>URL.revokeObjectURL(url),2500);resolve();
-        }catch(err){reject(err)}
-      },'image/png',.94));
-    }finally{host?.remove()}
+      window.open(new URL(CARD75,location.href).href,'_blank');
+    }
   };
   window.shareCampaignV72=shareCampaign75;
 
@@ -2771,7 +2755,7 @@ window.deletePopupV72=async function(id){
 </style>
 
 <style id="campaign-v70-fixes">
-.approvedCardWrap75{background:#fff;border-radius:22px;overflow:hidden;border:1px solid #ece7dd;box-shadow:0 8px 24px rgba(23,63,53,.08);margin:0 0 12px}.approvedCardImg75{display:block;width:100%;height:auto;object-fit:contain;background:#fff}.campaignPage75{padding:10px 12px 18px}.tabs75{margin-bottom:13px}.share75{display:flex;align-items:center;justify-content:center;gap:8px;min-height:54px;font-size:13px}.communityMedia img[src*="campaign-share-v75"],.communityPostMediaV37 img[src*="campaign-share-v75"]{object-fit:contain!important;background:#fff!important}
+.approvedCardWrap75{background:#fff;border-radius:22px;overflow:hidden;border:1px solid #ece7dd;box-shadow:0 8px 24px rgba(23,63,53,.08);margin:0 0 12px}.approvedCardImg75{display:block;width:100%;height:auto;object-fit:contain;background:#fff}.campaignPage75{padding:10px 12px 18px}.tabs75{margin-bottom:13px}.share75{display:flex;align-items:center;justify-content:center;gap:8px;min-height:54px;font-size:13px}.communityMedia img[src*="campaign-share-v76"],.communityPostMediaV37 img[src*="campaign-share-v76"]{object-fit:contain!important;background:#fff!important}
 @media(max-width:480px){.campaignPage75{padding:8px 9px 15px}.approvedCardWrap75{border-radius:18px}.share75{min-height:52px;font-size:12px}}
 </style>
 
