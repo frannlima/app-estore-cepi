@@ -2170,7 +2170,7 @@ function emergencyLogin(ev){
         '<div class="campaignPopupCopyV71"><small>CAMPANHA • '+periodV71(x)+'</small><h2>'+esc(x.title||'eStore no Volume Máximo')+'</h2><h4>Aumente o som das vendas.</h4><p>'+esc(x.employeeBenefit||x.description||x.text||'Confira a campanha ativa e aproveite as oportunidades do mês.')+'</p>'+
           '<button class="campaignPopupPrimaryV71" onclick="closeCampaignPopupV71();go(&quot;campaigns&quot;)">Quero conferir <span>→</span></button>'+
           '<button class="campaignPopupSecondaryV71" onclick="closeCampaignPopupV71()">Agora não</button>'+
-          '<img class="campaignPopupLogoV71" src="./riachuelo-horizontal-oficial.png" alt="Riachuelo">'+
+          '<img class="campaignPopupLogoV71" src="./assets/riachuelo-logo-exact-v75.svg" alt="Riachuelo">'+
         '</div></div>';
     document.body.appendChild(d);
   }
@@ -2362,7 +2362,7 @@ function showCampaignPopupV72(x){
    '<button class="popupCloseV72" onclick="closePopupV72()">×</button>'+
    '<div class="popupRadioV72"><span>◖</span><div class="popupEqV72"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="r">◗</span></div>'+
    '<div class="popupPrizeStageV72"><div class="popupPrizeV72 samsung"><img src="'+PRIZES_V72.samsung+'" alt="Samsung A07"></div><div class="popupPrizeV72 boom4"><img src="'+PRIZES_V72.boom4+'" alt="JBL Boombox 4"></div><div class="popupPrizeV72 boom3"><img src="'+PRIZES_V72.boom3+'" alt="JBL Boombox 3"></div><div class="popupPrizeV72 tune"><img src="'+PRIZES_V72.tune720+'" alt="JBL Tune 720BT"></div><div class="popupGoldRingV72"></div></div>'+
-   '<div class="popupCopyV72"><small>CAMPANHA • 01 A 31 DE OUTUBRO</small><h2>Esses prêmios<br>podem ser seus.</h2><h3>Vai ficar de fora?</h3><p>Participe da campanha de outubro e concorra a prêmios JBL e Samsung. Confira a mecânica e aproveite a oportunidade.</p><button class="popupPrimaryV72" onclick="closePopupV72();go(&quot;campaigns&quot;)">Quero conferir <span>→</span></button><button class="popupSecondaryV72" onclick="closePopupV72()">Agora não</button><img src="./riachuelo-horizontal-oficial.png" class="popupLogoV72" alt="Riachuelo"></div>'+
+   '<div class="popupCopyV72"><small>CAMPANHA • 01 A 31 DE OUTUBRO</small><h2>Esses prêmios<br>podem ser seus.</h2><h3>Vai ficar de fora?</h3><p>Participe da campanha de outubro e concorra a prêmios JBL e Samsung. Confira a mecânica e aproveite a oportunidade.</p><button class="popupPrimaryV72" onclick="closePopupV72();go(&quot;campaigns&quot;)">Quero conferir <span>→</span></button><button class="popupSecondaryV72" onclick="closePopupV72()">Agora não</button><img src="./assets/riachuelo-logo-exact-v75.svg" class="popupLogoV72" alt="Riachuelo"></div>'+
  '</div>';
  document.body.appendChild(el);
 }
@@ -2551,7 +2551,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v81';
+  const BUILD='v83';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2586,8 +2586,8 @@ window.deletePopupV72=async function(id){
   };
   let TAB75='campaigns';
   const LOGO75='./assets/riachuelo-logo-exact-v75.svg';
-  const CARD75='./assets/campaign-share-v76.svg?build=v81';
-  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v81';
+  const CARD75='./assets/campaign-share-v76.svg?build=v83';
+  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v83';
   const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
   const active75=x=>{if(!x||x.active===false)return false;const d=today75(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return(!s||d>=s)&&(!e||d<=e)};
@@ -2793,4 +2793,114 @@ window.deletePopupV72=async function(id){
   .heroProductsFocus75 .heroProductHalo75{width:84%;height:80%;top:45%}
 }
 </style>
-</body></html>
+
+<!-- V83-CAMPAIGN-BANNER-POPUP-FIX -->
+<style id="campaign-v83-style">
+.hero75.heroBannerV83{display:block!important;position:relative!important;padding:0!important;min-height:0!important;height:auto!important;aspect-ratio:1536/459!important;overflow:hidden!important;border-radius:22px!important;background:#0b332d!important;cursor:pointer!important}
+.hero75.heroBannerV83>img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:top center!important;opacity:1!important;filter:none!important}
+@media(max-width:480px){.hero75.heroBannerV83{min-height:0!important;aspect-ratio:1536/459!important;border-radius:18px!important}}
+.campaignPopV83{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;padding:14px;background:rgba(5,20,17,.76);backdrop-filter:blur(8px)}
+.campaignPopCardV83{position:relative;width:min(720px,96vw);max-height:94vh;overflow:auto;border-radius:26px;background:#0b332d;border:1px solid rgba(241,212,154,.58);box-shadow:0 30px 90px rgba(0,0,0,.52)}
+.campaignPopCloseV83{position:absolute;right:12px;top:12px;z-index:5;width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.65);background:rgba(4,28,24,.86);color:#fff;font-size:27px;line-height:1;display:grid;place-items:center}
+.campaignPopQuestionV83{padding:22px 62px 18px 22px;background:linear-gradient(135deg,#0b332d,#164c3f);color:#fff;font-size:clamp(22px,5vw,36px);font-weight:900;line-height:1.04;letter-spacing:-.03em}
+.campaignPopQuestionV83 strong{color:#f1c760}
+.campaignPopArtV83{display:block;width:100%;height:auto;background:#f5f1e8}
+.campaignPopFooterV83{padding:15px 18px 18px;text-align:center;color:#fff}
+.campaignPopFooterV83 p{margin:0 0 13px;font-size:12px;line-height:1.45;color:#d8ddd9}
+.campaignPopCtaV83{width:100%;border:0;border-radius:15px;padding:14px 16px;background:linear-gradient(180deg,#f6d56e,#edb744);color:#173F35;font-size:13px;font-weight:950}
+.campaignPopLogoV83{display:block;width:min(270px,58%);height:28px;object-fit:contain;margin:15px auto 0}
+@media(max-width:520px){.campaignPopV83{padding:9px}.campaignPopCardV83{width:96vw;border-radius:21px}.campaignPopQuestionV83{padding:18px 54px 15px 17px;font-size:23px}.campaignPopFooterV83{padding:13px 14px 15px}.campaignPopLogoV83{height:22px}}
+</style>
+<script>
+(function(){
+  const ART83='./assets/campaign-share-v76.svg?build=v83';
+  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v83';
+
+  function closeV83(){
+    document.getElementById('campaignPopV83')?.remove();
+    try{document.getElementById('campaignPop75')?.remove()}catch(e){}
+    try{document.getElementById('highlightsPopup')?.remove()}catch(e){}
+    try{document.getElementById('campaignPopupV37')?.remove()}catch(e){}
+  }
+  window.closeCampaignPopV83=closeV83;
+
+  window.openCampaignMechanicsV83=function(){
+    closeV83();
+    try{
+      if(typeof window.campaignTab75==='function') window.campaignTab75('campaigns');
+      else if(typeof go==='function') go('campaigns');
+    }catch(e){}
+    setTimeout(function(){
+      const t=document.querySelector('.campaignPage75 .info75')||document.querySelector('.campaignPage75 .prizePanel75');
+      if(t)t.scrollIntoView({behavior:'smooth',block:'start'});
+    },220);
+  };
+
+  function showV83(){
+    if(!window.U)return;
+    if(document.getElementById('campaignPopV83'))return;
+    const user=String(U?.u?.id||'user');
+    const key='estoreCampaignPopupV83:'+user;
+    try{
+      if(sessionStorage.getItem(key))return;
+      sessionStorage.setItem(key,'1');
+    }catch(e){}
+    closeV83();
+    const d=document.createElement('div');
+    d.id='campaignPopV83';
+    d.className='campaignPopV83';
+    d.innerHTML=
+      '<div class="campaignPopCardV83" role="dialog" aria-modal="true" aria-label="Campanha eStore no Volume Máximo">'+
+        '<button class="campaignPopCloseV83" onclick="closeCampaignPopV83()" aria-label="Fechar">×</button>'+
+        '<div class="campaignPopQuestionV83">Já pensou em transformar suas vendas no eStore em <strong>um Samsung ou JBL?</strong></div>'+
+        '<img class="campaignPopArtV83" src="'+ART83+'" alt="Campanha eStore no Volume Máximo">'+
+        '<div class="campaignPopFooterV83">'+
+          '<p>Conheça a mecânica, acompanhe os critérios e veja como concorrer às premiações de outubro.</p>'+
+          '<button class="campaignPopCtaV83" onclick="openCampaignMechanicsV83()">CONHECER A MECÂNICA <b>→</b></button>'+
+          '<img class="campaignPopLogoV83" src="'+LOGO83+'" alt="Riachuelo">'+
+        '</div>'+
+      '</div>';
+    document.body.appendChild(d);
+  }
+
+  window.showHighlightsPopup=showHighlightsPopup=async function(){
+    if(!window.U)return;
+    try{if(typeof refreshExtras==='function')await refreshExtras()}catch(e){}
+    showV83();
+  };
+
+  function patchHeroV83(root){
+    (root||document).querySelectorAll?.('.campaignPage75 .hero75').forEach(function(hero){
+      if(hero.dataset.v83==='1')return;
+      hero.dataset.v83='1';
+      hero.classList.add('heroBannerV83');
+      hero.innerHTML='<img src="'+ART83+'" alt="eStore no Volume Máximo">';
+      hero.setAttribute('role','button');
+      hero.setAttribute('tabindex','0');
+      hero.setAttribute('aria-label','Abrir mecânica da campanha eStore no Volume Máximo');
+      hero.onclick=window.openCampaignMechanicsV83;
+      hero.onkeydown=function(ev){if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();window.openCampaignMechanicsV83();}};
+    });
+  }
+
+  function bootV83(){
+    patchHeroV83(document);
+    const obs=new MutationObserver(function(ms){
+      for(const m of ms)for(const n of m.addedNodes||[])if(n.nodeType===1)patchHeroV83(n);
+      patchHeroV83(document);
+    });
+    try{obs.observe(document.documentElement,{childList:true,subtree:true})}catch(e){}
+    [450,900,1600,2800,4800].forEach(function(ms){
+      setTimeout(function(){
+        patchHeroV83(document);
+        if(window.U&&!document.getElementById('campaignPopV83'))showV83();
+      },ms);
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootV83,{once:true});
+  else bootV83();
+})();
+</script>
+
+</body>
+</html>
