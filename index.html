@@ -2547,4 +2547,28 @@ window.deletePopupV72=async function(id){
 .popupWaveV73{position:absolute;left:50%;top:50%;width:390px;height:390px;border:2px solid rgba(241,212,154,.22);border-radius:50%;animation:wave73 2.7s ease-out infinite}.popupWaveV73.w2{animation-delay:.9s}.popupWaveV73.w3{animation-delay:1.8s}@keyframes wave73{0%{opacity:.75;transform:translate(-50%,-50%) scale(.55)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.55)}}
 @media(max-width:620px){.campaignApprovedHeroV73{grid-template-columns:1fr;min-height:500px;padding:22px}.campaignApprovedProductsV73{min-height:260px}.campaignApprovedCopyV73{padding-right:20px}.campaignInfoGridV73{grid-template-columns:1fr 1fr}.collabPrizeGridV73{grid-template-columns:1fr 1fr}.collabPrizeImgV73{height:138px}.campaignApprovedHeroV73.feed{min-height:455px}.approvedBadgeV73{right:12px;top:12px}.approvedProductV73.p1{left:12px}.approvedProductV73.p2{right:0}}
 </style>
+
+<!-- V74-FORCE-SW-UPDATE -->
+<script>
+(function(){
+  const BUILD='v68';
+  if(!('serviceWorker' in navigator))return;
+  let reloading=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(reloading)return;
+    try{
+      const k='estoreControllerReload:'+BUILD;
+      if(sessionStorage.getItem(k))return;
+      sessionStorage.setItem(k,'1');
+    }catch(e){}
+    reloading=true;
+    location.reload();
+  });
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js?build='+BUILD,{scope:'./',updateViaCache:'none'})
+      .then(reg=>reg.update())
+      .catch(e=>console.warn('sw update',e));
+  });
+})();
+</script>
 </body></html>
