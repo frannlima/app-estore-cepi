@@ -2551,7 +2551,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v90';
+  const BUILD='v91';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2586,8 +2586,8 @@ window.deletePopupV72=async function(id){
   };
   let TAB75='campaigns';
   const LOGO75='./assets/riachuelo-logo-exact-v75.svg';
-  const CARD75='./assets/campaign-hero-v84.svg?build=v90';
-  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v90';
+  const CARD75='./assets/campaign-hero-v84.svg?build=v91';
+  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v91';
   const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
   const active75=x=>{if(!x||x.active===false)return false;const d=today75(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return(!s||d>=s)&&(!e||d<=e)};
@@ -2813,8 +2813,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART83='./assets/campaign-share-v76.svg?build=v90';
-  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v90';
+  const ART83='./assets/campaign-share-v76.svg?build=v91';
+  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v91';
 
   function closeV83(){
     document.getElementById('campaignPopV83')?.remove();
@@ -2964,8 +2964,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART84='./assets/campaign-hero-v84.svg?build=v90';
-  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v90';
+  const ART84='./assets/campaign-hero-v84.svg?build=v91';
+  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v91';
 
   function close84(){
     document.getElementById('campaignPopV84')?.remove();
@@ -3335,7 +3335,7 @@ window.deletePopupV72=async function(id){
     const asset=k=>API+'?asset='+encodeURIComponent(k)+'&v=90';
     try{
       const [logo,samsung,tune720,waveBeam2,waveBuds2,go4,tune520]=await Promise.all([
-        loadCampaignImgV90('./assets/riachuelo-logo-exact-v75.svg?build=v90'),
+        loadCampaignImgV90('./assets/riachuelo-logo-exact-v75.svg?build=v91'),
         loadCampaignImgV90(asset('samsung')),
         loadCampaignImgV90(asset('tune720')),
         loadCampaignImgV90(asset('waveBeam2')),
@@ -3428,6 +3428,156 @@ window.deletePopupV72=async function(id){
     }
   };
   window.shareCampaignV72=window.shareCampaign75;
+})();
+</script>
+
+<!-- V91-CAMPAIGN-MENU-BANNER -->
+<style id="campaign-v91-menu-banner-style">
+.campaignPage75 .hero75.heroBannerV91{
+  display:block!important;position:relative!important;overflow:hidden!important;
+  min-height:0!important;height:auto!important;aspect-ratio:3.30/1!important;
+  border-radius:22px!important;margin:0 0 12px!important;padding:0!important;
+  background:
+    radial-gradient(circle at 72% 42%,rgba(232,203,91,.38) 0,rgba(95,126,72,.18) 26%,rgba(0,0,0,0) 57%),
+    linear-gradient(135deg,#0a493e 0%,#07392f 55%,#062d27 100%)!important;
+  border:1px solid rgba(241,212,154,.36)!important;
+  box-shadow:0 10px 24px rgba(23,63,53,.15)!important;
+  cursor:pointer!important
+}
+.heroBannerV91 .cb91Copy{
+  position:absolute;left:4.2%;top:8.5%;width:46%;z-index:6;color:#fff
+}
+.heroBannerV91 .cb91Date{
+  display:block;color:#f2ca5f;font-size:clamp(8px,1.15vw,16px);font-weight:900;
+  letter-spacing:.02em;margin-bottom:4px
+}
+.heroBannerV91 .cb91Title{
+  margin:0;color:#fff;font-size:clamp(23px,4.2vw,54px);font-weight:900;line-height:.93;
+  letter-spacing:-.035em
+}
+.heroBannerV91 .cb91Title strong{display:block;color:#f1c658}
+.heroBannerV91 .cb91Sub{
+  margin:7px 0 5px;font-size:clamp(10px,1.55vw,22px);font-weight:800;line-height:1.05
+}
+.heroBannerV91 .cb91Desc{
+  margin:0;max-width:94%;font-size:clamp(7px,1.04vw,15px);line-height:1.25;color:#f5f4ee
+}
+.heroBannerV91 .cb91Btn{
+  margin-top:10px;border:0;border-radius:999px;padding:8px 15px;
+  background:linear-gradient(180deg,#ffd76b,#f0b83a);color:#173F35;
+  font-size:clamp(7px,.95vw,12px);font-weight:950
+}
+.heroBannerV91 .cb91Products{
+  position:absolute;right:3%;top:3%;width:48%;height:94%;z-index:4
+}
+.heroBannerV91 .cb91Halo{
+  position:absolute;left:49%;top:48%;width:66%;aspect-ratio:1;border-radius:50%;
+  transform:translate(-50%,-50%);
+  border:2px solid rgba(244,204,91,.72);
+  box-shadow:0 0 32px rgba(239,198,75,.24),inset 0 0 38px rgba(236,206,108,.12)
+}
+.heroBannerV91 .cb91Stage{
+  position:absolute;left:3%;right:4%;bottom:2%;height:20%;border-radius:50%;
+  background:radial-gradient(ellipse,#edc84e 0,#ad7f20 38%,rgba(21,74,61,.9) 64%,transparent 76%);
+  box-shadow:0 -3px 14px rgba(246,205,79,.55)
+}
+.heroBannerV91 .cb91Phone{
+  position:absolute;left:18%;top:7%;width:38%;height:80%;z-index:5
+}
+.heroBannerV91 .cb91Headset{
+  position:absolute;right:4%;top:14%;width:48%;height:72%;z-index:6
+}
+.heroBannerV91 .cb91Products img{
+  width:100%;height:100%;object-fit:contain;display:block;
+  filter:drop-shadow(0 10px 10px rgba(0,0,0,.36))
+}
+.heroBannerV91 .cb91Eq{
+  position:absolute;right:0;bottom:12%;height:58%;width:17%;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:3px;opacity:.82
+}
+.heroBannerV91 .cb91Eq i{
+  flex:1;border-radius:4px 4px 0 0;background:linear-gradient(#f5cf5e,#c98d1c)
+}
+@media(max-width:520px){
+  .campaignPage75 .hero75.heroBannerV91{aspect-ratio:3.35/1!important;border-radius:18px!important}
+  .heroBannerV91 .cb91Copy{left:4.5%;top:8%;width:48%}
+  .heroBannerV91 .cb91Date{font-size:7px;margin-bottom:2px}
+  .heroBannerV91 .cb91Title{font-size:22px}
+  .heroBannerV91 .cb91Sub{font-size:10px;margin:4px 0 3px}
+  .heroBannerV91 .cb91Desc{font-size:6.8px;line-height:1.18}
+  .heroBannerV91 .cb91Btn{margin-top:6px;padding:6px 10px;font-size:6.8px}
+  .heroBannerV91 .cb91Products{right:2%;width:49%}
+  .heroBannerV91 .cb91Phone{left:13%;width:41%}
+  .heroBannerV91 .cb91Headset{right:0;width:51%}
+  .heroBannerV91 .cb91Eq{width:15%;right:-1%;bottom:14%}
+}
+</style>
+<script>
+(function(){
+  const asset91=k=>API+'?asset='+encodeURIComponent(k)+'&v=91';
+  const phone91=asset91('samsung');
+  const headset91=asset91('tune720');
+
+  function openCampaign91(){
+    try{
+      if(typeof window.campaignTab75==='function') window.campaignTab75('prizes');
+      else if(typeof go==='function') go('campaigns');
+    }catch(e){}
+  }
+  window.openCampaign91=openCampaign91;
+
+  function bannerHtml91(){
+    const bars=[28,39,50,61,73,84,96,109];
+    return ''+
+      '<div class="cb91Copy">'+
+        '<span class="cb91Date">CAMPANHA • 01 A 31 DE OUTUBRO</span>'+
+        '<h2 class="cb91Title">eStore no <strong>Volume Máximo</strong></h2>'+
+        '<p class="cb91Sub">Aumente o som das vendas.</p>'+
+        '<p class="cb91Desc">Todos os vendedores elegíveis à comissão eStore do Brasil concorrem a prêmios JBL e Samsung.</p>'+
+        '<button class="cb91Btn" onclick="event.stopPropagation();openCampaign91()">CONFIRA A CAMPANHA ›</button>'+
+      '</div>'+
+      '<div class="cb91Products">'+
+        '<div class="cb91Halo"></div><div class="cb91Stage"></div>'+
+        '<div class="cb91Phone"><img src="'+phone91+'" alt="Samsung A07"></div>'+
+        '<div class="cb91Headset"><img src="'+headset91+'" alt="JBL Tune 720 BT"></div>'+
+        '<div class="cb91Eq">'+bars.map(h=>'<i style="height:'+h+'%"></i>').join('')+'</div>'+
+      '</div>';
+  }
+
+  function patch91(root){
+    const scope=root||document;
+    scope.querySelectorAll?.('.campaignPage75 .hero75').forEach(function(hero){
+      if(hero.dataset.v91==='1')return;
+      hero.dataset.v91='1';
+      hero.classList.remove('heroBannerV83','heroBannerV84');
+      hero.classList.add('heroBannerV91');
+      hero.innerHTML=bannerHtml91();
+      hero.onclick=openCampaign91;
+      hero.setAttribute('role','button');
+      hero.setAttribute('tabindex','0');
+      hero.setAttribute('aria-label','Campanha eStore no Volume Máximo');
+      hero.onkeydown=function(ev){
+        if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();openCampaign91()}
+      };
+    });
+  }
+
+  function boot91(){
+    patch91(document);
+    const obs=new MutationObserver(function(ms){
+      for(const m of ms){
+        for(const n of m.addedNodes||[]){
+          if(n.nodeType===1)patch91(n);
+        }
+      }
+      patch91(document);
+    });
+    try{obs.observe(document.documentElement,{childList:true,subtree:true})}catch(e){}
+    [150,400,800,1400,2400,4200].forEach(ms=>setTimeout(()=>patch91(document),ms));
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot91,{once:true});
+  else boot91();
 })();
 </script>
 </body>
