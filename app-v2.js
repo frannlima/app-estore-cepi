@@ -1852,7 +1852,7 @@ showCampaignPopupV37=function(){
       '<div class="campaignPopupCopyV38"><small>CAMPANHA • '+campaignPeriodV38(x)+'</small><h2>'+escV3(x.title||'Campanha eStore')+'</h2><b>Aumente o som das vendas.</b><p>'+escV3(x.employeeBenefit||x.description||x.text||'Confira os detalhes e aproveite a campanha.')+'</p>'+
       '<button class="campaignPrimaryV38" onclick="closeCampaignPopupV37(false);go(\'campaigns\')">Quero conferir <span>→</span></button>'+
       '<button class="campaignSecondaryV38" onclick="closeCampaignPopupV37(false)">Agora não</button>'+
-      '<img class="campaignBrandV38" src="./riachuelo-horizontal-oficial.png" alt="Riachuelo"></div>'+
+      '<img class="campaignBrandV38" src="./assets/riachuelo-logo-exact-v75.svg" alt="Riachuelo"></div>'+
     '</div>';
   document.body.appendChild(el);requestAnimationFrame(()=>el.classList.add('show'));
 };
@@ -1920,8 +1920,8 @@ adminV3=function(){
    no card do menu Campanhas e no arquivo de compartilhamento.
 */
 (function(){
-  const V76_LOGO = 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Logotipo_da_Riachuelo_%282026%29.svg/500px-Logotipo_da_Riachuelo_%282026%29.svg.png';
-  const V76_LOCAL_LOGO = './riachuelo-horizontal-oficial.png';
+  const V76_LOGO = './assets/riachuelo-logo-exact-v75.svg';
+  const V76_LOCAL_LOGO = './assets/riachuelo-logo-exact-v75.svg';
   const P76 = {
     samsung:'https://images.samsung.com/is/image/samsung/p6pim/br/sm-a075mlgjzto/gallery/br-galaxy-a07-sm-a075-541551-sm-a075mlgjzto-548184945?$Q80_1368_AMP_PNG$',
     tune720:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dwf4654304/JBL_TUNE_720BT_Product%20Image_Hero_Black.png?sw=680&sh=680',
@@ -2064,4 +2064,102 @@ adminV3=function(){
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot76,{once:true});
   else boot76();
+})();
+
+
+/* V82_CAMPAIGN_POPUP_AND_BANNER_2026 */
+(function(){
+  const V82_ART='./assets/campaign-share-v76.svg';
+  const V82_LOGO='./assets/riachuelo-logo-exact-v75.svg';
+  let popupShownV82=false;
+
+  const previousCampaignArtV82=typeof campaignArtV38==='function'?campaignArtV38:null;
+  campaignArtV38=function(x){
+    const title=String(x&&x.title||'').toLowerCase();
+    if(title.includes('volume máximo')||title.includes('volume maximo')) return V82_ART;
+    return previousCampaignArtV82?previousCampaignArtV82(x):V82_ART;
+  };
+
+  window.openCampaignMechanicsV82=function(){
+    try{ closeCampaignPopupV37(false); }catch(_){}
+    try{ CC_TAB_V38='campaign'; }catch(_){}
+    try{ go('campaigns'); }catch(_){}
+    setTimeout(function(){
+      const target=document.querySelector('.ccInfoGridV38')||document.querySelector('.ccHeroV38');
+      if(target) target.scrollIntoView({behavior:'smooth',block:'start'});
+    },180);
+  };
+
+  showCampaignPopupV37=function(){
+    try{ removeLegacyPromoV38(document); }catch(_){}
+    if(popupShownV82||document.getElementById('campaignPopupV37')) return;
+    const x=typeof currentCampaignV38==='function'?currentCampaignV38():null;
+    if(!x) return;
+    popupShownV82=true;
+
+    const el=document.createElement('div');
+    el.id='campaignPopupV37';
+    el.className='campaignOverlayV37';
+    el.innerHTML=
+      '<div class="campaignModalV82" role="dialog" aria-modal="true" aria-label="Campanha eStore no Volume Máximo">'+
+        '<button class="campaignCloseV37 campaignCloseV82" onclick="closeCampaignPopupV37(false)" aria-label="Fechar">×</button>'+
+        '<div class="campaignQuestionV82">Já pensou em <strong>ganhar um Samsung ou um JBL</strong> com suas vendas no eStore?</div>'+
+        '<button class="campaignBannerButtonV82" onclick="openCampaignMechanicsV82()" aria-label="Conhecer a mecânica da campanha">'+
+          '<img src="'+V82_ART+'" alt="eStore no Volume Máximo — campanha de outubro">'+
+        '</button>'+
+        '<div class="campaignPopupCopyV82">'+
+          '<span>01 A 31 DE OUTUBRO</span>'+
+          '<h2>eStore no Volume Máximo</h2>'+
+          '<p>Venda, avance no ranking e acompanhe no App os critérios e as premiações da campanha.</p>'+
+          '<button class="campaignPrimaryV82" onclick="openCampaignMechanicsV82()">CONHECER A MECÂNICA <b>→</b></button>'+
+          '<img class="campaignBrandV82" src="'+V82_LOGO+'" alt="Riachuelo">'+
+        '</div>'+
+      '</div>';
+    document.body.appendChild(el);
+    requestAnimationFrame(function(){el.classList.add('show');});
+  };
+
+  function addCampaignStylesV82(){
+    if(document.getElementById('campaign-v82-style')) return;
+    const s=document.createElement('style');
+    s.id='campaign-v82-style';
+    s.textContent=
+      '.ccHeroV38{background:#f5f1e8}.ccHeroV38 img{aspect-ratio:3/2!important;object-fit:contain!important;background:#f5f1e8}'+
+      '.ccCampaignCardV38 img{object-fit:cover;background:#f5f1e8}'+
+      '.campaignModalV82{position:relative;width:min(680px,94vw);max-height:94vh;overflow:auto;background:#0b302b;border:1px solid rgba(241,212,154,.55);border-radius:26px;box-shadow:0 28px 80px rgba(0,0,0,.5);transform:translateY(18px) scale(.97);transition:.28s}'+
+      '.campaignOverlayV37.show .campaignModalV82{transform:none}'+
+      '.campaignCloseV82{z-index:8;top:12px;right:12px;background:rgba(8,31,26,.86)!important;border:1px solid rgba(255,255,255,.55)!important;color:#fff!important}'+
+      '.campaignQuestionV82{padding:22px 58px 16px 22px;color:#fff;font-size:clamp(20px,4.7vw,34px);font-weight:850;line-height:1.06;letter-spacing:-.025em;background:linear-gradient(135deg,#092f2b,#164b3d)}'+
+      '.campaignQuestionV82 strong{color:#f1c85e}'+
+      '.campaignBannerButtonV82{display:block;width:100%;padding:0;border:0;background:#f5f1e8;cursor:pointer}'+
+      '.campaignBannerButtonV82 img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:contain;background:#f5f1e8}'+
+      '.campaignPopupCopyV82{padding:16px 20px 18px;text-align:center;color:#fff}'+
+      '.campaignPopupCopyV82>span{display:inline-block;color:#f1d49a;font-size:10px;font-weight:900;letter-spacing:.12em}'+
+      '.campaignPopupCopyV82 h2{margin:7px 0 5px;color:#fff;font-size:24px;line-height:1.05}'+
+      '.campaignPopupCopyV82 p{margin:0 auto 14px;max-width:520px;color:#d7ddd8;font-size:12px;line-height:1.45}'+
+      '.campaignPrimaryV82{width:100%;border:0;border-radius:15px;padding:13px 16px;background:linear-gradient(180deg,#f6d46d,#eeb846);color:#173F35;font-size:13px;font-weight:950;cursor:pointer}'+
+      '.campaignBrandV82{display:block;width:min(260px,56%);height:28px;object-fit:contain;margin:15px auto 0;filter:none}'+
+      '@media(max-width:560px){.campaignModalV82{width:94vw;border-radius:22px}.campaignQuestionV82{padding:19px 52px 14px 18px;font-size:23px}.campaignPopupCopyV82{padding:14px 16px 16px}.campaignBrandV82{height:22px}}';
+    document.head.appendChild(s);
+  }
+
+  function tryCampaignPopupV82(){
+    if(popupShownV82) return;
+    if(!window.U||!U.u||!U.u.id) return;
+    if(typeof currentCampaignV38!=='function'||!currentCampaignV38()) return;
+    showCampaignPopupV37();
+  }
+
+  function bootCampaignV82(){
+    addCampaignStylesV82();
+    [500,1000,1800,3000,5000,8000].forEach(function(ms){
+      setTimeout(tryCampaignPopupV82,ms);
+    });
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',bootCampaignV82,{once:true});
+  }else{
+    bootCampaignV82();
+  }
 })();
