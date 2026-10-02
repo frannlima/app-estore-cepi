@@ -2471,7 +2471,7 @@ window.deletePopupV72=async function(id){
         '<div><b>🎯 Critério</b><span>Mobilização de venda eStore durante outubro, conforme regulamento da campanha.</span></div>'+
         '<div><b>🏆 Premiação</b><span>Os 15 melhores vendedores em valor aprovado de cada grupo de porte concorrem a prêmios Samsung e JBL.</span></div>'+
       '</div>'+
-      '<section class="collabPrizeSectionV73"><div class="collabPrizeHeadV73"><span>🏆</span><div><h3>Premiação dos Colaboradores</h3><p>Os 15 melhores em valor aprovado de cada grupo de porte de lojas levam prêmio.</p></div></div>'+
+      '<section class="collabPrizeSectionV73"><div class="collabPrizeHeadV73"><span>🏆</span><div><h3>Premiação dos Vendedores</h3><p>Os 15 melhores em valor aprovado de cada grupo de porte de lojas levam prêmio.</p></div></div>'+
         '<div class="collabPrizeGridV73">'+
           collaboratorPrizeCardV73(PRIZES_V72.samsung,'Samsung A07 4G 128GB','1º a 3º')+
           collaboratorPrizeCardV73(PRIZES_V72.tune720,'JBL Tune 720 BT','4º e 5º')+
@@ -2485,7 +2485,7 @@ window.deletePopupV72=async function(id){
   };
 
   prizesV72=function(){
-    return '<section class="collabPrizeSectionV73 standalone"><div class="collabPrizeHeadV73"><span>🏆</span><div><h3>Premiação dos Colaboradores</h3><p>Os 15 melhores em valor aprovado de cada grupo de porte de lojas levam prêmio.</p></div></div>'+
+    return '<section class="collabPrizeSectionV73 standalone"><div class="collabPrizeHeadV73"><span>🏆</span><div><h3>Premiação dos Vendedores</h3><p>Os 15 melhores em valor aprovado de cada grupo de porte de lojas levam prêmio.</p></div></div>'+
       '<div class="collabPrizeGridV73">'+
         collaboratorPrizeCardV73(PRIZES_V72.samsung,'Samsung A07 4G 128GB','1º a 3º')+
         collaboratorPrizeCardV73(PRIZES_V72.tune720,'JBL Tune 720 BT','4º e 5º')+
@@ -2551,7 +2551,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v71';
+  const BUILD='v72';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2585,6 +2585,7 @@ window.deletePopupV72=async function(id){
     tune520:asset75('tune520')
   };
   let TAB75='campaigns';
+  const LOGO75='./riachuelo-horizontal-oficial.png';
   const CARD75='./assets/campaign-share-v75.jpg?build=v70';
   const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
@@ -2606,17 +2607,23 @@ window.deletePopupV72=async function(id){
 
   function hero75(){
     return '<section class="hero75">'+
-      '<div class="heroGlow75"></div><div class="heroEq75">'+Array.from({length:12},(_,i)=>'<i style="height:'+(26+(i%7)*8)+'px"></i>').join('')+'</div>'+
-      '<div class="heroText75"><small>CAMPANHA • 01 A 31 DE OUTUBRO</small><h2>eStore no <em>Volume Máximo</em></h2><p>Aumente o som das vendas.</p><span>Vendedores concorrem a prêmios<br>JBL e Samsung.</span><button onclick="campaignTab75(&quot;prizes&quot;)">CONFIRA A CAMPANHA <b>›</b></button></div>'+
-      '<div class="heroProducts75"><div class="hp phone">'+img75(P75.samsung,'Samsung A07')+'</div><div class="hp headset">'+img75(P75.tune720,'JBL Tune 720 BT')+'</div><div class="hp speaker">'+img75(P75.go4,'JBL Go 4')+'</div><div class="hp buds">'+img75(P75.waveBeam2,'JBL Wave Beam 2')+'</div></div>'+
-      '<div class="heroBadge75">♛<br><b>PRÊMIOS REAIS</b><br>JBL E SAMSUNG</div>'+
+      '<div class="heroGlow75"></div><div class="heroEq75">'+Array.from({length:15},(_,i)=>'<i style="height:'+(22+(i%8)*7)+'px"></i>').join('')+'</div>'+
+      '<div class="heroBrand75"><span>'+img75(LOGO75,'Riachuelo')+'</span></div>'+
+      '<div class="heroText75"><small>CAMPANHA • 01 A 31 DE OUTUBRO</small><h2>eStore no <em>Volume Máximo</em></h2><p>Aumente o som das vendas.</p><span>Todos os vendedores elegíveis à comissão eStore do Brasil concorrem a prêmios JBL e Samsung.</span><button onclick="campaignTab75(&quot;prizes&quot;)">CONFIRA A CAMPANHA <b>›</b></button></div>'+
+      '<div class="heroProducts75"><div class="hp phone">'+img75(P75.samsung,'Samsung A07 4G 128GB')+'</div><div class="hp headset">'+img75(P75.tune720,'JBL Tune 720 BT')+'</div><div class="hp beam">'+img75(P75.waveBeam2,'JBL Wave Beam 2')+'</div><div class="hp buds">'+img75(P75.waveBuds2,'JBL Wave Buds 2')+'</div><div class="hp speaker">'+img75(P75.go4,'JBL Go 4')+'</div></div>'+
+      '<div class="heroBadge75"><b>45 PREMIADOS</b><span>15 POR GRUPO DE PORTE</span></div>'+
     '</section>';
   }
   function info75(){
-    return '<section class="info75"><article><b>👥 Quem participa</b><p>Vendedores<br>da regional CE+PI.</p></article><article><b>📅 Período</b><p>01 a 31 de<br>outubro de 2026.</p></article><article><b>🎯 Critério</b><p>Mobilização de venda eStore durante outubro, conforme regulamento da campanha.</p></article><article><b>🏆 Premiação</b><p>Os 15 melhores vendedores em valor aprovado concorrem a prêmios Samsung e JBL.</p></article></section>';
+    return '<section class="info75">'+
+      '<article><b>👥 Quem participa</b><p>Todos os vendedores elegíveis à comissão eStore do Brasil.</p></article>'+
+      '<article><b>🎯 Critério</b><p>Os 15 maiores valores aprovados no eStore, em cada grupo de porte, levam prêmio.</p></article>'+
+      '<article><b>🏆 Premiação</b><p><strong>45 premiados</strong> no total • 15 por grupo de porte.</p></article>'+
+      '<article class="groups75"><b>👥 Grupos de porte</b><div><span>P+PP</span><span>M</span><span>G+GG+EXX</span></div><p>Mesma premiação para os três grupos.</p></article>'+
+    '</section>';
   }
   function prizePanel75(){
-    return '<section class="prizePanel75"><header><span>🏆</span><div><h3>Premiação dos Colaboradores</h3><p>Os 15 melhores em valor aprovado de cada grupo de porte de lojas levam prêmio.</p></div></header><div class="prizeGrid75">'+
+    return '<section class="prizePanel75"><header><span>🏆</span><div><h3>Premiação dos Vendedores</h3><p>Os 15 melhores em valor aprovado de cada grupo de porte de lojas levam prêmio. Mesma premiação para os três grupos.</p></div><strong class="prizeCount75">45 PREMIADOS<small>15 POR GRUPO</small></strong></header><div class="prizeGrid75">'+
       prize75(P75.samsung,'Samsung A07 4G 128GB','1º a 3º')+
       prize75(P75.tune720,'JBL Tune 720 BT','4º e 5º')+
       prize75(P75.waveBeam2,'JBL Wave Beam 2','6º')+
@@ -2682,7 +2689,7 @@ window.deletePopupV72=async function(id){
     g.fillStyle='#173F35';g.fillRect(0,0,c.width,c.height);g.fillStyle='#f1d49a';g.font='bold 34px Arial';g.fillText('CAMPANHA • 01 A 31 DE OUTUBRO',60,80);
     g.fillStyle='#fff';g.font='bold 82px Arial';g.fillText('eStore no',60,180);g.fillStyle='#f1d49a';g.fillText('Volume Máximo',60,275);
     g.fillStyle='#fff';g.font='36px Arial';g.fillText('Esses prêmios podem ser seus.',60,350);g.font='28px Arial';g.fillText('Samsung A07 • JBL Tune 720 BT • Wave Beam 2',60,415);g.fillText('Wave Buds 2 • JBL Go 4 • JBL T520 BT',60,455);
-    g.fillStyle='#fff';g.fillRect(60,520,960,660);g.fillStyle='#173F35';g.font='bold 48px Arial';g.fillText('Premiação dos Colaboradores',95,600);
+    g.fillStyle='#fff';g.fillRect(60,520,960,660);g.fillStyle='#173F35';g.font='bold 48px Arial';g.fillText('Premiação dos Vendedores',95,600);
     const rows=[['1º a 3º','Samsung A07 4G 128GB'],['4º e 5º','JBL Tune 720 BT'],['6º','JBL Wave Beam 2'],['7º','JBL Wave Buds 2'],['8º e 9º','JBL Go 4'],['10º a 15º','JBL T520 BT']];
     g.font='bold 30px Arial';rows.forEach((r,i)=>{const y=680+i*75;g.fillStyle='#DE7C00';g.fillText(r[0],95,y);g.fillStyle='#173F35';g.fillText(r[1],300,y)});
     return c;
@@ -2771,5 +2778,17 @@ window.deletePopupV72=async function(id){
 <style id="campaign-v71-fixes">
 .approvedCardWrap75{display:none!important}.campaignPage75{padding:10px 12px 18px}.hero75,.prizePanel75,.info75{visibility:visible!important}.hero75 img,.prizePhoto75 img,.popStage75 img{opacity:1!important}.communityCampaignV71{margin:10px 0 12px}.communityCampaignV71 .hero75{margin:0}.communityCampaignV71 .heroText75 button{pointer-events:none}.communityCampaignV71 .hero75{aspect-ratio:2.25/1}.popCard75{max-height:92vh}.popStage75{min-height:285px}.popStage75 .pp img{display:block!important}.share75{display:flex;align-items:center;justify-content:center;gap:8px;min-height:54px}
 @media(max-width:480px){.campaignPage75{padding:8px 9px 15px}.hero75{min-height:230px}.heroText75 h2{font-size:22px}.info75{grid-template-columns:repeat(2,1fr)}.info75 article{min-height:94px}.prizeGrid75{grid-template-columns:repeat(2,1fr)}.prizePhoto75{height:120px}.prizeCard75>b{font-size:9px}.prizeCard75 small{font-size:7px}.popStage75{height:285px}}
+</style>
+
+<style id="campaign-v72-brand-mechanics">
+.hero75{position:relative;overflow:hidden;border-radius:24px;background:radial-gradient(circle at 72% 42%,#4e7246 0,#214d3d 25%,#0d382f 60%,#082c25 100%);min-height:360px;aspect-ratio:auto;color:#fff;margin-bottom:12px;border:1px solid rgba(241,212,154,.42);box-shadow:0 14px 32px rgba(23,63,53,.18)}
+.heroBrand75{position:absolute;left:4%;top:4%;z-index:8}.heroBrand75 span{display:grid;place-items:center;background:#f7f4eb;border-radius:12px;padding:7px 12px;box-shadow:0 5px 14px rgba(0,0,0,.14)}.heroBrand75 img{display:block;width:118px;height:26px;object-fit:contain!important;filter:none!important}
+.heroText75{left:4.5%;top:18%;width:43%;z-index:5}.heroText75 small{font-size:9px;color:#f1d49a}.heroText75 h2{font-size:31px;line-height:.98;margin:9px 0}.heroText75 h2 em{color:#f1c963}.heroText75 p{font-size:15px;margin:0 0 7px}.heroText75>span{font-size:10px;line-height:1.35;max-width:280px}.heroText75 button{margin-top:14px;padding:10px 15px;font-size:9px}
+.heroProducts75{right:1%;top:3%;width:57%;height:94%;z-index:4}.heroProducts75 .hp img{filter:drop-shadow(0 12px 10px rgba(0,0,0,.38))}.hp.phone{width:38%;height:80%;left:8%;top:4%}.hp.headset{width:53%;height:68%;right:0;top:14%}.hp.beam{width:25%;height:28%;left:3%;bottom:3%}.hp.buds{width:23%;height:25%;left:31%;bottom:1%}.hp.speaker{width:27%;height:29%;right:4%;bottom:1%}
+.heroBadge75{right:2.5%;top:4%;min-width:110px;padding:9px 11px;background:linear-gradient(135deg,#f8d981,#e5a62e);border-radius:14px;color:#173F35}.heroBadge75 b{display:block;font-size:9px}.heroBadge75 span{display:block;font-size:7px;margin-top:2px;font-weight:900}.heroEq75{right:1%;bottom:2%;height:38%;opacity:.50}
+.info75{grid-template-columns:repeat(4,1fr);gap:8px}.info75 article{min-height:126px;padding:11px 10px}.info75 b{font-size:10px}.info75 p{font-size:9px;line-height:1.34}.info75 p strong{color:#173F35}.groups75>div{display:flex;gap:4px;flex-wrap:wrap;margin:5px 0 7px}.groups75>div span{background:#e6dfcb;color:#173F35;border-radius:999px;padding:5px 7px;font-size:7px;font-weight:950}
+.prizePanel75{padding:15px 13px 17px}.prizePanel75 header{position:relative;padding-right:122px;min-height:50px}.prizePanel75 h3{font-size:21px}.prizePanel75 header p{font-size:9px;line-height:1.35}.prizeCount75{position:absolute;right:0;top:0;background:linear-gradient(135deg,#f5c65b,#edae34);color:#173F35;border-radius:13px;padding:8px 10px;text-align:center;font-size:9px;line-height:1.1}.prizeCount75 small{display:block;font-size:7px;margin-top:3px}.prizePhoto75{height:110px}.prizeCard75>b{font-size:9px}.prizeCard75 small{font-size:7px}
+.shareRender75{font-family:Arial,sans-serif}.shareRender75 .hero75{min-height:390px}.shareRender75 .heroBrand75 img{width:140px;height:32px}
+@media(max-width:520px){.hero75{min-height:420px}.heroBrand75{top:3.2%;left:4%}.heroBrand75 img{width:105px;height:23px}.heroText75{left:5%;top:16%;width:48%}.heroText75 h2{font-size:24px}.heroText75 p{font-size:12px}.heroText75>span{font-size:8px}.heroProducts75{width:58%;height:78%;right:0;top:18%}.hp.phone{width:42%;height:65%;left:5%;top:4%}.hp.headset{width:54%;height:54%;right:-2%;top:17%}.hp.beam{width:26%;height:22%;left:2%;bottom:2%}.hp.buds{width:24%;height:21%;left:29%;bottom:0}.hp.speaker{width:29%;height:23%;right:2%;bottom:0}.heroBadge75{top:3%;right:2%;min-width:96px}.info75{grid-template-columns:1fr 1fr}.info75 article{min-height:115px}.prizePanel75 header{padding-right:0}.prizeCount75{position:static;display:inline-block;margin:8px 0 0 38px}.prizeGrid75{grid-template-columns:1fr 1fr}.prizePhoto75{height:130px}}
 </style>
 </body></html>
