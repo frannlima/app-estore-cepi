@@ -2653,7 +2653,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v93';
+  const BUILD='v94';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2688,8 +2688,8 @@ window.deletePopupV72=async function(id){
   };
   let TAB75='campaigns';
   const LOGO75='./assets/riachuelo-logo-exact-v75.svg';
-  const CARD75='./assets/campaign-hero-v84.svg?build=v93';
-  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v93';
+  const CARD75='./assets/campaign-hero-v84.svg?build=v94';
+  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v94';
   const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
   const active75=x=>{if(!x||x.active===false)return false;const d=today75(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return(!s||d>=s)&&(!e||d<=e)};
@@ -2915,8 +2915,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART83='./assets/campaign-share-v76.svg?build=v93';
-  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v93';
+  const ART83='./assets/campaign-share-v76.svg?build=v94';
+  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v94';
 
   function closeV83(){
     document.getElementById('campaignPopV83')?.remove();
@@ -3066,8 +3066,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART84='./assets/campaign-hero-v84.svg?build=v93';
-  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v93';
+  const ART84='./assets/campaign-hero-v84.svg?build=v94';
+  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v94';
 
   function close84(){
     document.getElementById('campaignPopV84')?.remove();
@@ -3437,7 +3437,7 @@ window.deletePopupV72=async function(id){
     const asset=k=>API+'?asset='+encodeURIComponent(k)+'&v=90';
     try{
       const [logo,samsung,tune720,waveBeam2,waveBuds2,go4,tune520]=await Promise.all([
-        loadCampaignImgV90('./assets/riachuelo-logo-exact-v75.svg?build=v93'),
+        loadCampaignImgV90('./assets/riachuelo-logo-exact-v75.svg?build=v94'),
         loadCampaignImgV90(asset('samsung')),
         loadCampaignImgV90(asset('tune720')),
         loadCampaignImgV90(asset('waveBeam2')),
@@ -3680,6 +3680,228 @@ window.deletePopupV72=async function(id){
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot91,{once:true});
   else boot91();
+})();
+</script>
+
+<!-- V94-RITUAL-RAIOX-SEMANAL -->
+<style id="ritual-v94-style">
+.ritualPageV94{display:grid;gap:12px;padding-bottom:18px}
+.ritualHeroV94{background:linear-gradient(135deg,#173F35,#0e5143);color:#fff;border-radius:24px;padding:22px;box-shadow:0 14px 35px rgba(23,63,53,.18)}
+.ritualHeroV94Top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.ritualHeroV94 h2{margin:0;font-size:29px;line-height:1}.ritualHeroV94 p{margin:8px 0 0;color:#e7efe9;line-height:1.35}
+.ritualHeroV94 .ritualHeroTagV94{font-size:11px;font-weight:900;letter-spacing:.08em;color:#f4c65c;text-transform:uppercase}
+.ritualHeroV94Flow{display:flex;gap:6px;flex-wrap:wrap;margin-top:16px}.ritualHeroV94Flow span{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);padding:7px 10px;border-radius:999px;font-size:11px;font-weight:800}
+.ritualTabsV94{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:#f3f0e8;border-radius:18px;padding:5px}
+.ritualTabsV94 button{border:0;background:transparent;color:#466964;padding:12px 8px;border-radius:14px;font-weight:900;font-size:13px}
+.ritualTabsV94 button.on{background:#173F35;color:#fff;box-shadow:0 6px 14px rgba(23,63,53,.16)}
+.ritualBodyV94{display:grid;gap:12px}
+.rxWeekHeadV94{display:flex;justify-content:space-between;gap:12px;align-items:center;background:#fff;border:1px solid #e4e1da;border-radius:18px;padding:15px}
+.rxWeekHeadV94 b{font-size:17px;color:#173F35}.rxWeekHeadV94 small{display:block;color:#6f746f;margin-top:4px}
+.rxStatusV94{padding:7px 10px;border-radius:999px;font-size:11px;font-weight:900;background:#f4efe2;color:#9a6c13;white-space:nowrap}.rxStatusV94.done{background:#e4f1e9;color:#176843}
+.rxSummaryV94{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.rxKpiV94{background:#fff;border:1px solid #e7e3da;border-radius:17px;padding:14px;min-width:0}.rxKpiV94 span{font-size:11px;color:#737872;display:block}.rxKpiV94 b{display:block;color:#173F35;font-size:22px;margin-top:4px;line-height:1.05}.rxKpiV94 small{font-size:11px;color:#787c78;margin-top:5px;display:block}.rxKpiV94 .down{color:#c43b32}.rxKpiV94 .up{color:#157349}.rxKpiV94 .gold{color:#b98011}
+.rxEvidenceV94{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.rxEvidenceV94 div{background:#f8f6f0;border:1px solid #e7e1d4;border-radius:14px;padding:10px;text-align:center;color:#466964}.rxEvidenceV94 b{display:block;color:#173F35;font-size:16px}.rxEvidenceV94 small{font-size:10px}
+.rxSectionV94{background:#fff;border:1px solid #e5e1d9;border-radius:20px;overflow:hidden}
+.rxSectionHeadV94{padding:15px 16px;background:#f8f5ed;border-bottom:1px solid #ece6da;display:flex;gap:10px;align-items:flex-start}.rxSectionNoV94{width:30px;height:30px;border-radius:9px;background:#173F35;color:#fff;display:grid;place-items:center;font-weight:900;font-size:13px;flex:0 0 auto}.rxSectionHeadV94 b{display:block;color:#173F35}.rxSectionHeadV94 small{display:block;color:#737873;margin-top:3px;line-height:1.3}
+.rxQCardV94{padding:15px 16px;border-bottom:1px solid #efebe4}.rxQCardV94:last-child{border-bottom:0}.rxQCardV94>strong{color:#173F35;display:block;line-height:1.35}.rxQCardV94>small{display:block;color:#737873;margin:5px 0 10px;line-height:1.35}
+.rxEvidenceNoteV94{display:inline-flex;align-items:center;gap:5px;background:#eef4f1;color:#466964;border-radius:9px;padding:6px 8px;font-size:10px;font-weight:700;margin-bottom:10px}
+.rxFreqV94{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.rxFreqV94 input{display:none}.rxFreqV94 label{display:grid;place-items:center;min-height:52px;text-align:center;padding:6px 4px;border:1px solid #dedbd4;border-radius:10px;font-size:9px;font-weight:800;color:#59635e;background:#fff;line-height:1.15}.rxFreqV94 input:checked+label{background:#173F35;color:#fff;border-color:#173F35}
+.rxRadioV94{display:grid;gap:7px}.rxRadioV94 label{border:1px solid #ddd9d0;border-radius:12px;padding:11px 12px;display:flex;gap:9px;align-items:center;color:#34433e;font-size:13px}.rxRadioV94 input{accent-color:#173F35}
+.rxTop3V94{display:grid;gap:8px;padding:12px 16px}.rxTop3V94 div{display:grid;grid-template-columns:34px 1fr auto;gap:9px;align-items:center;background:#f9f7f2;border-radius:13px;padding:9px}.rxMedalV94{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#e5d1a2;color:#173F35;font-weight:900}.rxTop3V94 b{font-size:12px;color:#173F35}.rxTop3V94 small{display:block;color:#7a7d79;font-size:10px}.rxTop3V94 strong{color:#173F35;font-size:11px}
+.rxStarsV94{display:flex;gap:6px;flex-wrap:wrap}.rxStarsV94 input{display:none}.rxStarsV94 label{width:42px;height:42px;border:1px solid #ded9ce;border-radius:11px;display:grid;place-items:center;font-weight:900;color:#8a8d89;background:#fff}.rxStarsV94 input:checked+label{background:#efb42b;color:#173F35;border-color:#efb42b}
+.rxAutoV94{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}.rxAutoV94 div{background:#f4f1e9;border-radius:13px;padding:11px}.rxAutoV94 span{font-size:10px;color:#737873}.rxAutoV94 b{display:block;color:#173F35;margin-top:3px}
+.rxAdaptiveV94{margin:12px 16px;border-radius:16px;padding:14px;background:linear-gradient(135deg,#173F35,#35685d);color:#fff}.rxAdaptiveV94 b{display:block;font-size:15px}.rxAdaptiveV94 p{margin:6px 0 0;font-size:12px;color:#e6eee9;line-height:1.35}
+.rxPlanGridV94{display:grid;grid-template-columns:1fr 1fr;gap:8px}.rxPlanGridV94 .wide{grid-column:1/-1}
+.rxActionsV94{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px 16px}.rxActionsV94 .btn{width:100%}
+.rxFcaV94{margin:12px 16px;padding:14px;border-radius:16px;background:#edf6f9;border:1px solid #cfe3e9}.rxFcaV94 b{color:#173F35}.rxFcaV94 p{font-size:12px;color:#53645e;line-height:1.4}.rxFcaV94 .btn{width:100%}
+.rxHistoryV94{display:grid;gap:8px}.rxHistCardV94{width:100%;border:1px solid #e1ddd5;background:#fff;border-radius:16px;padding:13px 14px;text-align:left;display:grid;grid-template-columns:1fr auto;gap:8px}.rxHistCardV94 b{color:#173F35}.rxHistCardV94 small{display:block;color:#777c77;margin-top:3px}.rxHistScoreV94{font-weight:900;color:#173F35}.rxHistScoreV94 em{display:block;font-style:normal;font-size:9px;color:#8a8d89;text-align:right;margin-top:3px}
+.rxEmptyV94{background:#fff;border:1px dashed #d7d2c8;border-radius:18px;padding:24px;text-align:center;color:#747a75}
+.rxMandV94{background:#fff;border:1px solid #e2ded5;border-radius:17px;padding:12px 14px}.rxMandV94 summary{font-weight:900;color:#173F35;cursor:pointer}.rxMandV94 p{font-size:12px;color:#66706b;line-height:1.45;margin:10px 0 0}
+@media(min-width:720px){.rxSummaryV94{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+<script>
+(function(){
+  window.RITUAL_TAB_V94=window.RITUAL_TAB_V94||'today';
+  window.RITUAL_WEEK_V94=window.RITUAL_WEEK_V94||'';
+  window.RITUAL_WEEKLY_V94=null;
+
+  function rxEscV94(v){return typeof esc==='function'?esc(v):String(v??'')}
+  function rxShareV94(v){if(v===null||v===undefined)return '—';return (Number(v)*100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%'}
+  function rxPpV94(v){if(v===null||v===undefined)return '—';let n=Number(v)*100;return (n>0?'+':'')+n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' p.p.'}
+  function rxDateV94(v){if(!v)return '—';try{return new Date(v+'T12:00:00').toLocaleDateString('pt-BR')}catch(e){return v}}
+  function rxDayV94(v){if(!v)return '—';try{return new Date(v+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'2-digit'})}catch(e){return v}}
+  function rxMoneyV94(v){return typeof money==='function'?money(v):Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+  function rxNumV94(v){return Number(v||0).toLocaleString('pt-BR')}
+
+  function ritualViewV94(){
+    if(!isSupervisorProfileV52()&&!isAdmin())return '<div class=notice>Ritual eStore disponível para perfil Supervisor.</div>';
+    return '<div class="ritualPageV52 ritualPageV94">'+
+      '<div class=ritualHeroV94><div class=ritualHeroV94Top><div><span class=ritualHeroTagV94>Gestão que vira ação</span><h2>Ritual eStore</h2><p>Rotina diária + Raio-X semanal para transformar dados, comportamento e execução em resultado.</p></div><div style="font-size:34px">✓</div></div>'+
+      '<div class=ritualHeroV94Flow><span>Preparar</span><span>Executar</span><span>Acompanhar</span><span>Melhorar</span></div></div>'+
+      '<div class=ritualTabsV94>'+
+        '<button class="ritualTabV94 '+(RITUAL_TAB_V94==='today'?'on':'')+'" data-tab=today onclick="setRitualTabV94(\'today\')">Hoje</button>'+
+        '<button class="ritualTabV94 '+(RITUAL_TAB_V94==='weekly'?'on':'')+'" data-tab=weekly onclick="setRitualTabV94(\'weekly\')">Raio-X semanal</button>'+
+        '<button class="ritualTabV94 '+(RITUAL_TAB_V94==='history'?'on':'')+'" data-tab=history onclick="setRitualTabV94(\'history\')">Histórico</button>'+
+      '</div>'+
+      '<details class=rxMandV94><summary>Os 10 Mandamentos do eStore</summary><p><b>Preparar:</b> alinhar conteúdo, reconhecer destaques e deixar a meta clara. <b>Executar:</b> garantir abordagem, acompanhamento e visibilidade das campanhas. <b>Acompanhar e melhorar:</b> ler venda, ticket, share, riscos e fechar a semana com plano de ação.</p></details>'+
+      '<div id=ritualBodyV52 class="ritualBodyV94"><div class=muted>Carregando ritual...</div></div>'+
+    '</div>'
+  }
+
+  window.setRitualTabV94=function(tab,week){
+    RITUAL_TAB_V94=tab||'today';
+    if(week!==undefined)RITUAL_WEEK_V94=week||'';
+    document.querySelectorAll('.ritualTabV94').forEach(b=>b.classList.toggle('on',b.dataset.tab===RITUAL_TAB_V94));
+    loadRitualV52();
+  };
+
+  function freqV94(key,title,hint,evidence,a){
+    const opts=[['todos','Todos os dias'],['quase','Quase todos'],['metade','Metade'],['poucos','Poucos dias'],['passou','Passou batido']];
+    return '<div class=rxQCardV94><strong>'+title+'</strong><small>'+hint+'</small>'+
+      (evidence?'<div class=rxEvidenceNoteV94>📊 '+evidence+'</div>':'')+
+      '<div class=rxFreqV94>'+opts.map(o=>'<span><input type=radio id="rx_'+key+'_'+o[0]+'" name="rx_'+key+'" value="'+o[0]+'" '+(String(a?.[key]||'')===o[0]?'checked':'')+'><label for="rx_'+key+'_'+o[0]+'">'+o[1]+'</label></span>').join('')+'</div></div>'
+  }
+
+  function weeklyHtmlV94(d){
+    const s=d.summary||{},e=d.existing||{},a=e.answers||{},done=e.status==='concluido';
+    const deltaCls=Number(s.shareDelta||0)>0?'up':Number(s.shareDelta||0)<0?'down':'';
+    const gap=s.gapToOne===null?'—':Math.max(0,Number(s.gapToOne)*100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' p.p.';
+    const weak=s.weakestDay||{};
+    const top=(s.top3||[]);
+    const campaigns=(CONTENT?.campaigns||[]).filter(x=>x?.active!==false).length;
+    const fcaSuggested=!!(e.fca_suggested||s.fcaPriority||(s.share!==null&&Number(s.share)<.01)||(s.shareDelta!==null&&Number(s.shareDelta)<0));
+    const adaptive=Number(s.share||0)>=.01
+      ?'<b>Share de 1% alcançado.</b><p>O que você vai garantir para sustentar este nível na próxima semana?</p>'
+      :'<b>Rumo ao Share de 1%.</b><p>Sua filial está a <b>'+gap+'</b> da referência. O que precisa mudar a partir da próxima semana?</p>';
+
+    return '<div class=rxWeekHeadV94><div><b>Raio-X Semanal • Semana '+rxNumV94(s.weekNumber)+'</b><small>'+rxDateV94(s.weekStart)+' a '+rxDateV94(s.weekEnd)+' • avaliação da semana anterior</small></div><span class="rxStatusV94 '+(done?'done':'')+'">'+(done?'Concluído':e.status==='rascunho'?'Rascunho':'A preencher')+'</span></div>'+
+      '<div class=rxSummaryV94>'+
+        '<div class=rxKpiV94><span>Share da semana</span><b>'+rxShareV94(s.share)+'</b><small class="'+deltaCls+'">'+rxPpV94(s.shareDelta)+' vs Sem. '+rxNumV94(s.previousWeekNumber)+'</small></div>'+
+        '<div class=rxKpiV94><span>Venda captada</span><b>'+rxMoneyV94(s.captured)+'</b><small>'+rxNumV94(s.orders)+' pedidos</small></div>'+
+        '<div class=rxKpiV94><span>Ticket médio</span><b>'+rxMoneyV94(s.ticket)+'</b><small>Aprovado '+(Number(s.approvedRate||0)*100).toLocaleString('pt-BR',{maximumFractionDigits:0})+'%</small></div>'+
+        '<div class=rxKpiV94><span>Distância para 1%</span><b class=gold>'+gap+'</b><small>Meta semanal '+rxMoneyV94(s.metaOne)+'</small></div>'+
+        '<div class=rxKpiV94><span>Participação do time</span><b>'+Math.round(Number(s.participation||0)*100)+'%</b><small>'+rxNumV94(s.sold)+' de '+rxNumV94(s.teamTotal)+' com venda</small></div>'+
+        '<div class=rxKpiV94><span>Dispersão</span><b class="'+(Number(s.zeros||0)>0?'down':'up')+'">'+(s.teamTotal?Math.round(Number(s.zeros||0)/Number(s.teamTotal)*100):0)+'%</b><small>'+rxNumV94(s.zeros)+' sem venda</small></div>'+
+      '</div>'+
+      '<div class=rxEvidenceV94><div><b>'+rxNumV94(s.distributionDays)+'/7</b><small>dias com meta distribuída</small></div><div><b>'+rxNumV94(s.hourlyDays)+'/7</b><small>dias com Hora a Hora</small></div><div><b>'+(s.priorityRank?('#'+s.priorityRank):'—')+'</b><small>prioridade FCA</small></div></div>'+
+
+      '<div class=rxSectionV94><div class=rxSectionHeadV94><span class=rxSectionNoV94>1</span><div><b>Mapa da Gestão</b><small>Responda com base em fatos e evidências observadas durante a semana.</small></div></div>'+
+        freqV94('goal_management','Gestão de Metas | O time sabia claramente sua meta individual em cada dia?','Considere se cada colaborador começou o turno sabendo seu objetivo.',s.distributionDays+' dias tiveram distribuição registrada no App.',a)+
+        freqV94('recognition','Reconhecimento | As vendas e os destaques foram celebrados durante a semana?','Considere fotos, nomes, valores e boas práticas compartilhadas com o time.','Top 3 da filial já identificado automaticamente abaixo.',a)+
+        freqV94('service_script','Atendimento | O time aplicou o script “Achou tudo o que precisava?”','Considere Caixa, Provador e ADV.','Validação comportamental do supervisor.',a)+
+        freqV94('campaigns','Campanhas | O time estava informado sobre campanhas, incentivos e premiações?','Considere comunicação e reforço das mecânicas vigentes.',campaigns+' campanha(s)/ação(ões) disponível(is) no App.',a)+
+      '</div>'+
+
+      '<div class=rxSectionV94><div class=rxSectionHeadV94><span class=rxSectionNoV94>2</span><div><b>Time de Campeões</b><small>Os números vêm do histórico da filial; você valida apenas o que depende da execução.</small></div></div>'+
+        '<div class=rxTop3V94>'+((top.length?top:[{name:'Sem vendas registradas',captured:0,orders:0}]).map((u,i)=>'<div><span class=rxMedalV94>'+(i+1)+'</span><span><b>'+rxEscV94(u.name)+'</b><small>'+rxNumV94(u.orders)+' pedido(s)</small></span><strong>'+rxMoneyV94(u.captured)+'</strong></div>').join(''))+'</div>'+
+        '<div class=rxQCardV94><strong>Conformidade | Houve alguma venda fora das regras do eStore?</strong><small>Ex.: vender pelo eStore item disponível na loja ou utilizar Retira Rápido para a mesma loja.</small><div class=rxRadioV94>'+
+          [['nao','Não identifiquei nenhum caso'],['sim_tratado','Sim, identifiquei e já tratei'],['sim_pendente','Sim, identifiquei e ainda vou tratar']].map(o=>'<label><input type=radio name=rx_irregular_status value="'+o[0]+'" '+(String(a.irregular_status||'')===o[0]?'checked':'')+'> '+o[1]+'</label>').join('')+
+        '</div></div>'+
+      '</div>'+
+
+      '<div class=rxSectionV94><div class=rxSectionHeadV94><span class=rxSectionNoV94>3</span><div><b>BD/BT • Desenvolvimento</b><small>Avalie o conteúdo usado para mobilizar e preparar o time.</small></div></div>'+
+        '<div class=rxQCardV94><strong>De 0 a 5, qual sua nota para o conteúdo e formato do BD/BT da semana anterior?</strong><div class=rxStarsV94 style="margin-top:10px">'+[0,1,2,3,4,5].map(n=>'<span><input id=rx_star_'+n+' type=radio name=rx_bdbt_rating value="'+n+'" '+(String(a.bdbt_rating??'')===String(n)?'checked':'')+'><label for=rx_star_'+n+'>'+n+'★</label></span>').join('')+'</div></div>'+
+        '<div class=rxQCardV94><strong>Sugestão ou feedback sobre o BD/BT</strong><textarea id=rx_bdbt_feedback class=field rows=3 placeholder="Opcional">'+rxEscV94(a.bdbt_feedback||'')+'</textarea></div>'+
+      '</div>'+
+
+      '<div class=rxSectionV94><div class=rxSectionHeadV94><span class=rxSectionNoV94>4</span><div><b>Rumo ao Share de 1%</b><small>O App mostra o cenário; você traz a leitura da operação.</small></div></div>'+
+        '<div class=rxQCardV94><div class=rxAutoV94><div><span>Resultado da semana</span><b>'+rxShareV94(s.share)+'</b></div><div><span>Dia mais fraco</span><b>'+rxDayV94(weak.date)+'</b><small>'+rxMoneyV94(weak.captured)+' • '+rxNumV94(weak.orders)+' pedido(s)</small></div></div>'+
+          '<strong>Por que o desempenho do dia mais fraco ficou abaixo da média?</strong><textarea id=rx_weak_day_reason class=field rows=4 placeholder="Cite razões e exemplos observados">'+rxEscV94(a.weak_day_reason||'')+'</textarea></div>'+
+        '<div class=rxQCardV94><strong>O que deu certo na semana e onde ficou o principal desafio?</strong><textarea id=rx_wins_challenges class=field rows=4 placeholder="Traga exemplos do dia a dia">'+rxEscV94(a.wins_challenges||'')+'</textarea></div>'+
+        '<div class=rxAdaptiveV94>'+adaptive+'</div>'+
+        '<div class=rxQCardV94><div class=rxPlanGridV94>'+
+          '<textarea id=rx_action_cause class="field wide" rows=2 placeholder="Causa / motivo">'+rxEscV94(a.action_cause||e.action_cause||'')+'</textarea>'+
+          '<textarea id=rx_action_plan class="field wide" rows=3 placeholder="Ação que será realizada">'+rxEscV94(a.action_plan||e.action_plan||'')+'</textarea>'+
+          '<input id=rx_action_owner class=field placeholder="Responsável" value="'+rxEscV94(a.action_owner||e.action_owner||displayName())+'">'+
+          '<input id=rx_action_deadline type=date class=field value="'+rxEscV94(a.action_deadline||e.action_deadline||'')+'">'+
+        '</div></div>'+
+        (fcaSuggested?'<div class=rxFcaV94><b>🎯 Conexão com o FCA</b><p>'+(s.fcaPriority?'Sua filial está entre as maiores retrações da semana. O plano deste Raio-X pode ser usado como base da causa e da ação no FCA.':'O Raio-X identificou atenção em Share/evolução. Se a filial for priorizada no FCA, este plano poderá apoiar a tratativa.')+'</p>'+(s.fcaPriority?'<button class="btn ghost" onclick="prepareFcaFromRitualV94()">Levar plano para o FCA</button>':'')+'</div>':'')+
+        '<div class=rxActionsV94>'+(isDemo()?'<div class="notice wide">Modo visitante • o Raio-X pode ser explorado, mas não é gravado.</div>':'<button class="btn ghost" onclick="saveWeeklyRitualV94(false)">Salvar rascunho</button><button class=btn onclick="saveWeeklyRitualV94(true)">Finalizar Raio-X</button>')+'</div>'+
+      '</div>';
+  }
+
+  function historyHtmlV94(d){
+    const h=d.history||[];
+    if(!h.length)return '<div class=rxEmptyV94><b>Nenhum Raio-X concluído ainda.</b><br><small>Ao salvar as semanas, sua evolução aparecerá aqui.</small></div>';
+    return '<div class=rxHistoryV94>'+h.map(x=>'<button class=rxHistCardV94 onclick="setRitualTabV94(\'weekly\',\''+rxEscV94(x.week_start)+'\')"><span><b>Semana '+rxNumV94(x.week_number)+'</b><small>'+rxDateV94(x.week_start)+' a '+rxDateV94(x.week_end)+' • '+rxEscV94(x.diagnosis||'Em andamento')+'</small></span><span class=rxHistScoreV94>'+rxNumV94(x.management_pct)+'%<em>'+(x.status==='concluido'?'Concluído':'Rascunho')+'</em></span></button>').join('')+'</div>';
+  }
+
+  window.loadRitualV52=async function(){
+    const b=document.getElementById('ritualBodyV52');if(!b)return;
+    b.innerHTML='<div class=muted>Carregando ritual...</div>';
+    try{
+      if(RITUAL_TAB_V94==='today'){
+        const date=ritualTodayV52(),j=await api({action:'ritual_get',matricula:U.u.id,st:U.u.st,date});
+        RITUAL_DATA_V52=j;b.innerHTML=ritualFormV52(j);return;
+      }
+      const j=await api({action:'ritual_weekly_get',matricula:U.u.id,st:U.u.st,week_start:RITUAL_WEEK_V94||undefined});
+      RITUAL_WEEKLY_V94=j;
+      b.innerHTML=RITUAL_TAB_V94==='history'?historyHtmlV94(j):weeklyHtmlV94(j);
+    }catch(e){b.innerHTML='<div class="notice danger">'+rxEscV94(e.message||'Não foi possível carregar o Ritual.')+'</div>'}
+  };
+
+  function radioValV94(name){return document.querySelector('input[name="'+name+'"]:checked')?.value||''}
+  window.saveWeeklyRitualV94=async function(finalize){
+    if(isDemo())return alert('Modo visitante: o Raio-X pode ser explorado, mas não é gravado.');
+    const j=RITUAL_WEEKLY_V94;if(!j?.summary)return;
+    const answers={
+      goal_management:radioValV94('rx_goal_management'),
+      recognition:radioValV94('rx_recognition'),
+      service_script:radioValV94('rx_service_script'),
+      campaigns:radioValV94('rx_campaigns'),
+      irregular_status:radioValV94('rx_irregular_status'),
+      bdbt_rating:radioValV94('rx_bdbt_rating'),
+      bdbt_feedback:document.getElementById('rx_bdbt_feedback')?.value||'',
+      weak_day_reason:document.getElementById('rx_weak_day_reason')?.value||'',
+      wins_challenges:document.getElementById('rx_wins_challenges')?.value||'',
+      action_cause:document.getElementById('rx_action_cause')?.value||'',
+      action_plan:document.getElementById('rx_action_plan')?.value||'',
+      action_owner:document.getElementById('rx_action_owner')?.value||'',
+      action_deadline:document.getElementById('rx_action_deadline')?.value||''
+    };
+    try{
+      const r=await api({action:'ritual_weekly_save',matricula:U.u.id,st:U.u.st,week_start:j.summary.weekStart,answers,finalize:!!finalize});
+      if(finalize)alert('Raio-X da Semana '+j.summary.weekNumber+' concluído. Diagnóstico: '+r.diagnosis+' • '+r.management_pct+'%.');
+      await loadRitualV52();
+    }catch(e){alert(e.message||'Não foi possível salvar o Raio-X.')}
+  };
+
+  window.prepareFcaFromRitualV94=function(){
+    const j=RITUAL_WEEKLY_V94;if(!j?.summary)return;
+    const data={
+      store:j.summary.st,weekStart:j.summary.weekStart,
+      cause:document.getElementById('rx_action_cause')?.value||j.existing?.action_cause||'',
+      action:document.getElementById('rx_action_plan')?.value||j.existing?.action_plan||'',
+      owner:document.getElementById('rx_action_owner')?.value||j.existing?.action_owner||displayName(),
+      deadline:document.getElementById('rx_action_deadline')?.value||j.existing?.action_deadline||'',
+      operational:[
+        ['goal_management','distribuicao_meta'],['service_script','abordagem_script'],['recognition','baixa_mobilizacao'],['campaigns','baixa_mobilizacao']
+      ].filter(p=>!['todos','quase'].includes(String(document.querySelector('input[name="rx_'+p[0]+'"]:checked')?.value||j.existing?.answers?.[p[0]]||''))).map(p=>p[1])
+    };
+    data.operational=[...new Set(data.operational)];
+    sessionStorage.setItem('ritualFcaPrefillV94',JSON.stringify(data));
+    FCA_TAB_V61='priority';go('fca');
+  };
+
+  if(typeof openFcaV60==='function'&&!window.__ritualFcaWrappedV94){
+    window.__ritualFcaWrappedV94=true;
+    const originalOpenFcaV94=openFcaV60;
+    openFcaV60=async function(st){
+      await originalOpenFcaV94(st);
+      setTimeout(function(){
+        try{
+          const p=JSON.parse(sessionStorage.getItem('ritualFcaPrefillV94')||'null');
+          if(!p||String(p.store)!==String(st))return;
+          const set=(id,v)=>{const el=document.getElementById(id);if(el&&!el.value&&v)el.value=v};
+          set('fcaRootCauseV61',p.cause);set('fcaActionPlanV61',p.action);set('fcaOwnerV61',p.owner);set('fcaDeadlineV61',p.deadline);
+          for(const v of p.operational||[]){const el=document.querySelector('input[name=fcaOperationalV61][value="'+v+'"]');if(el)el.checked=true}
+          sessionStorage.removeItem('ritualFcaPrefillV94');
+        }catch(e){}
+      },180);
+    };
+  }
+
+  window.ritualViewV52=ritualViewV94;
 })();
 </script>
 </body>
