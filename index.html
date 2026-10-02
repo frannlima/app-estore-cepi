@@ -2551,7 +2551,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v83';
+  const BUILD='v84';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2586,8 +2586,8 @@ window.deletePopupV72=async function(id){
   };
   let TAB75='campaigns';
   const LOGO75='./assets/riachuelo-logo-exact-v75.svg';
-  const CARD75='./assets/campaign-share-v76.svg?build=v83';
-  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v83';
+  const CARD75='./assets/campaign-hero-v84.svg?build=v84';
+  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v84';
   const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
   const active75=x=>{if(!x||x.active===false)return false;const d=today75(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return(!s||d>=s)&&(!e||d<=e)};
@@ -2813,8 +2813,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART83='./assets/campaign-share-v76.svg?build=v83';
-  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v83';
+  const ART83='./assets/campaign-share-v76.svg?build=v84';
+  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v84';
 
   function closeV83(){
     document.getElementById('campaignPopV83')?.remove();
@@ -2899,6 +2899,218 @@ window.deletePopupV72=async function(id){
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootV83,{once:true});
   else bootV83();
+})();
+</script>
+
+
+<!-- V84-CAMPAIGN-FIX-RENDER-POPUP-SHARE -->
+<style id="campaign-v84-style">
+.hero75.heroBannerV84{
+  display:block!important;position:relative!important;padding:0!important;
+  min-height:0!important;height:auto!important;aspect-ratio:1536/459!important;
+  overflow:hidden!important;border-radius:22px!important;background:#0b332d!important;
+  cursor:pointer!important;border:0!important
+}
+.hero75.heroBannerV84>img{
+  display:block!important;width:100%!important;height:100%!important;
+  object-fit:cover!important;object-position:center!important;opacity:1!important;
+  filter:none!important
+}
+.campaignPopV84{
+  position:fixed;inset:0;z-index:999999;display:grid;place-items:center;
+  padding:12px;background:rgba(4,20,17,.80);backdrop-filter:blur(8px)
+}
+.campaignPopCardV84{
+  position:relative;width:min(720px,96vw);max-height:94vh;overflow:auto;
+  border-radius:24px;background:#0b332d;border:1px solid rgba(241,212,154,.62);
+  box-shadow:0 30px 90px rgba(0,0,0,.55)
+}
+.campaignPopCloseV84{
+  position:absolute;right:12px;top:12px;z-index:6;width:38px;height:38px;
+  border-radius:50%;border:1px solid rgba(255,255,255,.7);
+  background:rgba(5,30,25,.88);color:#fff;font-size:27px;line-height:1;
+  display:grid;place-items:center
+}
+.campaignPopQuestionV84{
+  padding:22px 62px 17px 20px;background:linear-gradient(135deg,#0b332d,#164c3f);
+  color:#fff;font-size:clamp(22px,5vw,36px);font-weight:900;line-height:1.04;
+  letter-spacing:-.03em
+}
+.campaignPopQuestionV84 strong{color:#f1c760}
+.campaignPopArtV84{
+  display:block;width:100%;height:auto;aspect-ratio:1536/459;object-fit:cover;
+  background:#0b332d
+}
+.campaignPopFooterV84{padding:15px 18px 18px;text-align:center;color:#fff}
+.campaignPopFooterV84 p{margin:0 0 13px;font-size:12px;line-height:1.45;color:#d8ddd9}
+.campaignPopCtaV84{
+  width:100%;border:0;border-radius:15px;padding:14px 16px;
+  background:linear-gradient(180deg,#f6d56e,#edb744);color:#173F35;
+  font-size:13px;font-weight:950
+}
+.campaignPopLogoV84{
+  display:block;width:min(270px,58%);height:28px;object-fit:contain;margin:15px auto 0
+}
+.campaignSharePreviewV84{
+  display:block;width:100%;border:0;padding:0;margin:0 0 10px;background:transparent;
+  border-radius:20px;overflow:hidden;box-shadow:0 8px 24px rgba(23,63,53,.08)
+}
+.campaignSharePreviewV84 img{display:block;width:100%;height:auto}
+@media(max-width:520px){
+  .campaignPopV84{padding:8px}.campaignPopCardV84{width:96vw;border-radius:20px}
+  .campaignPopQuestionV84{padding:18px 54px 14px 16px;font-size:23px}
+  .campaignPopFooterV84{padding:13px 14px 15px}.campaignPopLogoV84{height:22px}
+}
+</style>
+<script>
+(function(){
+  const ART84='./assets/campaign-hero-v84.svg?build=v84';
+  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v84';
+
+  function close84(){
+    document.getElementById('campaignPopV84')?.remove();
+    document.getElementById('campaignPopV83')?.remove();
+    document.getElementById('campaignPop75')?.remove();
+    document.getElementById('highlightsPopup')?.remove();
+    document.getElementById('campaignPopupV37')?.remove();
+  }
+  window.closeCampaignPopV84=close84;
+
+  window.openCampaignMechanicsV84=function(){
+    close84();
+    try{
+      if(typeof window.campaignTab75==='function') window.campaignTab75('campaigns');
+      else if(typeof go==='function') go('campaigns');
+    }catch(e){}
+    setTimeout(function(){
+      const t=document.querySelector('.campaignPage75 .info75')||
+              document.querySelector('.campaignPage75 .prizePanel75');
+      if(t)t.scrollIntoView({behavior:'smooth',block:'start'});
+    },220);
+  };
+
+  function show84(force){
+    try{
+      if(typeof U==='undefined'||!U)return;
+    }catch(e){return}
+    if(document.getElementById('campaignPopV84'))return;
+
+    const uid=String(U?.u?.id||U?.id||'user');
+    const key='estoreCampaignPopupV84:'+uid;
+    if(!force){
+      try{if(sessionStorage.getItem(key))return}catch(e){}
+    }
+    try{sessionStorage.setItem(key,'1')}catch(e){}
+    close84();
+
+    const d=document.createElement('div');
+    d.id='campaignPopV84';
+    d.className='campaignPopV84';
+    d.innerHTML=
+      '<div class="campaignPopCardV84" role="dialog" aria-modal="true" aria-label="Campanha eStore no Volume Máximo">'+
+        '<button class="campaignPopCloseV84" onclick="closeCampaignPopV84()" aria-label="Fechar">×</button>'+
+        '<div class="campaignPopQuestionV84">Já pensou em transformar suas vendas no eStore em <strong>um Samsung ou JBL?</strong></div>'+
+        '<img class="campaignPopArtV84" src="'+ART84+'" alt="Campanha eStore no Volume Máximo">'+
+        '<div class="campaignPopFooterV84">'+
+          '<p>Conheça a mecânica, acompanhe os critérios e veja como concorrer às premiações de outubro.</p>'+
+          '<button class="campaignPopCtaV84" onclick="openCampaignMechanicsV84()">CONHECER A MECÂNICA <b>→</b></button>'+
+          '<img class="campaignPopLogoV84" src="'+LOGO84+'" alt="Riachuelo">'+
+        '</div>'+
+      '</div>';
+    document.body.appendChild(d);
+  }
+  window.showCampaignPopupV84=function(){show84(true)};
+
+  function patchCampaign84(root){
+    const scope=root||document;
+    scope.querySelectorAll?.('.campaignPage75 .hero75').forEach(function(hero){
+      if(hero.dataset.v84==='1')return;
+      hero.dataset.v84='1';
+      hero.classList.add('heroBannerV84');
+      hero.innerHTML='<img src="'+ART84+'" alt="eStore no Volume Máximo">';
+      hero.setAttribute('role','button');
+      hero.setAttribute('tabindex','0');
+      hero.setAttribute('aria-label','Conhecer a mecânica da campanha eStore no Volume Máximo');
+      hero.onclick=window.openCampaignMechanicsV84;
+      hero.onkeydown=function(ev){
+        if(ev.key==='Enter'||ev.key===' '){
+          ev.preventDefault();
+          window.openCampaignMechanicsV84();
+        }
+      };
+    });
+  }
+
+  // The app calls showHighlightsPopup 500 ms after login.
+  // Override the final handler with the campaign pop-up requested for this release.
+  window.showHighlightsPopup=showHighlightsPopup=async function(){
+    show84(false);
+  };
+
+  // Share the same approved banner rendered in the menu, avoiding the broken SVG fallback.
+  window.shareCampaign75=async function(){
+    try{
+      const img=await new Promise(function(resolve,reject){
+        const im=new Image();
+        im.onload=function(){resolve(im)};
+        im.onerror=function(){reject(new Error('Falha ao carregar o banner da campanha.'))};
+        im.src=new URL(ART84,location.href).href;
+      });
+      const canvas=document.createElement('canvas');
+      canvas.width=1536;canvas.height=459;
+      const g=canvas.getContext('2d',{alpha:false});
+      g.drawImage(img,0,0,1536,459);
+      const blob=await new Promise(function(resolve,reject){
+        canvas.toBlob(function(b){b?resolve(b):reject(new Error('Falha ao gerar imagem.'))},'image/jpeg',.96);
+      });
+      const file=new File([blob],'campanha-estore-volume-maximo.jpg',{type:'image/jpeg'});
+      if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
+        await navigator.share({
+          files:[file],
+          title:'eStore no Volume Máximo',
+          text:'Confira a campanha de outubro no App. eStore CE+PI.'
+        });
+        return;
+      }
+      const u=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=u;a.download=file.name;document.body.appendChild(a);a.click();a.remove();
+      setTimeout(function(){URL.revokeObjectURL(u)},2500);
+    }catch(e){
+      console.warn('share campaign v84',e);
+      window.open(new URL(ART84,location.href).href,'_blank');
+    }
+  };
+  window.shareCampaignV72=window.shareCampaign75;
+
+  function boot84(){
+    patchCampaign84(document);
+    const obs=new MutationObserver(function(ms){
+      for(const m of ms){
+        for(const n of m.addedNodes||[]){
+          if(n.nodeType===1)patchCampaign84(n);
+        }
+      }
+      patchCampaign84(document);
+    });
+    try{obs.observe(document.documentElement,{childList:true,subtree:true})}catch(e){}
+
+    // Covers persisted sessions and users already logged in when the new build arrives.
+    [350,700,1200,2200,4000].forEach(function(ms){
+      setTimeout(function(){
+        patchCampaign84(document);
+        try{
+          if(typeof U!=='undefined'&&U)show84(false);
+        }catch(e){}
+      },ms);
+    });
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',boot84,{once:true});
+  }else{
+    boot84();
+  }
 })();
 </script>
 
