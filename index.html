@@ -2551,7 +2551,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v70';
+  const BUILD='v71';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2575,13 +2575,14 @@ window.deletePopupV72=async function(id){
 <!-- V75-2026-10-01-APPROVED-CAMPAIGN-FINAL -->
 <script>
 (function(){
+  const asset75=k=>API+'?asset='+encodeURIComponent(k)+'&v=71';
   const P75={
-    samsung:'https://images.samsung.com/is/image/samsung/p6pim/br/sm-a075mzkgzto/gallery/br-galaxy-a07-sm-a075-sm-a075mzkgzto-548807702?%241164_776_PNG%24=',
-    tune720:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dwbfa524ed/01.JBL_Tune_720BT_ProductImage_Hero_Black.png?sh=535&sw=535',
-    waveBeam2:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dwb3516f7c/01.JBL_Wave%20Beam%202_Product%20Image_Hero_Black.png?sh=535&sw=535',
-    waveBuds2:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dw11b858ba/01.LS_JBL_Wave%20Buds%202_Product%20Image_Hero_Black.png?sh=535&sw=535',
-    go4:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dw96fc93ec/JBL_GO_4_HERO_BLACK_48156_x4.png?sh=535&sw=535',
-    tune520:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dwc23d813b/01.JBL_Tune_520BT_ProductImage_Hero_Black.png?sh=535&sw=535'
+    samsung:asset75('samsung'),
+    tune720:asset75('tune720'),
+    waveBeam2:asset75('waveBeam2'),
+    waveBuds2:asset75('waveBuds2'),
+    go4:asset75('go4'),
+    tune520:asset75('tune520')
   };
   let TAB75='campaigns';
   const CARD75='./assets/campaign-share-v75.jpg?build=v70';
@@ -2624,7 +2625,7 @@ window.deletePopupV72=async function(id){
       prize75(P75.tune520,'JBL T520 BT','10º a 15º')+
     '</div></section>';
   }
-  function main75(){return '<section class="approvedCardWrap75"><img class="approvedCardImg75" src="'+CARD75+'" alt="Campanha eStore no Volume Máximo • Premiação dos Colaboradores"></section><button class="share75" onclick="shareCampaign75()">↗ <b>Compartilhar campanha</b></button>'}
+  function main75(){return hero75()+info75()+prizePanel75()+'<button class="share75" onclick="shareCampaign75()">↗ <b>Compartilhar campanha</b></button>'}
   function coupon75(){
     const a=coupons75();
     return '<section class="simplePanel75"><h3>Cupons e benefícios</h3>'+(a.length?a.map(x=>'<article class="coupon75"><div><b>'+esc75(x.code||x.title||'CUPOM')+'</b><span>'+esc75(x.title||'')+'</span></div><p>'+esc75(x.description||x.text||'')+'</p></article>').join(''):'<p class="empty75">Nenhum cupom ativo neste período.</p>')+'</section>';
@@ -2655,7 +2656,14 @@ window.deletePopupV72=async function(id){
   window.showHighlightsPopup=showHighlightsPopup=function(){
     if(!U)return;
     const x=campaign75();
-    if(active75(x)){pop75();return}
+    if(active75(x)){
+      const key='estoreCampaignDailyV71:'+today75()+':'+String(U?.u?.id||'')+':'+String(x.id||x.title||'october');
+      try{
+        if(localStorage.getItem(key))return;
+        localStorage.setItem(key,'1');
+      }catch(e){}
+      pop75();return;
+    }
     try{if(typeof maybeShowRitualV52==='function')maybeShowRitualV52()}catch(e){}
   };
 
@@ -2680,30 +2688,50 @@ window.deletePopupV72=async function(id){
     return c;
   }
   window.shareCampaign75=async function(){
+    let host=null;
     try{
-      const url=new URL(CARD75,location.href).href;
-      const res=await fetch(url,{cache:'no-store'});
-      if(!res.ok)throw new Error('Não foi possível carregar o card da campanha.');
-      const blob=await res.blob();
-      const file=new File([blob],'campanha-estore-volume-maximo-outubro.jpg',{type:'image/jpeg'});
-      if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
-        await navigator.share({
-          files:[file],
-          title:'eStore no Volume Máximo',
-          text:'Esses prêmios podem ser seus. Confira a campanha de outubro no App. eStore CE+PI.'
-        });
-        return;
-      }
-      const a=document.createElement('a');
-      const objectUrl=URL.createObjectURL(blob);
-      a.href=objectUrl;a.download='campanha-estore-volume-maximo-outubro.jpg';
-      document.body.appendChild(a);a.click();a.remove();
-      setTimeout(()=>URL.revokeObjectURL(objectUrl),2500);
-      alert('O card da campanha foi preparado como imagem para compartilhamento.');
+      host=document.createElement('div');
+      host.className='shareRender75';
+      host.innerHTML=hero75()+info75()+prizePanel75();
+      document.body.appendChild(host);
+      await waitImgs75(host);
+      const h2c=await loadH2C75();
+      const canvas=await h2c(host,{backgroundColor:'#f7f6f2',scale:1.5,useCORS:true,allowTaint:false,logging:false});
+      await new Promise((resolve,reject)=>canvas.toBlob(async blob=>{
+        try{
+          if(!blob)throw new Error('Falha ao gerar card');
+          const file=new File([blob],'campanha-estore-volume-maximo-outubro.png',{type:'image/png'});
+          if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
+            await navigator.share({
+              files:[file],
+              title:'eStore no Volume Máximo',
+              text:'Esses prêmios podem ser seus. Confira a campanha de outubro no App. eStore CE+PI.'
+            });
+            resolve();return;
+          }
+          const url=URL.createObjectURL(blob),a=document.createElement('a');
+          a.href=url;a.download='campanha-estore-volume-maximo-outubro.png';
+          document.body.appendChild(a);a.click();a.remove();
+          setTimeout(()=>URL.revokeObjectURL(url),2500);
+          resolve();
+        }catch(e){reject(e)}
+      },'image/png',.95));
     }catch(e){
       console.warn('share campaign card',e);
-      window.open(new URL(CARD75,location.href).href,'_blank');
-    }
+      const canvas=fallbackCanvas75();
+      await new Promise((resolve,reject)=>canvas.toBlob(async blob=>{
+        try{
+          if(!blob)throw new Error('Falha ao gerar card');
+          const file=new File([blob],'campanha-estore-volume-maximo-outubro.png',{type:'image/png'});
+          if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
+            await navigator.share({files:[file],title:'eStore no Volume Máximo'});resolve();return;
+          }
+          const url=URL.createObjectURL(blob),a=document.createElement('a');
+          a.href=url;a.download='campanha-estore-volume-maximo-outubro.png';a.click();
+          setTimeout(()=>URL.revokeObjectURL(url),2500);resolve();
+        }catch(err){reject(err)}
+      },'image/png',.94));
+    }finally{host?.remove()}
   };
   window.shareCampaignV72=shareCampaign75;
 
@@ -2711,7 +2739,13 @@ window.deletePopupV72=async function(id){
     const baseCommunity=communityPostHtml;
     communityPostHtml=function(x){
       if(String(x?.title||'').trim().toLowerCase()==='estore no volume máximo'){
-        return baseCommunity({...x,media_url:CARD75,media_type:'image/jpeg'});
+        const y={...x,media_url:'',media_type:''};
+        let html=baseCommunity(y);
+        const social='<div class=communitySocialV46>';
+        const visual='<div class="communityCampaignV71">'+hero75()+'</div>';
+        if(html.includes(social))html=html.replace(social,visual+social);
+        else html=visual+html;
+        return html;
       }
       return baseCommunity(x);
     };
@@ -2732,5 +2766,10 @@ window.deletePopupV72=async function(id){
 <style id="campaign-v70-fixes">
 .approvedCardWrap75{background:#fff;border-radius:22px;overflow:hidden;border:1px solid #ece7dd;box-shadow:0 8px 24px rgba(23,63,53,.08);margin:0 0 12px}.approvedCardImg75{display:block;width:100%;height:auto;object-fit:contain;background:#fff}.campaignPage75{padding:10px 12px 18px}.tabs75{margin-bottom:13px}.share75{display:flex;align-items:center;justify-content:center;gap:8px;min-height:54px;font-size:13px}.communityMedia img[src*="campaign-share-v75"],.communityPostMediaV37 img[src*="campaign-share-v75"]{object-fit:contain!important;background:#fff!important}
 @media(max-width:480px){.campaignPage75{padding:8px 9px 15px}.approvedCardWrap75{border-radius:18px}.share75{min-height:52px;font-size:12px}}
+</style>
+
+<style id="campaign-v71-fixes">
+.approvedCardWrap75{display:none!important}.campaignPage75{padding:10px 12px 18px}.hero75,.prizePanel75,.info75{visibility:visible!important}.hero75 img,.prizePhoto75 img,.popStage75 img{opacity:1!important}.communityCampaignV71{margin:10px 0 12px}.communityCampaignV71 .hero75{margin:0}.communityCampaignV71 .heroText75 button{pointer-events:none}.communityCampaignV71 .hero75{aspect-ratio:2.25/1}.popCard75{max-height:92vh}.popStage75{min-height:285px}.popStage75 .pp img{display:block!important}.share75{display:flex;align-items:center;justify-content:center;gap:8px;min-height:54px}
+@media(max-width:480px){.campaignPage75{padding:8px 9px 15px}.hero75{min-height:230px}.heroText75 h2{font-size:22px}.info75{grid-template-columns:repeat(2,1fr)}.info75 article{min-height:94px}.prizeGrid75{grid-template-columns:repeat(2,1fr)}.prizePhoto75{height:120px}.prizeCard75>b{font-size:9px}.prizeCard75 small{font-size:7px}.popStage75{height:285px}}
 </style>
 </body></html>
