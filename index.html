@@ -2551,7 +2551,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v75';
+  const BUILD='v77';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2793,4 +2793,62 @@ window.deletePopupV72=async function(id){
   .heroProductsFocus75 .heroProductHalo75{width:84%;height:80%;top:45%}
 }
 </style>
+
+<!-- V77-2026-10-02-CAMPAIGN-POPUP-RELIABILITY -->
+<script>
+(function(){
+  const previousCampaignPopup = window.showHighlightsPopup;
+  if(typeof previousCampaignPopup!=='function') return;
+  let popupCallAt=0;
+  let popupCallUser='';
+  window.showHighlightsPopup = showHighlightsPopup = async function(){
+    if(typeof U==='undefined'||!U?.u?.id) return;
+    const uid=String(U.u.id);
+    const now=Date.now();
+    if(popupCallUser===uid && now-popupCallAt<4000) return;
+    popupCallUser=uid;
+    popupCallAt=now;
+
+    try{
+      if(typeof refreshExtras==='function') await refreshExtras();
+    }catch(e){
+      console.warn('[V77] Conteúdo da campanha indisponível no pré-carregamento.',e);
+    }
+
+    let day='';
+    try{day=new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}
+    catch(e){day=new Date().toISOString().slice(0,10)}
+    const reliableKey='estoreCampaignPopupV77:'+day+':'+uid;
+
+    try{
+      if(localStorage.getItem(reliableKey)) return;
+      const remove=[];
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i);
+        if(k&&k.startsWith('estoreCampaignDailyV71:')){
+          const p=k.split(':');
+          if(String(p[2]||'')===uid) remove.push(k);
+        }
+      }
+      remove.forEach(k=>localStorage.removeItem(k));
+    }catch(e){}
+
+    try{
+      await previousCampaignPopup();
+    }catch(e){
+      console.warn('[V77] Falha ao abrir comunicação da campanha.',e);
+      return;
+    }
+
+    requestAnimationFrame(()=>{
+      try{
+        const visible=!!document.getElementById('campaignPop75')||
+          !!document.getElementById('highlightsPopup')||
+          !!document.getElementById('campaignPopupV37');
+        if(visible) localStorage.setItem(reliableKey,'1');
+      }catch(e){}
+    });
+  };
+})();
+</script>
 </body></html>
