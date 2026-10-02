@@ -476,7 +476,7 @@ async function api(body){let r=await fetch(API,{method:'POST',headers:{'content-
 async function sha(t){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(t))} function hex(buf){return [...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 async function ungzip(buf){let ds=new DecompressionStream('gzip');return new Response(new Blob([buf]).stream().pipeThrough(ds)).arrayBuffer()}
 async function loadUser(id){let lk=hex(await sha('lookup|'+id)),h=lk[0],g=h<'4'?'0-3':h<'8'?'4-7':h<'c'?'8-b':'c-f',b=window.BUCKETS[g]?.[lk];if(!b)return null;let raw=Uint8Array.from(atob(b),c=>c.charCodeAt(0)),nonce=raw.slice(0,12),ct=raw.slice(12),key=await crypto.subtle.importKey('raw',await sha('estore|'+id),'AES-GCM',false,['decrypt']);try{let dec=await crypto.subtle.decrypt({name:'AES-GCM',iv:nonce},key,ct),txt=new TextDecoder().decode(await ungzip(dec));return JSON.parse(txt)}catch{return null}}
-async function login(){let id=$('#mat').value.trim();let err=$('#err');err.textContent='Consultando base oficial...';let btn=document.querySelector('#login .btn');if(btn){btn.disabled=true;btn.textContent='Entrando...'}if(!id){err.textContent='Informe sua matrícula.';if(btn){btn.disabled=false;btn.textContent='Entrar'}return}let u=null;try{let d=await api({action:'dashboard',matricula:id});if(!d?.user)throw new Error('Matrícula não localizada na base oficial.');u=d.user;if(d.common)COMMON=d.common;APP_UPDATED_AT=d.updatedAt||'';if(d.asof&&window.DB)DB.asof=d.asof}catch(e){console.warn('api dashboard',e);clearSession();err.textContent=(e?.message&&/Matrícula não localizada/.test(e.message))?'Matrícula não cadastrada na base oficial.':'Não foi possível consultar a base oficial agora. Verifique sua conexão e tente novamente.';if(btn){btn.disabled=false;btn.textContent='Entrar'}return}U=u;if(String(id)==='2457695')U.admin=true;RESULT_PERIOD_CACHE={};STORE_PERIOD_CACHE={};saveSession('user',id);document.getElementById('login').style.display='none';document.getElementById('shell').classList.remove('hide');document.getElementById('shell').style.display='block';updateDrawerInfo();go('home');setTimeout(async()=>{try{let fcaShown=await maybeShowFcaPriorityV61();if(fcaShown)return;let shown=await maybeShowRitualV52();if(!shown)showHighlightsPopup()}catch(e){console.warn('popup inicial',e);try{showHighlightsPopup()}catch(_){}}},450);Promise.resolve().then(refreshExtras).catch(e=>console.warn('extras',e))}
+async function login(){let id=$('#mat').value.trim();let err=$('#err');err.textContent='Consultando base oficial...';let btn=document.querySelector('#login .btn');if(btn){btn.disabled=true;btn.textContent='Entrando...'}if(!id){err.textContent='Informe sua matrícula.';if(btn){btn.disabled=false;btn.textContent='Entrar'}return}let u=null;try{let d=await api({action:'dashboard',matricula:id});if(!d?.user)throw new Error('Matrícula não localizada na base oficial.');u=d.user;if(d.common)COMMON=d.common;APP_UPDATED_AT=d.updatedAt||'';if(d.asof&&window.DB)DB.asof=d.asof}catch(e){console.warn('api dashboard',e);clearSession();err.textContent=(e?.message&&/Matrícula não localizada/.test(e.message))?'Matrícula não cadastrada na base oficial.':'Não foi possível consultar a base oficial agora. Verifique sua conexão e tente novamente.';if(btn){btn.disabled=false;btn.textContent='Entrar'}return}U=u;if(String(id)==='2457695')U.admin=true;RESULT_PERIOD_CACHE={};STORE_PERIOD_CACHE={};saveSession('user',id);document.getElementById('login').style.display='none';document.getElementById('shell').classList.remove('hide');document.getElementById('shell').style.display='block';updateDrawerInfo();go('home');setTimeout(()=>{try{showHighlightsPopup()}catch(e){console.warn('popup inicial',e)}},500);Promise.resolve().then(refreshExtras).catch(e=>console.warn('extras',e))}
 async function guestLogin(){let err=$('#err'),btn=$('#guestBtn');if(btn){btn.disabled=true;btn.textContent='Abrindo demonstração...'}if(err)err.textContent='';try{let d=await api({action:'guest_dashboard'});if(!d?.user)throw new Error('Modo demonstração indisponível.');U=d.user;U.demo=true;if(d.common)COMMON=d.common;APP_UPDATED_AT=d.updatedAt||'';RESULT_PERIOD_CACHE={};STORE_PERIOD_CACHE={};saveSession('guest');document.getElementById('login').style.display='none';document.getElementById('shell').classList.remove('hide');document.getElementById('shell').style.display='block';updateDrawerInfo();go('home');await refreshExtras()}catch(e){clearSession();if(err)err.textContent=e.message||'Não foi possível abrir o modo demonstração.';if(btn){btn.disabled=false;btn.textContent='Conhecer o App como visitante'}}}
 async function refreshExtras(){try{let [c,e,n]=await Promise.all([api({action:'content_get',matricula:U.u.id,demo:isDemo()}),api({action:'eday_get'}),api({action:'notifications_get',matricula:U.u.id,store_code:U.u.st})]);CONTENT={importantInfo:c.importantInfo||[],campaigns:c.campaigns||[],coupons:c.coupons||[],media:c.media||[],imageSlots:c.imageSlots||{},profilePhotos:c.profilePhotos||{},preferredNames:c.preferredNames||{}};PUBLIC_IMAGE_SLOTS={...PUBLIC_IMAGE_SLOTS,...(CONTENT.imageSlots||{})};applyPublicBranding();EDAY=e.config||{};NOTIFS=n.items||[];$('#nb').textContent=n.unread||'';updateDrawerInfo();refreshCommunityBadge()}catch(e){console.warn(e);refreshCommunityBadge()}}
 async function openNotifications(){let unread=NOTIFS.filter(x=>!x.read);if(!NOTIFS.length)return alert('Nenhuma notificação no momento.');let msg=NOTIFS.slice(0,8).map((x,i)=>(x.read?'':'● ')+(x.title||'Notificação')+'\n'+(x.message||'')).join('\n\n');alert(msg);if(isDemo())return;for(const x of unread){try{await api({action:'notification_read',matricula:U.u.id,notification_id:x.id});x.read=true}catch(e){}}$('#nb').textContent=''}
@@ -2571,4 +2571,170 @@ window.deletePopupV72=async function(id){
   });
 })();
 </script>
+
+<!-- V75-2026-10-01-APPROVED-CAMPAIGN-FINAL -->
+<script>
+(function(){
+  const P75={
+    samsung:'https://images.samsung.com/is/image/samsung/p6pim/br/sm-a075mzkgzto/gallery/br-galaxy-a07-sm-a075-sm-a075mzkgzto-548807702?%241164_776_PNG%24=',
+    tune720:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dwbfa524ed/01.JBL_Tune_720BT_ProductImage_Hero_Black.png?sh=535&sw=535',
+    waveBeam2:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dwb3516f7c/01.JBL_Wave%20Beam%202_Product%20Image_Hero_Black.png?sh=535&sw=535',
+    waveBuds2:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dw11b858ba/01.LS_JBL_Wave%20Buds%202_Product%20Image_Hero_Black.png?sh=535&sw=535',
+    go4:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dw96fc93ec/JBL_GO_4_HERO_BLACK_48156_x4.png?sh=535&sw=535',
+    tune520:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dwc23d813b/01.JBL_Tune_520BT_ProductImage_Hero_Black.png?sh=535&sw=535'
+  };
+  let TAB75='campaigns';
+  const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
+  const active75=x=>{if(!x||x.active===false)return false;const d=today75(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return(!s||d>=s)&&(!e||d<=e)};
+  const campaign75=()=>((CONTENT&&Array.isArray(CONTENT.campaigns)?CONTENT.campaigns:[]).filter(active75)[0]||{id:'october-volume-maximo-2026',title:'eStore no Volume Máximo',start_at:'2026-10-01',end_at:'2026-10-31',active:true});
+  const coupons75=()=>((CONTENT&&Array.isArray(CONTENT.coupons)?CONTENT.coupons:[]).filter(active75));
+  const date75=v=>{try{return new Date(String(v).slice(0,10)+'T12:00:00').toLocaleDateString('pt-BR')}catch(e){return String(v||'')}};
+  const period75=x=>(x.start_at?date75(x.start_at):'01/10/2026')+' a '+(x.end_at?date75(x.end_at):'31/10/2026');
+
+  function img75(src,alt){return '<img crossorigin="anonymous" referrerpolicy="no-referrer" src="'+src+'" alt="'+esc75(alt)+'">'}
+  function prize75(src,name,rank){
+    return '<article class="prizeCard75"><span class="rank75">'+rank+'</span><div class="prizePhoto75">'+img75(src,name)+'</div><b>'+esc75(name)+'</b><small>'+rank+' • Vendedores</small></article>';
+  }
+  function tabs75(){
+    const a=[['campaigns','📣','Campanhas'],['coupons','🎟️','Cupons'],['prizes','🎁','Premiação'],['sell','📈','Como vender']];
+    return '<nav class="tabs75">'+a.map(i=>'<button class="'+(TAB75===i[0]?'on':'')+'" onclick="campaignTab75(&quot;'+i[0]+'&quot;)"><strong>'+i[1]+'</strong><span>'+i[2]+'</span></button>').join('')+'</nav>';
+  }
+  window.campaignTab75=function(v){TAB75=v;go('campaigns')};
+
+  function hero75(){
+    return '<section class="hero75">'+
+      '<div class="heroGlow75"></div><div class="heroEq75">'+Array.from({length:12},(_,i)=>'<i style="height:'+(26+(i%7)*8)+'px"></i>').join('')+'</div>'+
+      '<div class="heroText75"><small>CAMPANHA • 01 A 31 DE OUTUBRO</small><h2>eStore no <em>Volume Máximo</em></h2><p>Aumente o som das vendas.</p><span>Vendedores concorrem a prêmios<br>JBL e Samsung.</span><button onclick="campaignTab75(&quot;prizes&quot;)">CONFIRA A CAMPANHA <b>›</b></button></div>'+
+      '<div class="heroProducts75"><div class="hp phone">'+img75(P75.samsung,'Samsung A07')+'</div><div class="hp headset">'+img75(P75.tune720,'JBL Tune 720 BT')+'</div><div class="hp speaker">'+img75(P75.go4,'JBL Go 4')+'</div><div class="hp buds">'+img75(P75.waveBeam2,'JBL Wave Beam 2')+'</div></div>'+
+      '<div class="heroBadge75">♛<br><b>PRÊMIOS REAIS</b><br>JBL E SAMSUNG</div>'+
+    '</section>';
+  }
+  function info75(){
+    return '<section class="info75"><article><b>👥 Quem participa</b><p>Vendedores<br>da regional CE+PI.</p></article><article><b>📅 Período</b><p>01 a 31 de<br>outubro de 2026.</p></article><article><b>🎯 Critério</b><p>Mobilização de venda eStore durante outubro, conforme regulamento da campanha.</p></article><article><b>🏆 Premiação</b><p>Os 15 melhores vendedores em valor aprovado concorrem a prêmios Samsung e JBL.</p></article></section>';
+  }
+  function prizePanel75(){
+    return '<section class="prizePanel75"><header><span>🏆</span><div><h3>Premiação dos Colaboradores</h3><p>Os 15 melhores em valor aprovado de cada grupo de porte de lojas levam prêmio.</p></div></header><div class="prizeGrid75">'+
+      prize75(P75.samsung,'Samsung A07 4G 128GB','1º a 3º')+
+      prize75(P75.tune720,'JBL Tune 720 BT','4º e 5º')+
+      prize75(P75.waveBeam2,'JBL Wave Beam 2','6º')+
+      prize75(P75.waveBuds2,'JBL Wave Buds 2','7º')+
+      prize75(P75.go4,'JBL Go 4','8º e 9º')+
+      prize75(P75.tune520,'JBL T520 BT','10º a 15º')+
+    '</div></section>';
+  }
+  function main75(){return hero75()+info75()+prizePanel75()+'<button class="share75" onclick="shareCampaign75()">↗ <b>Compartilhar campanha</b></button>'}
+  function coupon75(){
+    const a=coupons75();
+    return '<section class="simplePanel75"><h3>Cupons e benefícios</h3>'+(a.length?a.map(x=>'<article class="coupon75"><div><b>'+esc75(x.code||x.title||'CUPOM')+'</b><span>'+esc75(x.title||'')+'</span></div><p>'+esc75(x.description||x.text||'')+'</p></article>').join(''):'<p class="empty75">Nenhum cupom ativo neste período.</p>')+'</section>';
+  }
+  function prizes75(){return prizePanel75()+'<button class="share75" onclick="shareCampaign75()">↗ <b>Compartilhar campanha</b></button>'}
+  function sell75(){
+    const t=[['01','Amplie as possibilidades','Quando não tiver tamanho, cor ou produto, use o eStore para não perder a venda.'],['02','Apresente os benefícios','Reforce frete grátis, parcelamento e cupons ativos.'],['03','Use o App com o cliente','Pesquise o produto e conduza a compra de forma simples.'],['04','Transforme objeção em solução','Prazo, variedade e disponibilidade podem fechar a venda.']];
+    return '<section class="simplePanel75"><h3>Como vender mais no eStore</h3><div class="steps75">'+t.map(x=>'<article><i>'+x[0]+'</i><div><b>'+x[1]+'</b><p>'+x[2]+'</p></div></article>').join('')+'</div></section>';
+  }
+  window.campaigns=campaigns=function(){
+    const body=TAB75==='coupons'?coupon75():TAB75==='prizes'?prizes75():TAB75==='sell'?sell75():main75();
+    return '<div class="campaignPage75">'+tabs75()+body+'</div>';
+  };
+
+  function closePop75(){document.getElementById('campaignPop75')?.remove();document.getElementById('highlightsPopup')?.remove();document.getElementById('campaignPopupV37')?.remove()}
+  window.closePop75=closePop75;
+  function pop75(){
+    closePop75();
+    const d=document.createElement('div');d.id='campaignPop75';d.className='popOverlay75';
+    d.innerHTML='<div class="sound75 s1"></div><div class="sound75 s2"></div><div class="sound75 s3"></div><div class="popCard75">'+
+      '<button class="popClose75" onclick="closePop75()">×</button>'+
+      '<div class="popCopy75"><small>CAMPANHA • 01 A 31 DE OUTUBRO</small><h2>Esses prêmios<br>podem ser seus.</h2><h3>Vai ficar de fora?</h3><p>Participe da campanha de outubro e concorra a prêmios JBL e Samsung.<br>Confira a mecânica e aproveite a oportunidade.</p></div>'+
+      '<div class="popStage75"><div class="goldStage75"></div><div class="pp phone">'+img75(P75.samsung,'Samsung A07')+'</div><div class="pp headset">'+img75(P75.tune720,'JBL Tune 720 BT')+'</div><div class="pp beam">'+img75(P75.waveBeam2,'JBL Wave Beam 2')+'</div><div class="pp buds">'+img75(P75.waveBuds2,'JBL Wave Buds 2')+'</div><div class="pp go">'+img75(P75.go4,'JBL Go 4')+'</div><div class="popEq75">'+Array.from({length:17},(_,i)=>'<i style="height:'+(17+(i%9)*5)+'px"></i>').join('')+'</div></div>'+
+      '<div class="popButtons75"><button class="yes" onclick="closePop75();TAB75=&quot;campaigns&quot;;go(&quot;campaigns&quot;)">Quero conferir <b>›</b></button><button class="no" onclick="closePop75()">Agora não</button></div>'+
+    '</div>';
+    document.body.appendChild(d);
+  }
+  window.showHighlightsPopup=showHighlightsPopup=function(){
+    if(!U)return;
+    const x=campaign75();
+    if(active75(x)){pop75();return}
+    try{if(typeof maybeShowRitualV52==='function')maybeShowRitualV52()}catch(e){}
+  };
+
+  async function loadH2C75(){
+    if(window.html2canvas)return window.html2canvas;
+    return new Promise((resolve,reject)=>{
+      const old=document.getElementById('h2c75');if(old){old.addEventListener('load',()=>resolve(window.html2canvas),{once:true});old.addEventListener('error',reject,{once:true});return}
+      const s=document.createElement('script');s.id='h2c75';s.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';s.onload=()=>resolve(window.html2canvas);s.onerror=reject;document.head.appendChild(s);
+    });
+  }
+  function waitImgs75(root){
+    return Promise.all([...root.querySelectorAll('img')].map(img=>img.complete?Promise.resolve():new Promise(r=>{img.onload=img.onerror=()=>r()})));
+  }
+  function fallbackCanvas75(){
+    const c=document.createElement('canvas');c.width=1080;c.height=1350;const g=c.getContext('2d');
+    g.fillStyle='#173F35';g.fillRect(0,0,c.width,c.height);g.fillStyle='#f1d49a';g.font='bold 34px Arial';g.fillText('CAMPANHA • 01 A 31 DE OUTUBRO',60,80);
+    g.fillStyle='#fff';g.font='bold 82px Arial';g.fillText('eStore no',60,180);g.fillStyle='#f1d49a';g.fillText('Volume Máximo',60,275);
+    g.fillStyle='#fff';g.font='36px Arial';g.fillText('Esses prêmios podem ser seus.',60,350);g.font='28px Arial';g.fillText('Samsung A07 • JBL Tune 720 BT • Wave Beam 2',60,415);g.fillText('Wave Buds 2 • JBL Go 4 • JBL T520 BT',60,455);
+    g.fillStyle='#fff';g.fillRect(60,520,960,660);g.fillStyle='#173F35';g.font='bold 48px Arial';g.fillText('Premiação dos Colaboradores',95,600);
+    const rows=[['1º a 3º','Samsung A07 4G 128GB'],['4º e 5º','JBL Tune 720 BT'],['6º','JBL Wave Beam 2'],['7º','JBL Wave Buds 2'],['8º e 9º','JBL Go 4'],['10º a 15º','JBL T520 BT']];
+    g.font='bold 30px Arial';rows.forEach((r,i)=>{const y=680+i*75;g.fillStyle='#DE7C00';g.fillText(r[0],95,y);g.fillStyle='#173F35';g.fillText(r[1],300,y)});
+    return c;
+  }
+  window.shareCampaign75=async function(){
+    let host=null;
+    try{
+      host=document.createElement('div');host.className='shareRender75';host.innerHTML=hero75()+info75()+prizePanel75();document.body.appendChild(host);
+      await waitImgs75(host);
+      const h2c=await loadH2C75();
+      const canvas=await h2c(host,{backgroundColor:'#f7f6f2',scale:1.5,useCORS:true,allowTaint:false,logging:false});
+      await new Promise((resolve,reject)=>canvas.toBlob(async blob=>{
+        try{
+          if(!blob)throw new Error('Falha ao gerar card');
+          const file=new File([blob],'campanha-estore-outubro.png',{type:'image/png'});
+          if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
+            await navigator.share({files:[file],title:'eStore no Volume Máximo',text:'Campanha de outubro • eStore CE+PI'});resolve();return;
+          }
+          const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='campanha-estore-outubro.png';a.click();setTimeout(()=>URL.revokeObjectURL(u),2000);resolve();
+        }catch(e){reject(e)}
+      },'image/png',.95));
+    }catch(e){
+      try{
+        const canvas=fallbackCanvas75();
+        await new Promise((resolve,reject)=>canvas.toBlob(async blob=>{
+          try{
+            const file=new File([blob],'campanha-estore-outubro.png',{type:'image/png'});
+            if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]})))await navigator.share({files:[file],title:'eStore no Volume Máximo'});
+            else{const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='campanha-estore-outubro.png';a.click();setTimeout(()=>URL.revokeObjectURL(u),2000)}
+            resolve();
+          }catch(err){reject(err)}
+        },'image/png',.94));
+      }catch(err){alert('Não foi possível gerar o card agora. Tente novamente.')}
+    }finally{host?.remove()}
+  };
+  window.shareCampaignV72=shareCampaign75;
+
+  try{
+    const baseCommunity=communityPostHtml;
+    communityPostHtml=function(x){
+      if(String(x?.title||'').trim().toLowerCase()==='estore no volume máximo'){
+        const y={...x,title:'Campanha de Outubro',media_url:'',media_type:''};
+        let html=baseCommunity(y);
+        html=html.replace('Campanha de Outubro','eStore no Volume Máximo');
+        const social='<div class=communitySocialV46>';
+        if(html.includes(social))html=html.replace(social,hero75()+social);
+        return html;
+      }
+      return baseCommunity(x);
+    };
+  }catch(e){}
+})();
+</script>
+<style>
+.campaignPage75{background:#fff;border-radius:24px;padding:10px 12px 18px;box-shadow:0 10px 30px rgba(23,63,53,.07)}
+.tabs75{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;border-bottom:1px solid #deded8;padding:0 0 13px;margin-bottom:13px}.tabs75 button{border:0;background:transparent;color:#53615d;border-radius:17px;min-height:72px;display:grid;place-items:center;align-content:center;gap:4px;font-weight:800}.tabs75 button strong{font-size:21px;line-height:1}.tabs75 button span{font-size:10px}.tabs75 button.on{background:#173F35;color:#fff;box-shadow:0 6px 16px rgba(23,63,53,.18)}
+.hero75{position:relative;overflow:hidden;border-radius:22px;background:radial-gradient(circle at 74% 45%,#4c7045 0,#214d3d 26%,#0b342b 65%,#072a23 100%);aspect-ratio:2.25/1;color:#fff;margin-bottom:12px}.heroGlow75{position:absolute;right:-13%;top:-35%;width:65%;height:150%;border-radius:50%;background:radial-gradient(circle,rgba(246,200,82,.30),transparent 65%)}.heroText75{position:absolute;left:5%;top:8%;width:47%;z-index:4}.heroText75 small{font-size:8px;color:#f1d49a;font-weight:900;letter-spacing:.08em}.heroText75 h2{font-size:25px;line-height:.96;margin:7px 0}.heroText75 h2 em{display:block;color:#f2cb75;font-style:normal}.heroText75 p{font-size:12px;margin:0 0 5px}.heroText75>span{display:block;font-size:8px;line-height:1.25}.heroText75 button{margin-top:11px;border:0;border-radius:999px;background:#f5d77f;color:#173F35;padding:8px 12px;font-size:8px;font-weight:950}.heroText75 button b{font-size:15px}.heroProducts75{position:absolute;right:1%;top:3%;width:53%;height:95%;z-index:3}.hp{position:absolute;display:grid;place-items:center}.hp img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 8px 8px rgba(0,0,0,.35))}.hp.phone{width:31%;height:72%;left:13%;top:4%}.hp.headset{width:49%;height:70%;right:1%;top:18%}.hp.speaker{width:33%;height:35%;left:1%;bottom:4%}.hp.buds{width:30%;height:31%;right:3%;bottom:2%}.heroEq75{position:absolute;right:2%;bottom:7%;height:38%;display:flex;gap:3px;align-items:end;opacity:.64}.heroEq75 i{width:5px;border-radius:4px;background:linear-gradient(#f7d777,#DE7C00)}.heroBadge75{position:absolute;right:2.5%;top:5%;z-index:5;background:#f0c15f;color:#173F35;border-radius:12px;padding:7px 9px;text-align:center;font-size:7px;line-height:1.15;box-shadow:0 4px 10px rgba(0,0,0,.15)}
+.info75{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:0 0 13px}.info75 article{background:#f7f6f2;border:1px solid #ece9e1;border-radius:16px;padding:9px 8px;min-height:90px}.info75 b{display:block;color:#173F35;font-size:8px;margin-bottom:7px}.info75 p{margin:0;color:#52615c;font-size:7.5px;line-height:1.25}
+.prizePanel75{background:linear-gradient(150deg,#fffdf8,#fbf1df);border:1px solid #eadfcb;border-radius:22px;padding:13px 11px 15px}.prizePanel75 header{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px}.prizePanel75 header>span{font-size:25px}.prizePanel75 h3{margin:0;color:#173F35;font-size:18px;line-height:1}.prizePanel75 header p{margin:4px 0 0;color:#586761;font-size:8px}.prizeGrid75{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.prizeCard75{position:relative;background:#fff;border:1px solid #ece8df;border-radius:14px;padding:8px 6px 9px;text-align:center;overflow:hidden;box-shadow:0 4px 12px rgba(23,63,53,.05)}.rank75{position:absolute;left:0;top:0;z-index:3;background:linear-gradient(135deg,#e78800,#f5af26);color:#fff;font-weight:950;font-size:8px;padding:6px 9px 6px 7px;border-radius:0 0 12px 0}.prizePhoto75{height:91px;display:grid;place-items:center;padding-top:7px}.prizePhoto75 img{width:100%;height:100%;object-fit:contain}.prizeCard75>b{display:block;color:#102f29;font-size:8px;line-height:1.12;min-height:18px}.prizeCard75 small{display:block;color:#68756f;font-size:7px;margin-top:3px}.share75{width:100%;border:0;border-radius:17px;background:#173F35;color:#fff;padding:14px;margin-top:12px;font-size:12px;font-weight:900}.simplePanel75{background:#faf9f5;border-radius:20px;padding:14px}.simplePanel75 h3{margin:0 0 12px;color:#173F35}.coupon75{display:grid;grid-template-columns:.8fr 1.2fr;border-radius:15px;overflow:hidden;background:#f8efdc;margin-bottom:9px}.coupon75>div{background:#173F35;color:#fff;padding:14px;display:grid}.coupon75>div b{font-size:18px}.coupon75>div span,.coupon75 p{font-size:9px}.coupon75 p{padding:10px;color:#173F35}.empty75{color:#6b7773}.steps75{display:grid;gap:8px}.steps75 article{display:flex;gap:9px;background:#fff;border-radius:15px;padding:11px}.steps75 i{width:32px;height:32px;flex:0 0 32px;border-radius:50%;display:grid;place-items:center;background:#f1d49a;color:#173F35;font-weight:900;font-style:normal}.steps75 b{font-size:11px;color:#173F35}.steps75 p{font-size:9px;color:#61706a;margin:3px 0 0}
+.popOverlay75{position:fixed;inset:0;z-index:12000;background:rgba(4,16,13,.82);backdrop-filter:blur(7px);display:grid;place-items:center;padding:14px;overflow:hidden}.popCard75{position:relative;width:min(420px,94vw);max-height:94vh;overflow:auto;background:linear-gradient(180deg,#0d382e,#082b24);border:1px solid rgba(255,255,255,.75);border-radius:28px;color:#fff;box-shadow:0 28px 75px rgba(0,0,0,.52)}.popClose75{position:absolute;right:10px;top:10px;z-index:10;width:38px;height:38px;border:0;border-radius:50%;background:#fff;color:#111;font-size:25px}.popCopy75{padding:24px 22px 8px}.popCopy75 small{color:#f1d49a;font-size:9px;font-weight:950;letter-spacing:.08em}.popCopy75 h2{font-size:34px;line-height:.98;margin:10px 0 0}.popCopy75 h3{color:#f5d272;font-size:28px;line-height:1;margin:2px 0 10px}.popCopy75 p{font-size:11.5px;line-height:1.42;color:#eeeae2;margin:0}.popStage75{position:relative;height:300px;overflow:hidden;background:radial-gradient(circle at 50% 46%,rgba(246,197,78,.35),transparent 55%)}.goldStage75{position:absolute;left:50%;bottom:4px;transform:translateX(-50%);width:330px;height:90px;border-radius:50%;background:linear-gradient(#f7d56d,#ae6a00);box-shadow:0 0 28px rgba(244,195,75,.48),inset 0 12px 12px rgba(255,242,173,.5)}.pp{position:absolute;z-index:4}.pp img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 9px 9px rgba(0,0,0,.33))}.pp.phone{width:105px;height:176px;left:36%;top:22px;transform:translateX(-50%)}.pp.headset{width:175px;height:168px;right:4px;top:43px}.pp.beam{width:105px;height:92px;left:20px;bottom:37px}.pp.buds{width:103px;height:88px;left:120px;bottom:7px}.pp.go{width:112px;height:86px;right:24px;bottom:13px}.popEq75{position:absolute;left:12px;right:12px;bottom:8px;height:72px;display:flex;align-items:end;justify-content:space-between;opacity:.5}.popEq75 i{width:5px;border-radius:4px;background:linear-gradient(#f6dc8f,#DE7C00)}.popButtons75{padding:0 22px 21px}.popButtons75 button{width:100%;border-radius:16px;padding:13px;font-size:14px;font-weight:900}.popButtons75 .yes{border:0;background:linear-gradient(90deg,#ffe797,#f3c55f);color:#173F35}.popButtons75 .yes b{font-size:21px}.popButtons75 .no{margin-top:9px;border:1px solid rgba(255,255,255,.78);background:transparent;color:#fff}.sound75{position:absolute;left:50%;top:50%;width:390px;height:390px;border:2px solid rgba(241,212,154,.18);border-radius:50%;animation:sound75 2.7s ease-out infinite}.sound75.s2{animation-delay:.9s}.sound75.s3{animation-delay:1.8s}@keyframes sound75{0%{opacity:.8;transform:translate(-50%,-50%) scale(.55)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.55)}}
+.shareRender75{position:fixed;left:-10000px;top:0;width:720px;background:#f7f6f2;padding:18px;z-index:-1}.shareRender75 .hero75{aspect-ratio:2.25/1}.shareRender75 .heroText75 h2{font-size:48px}.shareRender75 .heroText75 p{font-size:22px}.shareRender75 .heroText75>span{font-size:15px}.shareRender75 .heroText75 small{font-size:14px}.shareRender75 .info75 article{min-height:120px;padding:16px}.shareRender75 .info75 b{font-size:14px}.shareRender75 .info75 p{font-size:12px}.shareRender75 .prizePanel75 h3{font-size:30px}.shareRender75 .prizePanel75 header p{font-size:14px}.shareRender75 .prizePhoto75{height:170px}.shareRender75 .prizeCard75>b{font-size:14px;min-height:28px}.shareRender75 .prizeCard75 small,.shareRender75 .rank75{font-size:12px}
+@media(max-width:480px){.campaignPage75{padding:8px 9px 15px}.tabs75 button{min-height:68px}.heroText75 h2{font-size:22px}.heroText75 p{font-size:10px}.heroText75>span{font-size:7px}.heroText75 button{font-size:7px;padding:7px 10px}.heroBadge75{font-size:6px}.info75{gap:5px}.info75 article{padding:8px 6px;min-height:86px}.prizePanel75{padding:12px 8px}.prizeGrid75{gap:6px}.prizePhoto75{height:82px}.prizeCard75{padding:7px 4px 8px}.prizeCard75>b{font-size:7.5px}.prizeCard75 small{font-size:6.5px}.rank75{font-size:7.5px}.popCopy75 h2{font-size:31px}.popCopy75 h3{font-size:26px}.popStage75{height:285px}}
+</style>
 </body></html>
