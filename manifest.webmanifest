@@ -3,7 +3,7 @@
   "name": "App. eStore CE+PI",
   "short_name": "eStore CE+PI",
   "description": "Painel regional eStore CE+PI",
-  "start_url": "./?build=v69",
+  "start_url": "./?build=v70",
   "scope": "./",
   "display": "standalone",
   "display_override": [
