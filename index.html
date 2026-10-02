@@ -2551,7 +2551,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v88';
+  const BUILD='v89';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2586,8 +2586,8 @@ window.deletePopupV72=async function(id){
   };
   let TAB75='campaigns';
   const LOGO75='./assets/riachuelo-logo-exact-v75.svg';
-  const CARD75='./assets/campaign-hero-v84.svg?build=v88';
-  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v88';
+  const CARD75='./assets/campaign-hero-v84.svg?build=v89';
+  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v89';
   const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
   const active75=x=>{if(!x||x.active===false)return false;const d=today75(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return(!s||d>=s)&&(!e||d<=e)};
@@ -2813,8 +2813,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART83='./assets/campaign-share-v76.svg?build=v88';
-  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v88';
+  const ART83='./assets/campaign-share-v76.svg?build=v89';
+  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v89';
 
   function closeV83(){
     document.getElementById('campaignPopV83')?.remove();
@@ -2964,8 +2964,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART84='./assets/campaign-hero-v84.svg?build=v88';
-  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v88';
+  const ART84='./assets/campaign-hero-v84.svg?build=v89';
+  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v89';
 
   function close84(){
     document.getElementById('campaignPopV84')?.remove();
@@ -3115,13 +3115,13 @@ window.deletePopupV72=async function(id){
 </script>
 
 
-<!-- V88-CAMPAIGN-POPUP-NO-LOGO -->
-<style id="campaign-v87-style">
-.campaignPopV87{
-  position:fixed;inset:0;z-index:1000002;display:grid;place-items:center;
+<!-- V89-CAMPAIGN-POPUP-FINAL -->
+<style id="campaign-v89-style">
+.campaignPopV89{
+  position:fixed;inset:0;z-index:1000005;display:grid;place-items:center;
   padding:8px;background:rgba(3,19,16,.84);backdrop-filter:blur(10px)
 }
-.campaignPopCardV87{
+.campaignPopCardV89{
   position:relative;width:min(720px,96vw);max-height:95vh;overflow:auto;
   border-radius:26px;background:
     radial-gradient(circle at 50% 48%,rgba(244,199,72,.18),transparent 34%),
@@ -3129,91 +3129,92 @@ window.deletePopupV72=async function(id){
   border:1px solid rgba(238,205,128,.78);
   box-shadow:0 28px 85px rgba(0,0,0,.58);color:#fff
 }
-.campaignPopCloseV87{
+.campaignPopCloseV89{
   position:absolute;right:16px;top:16px;z-index:20;width:48px;height:48px;
   border-radius:50%;border:1.5px solid rgba(255,255,255,.92);
   background:rgba(5,39,33,.72);color:#fff;font-size:31px;line-height:1;
   display:grid;place-items:center;cursor:pointer
 }
-.campaignPopQuestionV87{
+.campaignPopQuestionV89{
   padding:26px 76px 10px 28px;color:#fff;
   font-size:clamp(25px,5vw,39px);font-weight:950;line-height:1.08;
   letter-spacing:-.035em
 }
-.campaignPopQuestionV87 strong{color:#f2c554}
-.campaignPrizeStageV87{
+.campaignPopQuestionV89 strong{color:#f2c554}
+.campaignPrizeStageV89{
   position:relative;height:440px;margin:14px 16px 8px;overflow:hidden
 }
-.campaignPrizeGlowV87{
+.campaignPrizeGlowV89{
   position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);
   width:70%;aspect-ratio:1;border-radius:50%;
   background:radial-gradient(circle,rgba(255,213,87,.42) 0%,rgba(255,213,87,.16) 42%,transparent 69%);
   box-shadow:inset 0 0 0 3px rgba(238,199,88,.72),0 0 42px rgba(255,196,54,.22)
 }
-.campaignPrizeStageBaseV87{
+.campaignPrizeStageBaseV89{
   position:absolute;left:4%;right:4%;bottom:22px;height:76px;border-radius:50%;
   background:radial-gradient(ellipse,#f2ca53 0%,#c4962f 31%,#2e6856 60%,transparent 73%);
   box-shadow:0 -3px 20px rgba(255,211,78,.7)
 }
-.campaignPrizeV87{position:absolute;z-index:4;display:grid;place-items:center}
-.campaignPrizeV87 img{
+.campaignPrizeV89{position:absolute;z-index:4;display:grid;place-items:center}
+.campaignPrizeV89 img{
   display:block;width:100%;height:100%;object-fit:contain;
   filter:drop-shadow(0 15px 14px rgba(0,0,0,.38))
 }
-.campaignPrizeV87.phone{left:25%;top:24px;width:44%;height:332px;z-index:8}
-.campaignPrizeV87.phone img{transform:scale(1.42)}
-.campaignPrizeV87.headset{right:1%;top:74px;width:43%;height:270px;z-index:7}
-.campaignPrizeV87.buds{left:1%;bottom:34px;width:35%;height:154px;z-index:9}
-.campaignPrizeV87.speaker{right:5%;bottom:22px;width:33%;height:144px;z-index:10}
-.campaignPopFooterV87{padding:3px 28px 24px;text-align:center}
-.campaignPopFooterV87 p{
+.campaignPrizeV89.phone{left:25%;top:24px;width:44%;height:332px;z-index:8}
+.campaignPrizeV89.phone img{transform:scale(1.42)}
+.campaignPrizeV89.headset{right:1%;top:74px;width:43%;height:270px;z-index:7}
+.campaignPrizeV89.buds{left:1%;bottom:34px;width:35%;height:154px;z-index:9}
+.campaignPrizeV89.speaker{right:5%;bottom:22px;width:33%;height:144px;z-index:10}
+.campaignPopFooterV89{padding:3px 28px 24px;text-align:center}
+.campaignPopFooterV89 p{
   margin:0 auto 16px;max-width:620px;color:#f1f2ef;
   font-size:clamp(13px,2.5vw,18px);line-height:1.38
 }
-.campaignPopCtaV87{
+.campaignPopCtaV89{
   width:100%;border:0;border-radius:20px;padding:17px 18px;
   background:linear-gradient(180deg,#ffd86d,#f3bb3d);
   color:#173F35;font-size:15px;font-weight:950;cursor:pointer
 }
 @media(max-width:520px){
-  .campaignPopV87{padding:6px}
-  .campaignPopCardV87{width:96vw;border-radius:22px}
-  .campaignPopCloseV87{right:14px;top:14px;width:46px;height:46px;font-size:29px}
-  .campaignPopQuestionV87{padding:22px 64px 9px 20px;font-size:24px}
-    .campaignPrizeStageV87{height:352px;margin:12px 7px 5px}
-  .campaignPrizeGlowV87{width:75%;top:49%}
-  .campaignPrizeV87.phone{left:22%;top:16px;width:48%;height:278px}
-  .campaignPrizeV87.phone img{transform:scale(1.48)}
-  .campaignPrizeV87.headset{right:-2%;top:54px;width:45%;height:226px}
-  .campaignPrizeV87.buds{left:-1%;bottom:29px;width:36%;height:128px}
-  .campaignPrizeV87.speaker{right:3%;bottom:18px;width:35%;height:118px}
-  .campaignPopFooterV87{padding:2px 16px 17px}
-  .campaignPopFooterV87 p{font-size:13px;margin-bottom:13px}
-  .campaignPopCtaV87{padding:15px;font-size:13px}
-  }
+  .campaignPopV89{padding:6px}
+  .campaignPopCardV89{width:96vw;border-radius:22px}
+  .campaignPopCloseV89{right:14px;top:14px;width:46px;height:46px;font-size:29px}
+  .campaignPopQuestionV89{padding:22px 64px 9px 20px;font-size:24px}
+  .campaignPrizeStageV89{height:352px;margin:12px 7px 5px}
+  .campaignPrizeGlowV89{width:75%;top:49%}
+  .campaignPrizeV89.phone{left:22%;top:16px;width:48%;height:278px}
+  .campaignPrizeV89.phone img{transform:scale(1.48)}
+  .campaignPrizeV89.headset{right:-2%;top:54px;width:45%;height:226px}
+  .campaignPrizeV89.buds{left:-1%;bottom:29px;width:36%;height:128px}
+  .campaignPrizeV89.speaker{right:3%;bottom:18px;width:35%;height:118px}
+  .campaignPopFooterV89{padding:2px 16px 17px}
+  .campaignPopFooterV89 p{font-size:13px;margin-bottom:13px}
+  .campaignPopCtaV89{padding:15px;font-size:13px}
+}
 </style>
 <script>
 (function(){
-  const asset87=function(k){return API+'?asset='+encodeURIComponent(k)+'&v=87'};
-  const P87={
-    samsung:asset87('samsung'),
-    tune720:asset87('tune720'),
-    waveBuds2:asset87('waveBuds2'),
-    go4:asset87('go4')
+  let shownThisLoad=false;
+  const asset89=function(k){return API+'?asset='+encodeURIComponent(k)+'&v=89'};
+  const P89={
+    samsung:asset89('samsung'),
+    tune720:asset89('tune720'),
+    waveBuds2:asset89('waveBuds2'),
+    go4:asset89('go4')
   };
 
-  function clearLegacy87(){
-    ['campaignPopV85','campaignPopV84','campaignPopV83','campaignPop75','highlightsPopup','campaignPopupV37']
-      .forEach(function(id){document.getElementById(id)?.remove()});
+  const legacyIds=['campaignPopV85','campaignPopV84','campaignPopV83','campaignPop75','highlightsPopup','campaignPopupV37'];
+  function clearLegacy89(){
+    legacyIds.forEach(function(id){document.getElementById(id)?.remove()});
   }
-  function close87(){
-    document.getElementById('campaignPopV87')?.remove();
-    clearLegacy87();
+  function close89(){
+    document.getElementById('campaignPopV89')?.remove();
+    clearLegacy89();
   }
-  window.closeCampaignPopV87=close87;
+  window.closeCampaignPopV89=close89;
 
-  window.openCampaignMechanicsV87=function(){
-    close87();
+  window.openCampaignMechanicsV89=function(){
+    close89();
     try{
       if(typeof window.campaignTab75==='function') window.campaignTab75('campaigns');
       else if(typeof go==='function') go('campaigns');
@@ -3225,58 +3226,55 @@ window.deletePopupV72=async function(id){
     },220);
   };
 
-  function show87(force){
-    try{if(typeof U==='undefined'||!U)return}catch(e){return}
-    clearLegacy87();
-    if(document.getElementById('campaignPopV87'))return;
-
-    const uid=String(U?.u?.id||U?.id||'user');
-    const key='estoreCampaignPopupV88:'+uid;
-    if(!force){
-      try{if(sessionStorage.getItem(key))return}catch(e){}
-    }
-    try{sessionStorage.setItem(key,'1')}catch(e){}
+  function show89(force){
+    clearLegacy89();
+    try{if(typeof U==='undefined'||!U)return false}catch(e){return false}
+    if(document.getElementById('campaignPopV89'))return true;
+    if(shownThisLoad&&!force)return false;
+    shownThisLoad=true;
 
     const d=document.createElement('div');
-    d.id='campaignPopV87';
-    d.className='campaignPopV87';
+    d.id='campaignPopV89';
+    d.className='campaignPopV89';
     d.innerHTML=
-      '<div class="campaignPopCardV87" role="dialog" aria-modal="true" aria-label="Campanha eStore de outubro">'+
-        '<button class="campaignPopCloseV87" onclick="closeCampaignPopV87()" aria-label="Fechar">×</button>'+
-        '<div class="campaignPopQuestionV87">Já pensou em transformar suas vendas no eStore em <strong>um Samsung ou JBL?</strong></div>'+
-        '+
-        '<div class="campaignPrizeStageV87">'+
-          '<div class="campaignPrizeGlowV87"></div>'+
-          '<div class="campaignPrizeStageBaseV87"></div>'+
-          '<div class="campaignPrizeV87 buds"><img src="'+P87.waveBuds2+'" alt="JBL Wave Buds 2"></div>'+
-          '<div class="campaignPrizeV87 phone"><img src="'+P87.samsung+'" alt="Samsung A07"></div>'+
-          '<div class="campaignPrizeV87 headset"><img src="'+P87.tune720+'" alt="JBL Tune 720 BT"></div>'+
-          '<div class="campaignPrizeV87 speaker"><img src="'+P87.go4+'" alt="JBL Go 4"></div>'+
+      '<div class="campaignPopCardV89" role="dialog" aria-modal="true" aria-label="Campanha eStore de outubro">'+
+        '<button class="campaignPopCloseV89" onclick="closeCampaignPopV89()" aria-label="Fechar">×</button>'+
+        '<div class="campaignPopQuestionV89">Já pensou em transformar suas vendas no eStore em <strong>um Samsung ou JBL?</strong></div>'+
+        '<div class="campaignPrizeStageV89">'+
+          '<div class="campaignPrizeGlowV89"></div>'+
+          '<div class="campaignPrizeStageBaseV89"></div>'+
+          '<div class="campaignPrizeV89 buds"><img src="'+P89.waveBuds2+'" alt="JBL Wave Buds 2"></div>'+
+          '<div class="campaignPrizeV89 phone"><img src="'+P89.samsung+'" alt="Samsung A07"></div>'+
+          '<div class="campaignPrizeV89 headset"><img src="'+P89.tune720+'" alt="JBL Tune 720 BT"></div>'+
+          '<div class="campaignPrizeV89 speaker"><img src="'+P89.go4+'" alt="JBL Go 4"></div>'+
         '</div>'+
-        '<div class="campaignPopFooterV87">'+
+        '<div class="campaignPopFooterV89">'+
           '<p>Conheça a mecânica, acompanhe os critérios e veja como concorrer às premiações de outubro.</p>'+
-          '<button class="campaignPopCtaV87" onclick="openCampaignMechanicsV87()">CONHECER A MECÂNICA <b>→</b></button>'+
-          '+
+          '<button class="campaignPopCtaV89" onclick="openCampaignMechanicsV89()">CONHECER A MECÂNICA <b>→</b></button>'+
         '</div>'+
       '</div>';
     document.body.appendChild(d);
+    return true;
   }
 
-  window.showCampaignPopupV87=function(){show87(true)};
-  window.showCampaignPopupV85=function(){show87(true)};
-  window.showHighlightsPopup=async function(){show87(false)};
+  window.showCampaignPopupV89=function(){return show89(true)};
+  window.showCampaignPopupV87=function(){return show89(true)};
+  window.showCampaignPopupV85=function(){return show89(true)};
+  window.showHighlightsPopup=async function(){return show89(false)};
   try{showHighlightsPopup=window.showHighlightsPopup}catch(e){}
 
-  function boot87(){
-    [450,850,1400,2400,4200].forEach(function(ms){
-      setTimeout(function(){
-        clearLegacy87();
-        try{if(typeof U!=='undefined'&&U)show87(false)}catch(e){}
-      },ms);
+  const observer=new MutationObserver(function(){
+    clearLegacy89();
+  });
+  try{observer.observe(document.documentElement,{childList:true,subtree:true})}catch(e){}
+
+  function boot89(){
+    [120,350,700,1200,2200,4000,7000,12000].forEach(function(ms){
+      setTimeout(function(){if(!shownThisLoad)show89(false);else clearLegacy89()},ms);
     });
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot87,{once:true});
-  else boot87();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot89,{once:true});
+  else boot89();
 })();
 </script>
 
