@@ -2437,4 +2437,114 @@ window.deletePopupV72=async function(id){
 @keyframes wave72{0%{opacity:.8;transform:translate(-50%,-50%) scale(.55)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.55)}}@keyframes eq72{0%,100%{transform:scaleY(.45);opacity:.55}50%{transform:scaleY(1);opacity:1}}
 @media(max-width:520px){.campaignRealCardV72{grid-template-columns:1fr;min-height:460px}.campaignRealCopyV72{padding-right:40px}.campaignRealPrizesV72{grid-template-columns:1fr 1fr}.prizeGridV72{grid-template-columns:1fr 1fr}.campaignInfoGridV72{grid-template-columns:1fr 1fr}.popupPrizeStageV72{height:300px}.popupPrizeV72.boom4{left:24px}.popupPrizeV72.boom3{right:22px}.popupPrizeV72.tune{right:25px}}
 </style>
+
+<!-- V73-2026-10-01-COLLAB-PRIZES-APPROVED -->
+<script>
+(function(){
+  function collaboratorPrizeCardV73(src,name,rank){
+    return '<div class="collabPrizeCardV73"><div class="collabRankV73">'+rank+'</div><div class="collabPrizeImgV73"><img src="'+src+'" alt="'+esc(name)+'"></div><b>'+esc(name)+'</b><span>'+rank+' • Vendedores</span></div>';
+  }
+
+  campaignVisualV72=function(mode){
+    const compact=mode==='feed'?' feed':'';
+    return '<div class="campaignApprovedHeroV73'+compact+'">'+
+      '<div class="campaignApprovedGlowV73"></div>'+
+      '<div class="campaignApprovedCopyV73"><small>CAMPANHA • 01 A 31 DE OUTUBRO</small><h2>eStore no <span>Volume Máximo</span></h2><p>Aumente o som das vendas.</p><strong>Vendedores concorrem a prêmios JBL e Samsung.</strong><button onclick="go(&quot;campaigns&quot;)">CONFIRA A CAMPANHA <i>›</i></button></div>'+
+      '<div class="campaignApprovedProductsV73">'+
+        '<div class="approvedProductV73 p1"><img src="'+PRIZES_V72.samsung+'" alt="Samsung A07 4G 128GB"></div>'+
+        '<div class="approvedProductV73 p2"><img src="'+PRIZES_V72.tune720+'" alt="JBL Tune 720 BT"></div>'+
+        '<div class="approvedProductV73 p3"><img src="'+PRIZES_V72.waveBeam2+'" alt="JBL Wave Beam 2"></div>'+
+        '<div class="approvedProductV73 p4"><img src="'+PRIZES_V72.go4+'" alt="JBL Go 4"></div>'+
+      '</div>'+
+      '<div class="approvedEqualizerV73">'+Array.from({length:14},(_,i)=>'<i style="height:'+(12+i*3)+'px"></i>').join('')+'</div>'+
+      '<div class="approvedBadgeV73">PRÊMIOS REAIS<br>JBL E SAMSUNG</div>'+
+    '</div>';
+  };
+  window.campaignVisualV72=campaignVisualV72;
+
+  mainV72=function(){
+    const x=campaignV72();if(!x)return '<div class="campaignEmptyV72"><b>Nenhuma campanha ativa.</b><span>As campanhas aparecem automaticamente conforme a vigência definida no ADM.</span></div>';
+    return campaignVisualV72('page')+
+      '<div class="campaignInfoGridV73">'+
+        '<div><b>👥 Quem participa</b><span>Vendedores da Regional CE+PI.</span></div>'+
+        '<div><b>📅 Período</b><span>'+periodV72(x)+'</span></div>'+
+        '<div><b>🎯 Critério</b><span>Mobilização de venda eStore durante outubro, conforme regulamento da campanha.</span></div>'+
+        '<div><b>🏆 Premiação</b><span>Os 15 melhores vendedores em valor aprovado de cada grupo de porte concorrem a prêmios Samsung e JBL.</span></div>'+
+      '</div>'+
+      '<section class="collabPrizeSectionV73"><div class="collabPrizeHeadV73"><span>🏆</span><div><h3>Premiação dos Colaboradores</h3><p>Os 15 melhores em valor aprovado de cada grupo de porte de lojas levam prêmio.</p></div></div>'+
+        '<div class="collabPrizeGridV73">'+
+          collaboratorPrizeCardV73(PRIZES_V72.samsung,'Samsung A07 4G 128GB','1º a 3º')+
+          collaboratorPrizeCardV73(PRIZES_V72.tune720,'JBL Tune 720 BT','4º e 5º')+
+          collaboratorPrizeCardV73(PRIZES_V72.waveBeam2,'JBL Wave Beam 2','6º')+
+          collaboratorPrizeCardV73(PRIZES_V72.waveBuds2,'JBL Wave Buds 2','7º')+
+          collaboratorPrizeCardV73(PRIZES_V72.go4,'JBL Go 4','8º e 9º')+
+          collaboratorPrizeCardV73(PRIZES_V72.tune520,'JBL T520 BT','10º a 15º')+
+        '</div>'+
+      '</section>'+
+      '<button class="campaignShareV73" onclick="shareCampaignV72()">↗ Compartilhar campanha</button>';
+  };
+
+  prizesV72=function(){
+    return '<section class="collabPrizeSectionV73 standalone"><div class="collabPrizeHeadV73"><span>🏆</span><div><h3>Premiação dos Colaboradores</h3><p>Os 15 melhores em valor aprovado de cada grupo de porte de lojas levam prêmio.</p></div></div>'+
+      '<div class="collabPrizeGridV73">'+
+        collaboratorPrizeCardV73(PRIZES_V72.samsung,'Samsung A07 4G 128GB','1º a 3º')+
+        collaboratorPrizeCardV73(PRIZES_V72.tune720,'JBL Tune 720 BT','4º e 5º')+
+        collaboratorPrizeCardV73(PRIZES_V72.waveBeam2,'JBL Wave Beam 2','6º')+
+        collaboratorPrizeCardV73(PRIZES_V72.waveBuds2,'JBL Wave Buds 2','7º')+
+        collaboratorPrizeCardV73(PRIZES_V72.go4,'JBL Go 4','8º e 9º')+
+        collaboratorPrizeCardV73(PRIZES_V72.tune520,'JBL T520 BT','10º a 15º')+
+      '</div></section>'+
+      '<button class="campaignShareV73" onclick="shareCampaignV72()">↗ Compartilhar campanha</button>';
+  };
+
+  showCampaignPopupV72=function(x){
+    removeOldPopupV72();
+    const el=document.createElement('div');el.id='highlightsPopup';el.className='popupOverlayV73';
+    el.innerHTML='<div class="popupWaveV73 w1"></div><div class="popupWaveV73 w2"></div><div class="popupWaveV73 w3"></div>'+
+      '<div class="popupCardV73">'+
+        '<button class="popupCloseV73" onclick="closePopupV72()">×</button>'+
+        '<div class="popupTopV73"><small>CAMPANHA • 01 A 31 DE OUTUBRO</small><h2>Esses prêmios<br>podem ser seus.</h2><h3>Vai ficar de fora?</h3><p>Participe da campanha de outubro e concorra a prêmios JBL e Samsung. Confira a mecânica e aproveite a oportunidade.</p></div>'+
+        '<div class="popupStageV73"><div class="popupGoldV73"></div>'+
+          '<div class="popupProdV73 phone"><img src="'+PRIZES_V72.samsung+'" alt="Samsung A07"></div>'+
+          '<div class="popupProdV73 headset"><img src="'+PRIZES_V72.tune720+'" alt="JBL Tune 720 BT"></div>'+
+          '<div class="popupProdV73 beam"><img src="'+PRIZES_V72.waveBeam2+'" alt="JBL Wave Beam 2"></div>'+
+          '<div class="popupProdV73 buds"><img src="'+PRIZES_V72.waveBuds2+'" alt="JBL Wave Buds 2"></div>'+
+          '<div class="popupProdV73 go"><img src="'+PRIZES_V72.go4+'" alt="JBL Go 4"></div>'+
+          '<div class="popupEqV73">'+Array.from({length:15},(_,i)=>'<i style="height:'+(14+(i%8)*5)+'px"></i>').join('')+'</div>'+
+        '</div>'+
+        '<div class="popupActionsV73"><button class="primary" onclick="closePopupV72();go(&quot;campaigns&quot;)">Quero conferir <span>›</span></button><button class="secondary" onclick="closePopupV72()">Agora não</button></div>'+
+      '</div>';
+    document.body.appendChild(el);
+  };
+
+  showHighlightsPopup=async function(){
+    if(!U)return;
+    try{await refreshExtras()}catch(e){}
+    const camp=campaignV72();
+    if(camp){
+      const key='estoreCampaignPopupV73:'+String(camp.id||camp.title)+':'+String(U.u.id);
+      try{if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'1')}catch(e){}
+      showCampaignPopupV72(camp);return;
+    }
+    const p=popupsV72()[0];if(!p)return;
+    const key='estoreMessagePopupV73:'+String(p.id||p.title)+':'+String(U.u.id);
+    try{if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,'1')}catch(e){}
+    showMessagePopupV72(p);
+  };
+})();
+</script>
+<style>
+.campaignApprovedHeroV73{position:relative;overflow:hidden;border-radius:24px;min-height:355px;background:radial-gradient(circle at 76% 44%,#527449 0,#214d3d 28%,#0c352c 65%,#082c25 100%);color:#fff;padding:26px 24px;display:grid;grid-template-columns:.95fr 1.05fr;gap:10px;box-shadow:0 16px 38px rgba(23,63,53,.18);margin-bottom:16px}
+.campaignApprovedHeroV73.feed{min-height:300px;margin:14px 0;padding:20px}
+.campaignApprovedGlowV73{position:absolute;right:-80px;top:-90px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(245,205,95,.40),rgba(245,205,95,.05) 45%,transparent 68%)}
+.campaignApprovedCopyV73{position:relative;z-index:3;align-self:center}.campaignApprovedCopyV73 small{font-size:9px;font-weight:900;letter-spacing:.1em;color:#f5d184}.campaignApprovedCopyV73 h2{font-size:35px;line-height:.98;margin:12px 0 10px;letter-spacing:-.8px}.campaignApprovedCopyV73 h2 span{display:block;color:#f5cd7a}.campaignApprovedCopyV73 p{font-size:16px;margin:0 0 8px}.campaignApprovedCopyV73 strong{display:block;font-size:11px;line-height:1.35;color:#fff;margin-bottom:18px}.campaignApprovedCopyV73 button{border:0;border-radius:999px;background:linear-gradient(90deg,#ffe49b,#efbd61);color:#173F35;font-size:10px;font-weight:950;padding:11px 16px}.campaignApprovedCopyV73 button i{font-style:normal;font-size:18px;margin-left:7px}
+.campaignApprovedProductsV73{position:relative;z-index:2;min-height:270px}.approvedProductV73{position:absolute;display:grid;place-items:center}.approvedProductV73 img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 13px 13px rgba(0,0,0,.30))}.approvedProductV73.p1{width:126px;height:185px;left:6px;top:18px}.approvedProductV73.p2{width:190px;height:180px;right:-12px;top:63px}.approvedProductV73.p3{width:120px;height:105px;right:8px;bottom:0}.approvedProductV73.p4{width:92px;height:84px;left:36px;bottom:3px}.approvedEqualizerV73{position:absolute;right:30px;bottom:20px;height:70px;display:flex;gap:4px;align-items:end;opacity:.72}.approvedEqualizerV73 i{width:7px;border-radius:5px;background:linear-gradient(#f7de91,#DE7C00)}.approvedBadgeV73{position:absolute;right:22px;top:22px;z-index:5;border-radius:16px;background:#efc05f;color:#173F35;font-weight:950;font-size:9px;line-height:1.25;padding:10px 12px;text-align:center;box-shadow:0 7px 16px rgba(0,0,0,.18)}
+.campaignInfoGridV73{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 16px}.campaignInfoGridV73>div{background:#f6f5f0;border:1px solid #ebe8e1;border-radius:18px;padding:13px;min-height:118px}.campaignInfoGridV73 b{display:block;color:#173F35;font-size:11px;margin-bottom:9px}.campaignInfoGridV73 span{font-size:10px;color:#52635e;line-height:1.45}
+.collabPrizeSectionV73{background:linear-gradient(145deg,#fffdf8,#fbf1df);border:1px solid #eadfcb;border-radius:24px;padding:16px;margin-top:12px;box-shadow:0 10px 28px rgba(23,63,53,.07)}.collabPrizeSectionV73.standalone{margin-top:2px}.collabPrizeHeadV73{display:flex;gap:10px;align-items:flex-start;margin-bottom:14px}.collabPrizeHeadV73>span{font-size:28px}.collabPrizeHeadV73 h3{margin:0;color:#173F35;font-size:20px;line-height:1.05}.collabPrizeHeadV73 p{margin:5px 0 0;color:#52635e;font-size:10px;line-height:1.35}
+.collabPrizeGridV73{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.collabPrizeCardV73{position:relative;background:#fff;border:1px solid #ece8df;border-radius:17px;padding:10px 8px 11px;text-align:center;overflow:hidden;box-shadow:0 6px 16px rgba(23,63,53,.06)}.collabRankV73{position:absolute;left:0;top:0;z-index:2;background:linear-gradient(135deg,#e78800,#f6b337);color:#fff;font-size:10px;font-weight:950;padding:7px 12px 7px 9px;border-radius:0 0 14px 0}.collabPrizeImgV73{height:128px;display:grid;place-items:center;padding-top:8px}.collabPrizeImgV73 img{width:100%;height:100%;object-fit:contain!important;object-position:center!important}.collabPrizeCardV73>b{display:block;color:#102f29;font-size:10px;line-height:1.2;min-height:24px}.collabPrizeCardV73>span{display:block;color:#566761;font-size:8px;margin-top:3px}.campaignShareV73{width:100%;border:0;border-radius:17px;background:#173F35;color:#fff;font-weight:950;font-size:13px;padding:15px;margin-top:14px}
+.popupOverlayV73{position:fixed;inset:0;z-index:10120;background:rgba(5,18,15,.82);backdrop-filter:blur(8px);display:grid;place-items:center;padding:16px;overflow:hidden}.popupCardV73{position:relative;width:min(420px,95vw);max-height:94vh;overflow:auto;background:linear-gradient(180deg,#0b342b,#082b24);border:1px solid rgba(255,255,255,.50);border-radius:30px;box-shadow:0 30px 85px rgba(0,0,0,.55);color:#fff}.popupCloseV73{position:absolute;right:12px;top:12px;z-index:10;width:38px;height:38px;border:0;border-radius:50%;background:#fff;color:#111;font-size:25px}.popupTopV73{padding:25px 22px 8px}.popupTopV73 small{color:#f3cf7d;font-size:9px;font-weight:950;letter-spacing:.1em}.popupTopV73 h2{margin:11px 0 0;font-size:34px;line-height:.99;letter-spacing:-.7px}.popupTopV73 h3{margin:2px 0 10px;color:#f6d170;font-size:29px;line-height:1}.popupTopV73 p{margin:0;color:#e4e3dc;font-size:12px;line-height:1.43}
+.popupStageV73{position:relative;height:305px;overflow:hidden;background:radial-gradient(circle at 50% 52%,rgba(239,189,97,.42),rgba(15,64,50,.04) 42%,transparent 68%)}.popupGoldV73{position:absolute;left:50%;bottom:5px;width:320px;height:95px;border-radius:50%;transform:translateX(-50%);background:linear-gradient(#f4c75d,#a96a00);box-shadow:0 0 32px rgba(245,198,91,.52),inset 0 12px 14px rgba(255,241,170,.45)}.popupProdV73{position:absolute;z-index:4;display:grid;place-items:center}.popupProdV73 img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 10px 10px rgba(0,0,0,.35))}.popupProdV73.phone{width:110px;height:180px;left:36%;top:28px;transform:translateX(-50%)}.popupProdV73.headset{width:180px;height:170px;right:2px;top:48px}.popupProdV73.beam{width:112px;height:95px;left:26px;bottom:40px}.popupProdV73.buds{width:105px;height:88px;left:125px;bottom:10px}.popupProdV73.go{width:118px;height:88px;right:27px;bottom:16px}.popupEqV73{position:absolute;left:14px;right:14px;bottom:10px;display:flex;justify-content:space-between;align-items:end;height:75px;opacity:.65}.popupEqV73 i{width:6px;border-radius:4px;background:linear-gradient(#f8e19d,#DE7C00)}.popupActionsV73{padding:0 22px 22px}.popupActionsV73 button{width:100%;border-radius:16px;padding:14px;font-size:14px;font-weight:950}.popupActionsV73 .primary{border:0;background:linear-gradient(90deg,#ffe79d,#f4c35d);color:#173F35}.popupActionsV73 .primary span{font-size:21px;margin-left:7px}.popupActionsV73 .secondary{margin-top:9px;border:1px solid rgba(255,255,255,.65);background:transparent;color:#fff}
+.popupWaveV73{position:absolute;left:50%;top:50%;width:390px;height:390px;border:2px solid rgba(241,212,154,.22);border-radius:50%;animation:wave73 2.7s ease-out infinite}.popupWaveV73.w2{animation-delay:.9s}.popupWaveV73.w3{animation-delay:1.8s}@keyframes wave73{0%{opacity:.75;transform:translate(-50%,-50%) scale(.55)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.55)}}
+@media(max-width:620px){.campaignApprovedHeroV73{grid-template-columns:1fr;min-height:500px;padding:22px}.campaignApprovedProductsV73{min-height:260px}.campaignApprovedCopyV73{padding-right:20px}.campaignInfoGridV73{grid-template-columns:1fr 1fr}.collabPrizeGridV73{grid-template-columns:1fr 1fr}.collabPrizeImgV73{height:138px}.campaignApprovedHeroV73.feed{min-height:455px}.approvedBadgeV73{right:12px;top:12px}.approvedProductV73.p1{left:12px}.approvedProductV73.p2{right:0}}
+</style>
 </body></html>
