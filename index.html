@@ -2653,7 +2653,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v94';
+  const BUILD='v95';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2688,8 +2688,8 @@ window.deletePopupV72=async function(id){
   };
   let TAB75='campaigns';
   const LOGO75='./assets/riachuelo-logo-exact-v75.svg';
-  const CARD75='./assets/campaign-hero-v84.svg?build=v94';
-  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v94';
+  const CARD75='./assets/campaign-hero-v84.svg?build=v95';
+  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v95';
   const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
   const active75=x=>{if(!x||x.active===false)return false;const d=today75(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return(!s||d>=s)&&(!e||d<=e)};
@@ -2915,8 +2915,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART83='./assets/campaign-share-v76.svg?build=v94';
-  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v94';
+  const ART83='./assets/campaign-share-v76.svg?build=v95';
+  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v95';
 
   function closeV83(){
     document.getElementById('campaignPopV83')?.remove();
@@ -3066,8 +3066,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART84='./assets/campaign-hero-v84.svg?build=v94';
-  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v94';
+  const ART84='./assets/campaign-hero-v84.svg?build=v95';
+  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v95';
 
   function close84(){
     document.getElementById('campaignPopV84')?.remove();
@@ -3437,7 +3437,7 @@ window.deletePopupV72=async function(id){
     const asset=k=>API+'?asset='+encodeURIComponent(k)+'&v=90';
     try{
       const [logo,samsung,tune720,waveBeam2,waveBuds2,go4,tune520]=await Promise.all([
-        loadCampaignImgV90('./assets/riachuelo-logo-exact-v75.svg?build=v94'),
+        loadCampaignImgV90('./assets/riachuelo-logo-exact-v75.svg?build=v95'),
         loadCampaignImgV90(asset('samsung')),
         loadCampaignImgV90(asset('tune720')),
         loadCampaignImgV90(asset('waveBeam2')),
@@ -3683,7 +3683,7 @@ window.deletePopupV72=async function(id){
 })();
 </script>
 
-<!-- V94-RITUAL-RAIOX-SEMANAL -->
+<!-- V95-RITUAL-RAIOX-REGIONAL-ADM -->
 <style id="ritual-v94-style">
 .ritualPageV94{display:grid;gap:12px;padding-bottom:18px}
 .ritualHeroV94{background:linear-gradient(135deg,#173F35,#0e5143);color:#fff;border-radius:24px;padding:22px;box-shadow:0 14px 35px rgba(23,63,53,.18)}
@@ -3717,13 +3717,38 @@ window.deletePopupV72=async function(id){
 .rxHistoryV94{display:grid;gap:8px}.rxHistCardV94{width:100%;border:1px solid #e1ddd5;background:#fff;border-radius:16px;padding:13px 14px;text-align:left;display:grid;grid-template-columns:1fr auto;gap:8px}.rxHistCardV94 b{color:#173F35}.rxHistCardV94 small{display:block;color:#777c77;margin-top:3px}.rxHistScoreV94{font-weight:900;color:#173F35}.rxHistScoreV94 em{display:block;font-style:normal;font-size:9px;color:#8a8d89;text-align:right;margin-top:3px}
 .rxEmptyV94{background:#fff;border:1px dashed #d7d2c8;border-radius:18px;padding:24px;text-align:center;color:#747a75}
 .rxMandV94{background:#fff;border:1px solid #e2ded5;border-radius:17px;padding:12px 14px}.rxMandV94 summary{font-weight:900;color:#173F35;cursor:pointer}.rxMandV94 p{font-size:12px;color:#66706b;line-height:1.45;margin:10px 0 0}
-@media(min-width:720px){.rxSummaryV94{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.ritualTabsV94.admin4{grid-template-columns:repeat(4,1fr)}
+.rxRegionalHeroV95{background:#fff;border:1px solid #e2ded5;border-radius:20px;padding:16px;display:flex;gap:12px;align-items:end;justify-content:space-between;flex-wrap:wrap}
+.rxRegionalHeroV95 h3{margin:0;color:#173F35;font-size:20px}.rxRegionalHeroV95 p{margin:5px 0 0;color:#717671;font-size:12px;line-height:1.35}
+.rxRegionalHeroV95 select{min-width:210px}
+.rxRegionalKpisV95{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.rxRegionalKpiV95{background:#fff;border:1px solid #e5e1d8;border-radius:16px;padding:13px;min-width:0}
+.rxRegionalKpiV95 span{display:block;font-size:10px;color:#737873}.rxRegionalKpiV95 b{display:block;margin-top:4px;color:#173F35;font-size:21px}.rxRegionalKpiV95 small{display:block;margin-top:4px;color:#777d78;font-size:10px}
+.rxRegionalKpiV95 .down{color:#bd3a32}.rxRegionalKpiV95 .up{color:#177149}.rxRegionalKpiV95 .gold{color:#b57d0b}
+.rxReadV95{background:#fff;border:1px solid #e4e0d8;border-radius:20px;padding:15px}
+.rxReadV95 h3{margin:0;color:#173F35;font-size:17px}.rxReadV95>p{margin:5px 0 14px;color:#727873;font-size:11px;line-height:1.4}
+.rxPillarsV95{display:grid;gap:10px}.rxPillarV95{display:grid;grid-template-columns:120px 1fr 42px;gap:8px;align-items:center}.rxPillarV95 span{font-size:11px;font-weight:800;color:#466964}.rxPillarBarV95{height:9px;background:#ece9e1;border-radius:99px;overflow:hidden}.rxPillarBarV95 i{display:block;height:100%;background:linear-gradient(90deg,#466964,#173F35);border-radius:99px}.rxPillarV95 b{text-align:right;color:#173F35;font-size:11px}
+.rxRegionalFiltersV95{display:flex;gap:6px;overflow:auto;padding-bottom:2px}.rxRegionalFiltersV95 button{border:1px solid #ddd9d1;background:#fff;color:#466964;border-radius:999px;padding:8px 11px;font-size:10px;font-weight:900;white-space:nowrap}.rxRegionalFiltersV95 button.on{background:#173F35;color:#fff;border-color:#173F35}
+.rxRegionalListV95{display:grid;gap:8px}.rxStoreV95{background:#fff;border:1px solid #e4e0d8;border-radius:17px;padding:13px;display:grid;gap:9px}
+.rxStoreTopV95{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.rxStoreTopV95 b{color:#173F35}.rxStoreTopV95 small{display:block;color:#777c78;margin-top:3px;font-size:10px}
+.rxBadgeV95{padding:5px 8px;border-radius:999px;font-size:9px;font-weight:900;background:#f0ede6;color:#756b57;white-space:nowrap}.rxBadgeV95.done{background:#e6f2e9;color:#176843}.rxBadgeV95.partial{background:#fff0d8;color:#a26800}.rxBadgeV95.priority{background:#fde5e2;color:#aa312b}
+.rxStoreMetricsV95{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.rxStoreMetricsV95 div{background:#f8f6f1;border-radius:11px;padding:8px;min-width:0}.rxStoreMetricsV95 span{display:block;font-size:8px;color:#797d78}.rxStoreMetricsV95 b{display:block;margin-top:3px;color:#173F35;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rxStoreFooterV95{display:flex;justify-content:space-between;gap:8px;align-items:center}.rxStoreFooterV95 small{font-size:10px;color:#737873}.rxStoreFooterV95 button{border:0;background:#173F35;color:#fff;border-radius:10px;padding:8px 10px;font-size:10px;font-weight:900}
+.rxModalV95{position:fixed;inset:0;z-index:1000010;background:rgba(5,24,20,.76);backdrop-filter:blur(8px);padding:12px;display:grid;place-items:center}
+.rxModalCardV95{width:min(760px,96vw);max-height:92vh;overflow:auto;background:#f6f4ee;border-radius:24px;box-shadow:0 25px 70px rgba(0,0,0,.38)}
+.rxModalHeadV95{position:sticky;top:0;z-index:2;background:#173F35;color:#fff;padding:18px 54px 16px 18px}.rxModalHeadV95 h3{margin:0}.rxModalHeadV95 p{margin:5px 0 0;font-size:11px;color:#dce8e1}.rxModalCloseV95{position:absolute;right:13px;top:13px;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.08);color:#fff;font-size:22px}
+.rxModalBodyV95{padding:13px;display:grid;gap:10px}.rxSupV95{background:#fff;border:1px solid #e3dfd7;border-radius:17px;padding:13px}.rxSupV95 h4{margin:0;color:#173F35}.rxSupV95 .sub{display:flex;justify-content:space-between;gap:8px;color:#777c78;font-size:10px;margin-top:3px}
+.rxSupMgmtV95{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:10px}.rxSupMgmtV95 div{background:#f7f5f0;border-radius:10px;padding:8px}.rxSupMgmtV95 span{font-size:8px;color:#7a7e7a}.rxSupMgmtV95 b{display:block;color:#173F35;font-size:11px;margin-top:2px}
+.rxPlanV95{margin-top:10px;padding:10px;border-radius:12px;background:#edf4f1}.rxPlanV95 b{display:block;color:#173F35;font-size:10px}.rxPlanV95 p{margin:3px 0 8px;color:#53615c;font-size:10px;line-height:1.35}
+.rxEmptySupV95{padding:18px;text-align:center;color:#747a75;background:#fff;border-radius:15px;border:1px dashed #d7d3ca}
+@media(min-width:720px){.rxSummaryV94{grid-template-columns:repeat(4,minmax(0,1fr))}.rxRegionalKpisV95{grid-template-columns:repeat(4,minmax(0,1fr))}.rxRegionalListV95{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <script>
 (function(){
   window.RITUAL_TAB_V94=window.RITUAL_TAB_V94||'today';
   window.RITUAL_WEEK_V94=window.RITUAL_WEEK_V94||'';
   window.RITUAL_WEEKLY_V94=null;
+  window.RITUAL_REGION_V95=null;
 
   function rxEscV94(v){return typeof esc==='function'?esc(v):String(v??'')}
   function rxShareV94(v){if(v===null||v===undefined)return '—';return (Number(v)*100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%'}
@@ -3738,10 +3763,11 @@ window.deletePopupV72=async function(id){
     return '<div class="ritualPageV52 ritualPageV94">'+
       '<div class=ritualHeroV94><div class=ritualHeroV94Top><div><span class=ritualHeroTagV94>Gestão que vira ação</span><h2>Ritual eStore</h2><p>Rotina diária + Raio-X semanal para transformar dados, comportamento e execução em resultado.</p></div><div style="font-size:34px">✓</div></div>'+
       '<div class=ritualHeroV94Flow><span>Preparar</span><span>Executar</span><span>Acompanhar</span><span>Melhorar</span></div></div>'+
-      '<div class=ritualTabsV94>'+
+      '<div class="ritualTabsV94 '+(isAdmin()?'admin4':'')+'">'+
         '<button class="ritualTabV94 '+(RITUAL_TAB_V94==='today'?'on':'')+'" data-tab=today onclick="setRitualTabV94(\'today\')">Hoje</button>'+
         '<button class="ritualTabV94 '+(RITUAL_TAB_V94==='weekly'?'on':'')+'" data-tab=weekly onclick="setRitualTabV94(\'weekly\')">Raio-X semanal</button>'+
         '<button class="ritualTabV94 '+(RITUAL_TAB_V94==='history'?'on':'')+'" data-tab=history onclick="setRitualTabV94(\'history\')">Histórico</button>'+
+        (isAdmin()?'<button class="ritualTabV94 '+(RITUAL_TAB_V94==='regional'?'on':'')+'" data-tab=regional onclick="setRitualTabV94(\'regional\')">Visão Regional</button>':'')+
       '</div>'+
       '<details class=rxMandV94><summary>Os 10 Mandamentos do eStore</summary><p><b>Preparar:</b> alinhar conteúdo, reconhecer destaques e deixar a meta clara. <b>Executar:</b> garantir abordagem, acompanhamento e visibilidade das campanhas. <b>Acompanhar e melhorar:</b> ler venda, ticket, share, riscos e fechar a semana com plano de ação.</p></details>'+
       '<div id=ritualBodyV52 class="ritualBodyV94"><div class=muted>Carregando ritual...</div></div>'+
@@ -3826,6 +3852,70 @@ window.deletePopupV72=async function(id){
     return '<div class=rxHistoryV94>'+h.map(x=>'<button class=rxHistCardV94 onclick="setRitualTabV94(\'weekly\',\''+rxEscV94(x.week_start)+'\')"><span><b>Semana '+rxNumV94(x.week_number)+'</b><small>'+rxDateV94(x.week_start)+' a '+rxDateV94(x.week_end)+' • '+rxEscV94(x.diagnosis||'Em andamento')+'</small></span><span class=rxHistScoreV94>'+rxNumV94(x.management_pct)+'%<em>'+(x.status==='concluido'?'Concluído':'Rascunho')+'</em></span></button>').join('')+'</div>';
   }
 
+  function rxRegionalStatusV95(x){
+    if(x.expectedCount>0&&x.completedCount>=x.expectedCount)return ['Concluído','done'];
+    if(x.completedCount>0)return ['Parcial','partial'];
+    return ['Pendente',''];
+  }
+  function rxRegionalFilterKeyV95(x){
+    if(x.priorityRank)return 'priority';
+    if(!x.completedCount)return 'pending';
+    if(x.share!==null&&Number(x.share)>=.01)return 'one';
+    return 'done';
+  }
+  function regionalHtmlV95(d){
+    const s=d.summary||{},w=d.week||{},stores=d.stores||[],pillars=d.pillars||{};
+    const weekOpts=(d.weeks||[]).map(x=>'<option value="'+rxEscV94(x.start)+'" '+(String(x.start)===String(w.start)?'selected':'')+'>Semana '+rxNumV94(x.number)+' • '+rxDateV94(x.start)+' a '+rxDateV94(x.end)+'</option>').join('');
+    const pillarList=['goal_management','recognition','service_script','campaigns'];
+    const validPillars=pillarList.map(k=>pillars[k]).filter(Boolean).filter(x=>x.value!==null);
+    const weak=validPillars.slice().sort((a,b)=>Number(a.value)-Number(b.value))[0]||null;
+    return '<div class=rxRegionalHeroV95><div><h3>Visão Regional • Raio-X eStore</h3><p>Consolidado CE+PI para acompanhar adesão, maturidade da gestão, performance e conexão com o FCA.</p></div><select class=field onchange="RITUAL_WEEK_V94=this.value;loadRitualV52()">'+weekOpts+'</select></div>'+
+      '<div class=rxRegionalKpisV95>'+
+        '<div class=rxRegionalKpiV95><span>Filiais com Raio-X concluído</span><b>'+rxNumV94(s.storesResponded)+' / '+rxNumV94(s.stores)+'</b><small>'+Math.round((Number(s.storesResponded||0)/Math.max(1,Number(s.stores||19)))*100)+'% das filiais</small></div>'+
+        '<div class=rxRegionalKpiV95><span>Supervisores concluídos</span><b>'+rxNumV94(s.completedSupervisors)+' / '+rxNumV94(s.expectedSupervisors)+'</b><small>Aderência '+Math.round(Number(s.adherence||0)*100)+'%</small></div>'+
+        '<div class=rxRegionalKpiV95><span>Maturidade média</span><b>'+rxNumV94(s.avgMaturity)+'%</b><small>média dos Raio-X concluídos</small></div>'+
+        '<div class=rxRegionalKpiV95><span>Share Regional</span><b>'+rxShareV94(s.regionalShare)+'</b><small class="'+(Number(s.regionalDelta||0)>0?'up':Number(s.regionalDelta||0)<0?'down':'')+'">'+rxPpV94(s.regionalDelta)+' vs Sem. '+rxNumV94(w.previousNumber)+'</small></div>'+
+        '<div class=rxRegionalKpiV95><span>Filiais ≥ 1%</span><b class=up>'+rxNumV94(s.atOne)+'</b><small>referência de Share</small></div>'+
+        '<div class=rxRegionalKpiV95><span>Filiais em retração</span><b class=down>'+rxNumV94(s.retracting)+'</b><small>vs semana anterior</small></div>'+
+        '<div class=rxRegionalKpiV95><span>Prioridade FCA</span><b class=gold>'+rxNumV94(s.fcaPriority)+'</b><small>Top 5 retrações</small></div>'+
+      '</div>'+
+      '<div class=rxReadV95><h3>Leitura Regional do Raio-X</h3><p>'+(weak?'Maior oportunidade percebida nesta semana: <b>'+rxEscV94(weak.label)+'</b> • '+rxNumV94(weak.value)+'%.':'Os pilares aparecerão conforme os supervisores concluírem o Raio-X.')+'</p><div class=rxPillarsV95>'+
+        pillarList.map(k=>{let p=pillars[k]||{label:k,value:null};let v=p.value===null?0:Number(p.value);return '<div class=rxPillarV95><span>'+rxEscV94(p.label)+'</span><div class=rxPillarBarV95><i style="width:'+Math.max(0,Math.min(100,v))+'%"></i></div><b>'+(p.value===null?'—':rxNumV94(v)+'%')+'</b></div>'}).join('')+
+      '</div></div>'+
+      '<div class=rxRegionalFiltersV95><button class=on data-rxf=all onclick="filterRegionalV95(\'all\')">Todas</button><button data-rxf=pending onclick="filterRegionalV95(\'pending\')">Pendentes</button><button data-rxf=priority onclick="filterRegionalV95(\'priority\')">Prioridade FCA</button><button data-rxf=one onclick="filterRegionalV95(\'one\')">≥ 1%</button></div>'+
+      '<div class=rxRegionalListV95>'+stores.map(x=>{
+        const st=rxRegionalStatusV95(x),key=rxRegionalFilterKeyV95(x),delta=Number(x.shareDelta||0);
+        return '<div class=rxStoreV95 data-rxkey="'+key+'" data-st="'+rxEscV94(x.st)+'"><div class=rxStoreTopV95><div><b>'+rxEscV94(x.st)+' • '+rxEscV94(x.name)+'</b><small>'+rxNumV94(x.completedCount)+' de '+rxNumV94(x.expectedCount)+' supervisor(es) concluíram</small></div><div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">'+(x.priorityRank?'<span class="rxBadgeV95 priority">FCA #'+x.priorityRank+'</span>':'')+'<span class="rxBadgeV95 '+st[1]+'">'+st[0]+'</span></div></div>'+
+          '<div class=rxStoreMetricsV95><div><span>Share</span><b>'+rxShareV94(x.share)+'</b></div><div><span>Δ p.p.</span><b class="'+(delta>0?'up':delta<0?'down':'')+'">'+rxPpV94(x.shareDelta)+'</b></div><div><span>Participação</span><b>'+Math.round(Number(x.participation||0)*100)+'%</b></div><div><span>Dispersão</span><b>'+Math.round(Number(x.dispersion||0)*100)+'%</b></div></div>'+
+          '<div class=rxStoreFooterV95><small>Maturidade: <b>'+(x.managementPct===null?'—':rxNumV94(x.managementPct)+'%')+'</b> • '+rxMoneyV94(x.captured)+' • '+rxNumV94(x.orders)+' pedidos</small><button onclick="openRegionalStoreV95(\''+rxEscV94(x.st)+'\')">Ver Raio-X</button></div></div>';
+      }).join('')+'</div>';
+  }
+
+  window.filterRegionalV95=function(mode){
+    document.querySelectorAll('.rxRegionalFiltersV95 button').forEach(b=>b.classList.toggle('on',b.dataset.rxf===mode));
+    document.querySelectorAll('.rxStoreV95').forEach(el=>{
+      const key=el.dataset.rxkey||'';
+      el.style.display=(mode==='all'||key===mode)?'grid':'none';
+    });
+  };
+
+  function rxFreqLabelV95(v){return ({todos:'Todos os dias',quase:'Quase todos',metade:'Metade da semana',poucos:'Poucos dias',passou:'Passou batido'})[String(v||'')]||'—'}
+  window.openRegionalStoreV95=function(st){
+    const d=RITUAL_REGION_V95,x=(d?.stores||[]).find(z=>String(z.st)===String(st));if(!x)return;
+    document.getElementById('rxModalV95')?.remove();
+    const responses=x.responses||[];
+    const expected=(x.expectedSupervisors||[]).map(u=>rxEscV94(u.name)).join(', ')||'—';
+    const body=responses.length?responses.map(r=>{
+      const a=r.answers||{};
+      return '<div class=rxSupV95><h4>'+rxEscV94(r.supervisor_name||'Supervisor')+'</h4><div class=sub><span>'+rxEscV94(r.supervisor_role||'')+'</span><span>'+rxEscV94(r.status==='concluido'?'Concluído':'Rascunho')+' • '+rxNumV94(r.management_pct)+'%</span></div>'+
+        '<div class=rxSupMgmtV95><div><span>Gestão de Metas</span><b>'+rxFreqLabelV95(a.goal_management)+'</b></div><div><span>Reconhecimento</span><b>'+rxFreqLabelV95(a.recognition)+'</b></div><div><span>Atendimento</span><b>'+rxFreqLabelV95(a.service_script)+'</b></div><div><span>Campanhas</span><b>'+rxFreqLabelV95(a.campaigns)+'</b></div></div>'+
+        '<div class=rxPlanV95><b>Leitura do pior dia</b><p>'+rxEscV94(a.weak_day_reason||'Não informado')+'</p><b>O que funcionou / desafio</b><p>'+rxEscV94(a.wins_challenges||'Não informado')+'</p><b>Causa</b><p>'+rxEscV94(r.action_cause||a.action_cause||'Não informada')+'</p><b>Ação</b><p>'+rxEscV94(r.action_plan||a.action_plan||'Não informada')+'</p><b>Responsável / Prazo</b><p>'+rxEscV94(r.action_owner||a.action_owner||'—')+' • '+rxDateV94(r.action_deadline||a.action_deadline)+'</p></div></div>';
+    }).join(''):'<div class=rxEmptySupV95><b>Nenhum supervisor respondeu o Raio-X desta filial.</b><br><small>Esperados: '+expected+'</small></div>';
+    const m=document.createElement('div');m.id='rxModalV95';m.className='rxModalV95';
+    m.innerHTML='<div class=rxModalCardV95><div class=rxModalHeadV95><button class=rxModalCloseV95 onclick="document.getElementById(\'rxModalV95\')?.remove()">×</button><h3>'+rxEscV94(x.st)+' • '+rxEscV94(x.name)+'</h3><p>Share '+rxShareV94(x.share)+' • '+rxPpV94(x.shareDelta)+' • Participação '+Math.round(Number(x.participation||0)*100)+'% • Dispersão '+Math.round(Number(x.dispersion||0)*100)+'%</p></div><div class=rxModalBodyV95><div class=rxAutoV94><div><span>Supervisores esperados</span><b>'+expected+'</b></div><div><span>Maturidade da filial</span><b>'+(x.managementPct===null?'—':rxNumV94(x.managementPct)+'%')+'</b></div></div>'+body+'</div></div>';
+    document.body.appendChild(m);
+  };
+
   window.loadRitualV52=async function(){
     const b=document.getElementById('ritualBodyV52');if(!b)return;
     b.innerHTML='<div class=muted>Carregando ritual...</div>';
@@ -3833,6 +3923,11 @@ window.deletePopupV72=async function(id){
       if(RITUAL_TAB_V94==='today'){
         const date=ritualTodayV52(),j=await api({action:'ritual_get',matricula:U.u.id,st:U.u.st,date});
         RITUAL_DATA_V52=j;b.innerHTML=ritualFormV52(j);return;
+      }
+      if(RITUAL_TAB_V94==='regional'){
+        if(!isAdmin())throw new Error('Visão Regional disponível somente para Administrador.');
+        const r=await api({action:'ritual_weekly_regional',matricula:U.u.id,week_start:RITUAL_WEEK_V94||undefined});
+        RITUAL_REGION_V95=r;b.innerHTML=regionalHtmlV95(r);return;
       }
       const j=await api({action:'ritual_weekly_get',matricula:U.u.id,st:U.u.st,week_start:RITUAL_WEEK_V94||undefined});
       RITUAL_WEEKLY_V94=j;
