@@ -2551,7 +2551,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v85';
+  const BUILD='v87';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2586,8 +2586,8 @@ window.deletePopupV72=async function(id){
   };
   let TAB75='campaigns';
   const LOGO75='./assets/riachuelo-logo-exact-v75.svg';
-  const CARD75='./assets/campaign-hero-v84.svg?build=v85';
-  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v85';
+  const CARD75='./assets/campaign-hero-v84.svg?build=v87';
+  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v87';
   const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
   const active75=x=>{if(!x||x.active===false)return false;const d=today75(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return(!s||d>=s)&&(!e||d<=e)};
@@ -2813,8 +2813,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART83='./assets/campaign-share-v76.svg?build=v85';
-  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v85';
+  const ART83='./assets/campaign-share-v76.svg?build=v87';
+  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v87';
 
   function closeV83(){
     document.getElementById('campaignPopV83')?.remove();
@@ -2964,8 +2964,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART84='./assets/campaign-hero-v84.svg?build=v85';
-  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v85';
+  const ART84='./assets/campaign-hero-v84.svg?build=v87';
+  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v87';
 
   function close84(){
     document.getElementById('campaignPopV84')?.remove();
@@ -3115,113 +3115,116 @@ window.deletePopupV72=async function(id){
 </script>
 
 
-<!-- V85-CAMPAIGN-APPROVED-POPUP -->
-<style id="campaign-v85-style">
-.campaignPopV85{
-  position:fixed;inset:0;z-index:1000000;display:grid;place-items:center;
-  padding:10px;background:rgba(4,20,17,.82);backdrop-filter:blur(9px)
+<!-- V87-CAMPAIGN-POPUP-FINAL -->
+<style id="campaign-v87-style">
+.campaignPopV87{
+  position:fixed;inset:0;z-index:1000002;display:grid;place-items:center;
+  padding:8px;background:rgba(3,19,16,.84);backdrop-filter:blur(10px)
 }
-.campaignPopCardV85{
-  position:relative;width:min(720px,96vw);max-height:94vh;overflow:auto;
+.campaignPopCardV87{
+  position:relative;width:min(720px,96vw);max-height:95vh;overflow:auto;
   border-radius:26px;background:
-    radial-gradient(circle at 62% 47%,rgba(243,199,82,.18),transparent 26%),
-    linear-gradient(155deg,#0c4a3d 0%,#07372f 55%,#073229 100%);
-  border:1px solid rgba(241,212,154,.72);
-  box-shadow:0 30px 90px rgba(0,0,0,.58);
-  color:#fff
+    radial-gradient(circle at 50% 48%,rgba(244,199,72,.18),transparent 34%),
+    linear-gradient(160deg,#0f5747 0%,#0b4a3e 46%,#07372f 100%);
+  border:1px solid rgba(238,205,128,.78);
+  box-shadow:0 28px 85px rgba(0,0,0,.58);color:#fff
 }
-.campaignPopCloseV85{
-  position:absolute;right:14px;top:14px;z-index:10;width:40px;height:40px;
-  border-radius:50%;border:1px solid rgba(255,255,255,.82);
-  background:rgba(4,28,24,.82);color:#fff;font-size:28px;line-height:1;
-  display:grid;place-items:center
+.campaignPopCloseV87{
+  position:absolute;right:16px;top:16px;z-index:20;width:48px;height:48px;
+  border-radius:50%;border:1.5px solid rgba(255,255,255,.92);
+  background:rgba(5,39,33,.72);color:#fff;font-size:31px;line-height:1;
+  display:grid;place-items:center;cursor:pointer
 }
-.campaignPopQuestionV85{
-  padding:26px 66px 14px 22px;color:#fff;
-  font-size:clamp(23px,5vw,38px);font-weight:950;line-height:1.03;
+.campaignPopQuestionV87{
+  padding:26px 76px 10px 28px;color:#fff;
+  font-size:clamp(25px,5vw,39px);font-weight:950;line-height:1.08;
   letter-spacing:-.035em
 }
-.campaignPopQuestionV85 strong{color:#f2c554}
-.campaignPopBrandTopV85{
-  display:block;width:min(255px,42%);height:30px;object-fit:contain;
-  object-position:left center;margin:0 0 4px 22px
+.campaignPopQuestionV87 strong{color:#f2c554}
+.campaignPopBrandTopV87{
+  display:block;width:min(330px,50%);height:38px;object-fit:contain;
+  object-position:left center;margin:2px 0 4px 28px
 }
-.campaignPrizeStageV85{
-  position:relative;height:390px;margin:0 12px 6px;overflow:hidden
+.campaignPrizeStageV87{
+  position:relative;height:440px;margin:0 16px 8px;overflow:hidden
 }
-.campaignPrizeGlowV85{
-  position:absolute;left:50%;top:43%;transform:translate(-50%,-50%);
-  width:72%;aspect-ratio:1;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,212,87,.42) 0%,rgba(255,212,87,.14) 36%,transparent 68%);
-  box-shadow:inset 0 0 0 2px rgba(255,207,75,.58),0 0 44px rgba(255,197,62,.24)
+.campaignPrizeGlowV87{
+  position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);
+  width:70%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,213,87,.42) 0%,rgba(255,213,87,.16) 42%,transparent 69%);
+  box-shadow:inset 0 0 0 3px rgba(238,199,88,.72),0 0 42px rgba(255,196,54,.22)
 }
-.campaignPrizeStageBaseV85{
-  position:absolute;left:6%;right:6%;bottom:20px;height:62px;border-radius:50%;
-  background:radial-gradient(ellipse,#f0c451 0%,#a9842e 37%,#174a3d 68%,transparent 72%);
-  box-shadow:0 -4px 18px rgba(255,214,86,.72)
+.campaignPrizeStageBaseV87{
+  position:absolute;left:4%;right:4%;bottom:22px;height:76px;border-radius:50%;
+  background:radial-gradient(ellipse,#f2ca53 0%,#c4962f 31%,#2e6856 60%,transparent 73%);
+  box-shadow:0 -3px 20px rgba(255,211,78,.7)
 }
-.campaignPrizeV85{position:absolute;z-index:4;display:grid;place-items:center}
-.campaignPrizeV85 img{
+.campaignPrizeV87{position:absolute;z-index:4;display:grid;place-items:center}
+.campaignPrizeV87 img{
   display:block;width:100%;height:100%;object-fit:contain;
-  filter:drop-shadow(0 14px 13px rgba(0,0,0,.34))
+  filter:drop-shadow(0 15px 14px rgba(0,0,0,.38))
 }
-.campaignPrizeV85.phone{left:31%;top:34px;width:28%;height:285px;z-index:5}
-.campaignPrizeV85.headset{right:5%;top:54px;width:42%;height:245px;z-index:6}
-.campaignPrizeV85.buds{left:7%;bottom:31px;width:31%;height:150px;z-index:6}
-.campaignPrizeV85.speaker{right:12%;bottom:20px;width:31%;height:132px;z-index:7}
-.campaignPopFooterV85{padding:4px 22px 22px;text-align:center}
-.campaignPopFooterV85 p{
-  margin:0 auto 16px;max-width:610px;color:#e5e9e6;
-  font-size:clamp(12px,2.5vw,17px);line-height:1.4
+.campaignPrizeV87.phone{left:25%;top:24px;width:44%;height:332px;z-index:8}
+.campaignPrizeV87.phone img{transform:scale(1.42)}
+.campaignPrizeV87.headset{right:1%;top:74px;width:43%;height:270px;z-index:7}
+.campaignPrizeV87.buds{left:1%;bottom:34px;width:35%;height:154px;z-index:9}
+.campaignPrizeV87.speaker{right:5%;bottom:22px;width:33%;height:144px;z-index:10}
+.campaignPopFooterV87{padding:3px 28px 24px;text-align:center}
+.campaignPopFooterV87 p{
+  margin:0 auto 16px;max-width:620px;color:#f1f2ef;
+  font-size:clamp(13px,2.5vw,18px);line-height:1.38
 }
-.campaignPopCtaV85{
-  width:100%;border:0;border-radius:17px;padding:15px 16px;
-  background:linear-gradient(180deg,#f8d46b,#edb23e);
-  color:#173F35;font-size:14px;font-weight:950
+.campaignPopCtaV87{
+  width:100%;border:0;border-radius:20px;padding:17px 18px;
+  background:linear-gradient(180deg,#ffd86d,#f3bb3d);
+  color:#173F35;font-size:15px;font-weight:950;cursor:pointer
 }
-.campaignPopBrandBottomV85{
-  display:block;width:min(390px,62%);height:42px;object-fit:contain;
-  margin:18px auto 2px
+.campaignPopBrandBottomV87{
+  display:block;width:min(430px,64%);height:45px;object-fit:contain;
+  margin:19px auto 0
 }
 @media(max-width:520px){
-  .campaignPopV85{padding:7px}
-  .campaignPopCardV85{width:96vw;border-radius:22px}
-  .campaignPopQuestionV85{padding:22px 58px 12px 18px;font-size:24px}
-  .campaignPopBrandTopV85{margin-left:18px;width:42%;height:25px}
-  .campaignPrizeStageV85{height:330px;margin:0 7px 4px}
-  .campaignPrizeV85.phone{left:31%;top:28px;width:29%;height:242px}
-  .campaignPrizeV85.headset{right:2%;top:48px;width:43%;height:210px}
-  .campaignPrizeV85.buds{left:3%;bottom:28px;width:34%;height:128px}
-  .campaignPrizeV85.speaker{right:8%;bottom:18px;width:34%;height:112px}
-  .campaignPopFooterV85{padding:2px 15px 17px}
-  .campaignPopFooterV85 p{font-size:13px;margin-bottom:13px}
-  .campaignPopCtaV85{padding:14px;font-size:13px}
-  .campaignPopBrandBottomV85{height:30px;margin-top:15px}
+  .campaignPopV87{padding:6px}
+  .campaignPopCardV87{width:96vw;border-radius:22px}
+  .campaignPopCloseV87{right:14px;top:14px;width:46px;height:46px;font-size:29px}
+  .campaignPopQuestionV87{padding:22px 64px 9px 20px;font-size:24px}
+  .campaignPopBrandTopV87{margin-left:20px;width:48%;height:30px}
+  .campaignPrizeStageV87{height:352px;margin:0 7px 5px}
+  .campaignPrizeGlowV87{width:75%;top:49%}
+  .campaignPrizeV87.phone{left:22%;top:16px;width:48%;height:278px}
+  .campaignPrizeV87.phone img{transform:scale(1.48)}
+  .campaignPrizeV87.headset{right:-2%;top:54px;width:45%;height:226px}
+  .campaignPrizeV87.buds{left:-1%;bottom:29px;width:36%;height:128px}
+  .campaignPrizeV87.speaker{right:3%;bottom:18px;width:35%;height:118px}
+  .campaignPopFooterV87{padding:2px 16px 17px}
+  .campaignPopFooterV87 p{font-size:13px;margin-bottom:13px}
+  .campaignPopCtaV87{padding:15px;font-size:13px}
+  .campaignPopBrandBottomV87{height:34px;margin-top:15px;width:66%}
 }
 </style>
 <script>
 (function(){
-  const LOGO85='./assets/riachuelo-logo-exact-v75.svg?build=v85';
-  const asset85=function(k){return API+'?asset='+encodeURIComponent(k)+'&v=71'};
-  const P85={
-    samsung:asset85('samsung'),
-    tune720:asset85('tune720'),
-    waveBuds2:asset85('waveBuds2'),
-    go4:asset85('go4')
+  const LOGO87='./assets/riachuelo-logo-exact-v75.svg?build=v87';
+  const asset87=function(k){return API+'?asset='+encodeURIComponent(k)+'&v=87'};
+  const P87={
+    samsung:asset87('samsung'),
+    tune720:asset87('tune720'),
+    waveBuds2:asset87('waveBuds2'),
+    go4:asset87('go4')
   };
 
-  function close85(){
-    document.getElementById('campaignPopV85')?.remove();
-    document.getElementById('campaignPopV84')?.remove();
-    document.getElementById('campaignPopV83')?.remove();
-    document.getElementById('campaignPop75')?.remove();
-    document.getElementById('highlightsPopup')?.remove();
-    document.getElementById('campaignPopupV37')?.remove();
+  function clearLegacy87(){
+    ['campaignPopV85','campaignPopV84','campaignPopV83','campaignPop75','highlightsPopup','campaignPopupV37']
+      .forEach(function(id){document.getElementById(id)?.remove()});
   }
-  window.closeCampaignPopV85=close85;
+  function close87(){
+    document.getElementById('campaignPopV87')?.remove();
+    clearLegacy87();
+  }
+  window.closeCampaignPopV87=close87;
 
-  window.openCampaignMechanicsV85=function(){
-    close85();
+  window.openCampaignMechanicsV87=function(){
+    close87();
     try{
       if(typeof window.campaignTab75==='function') window.campaignTab75('campaigns');
       else if(typeof go==='function') go('campaigns');
@@ -3233,55 +3236,58 @@ window.deletePopupV72=async function(id){
     },220);
   };
 
-  function show85(force){
+  function show87(force){
     try{if(typeof U==='undefined'||!U)return}catch(e){return}
-    if(document.getElementById('campaignPopV85'))return;
+    clearLegacy87();
+    if(document.getElementById('campaignPopV87'))return;
 
     const uid=String(U?.u?.id||U?.id||'user');
-    const key='estoreCampaignPopupV85:'+uid;
+    const key='estoreCampaignPopupV87:'+uid;
     if(!force){
       try{if(sessionStorage.getItem(key))return}catch(e){}
     }
     try{sessionStorage.setItem(key,'1')}catch(e){}
-    close85();
 
     const d=document.createElement('div');
-    d.id='campaignPopV85';
-    d.className='campaignPopV85';
+    d.id='campaignPopV87';
+    d.className='campaignPopV87';
     d.innerHTML=
-      '<div class="campaignPopCardV85" role="dialog" aria-modal="true" aria-label="Campanha eStore no Volume Máximo">'+
-        '<button class="campaignPopCloseV85" onclick="closeCampaignPopV85()" aria-label="Fechar">×</button>'+
-        '<div class="campaignPopQuestionV85">Já pensou em transformar suas vendas no eStore em <strong>um Samsung ou JBL?</strong></div>'+
-        '<img class="campaignPopBrandTopV85" src="'+LOGO85+'" alt="Riachuelo">'+
-        '<div class="campaignPrizeStageV85">'+
-          '<div class="campaignPrizeGlowV85"></div>'+
-          '<div class="campaignPrizeStageBaseV85"></div>'+
-          '<div class="campaignPrizeV85 buds"><img src="'+P85.waveBuds2+'" alt="JBL Wave Buds 2"></div>'+
-          '<div class="campaignPrizeV85 phone"><img src="'+P85.samsung+'" alt="Samsung A07"></div>'+
-          '<div class="campaignPrizeV85 headset"><img src="'+P85.tune720+'" alt="JBL Tune 720 BT"></div>'+
-          '<div class="campaignPrizeV85 speaker"><img src="'+P85.go4+'" alt="JBL Go 4"></div>'+
+      '<div class="campaignPopCardV87" role="dialog" aria-modal="true" aria-label="Campanha eStore de outubro">'+
+        '<button class="campaignPopCloseV87" onclick="closeCampaignPopV87()" aria-label="Fechar">×</button>'+
+        '<div class="campaignPopQuestionV87">Já pensou em transformar suas vendas no eStore em <strong>um Samsung ou JBL?</strong></div>'+
+        '<img class="campaignPopBrandTopV87" src="'+LOGO87+'" alt="Riachuelo">'+
+        '<div class="campaignPrizeStageV87">'+
+          '<div class="campaignPrizeGlowV87"></div>'+
+          '<div class="campaignPrizeStageBaseV87"></div>'+
+          '<div class="campaignPrizeV87 buds"><img src="'+P87.waveBuds2+'" alt="JBL Wave Buds 2"></div>'+
+          '<div class="campaignPrizeV87 phone"><img src="'+P87.samsung+'" alt="Samsung A07"></div>'+
+          '<div class="campaignPrizeV87 headset"><img src="'+P87.tune720+'" alt="JBL Tune 720 BT"></div>'+
+          '<div class="campaignPrizeV87 speaker"><img src="'+P87.go4+'" alt="JBL Go 4"></div>'+
         '</div>'+
-        '<div class="campaignPopFooterV85">'+
+        '<div class="campaignPopFooterV87">'+
           '<p>Conheça a mecânica, acompanhe os critérios e veja como concorrer às premiações de outubro.</p>'+
-          '<button class="campaignPopCtaV85" onclick="openCampaignMechanicsV85()">CONHECER A MECÂNICA <b>→</b></button>'+
-          '<img class="campaignPopBrandBottomV85" src="'+LOGO85+'" alt="Riachuelo">'+
+          '<button class="campaignPopCtaV87" onclick="openCampaignMechanicsV87()">CONHECER A MECÂNICA <b>→</b></button>'+
+          '<img class="campaignPopBrandBottomV87" src="'+LOGO87+'" alt="Riachuelo">'+
         '</div>'+
       '</div>';
     document.body.appendChild(d);
   }
 
-  window.showCampaignPopupV85=function(){show85(true)};
-  window.showHighlightsPopup=showHighlightsPopup=async function(){show85(false)};
+  window.showCampaignPopupV87=function(){show87(true)};
+  window.showCampaignPopupV85=function(){show87(true)};
+  window.showHighlightsPopup=async function(){show87(false)};
+  try{showHighlightsPopup=window.showHighlightsPopup}catch(e){}
 
-  function boot85(){
-    [350,750,1300,2300,4000].forEach(function(ms){
+  function boot87(){
+    [450,850,1400,2400,4200].forEach(function(ms){
       setTimeout(function(){
-        try{if(typeof U!=='undefined'&&U)show85(false)}catch(e){}
+        clearLegacy87();
+        try{if(typeof U!=='undefined'&&U)show87(false)}catch(e){}
       },ms);
     });
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot85,{once:true});
-  else boot85();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot87,{once:true});
+  else boot87();
 })();
 </script>
 
