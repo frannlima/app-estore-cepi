@@ -2653,7 +2653,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v97';
+  const BUILD='v98';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2688,8 +2688,8 @@ window.deletePopupV72=async function(id){
   };
   let TAB75='campaigns';
   const LOGO75='./assets/riachuelo-logo-exact-v75.svg';
-  const CARD75='./assets/campaign-hero-v84.svg?build=v97';
-  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v97';
+  const CARD75='./assets/campaign-hero-v84.svg?build=v98';
+  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v98';
   const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
   const active75=x=>{if(!x||x.active===false)return false;const d=today75(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return(!s||d>=s)&&(!e||d<=e)};
@@ -2915,8 +2915,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART83='./assets/campaign-share-v76.svg?build=v97';
-  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v97';
+  const ART83='./assets/campaign-share-v76.svg?build=v98';
+  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v98';
 
   function closeV83(){
     document.getElementById('campaignPopV83')?.remove();
@@ -3066,8 +3066,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART84='./assets/campaign-hero-v84.svg?build=v97';
-  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v97';
+  const ART84='./assets/campaign-hero-v84.svg?build=v98';
+  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v98';
 
   function close84(){
     document.getElementById('campaignPopV84')?.remove();
@@ -3437,7 +3437,7 @@ window.deletePopupV72=async function(id){
     const asset=k=>API+'?asset='+encodeURIComponent(k)+'&v=90';
     try{
       const [logo,samsung,tune720,waveBeam2,waveBuds2,go4,tune520]=await Promise.all([
-        loadCampaignImgV90('./assets/riachuelo-logo-exact-v75.svg?build=v97'),
+        loadCampaignImgV90('./assets/riachuelo-logo-exact-v75.svg?build=v98'),
         loadCampaignImgV90(asset('samsung')),
         loadCampaignImgV90(asset('tune720')),
         loadCampaignImgV90(asset('waveBeam2')),
@@ -4007,11 +4007,11 @@ window.deletePopupV72=async function(id){
 .fcaPartialHeadV96 h3{margin:0;color:#173F35;font-size:22px}.fcaPartialHeadV96 p{margin:6px 0 0;color:#68716c;font-size:12px;line-height:1.4;max-width:680px}
 .fcaPartialTagV96{background:#fff;border:1px solid #d9e2dc;color:#173F35;border-radius:999px;padding:8px 11px;font-size:11px;font-weight:900;white-space:nowrap}
 .fcaPartialKpisV96{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
-.fcaPartialKpiV96{background:#fff;border:1px solid #e0e3de;border-radius:18px;padding:14px;min-width:0}.fcaPartialKpiV96 span{display:block;font-size:10px;color:#737a75;font-weight:800;text-transform:uppercase}.fcaPartialKpiV96 b{display:block;color:#173F35;font-size:23px;margin-top:5px}.fcaPartialKpiV96 small{display:block;margin-top:6px;color:#737a75;font-size:10px;line-height:1.3}.fcaPartialKpiV96 small.up{color:#157349;font-weight:800}.fcaPartialKpiV96 small.down{color:#c43b32;font-weight:800}
-.fcaPartialTablesV96{display:grid;grid-template-columns:1fr;gap:10px}.fcaPartialTableV96{background:#fff;border:1px solid #e0e3de;border-radius:17px;overflow:hidden}.fcaPartialTableV96 header{padding:12px 13px;border-bottom:1px solid #ece9e3;display:flex;justify-content:space-between;gap:8px;align-items:center}.fcaPartialTableV96 header b{color:#173F35;font-size:13px}.fcaPartialTableV96 header small{font-size:9px;color:#7a7d79}
-.fcaPartialRowV96{display:grid;grid-template-columns:1.35fr .62fr .72fr .55fr .72fr;gap:6px;align-items:center;padding:10px 12px;border-bottom:1px solid #f0ede7}.fcaPartialRowV96:last-child{border-bottom:0}.fcaPartialRowV96 .store b{display:block;color:#173F35;font-size:10px}.fcaPartialRowV96 .store small{display:block;color:#777d78;font-size:8px;margin-top:2px}.fcaPartialRowV96>span{font-size:9px;color:#52625c;text-align:right}.fcaPartialRowV96>span.delta.up{color:#157349;font-weight:900}.fcaPartialRowV96>span.delta.down{color:#c43b32;font-weight:900}
+.fcaPartialKpiV96{background:#fff;border:1px solid #e0e3de;border-radius:18px;padding:14px;min-width:0;min-height:118px;display:grid;grid-template-rows:auto 1fr auto;align-items:start}.fcaPartialKpiV96 span{display:block;font-size:10px;color:#737a75;font-weight:800;text-transform:uppercase}.fcaPartialKpiV96 b{display:flex;align-items:center;color:#173F35;font-size:23px;margin-top:5px;line-height:1.05;font-variant-numeric:tabular-nums}.fcaPartialKpiV96 small{display:block;margin-top:6px;color:#737a75;font-size:10px;line-height:1.3;min-height:26px}.fcaPartialKpiV96 small.up{color:#157349;font-weight:800}.fcaPartialKpiV96 small.down{color:#c43b32;font-weight:800}
+.fcaPartialTablesV96{display:grid;grid-template-columns:1fr;gap:10px}.fcaPartialTableV96{background:#fff;border:1px solid #e0e3de;border-radius:17px;overflow:hidden}.fcaPartialTableV96 header{padding:12px 13px 10px;border-bottom:1px solid #ece9e3}.fcaPartialTableV96 header b{display:block;color:#173F35;font-size:13px}.fcaPartialColsV98,.fcaPartialRowV96{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(58px,.95fr) minmax(42px,.62fr) minmax(28px,.42fr) minmax(60px,.88fr);gap:5px;align-items:center}.fcaPartialColsV98{padding:8px 12px;background:#f7f8f5;border-bottom:1px solid #ece9e3}.fcaPartialColsV98 span{font-size:8px;line-height:1;text-transform:uppercase;font-weight:900;color:#6c7772;text-align:right;letter-spacing:.02em}.fcaPartialColsV98 span:first-child{text-align:left}.fcaPartialRowV96{padding:10px 12px;border-bottom:1px solid #f0ede7}.fcaPartialRowV96:last-child{border-bottom:0}.fcaPartialRowV96 .store{min-width:0}.fcaPartialRowV96 .store b{display:block;color:#173F35;font-size:10px;line-height:1.18;overflow-wrap:anywhere}.fcaPartialRowV96 .store small{display:block;font-size:8px;margin-top:3px;font-weight:900}.fcaPartialRowV96 .store small.up{color:#157349}.fcaPartialRowV96 .store small.down{color:#c43b32}.fcaPartialRowV96>span{font-size:9px;color:#52625c;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .fcaPartialActionsV96{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}.fcaPartialActionsV96 .btn{width:100%}
 @media(min-width:760px){.fcaPartialKpisV96{grid-template-columns:repeat(4,minmax(0,1fr))}.fcaPartialTablesV96{grid-template-columns:1fr 1fr}}
+@media(max-width:390px){.fcaPartialV96{padding:13px}.fcaPartialColsV98,.fcaPartialRowV96{grid-template-columns:minmax(0,1.65fr) 56px 40px 26px 56px;gap:3px;padding-left:8px;padding-right:8px}.fcaPartialRowV96 .store b{font-size:9px}.fcaPartialRowV96>span{font-size:8px}.fcaPartialColsV98 span{font-size:7px}.fcaPartialKpiV96 b{font-size:20px}}
 </style>
 <script>
 (function(){
@@ -4024,9 +4024,9 @@ window.deletePopupV72=async function(id){
   }
   function fcaPartialRowV96(x,mode){
     return '<div class=fcaPartialRowV96>'+
-      '<div class=store><b>'+esc(x.st)+' • '+esc(storeDisplayName(x.st))+'</b><small>'+money(x.captured)+' acumulado</small></div>'+
+      '<div class=store><b>'+esc(x.st)+' • '+esc(storeDisplayName(x.st))+'</b><small class="'+mode+'">'+fcaPpV61(x.share_delta)+'</small></div>'+
+      '<span>'+money(x.captured)+'</span>'+
       '<span>'+pct(x.share)+'</span>'+
-      '<span class="delta '+mode+'">'+fcaPpV61(x.share_delta)+'</span>'+
       '<span>'+num(x.orders)+'</span>'+
       '<span>'+money(x.ticket)+'</span>'+
     '</div>';
@@ -4049,8 +4049,8 @@ window.deletePopupV72=async function(id){
         '<div class=fcaPartialKpiV96><span>Ticket médio</span><b>'+money(r.ticket)+'</b><small class="'+(Number(ticketChange||0)>0?'up':Number(ticketChange||0)<0?'down':'')+'">'+(ticketChange===null?'Sem base comparável':((ticketChange>0?'▲ +':ticketChange<0?'▼ ':'— ')+(ticketChange*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%'))+' vs Semana '+d.weekNumber+'</small></div>'+
       '</div>'+
       '<div class=fcaPartialTablesV96>'+
-        '<div class=fcaPartialTableV96><header><b>↗ Maiores recuperações</b><small>Share • Δ p.p. • Pedidos • Ticket</small></header>'+(grow||'<div class=muted style="padding:14px">Sem recuperação identificada.</div>')+'</div>'+
-        '<div class=fcaPartialTableV96><header><b>↘ Maiores retrações</b><small>Share • Δ p.p. • Pedidos • Ticket</small></header>'+(ret||'<div class=muted style="padding:14px">Sem retração identificada.</div>')+'</div>'+
+        '<div class=fcaPartialTableV96><header><b>↗ Maiores recuperações</b></header><div class=fcaPartialColsV98><span>Loja / Δ p.p.</span><span>Captado</span><span>Share</span><span>Ped.</span><span>Ticket</span></div>'+(grow||'<div class=muted style="padding:14px">Sem recuperação identificada.</div>')+'</div>'+
+        '<div class=fcaPartialTableV96><header><b>↘ Maiores retrações</b></header><div class=fcaPartialColsV98><span>Loja / Δ p.p.</span><span>Captado</span><span>Share</span><span>Ped.</span><span>Ticket</span></div>'+(ret||'<div class=muted style="padding:14px">Sem retração identificada.</div>')+'</div>'+
       '</div>'+
       '<div class=fcaPartialActionsV96><button class=btn onclick="shareFcaPartialV96()">↗ Compartilhar panorama parcial</button></div>'+
     '</div>'
@@ -4067,11 +4067,13 @@ window.deletePopupV72=async function(id){
     let s=start;while(s>min){c.font=(weight||'700')+' '+s+'px Arial, sans-serif';if(c.measureText(String(text)).width<=max)break;s--}return s
   }
   function fcaCanvasStoreRowV96(c,x,y,w,row,deltaColor,G,G2,LINE){
-    fcaCanvasTextV96(c,row.st+' • '+storeDisplayName(row.st),x+18,y+28,fcaCanvasFitV96(c,row.st+' • '+storeDisplayName(row.st),260,16,11,'700'),'700',G);
-    fcaCanvasTextV96(c,money(row.captured),x+365,y+28,13,'700',G,'right');
-    fcaCanvasTextV96(c,pct(row.share),x+445,y+28,13,'700',G,'right');
-    fcaCanvasTextV96(c,num(row.orders),x+510,y+28,13,'700',G,'right');
-    fcaCanvasTextV96(c,money(row.ticket),x+w-18,y+28,13,'700',G,'right');
+    const capturedX=x+590,shareX=x+710,ordersX=x+800,ticketX=x+w-18;
+    const storeMax=capturedX-(x+18)-42;
+    fcaCanvasTextV96(c,row.st+' • '+storeDisplayName(row.st),x+18,y+28,fcaCanvasFitV96(c,row.st+' • '+storeDisplayName(row.st),storeMax,16,11,'700'),'700',G);
+    fcaCanvasTextV96(c,money(row.captured),capturedX,y+28,13,'700',G,'right');
+    fcaCanvasTextV96(c,pct(row.share),shareX,y+28,13,'700',G,'right');
+    fcaCanvasTextV96(c,num(row.orders),ordersX,y+28,13,'700',G,'right');
+    fcaCanvasTextV96(c,money(row.ticket),ticketX,y+28,13,'700',G,'right');
     fcaCanvasTextV96(c,fcaPpV61(row.share_delta),x+18,y+51,12,'700',deltaColor);
     c.strokeStyle=LINE;c.lineWidth=1;c.beginPath();c.moveTo(x+15,y+64);c.lineTo(x+w-15,y+64);c.stroke();
   }
@@ -4100,8 +4102,8 @@ window.deletePopupV72=async function(id){
       ['PEDIDOS',num(r.orders),(ordersChange===null?'Sem base':((ordersChange>0?'+':'')+(ordersChange*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%'))+' vs Sem. '+d.weekNumber,Number(ordersChange||0)>=0?GREEN:RED],
       ['TICKET MÉDIO',money(r.ticket),(ticketChange===null?'Sem base':((ticketChange>0?'+':'')+(ticketChange*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%'))+' vs Sem. '+d.weekNumber,Number(ticketChange||0)>=0?GREEN:RED]
     ];
-    const cw=242,ch=142,cy=215;
-    cards.forEach((a,i)=>{const x=35+i*(cw+18);fcaCanvasRoundV96(c,x,cy,cw,ch,20,WHITE,LINE);fcaCanvasTextV96(c,a[0],x+18,cy+30,13,'700',G2);fcaCanvasTextV96(c,a[1],x+18,cy+78,fcaCanvasFitV96(c,a[1],cw-36,29,20,'700'),'700',G);fcaCanvasTextV96(c,a[2],x+18,cy+113,12,'700',a[3])});
+    const cw=242,ch=142,cy=215,cgap=14;
+    cards.forEach((a,i)=>{const x=35+i*(cw+cgap);fcaCanvasRoundV96(c,x,cy,cw,ch,20,WHITE,LINE);fcaCanvasTextV96(c,a[0],x+18,cy+30,13,'700',G2);fcaCanvasTextV96(c,a[1],x+18,cy+78,fcaCanvasFitV96(c,a[1],cw-36,29,20,'700'),'700',G);fcaCanvasTextV96(c,a[2],x+18,cy+113,12,'700',a[3])});
     fcaCanvasTextV96(c,'Meta parcial acumulada: '+money(r.meta)+' • Desvio financeiro: '+money(gap),53,383,13,'700',gap>=0?GREEN:RED);
 
     function drawSection(title,arr,mode,y0){
@@ -4110,10 +4112,10 @@ window.deletePopupV72=async function(id){
       fcaCanvasRoundV96(c,35,y0,1010,58,20,G);
       c.fillStyle=G;c.fillRect(35,y0+30,1010,28);
       fcaCanvasTextV96(c,title,58,y0+38,22,'700',WHITE);
-      fcaCanvasTextV96(c,'CAPTADO',565,y0+38,11,'700','#E4ECE7','right');
-      fcaCanvasTextV96(c,'SHARE',650,y0+38,11,'700','#E4ECE7','right');
-      fcaCanvasTextV96(c,'PED.',720,y0+38,11,'700','#E4ECE7','right');
-      fcaCanvasTextV96(c,'TICKET',1020,y0+38,11,'700','#E4ECE7','right');
+      fcaCanvasTextV96(c,'CAPTADO',640,y0+38,11,'700','#E4ECE7','right');
+      fcaCanvasTextV96(c,'SHARE',760,y0+38,11,'700','#E4ECE7','right');
+      fcaCanvasTextV96(c,'PED.',850,y0+38,11,'700','#E4ECE7','right');
+      fcaCanvasTextV96(c,'TICKET',1012,y0+38,11,'700','#E4ECE7','right');
       (arr||[]).slice(0,5).forEach((row,i)=>fcaCanvasStoreRowV96(c,50,y0+66+i*62,980,row,col,G,G2,LINE));
     }
     drawSection('↗ Maiores recuperações de Share',p.growth||[],'up',410);
