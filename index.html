@@ -2653,7 +2653,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v95';
+  const BUILD='v96';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2688,8 +2688,8 @@ window.deletePopupV72=async function(id){
   };
   let TAB75='campaigns';
   const LOGO75='./assets/riachuelo-logo-exact-v75.svg';
-  const CARD75='./assets/campaign-hero-v84.svg?build=v95';
-  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v95';
+  const CARD75='./assets/campaign-hero-v84.svg?build=v96';
+  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v96';
   const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
   const active75=x=>{if(!x||x.active===false)return false;const d=today75(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return(!s||d>=s)&&(!e||d<=e)};
@@ -2915,8 +2915,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART83='./assets/campaign-share-v76.svg?build=v95';
-  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v95';
+  const ART83='./assets/campaign-share-v76.svg?build=v96';
+  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v96';
 
   function closeV83(){
     document.getElementById('campaignPopV83')?.remove();
@@ -3066,8 +3066,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART84='./assets/campaign-hero-v84.svg?build=v95';
-  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v95';
+  const ART84='./assets/campaign-hero-v84.svg?build=v96';
+  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v96';
 
   function close84(){
     document.getElementById('campaignPopV84')?.remove();
@@ -3437,7 +3437,7 @@ window.deletePopupV72=async function(id){
     const asset=k=>API+'?asset='+encodeURIComponent(k)+'&v=90';
     try{
       const [logo,samsung,tune720,waveBeam2,waveBuds2,go4,tune520]=await Promise.all([
-        loadCampaignImgV90('./assets/riachuelo-logo-exact-v75.svg?build=v95'),
+        loadCampaignImgV90('./assets/riachuelo-logo-exact-v75.svg?build=v96'),
         loadCampaignImgV90(asset('samsung')),
         loadCampaignImgV90(asset('tune720')),
         loadCampaignImgV90(asset('waveBeam2')),
@@ -3997,6 +3997,171 @@ window.deletePopupV72=async function(id){
   }
 
   window.ritualViewV52=ritualViewV94;
+})();
+</script>
+
+<!-- V96-FCA-PARCIAL-PANORAMA-COMPARTILHAVEL -->
+<style id="fca-partial-v96-style">
+.fcaPartialV96{background:linear-gradient(180deg,#eef5f1 0%,#f7f5ef 100%);border:1px solid #dbe6df;border-left:7px solid #466964;border-radius:24px;padding:18px;box-shadow:0 12px 28px rgba(23,63,53,.08)}
+.fcaPartialHeadV96{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.fcaPartialHeadV96 h3{margin:0;color:#173F35;font-size:22px}.fcaPartialHeadV96 p{margin:6px 0 0;color:#68716c;font-size:12px;line-height:1.4;max-width:680px}
+.fcaPartialTagV96{background:#fff;border:1px solid #d9e2dc;color:#173F35;border-radius:999px;padding:8px 11px;font-size:11px;font-weight:900;white-space:nowrap}
+.fcaPartialKpisV96{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
+.fcaPartialKpiV96{background:#fff;border:1px solid #e0e3de;border-radius:18px;padding:14px;min-width:0}.fcaPartialKpiV96 span{display:block;font-size:10px;color:#737a75;font-weight:800;text-transform:uppercase}.fcaPartialKpiV96 b{display:block;color:#173F35;font-size:23px;margin-top:5px}.fcaPartialKpiV96 small{display:block;margin-top:6px;color:#737a75;font-size:10px;line-height:1.3}.fcaPartialKpiV96 small.up{color:#157349;font-weight:800}.fcaPartialKpiV96 small.down{color:#c43b32;font-weight:800}
+.fcaPartialTablesV96{display:grid;grid-template-columns:1fr;gap:10px}.fcaPartialTableV96{background:#fff;border:1px solid #e0e3de;border-radius:17px;overflow:hidden}.fcaPartialTableV96 header{padding:12px 13px;border-bottom:1px solid #ece9e3;display:flex;justify-content:space-between;gap:8px;align-items:center}.fcaPartialTableV96 header b{color:#173F35;font-size:13px}.fcaPartialTableV96 header small{font-size:9px;color:#7a7d79}
+.fcaPartialRowV96{display:grid;grid-template-columns:1.35fr .62fr .72fr .55fr .72fr;gap:6px;align-items:center;padding:10px 12px;border-bottom:1px solid #f0ede7}.fcaPartialRowV96:last-child{border-bottom:0}.fcaPartialRowV96 .store b{display:block;color:#173F35;font-size:10px}.fcaPartialRowV96 .store small{display:block;color:#777d78;font-size:8px;margin-top:2px}.fcaPartialRowV96>span{font-size:9px;color:#52625c;text-align:right}.fcaPartialRowV96>span.delta.up{color:#157349;font-weight:900}.fcaPartialRowV96>span.delta.down{color:#c43b32;font-weight:900}
+.fcaPartialActionsV96{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}.fcaPartialActionsV96 .btn{width:100%}
+@media(min-width:760px){.fcaPartialKpisV96{grid-template-columns:repeat(4,minmax(0,1fr))}.fcaPartialTablesV96{grid-template-columns:1fr 1fr}}
+</style>
+<script>
+(function(){
+  function fcaPartialPctChangeV96(cur,prev){cur=Number(cur||0);prev=Number(prev||0);return prev?cur/prev-1:null}
+  function fcaPartialChangeTextV96(v,kind){
+    if(v===null||v===undefined||!Number.isFinite(Number(v)))return 'Sem base comparável';
+    const n=Number(v),arrow=n>0?'▲':n<0?'▼':'—',cls=n>0?'up':n<0?'down':'';
+    const txt=kind==='money'?(Math.abs(n)).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):(Math.abs(n)*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+    return '<span class="'+cls+'">'+arrow+' '+(n<0?'-':'')+txt+'</span>';
+  }
+  function fcaPartialRowV96(x,mode){
+    return '<div class=fcaPartialRowV96>'+
+      '<div class=store><b>'+esc(x.st)+' • '+esc(storeDisplayName(x.st))+'</b><small>'+money(x.captured)+' acumulado</small></div>'+
+      '<span>'+pct(x.share)+'</span>'+
+      '<span class="delta '+mode+'">'+fcaPpV61(x.share_delta)+'</span>'+
+      '<span>'+num(x.orders)+'</span>'+
+      '<span>'+money(x.ticket)+'</span>'+
+    '</div>';
+  }
+
+  window.fcaPartialHtmlV61=function(d){
+    let p=d.currentPartial||{},r=p.regional||{},delta=Number(p.share_delta||0);
+    let ordersChange=fcaPartialPctChangeV96(r.orders,d.summary?.orders);
+    let ticketChange=fcaPartialPctChangeV96(r.ticket,d.summary?.ticket);
+    let meta=Number(r.meta||0),captured=Number(r.captured||0),gap=Number(r.financial_gap||0);
+    let gapPct=meta>0?captured/meta-1:null;
+    let grow=(p.growth||[]).slice(0,5).map(x=>fcaPartialRowV96(x,'up')).join('');
+    let ret=(p.retractions||[]).slice(0,5).map(x=>fcaPartialRowV96(x,'down')).join('');
+    return '<div class=fcaPartialV96>'+
+      '<div class=fcaPartialHeadV96><div><h3>Parcial • Semana '+d.currentWeekNumber+'</h3><p>Prévia da semana em andamento com dados disponíveis até '+fcaDateV61(p.end)+'. Comparação simulada contra a Semana '+d.weekNumber+' fechada para antecipar o cenário da Regional.</p></div><span class=fcaPartialTagV96>Atualizado até '+fcaDateV61(p.end)+'</span></div>'+
+      '<div class=fcaPartialKpisV96>'+
+        '<div class=fcaPartialKpiV96><span>Share parcial</span><b>'+pct(r.share)+'</b><small class="'+(delta>0?'up':delta<0?'down':'')+'">'+fcaPpV61(delta)+' vs Semana '+d.weekNumber+'</small></div>'+
+        '<div class=fcaPartialKpiV96><span>Venda captada</span><b>'+money(r.captured)+'</b><small class="'+(gap<0?'down':'up')+'">Desvio vs meta parcial: '+(gapPct===null?'—':((gapPct>0?'+':'')+(gapPct*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%'))+' • '+money(gap)+'</small></div>'+
+        '<div class=fcaPartialKpiV96><span>Pedidos</span><b>'+num(r.orders)+'</b><small class="'+(Number(ordersChange||0)>0?'up':Number(ordersChange||0)<0?'down':'')+'">'+(ordersChange===null?'Sem base comparável':((ordersChange>0?'▲ +':ordersChange<0?'▼ ':'— ')+(ordersChange*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%'))+' vs Semana '+d.weekNumber+'</small></div>'+
+        '<div class=fcaPartialKpiV96><span>Ticket médio</span><b>'+money(r.ticket)+'</b><small class="'+(Number(ticketChange||0)>0?'up':Number(ticketChange||0)<0?'down':'')+'">'+(ticketChange===null?'Sem base comparável':((ticketChange>0?'▲ +':ticketChange<0?'▼ ':'— ')+(ticketChange*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%'))+' vs Semana '+d.weekNumber+'</small></div>'+
+      '</div>'+
+      '<div class=fcaPartialTablesV96>'+
+        '<div class=fcaPartialTableV96><header><b>↗ Maiores recuperações</b><small>Share • Δ p.p. • Pedidos • Ticket</small></header>'+(grow||'<div class=muted style="padding:14px">Sem recuperação identificada.</div>')+'</div>'+
+        '<div class=fcaPartialTableV96><header><b>↘ Maiores retrações</b><small>Share • Δ p.p. • Pedidos • Ticket</small></header>'+(ret||'<div class=muted style="padding:14px">Sem retração identificada.</div>')+'</div>'+
+      '</div>'+
+      '<div class=fcaPartialActionsV96><button class=btn onclick="shareFcaPartialV96()">↗ Compartilhar panorama parcial</button></div>'+
+    '</div>'
+  };
+
+  function fcaCanvasTextV96(c,text,x,y,size,weight,color,align){
+    c.fillStyle=color;c.font=(weight||'400')+' '+size+'px Arial, sans-serif';c.textAlign=align||'left';c.fillText(String(text),x,y);c.textAlign='left'
+  }
+  function fcaCanvasRoundV96(c,x,y,w,h,r,fill,stroke){
+    c.beginPath();if(c.roundRect)c.roundRect(x,y,w,h,r);else c.rect(x,y,w,h);
+    c.fillStyle=fill;c.fill();if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke()}
+  }
+  function fcaCanvasFitV96(c,text,max,start,min,weight){
+    let s=start;while(s>min){c.font=(weight||'700')+' '+s+'px Arial, sans-serif';if(c.measureText(String(text)).width<=max)break;s--}return s
+  }
+  function fcaCanvasStoreRowV96(c,x,y,w,row,deltaColor,G,G2,LINE){
+    fcaCanvasTextV96(c,row.st+' • '+storeDisplayName(row.st),x+18,y+28,fcaCanvasFitV96(c,row.st+' • '+storeDisplayName(row.st),260,16,11,'700'),'700',G);
+    fcaCanvasTextV96(c,money(row.captured),x+365,y+28,13,'700',G,'right');
+    fcaCanvasTextV96(c,pct(row.share),x+445,y+28,13,'700',G,'right');
+    fcaCanvasTextV96(c,num(row.orders),x+510,y+28,13,'700',G,'right');
+    fcaCanvasTextV96(c,money(row.ticket),x+w-18,y+28,13,'700',G,'right');
+    fcaCanvasTextV96(c,fcaPpV61(row.share_delta),x+18,y+51,12,'700',deltaColor);
+    c.strokeStyle=LINE;c.lineWidth=1;c.beginPath();c.moveTo(x+15,y+64);c.lineTo(x+w-15,y+64);c.stroke();
+  }
+
+  window.fcaPartialShareCanvasV96=async function(){
+    let d=FCA_DATA_V60,p=d?.currentPartial;if(!d||!p)throw new Error('Parcial semanal ainda não disponível.');
+    const W=1080,H=1320,S=2,cv=document.createElement('canvas');cv.width=W*S;cv.height=H*S;
+    const c=cv.getContext('2d');c.scale(S,S);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
+    const G='#173F35',G2='#466964',BG='#F6F4EE',WHITE='#FFFFFF',GOLD='#C99A2E',GREEN='#157349',RED='#C43B32',MINT='#EAF2EE',LINE='#E5E1D8';
+    c.fillStyle=BG;c.fillRect(0,0,W,H);
+
+    // Cabeçalho sem bloco de mensagem/mobilização dentro da arte.
+    fcaCanvasRoundV96(c,0,0,W,190,0,G);
+    let logo=TEAM_LOGO_H_IMG;
+    try{if(!(logo.complete&&logo.naturalWidth))await logo.decode()}catch(e){}
+    if(logo.complete&&logo.naturalWidth){let rw=logo.naturalWidth/logo.naturalHeight,lh=48,lw=lh*rw;c.drawImage(logo,52,38,lw,lh)}
+    fcaCanvasTextV96(c,'PANORAMA REGIONAL eStore • CE+PI',52,119,31,'700',WHITE);
+    fcaCanvasTextV96(c,'Parcial • Semana '+d.currentWeekNumber+'  |  atualizado até '+fcaDateV61(p.end),52,158,19,'700','#E9D39A');
+    fcaCanvasTextV96(c,'Comparação com a Semana '+d.weekNumber+' fechada',1024,158,15,'400','#DFE8E3','right');
+
+    const r=p.regional||{},delta=Number(p.share_delta||0),meta=Number(r.meta||0),captured=Number(r.captured||0),gap=Number(r.financial_gap||0);
+    const gapPct=meta>0?captured/meta-1:null,ordersChange=fcaPartialPctChangeV96(r.orders,d.summary?.orders),ticketChange=fcaPartialPctChangeV96(r.ticket,d.summary?.ticket);
+    const cards=[
+      ['SHARE PARCIAL',pct(r.share),fcaPpV61(delta)+' vs Sem. '+d.weekNumber,delta>=0?GREEN:RED],
+      ['VENDA CAPTADA',money(r.captured),'Desvio vs meta: '+(gapPct===null?'—':((gapPct>0?'+':'')+(gapPct*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%')),gap>=0?GREEN:RED],
+      ['PEDIDOS',num(r.orders),(ordersChange===null?'Sem base':((ordersChange>0?'+':'')+(ordersChange*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%'))+' vs Sem. '+d.weekNumber,Number(ordersChange||0)>=0?GREEN:RED],
+      ['TICKET MÉDIO',money(r.ticket),(ticketChange===null?'Sem base':((ticketChange>0?'+':'')+(ticketChange*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%'))+' vs Sem. '+d.weekNumber,Number(ticketChange||0)>=0?GREEN:RED]
+    ];
+    const cw=242,ch=142,cy=215;
+    cards.forEach((a,i)=>{const x=35+i*(cw+18);fcaCanvasRoundV96(c,x,cy,cw,ch,20,WHITE,LINE);fcaCanvasTextV96(c,a[0],x+18,cy+30,13,'700',G2);fcaCanvasTextV96(c,a[1],x+18,cy+78,fcaCanvasFitV96(c,a[1],cw-36,29,20,'700'),'700',G);fcaCanvasTextV96(c,a[2],x+18,cy+113,12,'700',a[3])});
+    fcaCanvasTextV96(c,'Meta parcial acumulada: '+money(r.meta)+' • Desvio financeiro: '+money(gap),53,383,13,'700',gap>=0?GREEN:RED);
+
+    function drawSection(title,arr,mode,y0){
+      const col=mode==='up'?GREEN:RED;
+      fcaCanvasRoundV96(c,35,y0,1010,388,20,WHITE,LINE);
+      fcaCanvasRoundV96(c,35,y0,1010,58,20,G);
+      c.fillStyle=G;c.fillRect(35,y0+30,1010,28);
+      fcaCanvasTextV96(c,title,58,y0+38,22,'700',WHITE);
+      fcaCanvasTextV96(c,'CAPTADO',565,y0+38,11,'700','#E4ECE7','right');
+      fcaCanvasTextV96(c,'SHARE',650,y0+38,11,'700','#E4ECE7','right');
+      fcaCanvasTextV96(c,'PED.',720,y0+38,11,'700','#E4ECE7','right');
+      fcaCanvasTextV96(c,'TICKET',1020,y0+38,11,'700','#E4ECE7','right');
+      (arr||[]).slice(0,5).forEach((row,i)=>fcaCanvasStoreRowV96(c,50,y0+66+i*62,980,row,col,G,G2,LINE));
+    }
+    drawSection('↗ Maiores recuperações de Share',p.growth||[],'up',410);
+    drawSection('↘ Maiores retrações de Share',p.retractions||[],'down',816);
+
+    fcaCanvasTextV96(c,'Prévia gerencial • dados acumulados até '+fcaDateV61(p.end),50,1265,13,'400',G2);
+    fcaCanvasTextV96(c,'App. eStore CE+PI',1030,1265,14,'700',G,'right');
+    return cv
+  };
+
+  window.fcaPartialCaptionV96=function(){
+    let d=FCA_DATA_V60,p=d?.currentPartial||{},r=p.regional||{};
+    let delta=Number(p.share_delta||0),meta=Number(r.meta||0),captured=Number(r.captured||0),gapPct=meta>0?captured/meta-1:null;
+    let ordersChange=fcaPartialPctChangeV96(r.orders,d.summary?.orders),ticketChange=fcaPartialPctChangeV96(r.ticket,d.summary?.ticket);
+    let recovery=(p.growth||[]).slice(0,3).map(x=>x.st).join(', '),attention=(p.retractions||[]).slice(0,3).map(x=>x.st).join(', ');
+    let scenario=delta>=0?'A parcial mostra evolução do Share regional frente à semana anterior fechada.':'A parcial sinaliza retração do Share regional frente à semana anterior fechada.';
+    let metaTxt=gapPct===null?'':' No captado, estamos '+(gapPct>=0?'acima':'abaixo')+' da meta parcial em '+Math.abs(gapPct*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%.';
+    return '📊 *PANORAMA REGIONAL eStore | PARCIAL • SEMANA '+d.currentWeekNumber+'*\n'+
+      'Atualizado até '+fcaDateV61(p.end)+' | Comparativo vs Semana '+d.weekNumber+' fechada\n\n'+
+      '• *Share:* '+pct(r.share)+' ('+fcaPpV61(delta)+')\n'+
+      '• *Venda captada:* '+money(r.captured)+' | desvio vs meta: '+(gapPct===null?'—':((gapPct>0?'+':'')+(gapPct*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%'))+'\n'+
+      '• *Pedidos:* '+num(r.orders)+(ordersChange===null?'':' ('+(ordersChange>0?'+':'')+(ordersChange*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%)')+'\n'+
+      '• *Ticket médio:* '+money(r.ticket)+(ticketChange===null?'':' ('+(ticketChange>0?'+':'')+(ticketChange*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%)')+'\n\n'+
+      '*Leitura:* '+scenario+metaTxt+' O momento pede atuação rápida nas oportunidades sem perder o ritmo das lojas que já estão reagindo.\n\n'+
+      (recovery?'✅ *Recuperações em destaque:* '+recovery+'.\n':'')+
+      (attention?'⚠️ *Maior atenção:* '+attention+'.\n':'')+
+      '\n🎯 *Direcionamento:* acelerar abordagem, distribuição e acompanhamento de meta, conversão e atuação nas dispersões. Precisamos proteger a evolução da regional e evitar que a CE+PI entre em priorização.\n\n'+
+      '*Vamos transformar a prévia em ação e acelerar a entrega da semana.* 🚀'
+  };
+
+  window.shareFcaPartialV96=async function(){
+    try{
+      const cv=await fcaPartialShareCanvasV96();
+      cv.toBlob(async blob=>{
+        if(!blob)return;
+        const d=FCA_DATA_V60,p=d.currentPartial||{},name='Panorama_Regional_eStore_CEPI_Semana_'+d.currentWeekNumber+'_Parcial.png';
+        const file=new File([blob],name,{type:'image/png'}),caption=fcaPartialCaptionV96();
+        try{
+          if(navigator.canShare&&navigator.canShare({files:[file]})){
+            await navigator.share({title:'Panorama Regional eStore • CE+PI',text:caption,files:[file]});return
+          }
+        }catch(e){if(e?.name==='AbortError')return}
+        try{await navigator.clipboard.writeText(caption)}catch(e){}
+        const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
+        setTimeout(()=>URL.revokeObjectURL(a.href),1800);
+      },'image/png',.95)
+    }catch(e){alert(e.message||'Não foi possível gerar o panorama parcial.')}
+  };
 })();
 </script>
 </body>
