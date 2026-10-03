@@ -1,17 +1,17 @@
-const CACHE='estore-cepi-shell-v102';
-const BUILD='v102';
-const PRESENTATION_SCRIPT='./presentation-v102.js?build=v102';
-const SHELL=['./presentation-v102.js','./assets/campaign-popup-v86.svg','./assets/campaign-hero-v84.svg','./assets/riachuelo-logo-exact-v75.svg','./assets/campaign-share-v76.svg','./assets/campaign-share-v75.jpg','./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon.svg','./riachuelo-horizontal-oficial.png'];
+const CACHE='estore-cepi-shell-v103';
+const BUILD='v103';
+const PRESENTATION_SCRIPT='./presentation-v103.js?build=v103';
+const SHELL=['./presentation-v103.js','./assets/campaign-popup-v86.svg','./assets/campaign-hero-v84.svg','./assets/riachuelo-logo-exact-v75.svg','./assets/campaign-share-v76.svg','./assets/campaign-share-v75.jpg','./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon.svg','./riachuelo-horizontal-oficial.png'];
 
-function injectPresentationV102(html){
+function injectPresentationV103(html){
   if(!html) return html;
-  html=html.replace(/\n?<script[^>]+src=["']\.\/presentation-v10[12]\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n');
+  html=html.replace(/\n?<script[^>]+src=["']\.\/presentation-v10[123]\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n');
   const tag='\n<script src="'+PRESENTATION_SCRIPT+'"></script>\n';
   return html.replace(/<\/body>\s*<\/html>\s*$/i, tag+'</body></html>');
 }
 async function htmlResponseWithInjection(res){
   const text=await res.text();
-  return new Response(injectPresentationV102(text),{status:res.status,statusText:res.statusText,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}});
+  return new Response(injectPresentationV103(text),{status:res.status,statusText:res.statusText,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}});
 }
 
 self.addEventListener('install',event=>{
