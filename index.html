@@ -883,7 +883,7 @@ function simSales(){return +(localStorage.getItem(simKey())||0)}
 function setSimSales(v){localStorage.setItem(simKey(),String(Math.max(0,v)));loadMetaAssignments()}
 function addSimSale(){let v=prompt('Valor da venda captada agora (R$):');if(v===null)return;v=Number(String(v).replace(',','.'));if(!Number.isFinite(v)||v<=0)return alert('Informe um valor válido.');setSimSales(simSales()+v)}
 function resetSimSales(){if(confirm('Zerar somente o contador manual de hoje?'))setSimSales(0)}
-async function loadMetaAssignments(){try{let d=new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'}),j=await api({action:'meta_assign_get',matricula:U.u.id,st:U.u.st,date:d}),mine=(j.assignments||[]).find(a=>String(a.matricula)===String(U.u.id)),sp=COMMON?.stores?.[U.u.st]?.p?.[PER]||{},dayStore=COMMON?.stores?.[U.u.st]?.p?.day||{},storeTarget=+(j.targets?.[PER]??sp.ef)||0,dayEstoreTarget=+(j.targets?.day??dayStore.ef)||0,ticketYTD={'113':162,'314':133,'108':226,'552':133,'073':145,'222':177,'177':208,'258':145,'350':165,'175':200,'146':147,'084':256,'138':254,'238':233,'318':237,'142':165,'344':230,'262':257},avgTicket=+(ticketYTD[String(U.u.st)]||188),orderTarget=Math.max(1,Math.ceil(storeTarget/avgTicket)),day=U?.p?.day||{c:0,a:0,o:0},x=U?.p?.[PER]||{c:0,a:0,o:0},rate=edayToday()?.10:.03,commit=mine?+mine.target:0,manual=simSales(),live=Math.max(+day.c||0,manual),approvedRatio=(+day.c||0)>0?Math.min(1,(+day.a||0)/(+day.c||1)):1,simApproved=live*approvedRatio,simComm=simApproved*rate,remaining=Math.max(0,commit-live),att=commit?live/commit:0,pace=commit?(att>=1?'Desafio entregue! Excelente ritmo.':att>=.7?'Você está muito perto. Continue acelerando!':att>=.4?'Bom ritmo. Vamos buscar o próximo pedido!':'Seu desafio começou. Cada venda conta!'):'Defina seu desafio para acompanhar seu ritmo.';let period='<div class=grid><div class=kpi>Meta eStore • '+metaPeriodLabel()+'<b>'+money(storeTarget)+'</b><small>1% da meta de venda da filial no período</small></div><div class=kpi>Meta de pedidos • '+metaPeriodLabel()+'<b>'+orderTarget+' pedido'+(orderTarget===1?'':'s')+'</b><small>Ticket médio anual: '+money(avgTicket)+'</small></div></div>';let personal=mine?'<div class=commitHero>Seu compromisso de hoje é:<b>'+money(commit)+'</b><span class=muted>Definido para sua matrícula.</span></div>':'<div class=notice><b>Sua meta eStore ainda não foi distribuída.</b><br>Solicite ao seu gestor imediato a definição do seu compromisso de hoje.</div>';let challenge=isDemo()?'<div class=notice style="margin-top:10px"><b>Modo visitante</b><br>O desafio individual e a distribuição de metas ficam disponíveis somente para usuários autenticados.</div>':'<button class="btn alt" style="margin-top:10px" onclick="assignMeta(\''+U.u.id+'\',true)">'+(mine?'Quero definir um novo desafio':'Definir meu próprio desafio')+'</button>';let simulator=(commit||manual)?'<div class=simBox><div class=title>Meu ritmo de hoje • simulação</div><div class=grid><div class=kpi>Contador de vendas<b>'+money(live)+'</b></div><div class=kpi>Falta para o desafio<b>'+money(remaining)+'</b></div><div class=kpi>Atingimento<b>'+pct(att)+'</b></div><div class=kpi>Comissão simulada agora<b>'+money(simComm)+'</b><small>'+(edayToday()?'eDay • 10%':'Dia normal • 3%')+'</small></div></div><div class=paceCard><b>'+pace+'</b><div class=paceBar><i style="width:'+Math.min(100,att*100)+'%"></i></div><div class=muted>'+(commit?'Ritmo: '+money(live)+' de '+money(commit):'Defina seu desafio para medir o ritmo.')+'</div></div><div class=toolbar style="margin-top:12px"><button class=btn onclick="addSimSale()">+ Registrar venda</button><button class="btn ghost" onclick="resetSimSales()">Zerar contador</button></div><div class=muted style="margin-top:10px">Simulação: o contador manual não altera a venda oficial. O resultado oficial continua sendo atualizado pelo Hora a Hora/importações. A comissão definitiva considera venda aprovada.</div></div>':'';let incentive=commit?'<div class="notice success"><b>Entregando seu desafio, sua comissão estimada será de '+money(commit*rate)+'</b><br>'+(edayToday()?'Hoje é eDay: simulação a 10%.':'Simulação de dia normal a 3%.')+'</div>':'';$('#metaBox').innerHTML=period+personal+incentive+challenge+simulator;if(isLead()){let a=j.assignments||[],t=teamList(),set=new Set(a.map(x=>String(x.matricula))),hc=j.hc?+j.hc.hc_available:0,suggest=hc?dayEstoreTarget/hc:0,dayTarget=dayEstoreTarget;if(isDemo()){$('#metaManage').innerHTML='<div class=notice><b>Visão do Supervisor • somente leitura</b><br>Aqui o supervisor informa o HC disponível, rateia a meta da loja e acompanha a distribuição individual.</div><div class=grid><div class=kpi>Meta operação hoje<b>'+money(dayTarget)+'</b></div><div class=kpi>Meta pedidos hoje<b>'+orderTarget+'</b></div><div class=kpi>HC registrado<b>'+(hc||'—')+'</b></div><div class=kpi>Sugestão por pessoa<b>'+(hc?money(suggest):'HC ainda não informado')+'</b></div></div><div class=notice>Os campos de edição e salvamento ficam bloqueados no modo visitante.</div>';return}$('#metaManage').innerHTML='<div class=notice><b>HC disponível hoje</b><br>Informe a quantidade real de colaboradores disponíveis na operação antes de ratear a meta.</div><div style="display:flex;gap:8px;align-items:center"><input id=hcToday class=field style="margin:10px 0;flex:1" type=number min=0 inputmode=numeric value="'+(hc||'')+'" placeholder="HC real do dia"><button class=btn onclick="saveHC()">Salvar HC</button></div><div class=grid><div class=kpi>Meta operação hoje<b>'+money(dayTarget)+'</b></div><div class=kpi>Meta pedidos hoje<b>'+orderTarget+'</b><small>Meta financeira ÷ ticket médio da filial</small></div><div class=kpi>HC real hoje<b>'+(hc||'—')+'</b></div><div class=kpi>Sugestão por pessoa<b>'+(hc?money(suggest):'Informe o HC')+'</b></div></div><button class="btn alt" style="margin:12px 0" onclick="rateMeta('+dayTarget+','+hc+')">Ratear igualmente</button><button class="btn" style="margin:12px 0 12px 8px" onclick="shareMetaCard('+dayTarget+','+hc+','+orderTarget+')">📤 Compartilhar meta</button><div class=notice><b>'+a.length+' metas distribuídas hoje</b>'+(hc?' • referência HC '+hc:' • HC ainda não informado')+'</div>'+t.map(u=>'<div class=teamrow>'+photo(u.id,preferredName(u.id,u.name))+'<div><b>'+esc(preferredName(u.id,u.name))+'</b><div class=muted>'+esc(u.id)+(set.has(String(u.id))?' • meta ativa':' • pendente')+'</div></div><button class=btn onclick="assignMeta(\''+u.id+'\')">Meta</button></div>').join('')}}catch(e){$('#metaBox').innerHTML='<div class="notice danger">'+esc(e.message)+'</div>'}}
+async function loadMetaAssignments(){try{let d=new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'}),j=await api({action:'meta_assign_get',matricula:U.u.id,st:U.u.st,date:d}),mine=(j.assignments||[]).find(a=>String(a.matricula)===String(U.u.id)),sp=COMMON?.stores?.[U.u.st]?.p?.[PER]||{},dayStore=COMMON?.stores?.[U.u.st]?.p?.day||{},storeTarget=+(j.targets?.[PER]??sp.ef)||0,dayEstoreTarget=+(j.targets?.day??dayStore.ef)||0,ticketYTD=HISTORICAL_TICKETS_V97,avgTicket=+(ticketYTD[String(U.u.st)]||188),orderTarget=Math.max(1,Math.ceil(storeTarget/avgTicket)),day=U?.p?.day||{c:0,a:0,o:0},x=U?.p?.[PER]||{c:0,a:0,o:0},rate=edayToday()?.10:.03,commit=mine?+mine.target:0,manual=simSales(),live=Math.max(+day.c||0,manual),approvedRatio=(+day.c||0)>0?Math.min(1,(+day.a||0)/(+day.c||1)):1,simApproved=live*approvedRatio,simComm=simApproved*rate,remaining=Math.max(0,commit-live),att=commit?live/commit:0,pace=commit?(att>=1?'Desafio entregue! Excelente ritmo.':att>=.7?'Você está muito perto. Continue acelerando!':att>=.4?'Bom ritmo. Vamos buscar o próximo pedido!':'Seu desafio começou. Cada venda conta!'):'Defina seu desafio para acompanhar seu ritmo.';let period='<div class=grid><div class=kpi>Meta eStore • '+metaPeriodLabel()+'<b>'+money(storeTarget)+'</b><small>1% da meta de venda da filial no período</small></div><div class=kpi>Meta de pedidos • '+metaPeriodLabel()+'<b>'+orderTarget+' pedido'+(orderTarget===1?'':'s')+'</b><small>Ticket médio anual: '+money(avgTicket)+'</small></div></div>';let personal=mine?'<div class=commitHero>Seu compromisso de hoje é:<b>'+money(commit)+'</b><span class=muted>Definido para sua matrícula.</span></div>':'<div class=notice><b>Sua meta eStore ainda não foi distribuída.</b><br>Solicite ao seu gestor imediato a definição do seu compromisso de hoje.</div>';let challenge=isDemo()?'<div class=notice style="margin-top:10px"><b>Modo visitante</b><br>O desafio individual e a distribuição de metas ficam disponíveis somente para usuários autenticados.</div>':'<button class="btn alt" style="margin-top:10px" onclick="assignMeta(\''+U.u.id+'\',true)">'+(mine?'Quero definir um novo desafio':'Definir meu próprio desafio')+'</button>';let simulator=(commit||manual)?'<div class=simBox><div class=title>Meu ritmo de hoje • simulação</div><div class=grid><div class=kpi>Contador de vendas<b>'+money(live)+'</b></div><div class=kpi>Falta para o desafio<b>'+money(remaining)+'</b></div><div class=kpi>Atingimento<b>'+pct(att)+'</b></div><div class=kpi>Comissão simulada agora<b>'+money(simComm)+'</b><small>'+(edayToday()?'eDay • 10%':'Dia normal • 3%')+'</small></div></div><div class=paceCard><b>'+pace+'</b><div class=paceBar><i style="width:'+Math.min(100,att*100)+'%"></i></div><div class=muted>'+(commit?'Ritmo: '+money(live)+' de '+money(commit):'Defina seu desafio para medir o ritmo.')+'</div></div><div class=toolbar style="margin-top:12px"><button class=btn onclick="addSimSale()">+ Registrar venda</button><button class="btn ghost" onclick="resetSimSales()">Zerar contador</button></div><div class=muted style="margin-top:10px">Simulação: o contador manual não altera a venda oficial. O resultado oficial continua sendo atualizado pelo Hora a Hora/importações. A comissão definitiva considera venda aprovada.</div></div>':'';let incentive=commit?'<div class="notice success"><b>Entregando seu desafio, sua comissão estimada será de '+money(commit*rate)+'</b><br>'+(edayToday()?'Hoje é eDay: simulação a 10%.':'Simulação de dia normal a 3%.')+'</div>':'';$('#metaBox').innerHTML=period+personal+incentive+challenge+simulator;if(isLead()){let a=j.assignments||[],t=teamList(),set=new Set(a.map(x=>String(x.matricula))),hc=j.hc?+j.hc.hc_available:0,suggest=hc?dayEstoreTarget/hc:0,dayTarget=dayEstoreTarget;if(isDemo()){$('#metaManage').innerHTML='<div class=notice><b>Visão do Supervisor • somente leitura</b><br>Aqui o supervisor informa o HC disponível, rateia a meta da loja e acompanha a distribuição individual.</div><div class=grid><div class=kpi>Meta operação hoje<b>'+money(dayTarget)+'</b></div><div class=kpi>Meta pedidos hoje<b>'+orderTarget+'</b></div><div class=kpi>HC registrado<b>'+(hc||'—')+'</b></div><div class=kpi>Sugestão por pessoa<b>'+(hc?money(suggest):'HC ainda não informado')+'</b></div></div><div class=notice>Os campos de edição e salvamento ficam bloqueados no modo visitante.</div>';return}$('#metaManage').innerHTML='<div class=notice><b>HC disponível hoje</b><br>Informe a quantidade real de colaboradores disponíveis na operação antes de ratear a meta.</div><div style="display:flex;gap:8px;align-items:center"><input id=hcToday class=field style="margin:10px 0;flex:1" type=number min=0 inputmode=numeric value="'+(hc||'')+'" placeholder="HC real do dia"><button class=btn onclick="saveHC()">Salvar HC</button></div><div class=grid><div class=kpi>Meta operação hoje<b>'+money(dayTarget)+'</b></div><div class=kpi>Meta pedidos hoje<b>'+orderTarget+'</b><small>Meta financeira ÷ ticket médio da filial</small></div><div class=kpi>HC real hoje<b>'+(hc||'—')+'</b></div><div class=kpi>Sugestão por pessoa<b>'+(hc?money(suggest):'Informe o HC')+'</b></div></div><button class="btn alt" style="margin:12px 0" onclick="rateMeta('+dayTarget+','+hc+')">Ratear igualmente</button><button class="btn" style="margin:12px 0 12px 8px" onclick="shareMetaCard('+dayTarget+','+hc+','+orderTarget+')">📤 Compartilhar meta</button><div class=notice><b>'+a.length+' metas distribuídas hoje</b>'+(hc?' • referência HC '+hc:' • HC ainda não informado')+'</div>'+t.map(u=>'<div class=teamrow>'+photo(u.id,preferredName(u.id,u.name))+'<div><b>'+esc(preferredName(u.id,u.name))+'</b><div class=muted>'+esc(u.id)+(set.has(String(u.id))?' • meta ativa':' • pendente')+'</div></div><button class=btn onclick="assignMeta(\''+u.id+'\')">Meta</button></div>').join('')}}catch(e){$('#metaBox').innerHTML='<div class="notice danger">'+esc(e.message)+'</div>'}}
 async function shareMetaCard(dayTarget,hc,orderTarget){
  if(!dayTarget)return alert('Meta da operação não localizada.');
  if(!hc)return alert('Informe e salve o HC disponível antes de compartilhar a meta.');
@@ -1393,7 +1393,7 @@ async function loadHourly(){
  let d=new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'});
  try{
   let j=await api({action:'hourly_get',matricula:U.u.id,result_date:d}),
-      ticketYTD={'113':162,'314':133,'108':226,'552':133,'073':145,'222':177,'177':208,'258':145,'350':165,'175':200,'146':147,'084':256,'138':254,'238':233,'318':237,'142':165,'344':230,'262':257},
+      ticketYTD=HISTORICAL_TICKETS_V97,
       rows=(j.stores||[]).map(x=>{
         let hasMeta=(+x.metaValue||0)>0;
         return {...x,hasMeta,orderTarget:hasMeta?Math.max(1,Math.ceil((+x.metaValue||0)/+(ticketYTD[String(x.st)]||188))):0}
@@ -1459,7 +1459,7 @@ async function hourSubmit(){let captured=Number(String($('#hval').value).replace
 async function shareHourly(){
  let d=new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'}),
      j=await api({action:'hourly_get',matricula:U.u.id,result_date:d}),
-     ticketYTD={'113':162,'314':133,'108':226,'552':133,'073':145,'222':177,'177':208,'258':145,'350':165,'175':200,'146':147,'084':256,'138':254,'238':233,'318':237,'142':165,'344':230,'262':257},
+     ticketYTD=HISTORICAL_TICKETS_V97,
      rows=(j.stores||[]).map(r=>{let hasMeta=(+r.metaValue||0)>0;return {...r,hasMeta,orderTarget:hasMeta?Math.max(1,Math.ceil((+r.metaValue||0)/+(ticketYTD[String(r.st)]||188))):0}}),
      eligible=rows.filter(r=>r.hasMeta),
      expected=eligible.length,
@@ -1868,7 +1868,7 @@ function storeDisplayName(st){let code=String(st||U?.u?.st||'').padStart(3,'0'),
 function profile(){let dn=displayName();if(isDemo())return '<div class=card><div class=profileHead>'+photo(U.u.id,dn,'photoBig')+'<div><div class=title>'+esc(dn)+'</div><div class=muted>Modo Demonstração • Filial '+esc(U.u.st)+'</div></div></div><div class=notice>Este perfil permite conhecer todas as áreas do App sem alterar dados, configurações ou registros.</div></div>';return '<div class=card><div class=profileHead>'+photo(U.u.id,dn,'photoBig')+'<div><div class=title>'+esc(dn)+'</div><div class=muted>Matrícula '+esc(U.u.id)+' • Filial '+esc(U.u.st)+'<br>'+esc(U.u.role)+'</div></div></div><div class=card style="box-shadow:none;background:#f7f6f2"><div class=title>Personalizar meu perfil</div><div class=muted>Escolha como seu nome aparecerá na tela inicial e adicione sua foto.</div><input id=prefName class=field maxlength=40 value="'+esc(dn)+'" placeholder="Nome de preferência"><input id=profilePhoto type=file accept="image/*" class=field><button class=btn onclick="saveMyProfile()">Salvar perfil</button><div id=profileSaveStatus></div></div><div class=notice>Moda que inspira o Brasil.<br><br>Vontade de crescer • Ninguém faz nada sozinho • O simples é incrível • Talento é conquista</div></div>'}
 async function saveMyProfile(){let name=$('#prefName').value.trim(),file=$('#profilePhoto').files[0],st=$('#profileSaveStatus');if(!name)return alert('Informe o nome de preferência.');st.innerHTML='<div class=notice>Salvando perfil...</div>';try{await api({action:'profile_preferences_set',matricula:U.u.id,preferred_name:name});CONTENT.preferredNames=CONTENT.preferredNames||{};CONTENT.preferredNames[String(U.u.id)]=name;if(file){let dataUrl=await resizeProfilePhoto(file);let j=await api({action:'profile_photo_set',matricula:U.u.id,dataUrl});CONTENT.profilePhotos[String(U.u.id)]=j.photo_url}st.innerHTML='<div class="notice success">Perfil atualizado com sucesso.</div>';setTimeout(()=>go('profile'),500)}catch(e){st.innerHTML='<div class="notice danger">'+esc(e.message)+'</div>'}}
 function resizeProfilePhoto(file){return new Promise((resolve,reject)=>{let r=new FileReader();r.onerror=reject;r.onload=()=>{let im=new Image();im.onerror=reject;im.onload=()=>{let size=Math.min(im.width,im.height),sx=(im.width-size)/2,sy=(im.height-size)/2,c=document.createElement('canvas');c.width=c.height=640;c.getContext('2d').drawImage(im,sx,sy,size,size,0,0,640,640);resolve(c.toDataURL('image/jpeg',.82))};im.src=r.result};r.readAsDataURL(file)})}
-function admin(){if(!isAdmin())return '<div class=notice>Acesso administrativo não autorizado.</div>';if(isDemo())return '<div class="card readOnlyAdmin"><div class=title>Central Administrativa • Demonstração</div><div class=muted>Você pode conhecer a estrutura administrativa, mas alterações ficam bloqueadas no modo visitante.</div><div class=adminGrid style="margin-top:14px"><button class=btn>Atualizar Resultados</button><button class=btn>Comparativo Semanal</button><button class=btn>Atualizar Metas</button><button class=btn>Banco de Dados</button><button class=btn>Informações Importantes</button><button class=btn>Cupons e Campanhas</button><button class=btn>eDay</button><button class=btn>Notificações</button><button class=btn>Imagens do App</button><button class=btn>Hora a Hora</button><button class=btn>Chat / Suporte</button><button class=btn>Ritual eStore</button></div><div class=notice style="margin-top:14px">🔒 Somente leitura. Nenhum dado pode ser incluído, alterado ou excluído.</div></div>';return '<div class=card><div class=title>Central Administrativa</div><div class=muted>Atualização de dados, configurações e gestão do App.</div><div class=adminGrid style="margin-top:14px"><button class=btn onclick="adminResults()">Atualizar Resultados</button><button class=btn onclick="adminWeeklyComparisonV70()">Comparativo Semanal</button><button class=btn onclick="adminTargets()">Atualizar Metas</button><button class=btn onclick="adminDatabase()">Banco de Dados</button><button class=btn onclick="adminInfo()">Informações Importantes</button><button class=btn onclick="adminCampaign()">Cupons e Campanhas</button><button class=btn onclick="adminEday()">eDay</button><button class=btn onclick="adminNotify()">Notificações</button><button class=btn onclick="adminMedia()">Imagens do App</button><button class=btn onclick="go(&quot;hourly&quot;)">Hora a Hora</button><button class=btn onclick="go(&quot;support&quot;)">Chat / Suporte</button><button class=btn onclick="adminRitualV52()">Ritual eStore</button><button class=btn onclick="go(&quot;fca&quot;)">FCA e Performance</button></div></div><div id=adminWork></div><div class=card><div class=title>Auditoria recente</div><div id=audit class=muted>Carregando...</div></div>'}
+function admin(){if(!isAdmin())return '<div class=notice>Acesso administrativo não autorizado.</div>';if(isDemo())return '<div class="card readOnlyAdmin"><div class=title>Central Administrativa • Demonstração</div><div class=muted>Você pode conhecer a estrutura administrativa, mas alterações ficam bloqueadas no modo visitante.</div><div class=adminGrid style="margin-top:14px"><button class=btn>Atualizar Resultados</button><button class=btn>Comparativo Semanal</button><button class=btn>Atualizar Metas</button><button class=btn>Ticket Médio Histórico</button><button class=btn>Banco de Dados</button><button class=btn>Informações Importantes</button><button class=btn>Cupons e Campanhas</button><button class=btn>eDay</button><button class=btn>Notificações</button><button class=btn>Mídias do App</button><button class=btn>Hora a Hora</button><button class=btn>Chat / Suporte</button><button class=btn>Ritual eStore</button></div><div class=notice style="margin-top:14px">🔒 Somente leitura. Nenhum dado pode ser incluído, alterado ou excluído.</div></div>';return '<div class=card><div class=title>Central Administrativa</div><div class=muted>Atualização de dados, configurações e gestão do App.</div><div class=adminGrid style="margin-top:14px"><button class=btn onclick="adminResults()">Atualizar Resultados</button><button class=btn onclick="adminWeeklyComparisonV70()">Comparativo Semanal</button><button class=btn onclick="adminTargets()">Atualizar Metas</button><button class=btn onclick="adminHistoricalTicketsV97()">Ticket Médio Histórico</button><button class=btn onclick="adminDatabase()">Banco de Dados</button><button class=btn onclick="adminInfo()">Informações Importantes</button><button class=btn onclick="adminCampaign()">Cupons e Campanhas</button><button class=btn onclick="adminEday()">eDay</button><button class=btn onclick="adminNotify()">Notificações</button><button class=btn onclick="adminMedia()">Mídias do App</button><button class=btn onclick="go(&quot;hourly&quot;)">Hora a Hora</button><button class=btn onclick="go(&quot;support&quot;)">Chat / Suporte</button><button class=btn onclick="adminRitualV52()">Ritual eStore</button><button class=btn onclick="go(&quot;fca&quot;)">FCA e Performance</button></div></div><div id=adminWork></div><div class=card><div class=title>Auditoria recente</div><div id=audit class=muted>Carregando...</div></div>'}
 
 let WEEKLY_COMPARE_V70=null;
 function weeklyDateLabelV70(v){return v?fcaDateV61(v):'—'}
@@ -2497,7 +2497,7 @@ refreshExtras=async function(){
    let c=await api({action:'content_get',matricula:U.u.id,demo:isDemo()});
    CONTENT.popups=c.popups||[];
    CONTENT.campaigns=c.campaigns||CONTENT.campaigns||[];
-   CONTENT.coupons=c.coupons||CONTENT.coupons||[];
+   CONTENT.coupons=c.coupons||CONTENT.coupons||[];setHistoricalTicketsV97(c.historicalTickets||{});
  }catch(e){}
 };
 
@@ -2653,7 +2653,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v96';
+  const BUILD='v97';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2688,8 +2688,8 @@ window.deletePopupV72=async function(id){
   };
   let TAB75='campaigns';
   const LOGO75='./assets/riachuelo-logo-exact-v75.svg';
-  const CARD75='./assets/campaign-hero-v84.svg?build=v96';
-  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v96';
+  const CARD75='./assets/campaign-hero-v84.svg?build=v97';
+  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v97';
   const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
   const active75=x=>{if(!x||x.active===false)return false;const d=today75(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return(!s||d>=s)&&(!e||d<=e)};
@@ -2915,8 +2915,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART83='./assets/campaign-share-v76.svg?build=v96';
-  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v96';
+  const ART83='./assets/campaign-share-v76.svg?build=v97';
+  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v97';
 
   function closeV83(){
     document.getElementById('campaignPopV83')?.remove();
@@ -3066,8 +3066,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART84='./assets/campaign-hero-v84.svg?build=v96';
-  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v96';
+  const ART84='./assets/campaign-hero-v84.svg?build=v97';
+  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v97';
 
   function close84(){
     document.getElementById('campaignPopV84')?.remove();
@@ -3437,7 +3437,7 @@ window.deletePopupV72=async function(id){
     const asset=k=>API+'?asset='+encodeURIComponent(k)+'&v=90';
     try{
       const [logo,samsung,tune720,waveBeam2,waveBuds2,go4,tune520]=await Promise.all([
-        loadCampaignImgV90('./assets/riachuelo-logo-exact-v75.svg?build=v96'),
+        loadCampaignImgV90('./assets/riachuelo-logo-exact-v75.svg?build=v97'),
         loadCampaignImgV90(asset('samsung')),
         loadCampaignImgV90(asset('tune720')),
         loadCampaignImgV90(asset('waveBeam2')),
@@ -4164,5 +4164,260 @@ window.deletePopupV72=async function(id){
   };
 })();
 </script>
+
+<!-- V97-ADMIN-MEDIA-TICKET-HISTORY -->
+<style id="admin-media-ticket-v97">
+.appMediaBadgeV97{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:999px;background:#edf3f0;color:#173F35;font-size:9px;font-weight:900}
+.appMediaVideoV97,.appImgSlotCardV47 video,.appImgLibraryV47 video,.appImgPreviewV47{width:100%;object-fit:cover;background:#102f29}
+.appImgSlotCardV47 video{height:128px}
+.appImgLibraryV47 video{height:92px;border-radius:12px}
+.ticketHeroV97{padding:17px;border-radius:20px;background:linear-gradient(135deg,#173F35,#466964);color:#fff;margin:12px 0}
+.ticketHeroV97 h3{margin:0 0 6px;font-size:18px}.ticketHeroV97 p{margin:0;color:#e4ebe7;font-size:11px;line-height:1.4}
+.ticketGridV97{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:14px 0}
+.ticketItemV97{background:#fff;border:1px solid #e6e4de;border-radius:16px;padding:10px}
+.ticketItemV97 label{display:block;color:#173F35;font-size:11px;font-weight:900;margin-bottom:5px}
+.ticketItemV97 input{width:100%;border:1px solid #d9ddd9;border-radius:10px;padding:9px;font-weight:800;color:#173F35}
+.ticketMetaV97{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.ticketHistoryV97{margin-top:12px;padding-top:10px;border-top:1px solid #e5e4df}
+@media(max-width:620px){.ticketGridV97{grid-template-columns:repeat(2,minmax(0,1fr))}.ticketMetaV97{grid-template-columns:1fr}.appImgSlotCardV47 video{height:108px}}
+</style>
+<script>
+const DEFAULT_HISTORICAL_TICKETS_V97={'073':145,'084':256,'108':226,'109':130,'113':162,'138':254,'142':165,'146':147,'175':200,'177':208,'222':177,'238':233,'258':145,'262':257,'314':133,'318':237,'344':230,'350':165,'552':133};
+let HISTORICAL_TICKETS_V97={...DEFAULT_HISTORICAL_TICKETS_V97};
+let HISTORICAL_TICKET_INFO_V97={reference_date:'',updated_at:'',updated_by:'',history:[]};
+
+function setHistoricalTicketsV97(payload){
+  const x=(payload&&payload.values)?payload:{values:payload||{}};
+  HISTORICAL_TICKETS_V97={...DEFAULT_HISTORICAL_TICKETS_V97,...(x.values||{})};
+  HISTORICAL_TICKET_INFO_V97={
+    reference_date:String(x.reference_date||''),
+    updated_at:String(x.updated_at||''),
+    updated_by:String(x.updated_by||''),
+    history:Array.isArray(x.history)?x.history:[]
+  };
+}
+function historicalTicketV97(st){return +(HISTORICAL_TICKETS_V97[String(st)]||188)}
+storeTicketV40=function(st){return historicalTicketV97(st)};
+
+function mediaTypeV97(x){
+  const t=String(x?.media_type||x?.type||'').toLowerCase();
+  if(t.startsWith('video'))return 'video';
+  if(/\.(mp4|webm|mov)(\?|#|$)/i.test(String(x?.url||'')))return 'video';
+  return 'image';
+}
+function mediaPreviewHtmlV97(x,cls){
+  const url=esc(x?.url||''),type=mediaTypeV97(x),pos=esc(x?.position||'center center');
+  if(type==='video')return '<video class="'+(cls||'')+'" src="'+url+'" muted loop playsinline autoplay preload="metadata" style="object-position:'+pos+'"></video>';
+  return '<img class="'+(cls||'')+'" src="'+url+'" alt="" style="object-position:'+pos+'">';
+}
+function slotAllowsVideoV97(id){return id!=='login_background'}
+
+function adminMediaSlotCardV97(id,slots){
+  const d=APP_IMAGE_DEFAULTS[id],x=slots?.[id]||{},live={...d,...x},custom=!!x.url,type=mediaTypeV97(live);
+  return '<div class=appImgSlotCardV47>'+
+    mediaPreviewHtmlV97(live,'')+
+    '<div class=appImgSlotBodyV47><div><b>'+esc(d.label)+'</b><span>'+(custom?(type==='video'?'Vídeo personalizado ativo':'Imagem personalizada ativa'):'Usando mídia padrão')+'</span></div>'+
+    '<button class=btn onclick="editAdminMediaSlotV97(\''+id+'\')">Alterar</button></div></div>';
+}
+
+window.adminMedia=adminMedia=async function(){
+  try{
+    const j=await loadContentAdmin();window.ADMCONTENT=j;
+    const slots=j.imageSlots||{},media=j.media||[];
+    $('#adminWork').innerHTML=
+      '<div class=card><div class=title>Mídias do App</div>'+
+      '<div class=muted>Gerencie imagens e vídeos usados nas áreas visuais do App. Vídeos podem ser aplicados nos destaques da Home e na capa da comunidade.</div>'+
+      '<div class=notice style="margin-top:14px"><b>Limpeza automática ativa</b><br>Quando uma mídia enviada pelo App é substituída e não está sendo usada em outra área, o arquivo anterior é removido automaticamente da biblioteca e do armazenamento.</div>'+
+      '<div class=appImgSlotGridV47>'+APP_IMAGE_SLOT_ORDER.map(id=>adminMediaSlotCardV97(id,slots)).join('')+'</div>'+
+      '<div id=imageSlotEditorV47></div>'+
+      '<div class=title style="margin-top:22px">Biblioteca de mídias</div>'+
+      '<div class=muted>Imagens até 8 MB • vídeos até 25 MB.</div>'+
+      '<div class=toolbar style="margin:10px 0"><input id=appMediaV97 type=file accept="image/*,video/*" class=field><button class=btn onclick="uploadAppMediaV97()">Adicionar à biblioteca</button></div>'+
+      '<div id=appMediaStatusV97></div>'+
+      '<div class=appImgLibraryV47>'+(
+        media.map((m,i)=>'<div class=appImgLibItemV47>'+mediaPreviewHtmlV97(m,'')+'<span>'+esc(m.name||(mediaTypeV97(m)==='video'?'Vídeo':'Imagem'))+'</span><small class=appMediaBadgeV97>'+(mediaTypeV97(m)==='video'?'▶ Vídeo':'▧ Imagem')+'</small></div>').join('')
+        ||'<div class=muted>Nenhuma mídia cadastrada ainda.</div>'
+      )+'</div></div>';
+  }catch(e){$('#adminWork').innerHTML='<div class="notice danger">'+esc(e.message)+'</div>'}
+};
+
+window.editAdminMediaSlotV97=function(id){
+  const d=APP_IMAGE_DEFAULTS[id],slots=window.ADMCONTENT?.imageSlots||{},x=slots[id]||{},live={...d,...x},media=window.ADMCONTENT?.media||[];
+  const positions=[['center center','Centro'],['center top','Topo'],['center 20%','Centro • alto'],['center 30%','Centro • 30%'],['center 34%','Centro • 34%'],['center 38%','Centro • 38%'],['center 45%','Centro • 45%'],['left center','Esquerda'],['right center','Direita']];
+  const el=$('#imageSlotEditorV47');if(!el)return;
+  const currentType=mediaTypeV97(live);
+  el.innerHTML='<div class=appImgEditorV47>'+
+    '<div class=appImgEditorHeadV47><div><div class=title>'+esc(d.label)+'</div><div class=muted>'+esc(d.help||'')+'</div></div><button class="btn ghost" onclick="closeAdminImageSlot()">×</button></div>'+
+    '<div id=slotPreviewHostV97>'+mediaPreviewHtmlV97(live,'appImgPreviewV47')+'</div>'+
+    '<label class=muted>Usar mídia da biblioteca</label>'+
+    '<select id=slotLibraryV97 class=field onchange="admMediaLibraryPickV97(this)"><option value="">Selecione uma mídia salva</option>'+
+       media.map((m,i)=>'<option value="'+i+'">'+(mediaTypeV97(m)==='video'?'▶ ':'▧ ')+esc(m.name||'Mídia')+'</option>').join('')+
+    '</select>'+
+    '<label class=muted>Ou enviar nova mídia</label><input id=slotUploadV97 type=file accept="'+(slotAllowsVideoV97(id)?'image/*,video/*':'image/*')+'" class=field onchange="admMediaFilePreviewV97(this,\''+id+'\')">'+
+    '<label class=muted>Tipo da mídia</label><select id=slotMediaTypeV97 class=field onchange="admMediaTypeChangedV97(this.value,\''+id+'\')"><option value=image '+(currentType==='image'?'selected':'')+'>Imagem</option>'+(slotAllowsVideoV97(id)?'<option value=video '+(currentType==='video'?'selected':'')+'>Vídeo</option>':'')+'</select>'+
+    '<label class=muted>Ou informar URL</label><input id=slotUrlV97 class=field value="'+esc(live.url)+'" placeholder="https://..." oninput="admMediaUrlPreviewV97(this.value)">'+
+    '<label class=muted>Enquadramento</label><select id=slotPositionV97 class=field onchange="admMediaPositionPreviewV97(this.value)">'+positions.map(p=>'<option value="'+p[0]+'" '+(p[0]===live.position?'selected':'')+'>'+p[1]+'</option>').join('')+'</select>'+
+    (id==='community_cover'?'<label class=muted>Link da campanha / conteúdo</label><input id=slotLinkV97 class=field value="'+esc(live.link_url||'')+'" placeholder="https://...">':'<input id=slotLinkV97 type=hidden value="'+esc(live.link_url||'')+'">')+
+    '<div id=slotStatusV97></div><div class=toolbar style="margin-top:12px"><button class=btn onclick="saveAdminMediaSlotV97(\''+id+'\')">Publicar mídia</button><button class="btn ghost" onclick="resetAdminMediaSlotV97(\''+id+'\')">Restaurar padrão</button></div>'+
+    '</div>';
+  setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),20);
+};
+
+window.admMediaLibraryPickV97=function(sel){
+  if(!sel||sel.value==='')return;
+  const m=(window.ADMCONTENT?.media||[])[Number(sel.value)];if(!m)return;
+  const type=mediaTypeV97(m),typeSel=$('#slotMediaTypeV97'),url=$('#slotUrlV97');
+  if(typeSel&&[...typeSel.options].some(o=>o.value===type))typeSel.value=type;
+  if(url)url.value=m.url||'';
+  renderMediaPreviewV97(m.url,type);
+};
+window.renderMediaPreviewV97=function(url,type){
+  const h=$('#slotPreviewHostV97');if(!h||!url)return;
+  const pos=$('#slotPositionV97')?.value||'center center';
+  h.innerHTML=type==='video'
+    ?'<video class=appImgPreviewV47 src="'+esc(url)+'" muted loop playsinline autoplay controls style="object-position:'+esc(pos)+'"></video>'
+    :'<img class=appImgPreviewV47 src="'+esc(url)+'" alt="" style="object-position:'+esc(pos)+'">';
+};
+window.admMediaFilePreviewV97=function(inp,id){
+  const f=inp?.files?.[0];if(!f)return;
+  const isVideo=String(f.type||'').startsWith('video/');
+  if(isVideo&&!slotAllowsVideoV97(id)){inp.value='';return alert('Nesta área utilize uma imagem.')}
+  const type=isVideo?'video':'image',sel=$('#slotMediaTypeV97');if(sel)sel.value=type;
+  renderMediaPreviewV97(URL.createObjectURL(f),type);
+};
+window.admMediaUrlPreviewV97=function(url){if(url)renderMediaPreviewV97(url,$('#slotMediaTypeV97')?.value||'image')};
+window.admMediaTypeChangedV97=function(type,id){
+  if(type==='video'&&!slotAllowsVideoV97(id)){const s=$('#slotMediaTypeV97');if(s)s.value='image';return}
+  const url=$('#slotUrlV97')?.value;if(url)renderMediaPreviewV97(url,type);
+};
+window.admMediaPositionPreviewV97=function(v){const p=$('#slotPreviewHostV97')?.firstElementChild;if(p)p.style.objectPosition=v};
+
+window.saveAdminMediaSlotV97=async function(id){
+  const st=$('#slotStatusV97'),f=$('#slotUploadV97')?.files?.[0];
+  let url=($('#slotUrlV97')?.value||'').trim(),link_url=($('#slotLinkV97')?.value||'').trim(),position=$('#slotPositionV97')?.value||'center center',media_type=$('#slotMediaTypeV97')?.value||'image';
+  try{
+    if(f){
+      const mt=String(f.type||''),isImage=mt.startsWith('image/'),isVideo=mt.startsWith('video/');
+      if(!isImage&&!isVideo)throw new Error('Selecione uma imagem ou vídeo válido.');
+      if(isVideo&&!slotAllowsVideoV97(id))throw new Error('Nesta área utilize uma imagem.');
+      if(isImage&&f.size>8388608)throw new Error('A imagem deve ter no máximo 8 MB.');
+      if(isVideo&&f.size>26214400)throw new Error('O vídeo deve ter no máximo 25 MB.');
+      st.innerHTML='<div class=notice>Enviando mídia...</div>';
+      const fd=new FormData();fd.append('action','content_media_upload');fd.append('matricula',U.u.id);fd.append('password',adminPwd());fd.append('media',f);
+      const up=await apiForm(fd);url=up.item?.url||url;media_type=mediaTypeV97(up.item||{type:mt});
+    }
+    if(!url)throw new Error('Selecione, envie ou informe uma mídia.');
+    st.innerHTML='<div class=notice>Publicando no App...</div>';
+    const j=await api({action:'app_image_slot_save',matricula:U.u.id,password:adminPwd(),slot:id,url,media_type,link_url,position});
+    PUBLIC_IMAGE_SLOTS=j.slots||PUBLIC_IMAGE_SLOTS;
+    await refreshExtras();
+    st.innerHTML='<div class="notice success">Mídia publicada. A versão anterior foi limpa automaticamente quando não havia outro uso.</div>';
+    setTimeout(()=>adminMedia(),700);
+  }catch(e){st.innerHTML='<div class="notice danger">'+esc(e.message)+'</div>'}
+};
+window.resetAdminMediaSlotV97=async function(id){
+  if(!confirm('Restaurar a mídia padrão desta área? A mídia personalizada anterior será removida se não estiver em uso.'))return;
+  try{
+    const j=await api({action:'app_image_slot_save',matricula:U.u.id,password:adminPwd(),slot:id,url:'',media_type:'image',link_url:'',position:'center center'});
+    PUBLIC_IMAGE_SLOTS=j.slots||{};await refreshExtras();adminMedia();
+  }catch(e){alert(e.message)}
+};
+window.uploadAppMediaV97=async function(){
+  const f=$('#appMediaV97')?.files?.[0],st=$('#appMediaStatusV97');if(!f)return alert('Selecione uma imagem ou vídeo.');
+  try{
+    const mt=String(f.type||''),isImage=mt.startsWith('image/'),isVideo=mt.startsWith('video/');
+    if(!isImage&&!isVideo)throw new Error('Formato não suportado.');
+    if(isImage&&f.size>8388608)throw new Error('A imagem deve ter no máximo 8 MB.');
+    if(isVideo&&f.size>26214400)throw new Error('O vídeo deve ter no máximo 25 MB.');
+    st.innerHTML='<div class=notice>Enviando mídia...</div>';
+    const fd=new FormData();fd.append('action','content_media_upload');fd.append('matricula',U.u.id);fd.append('password',adminPwd());fd.append('media',f);
+    await apiForm(fd);st.innerHTML='<div class="notice success">Mídia adicionada à biblioteca.</div>';setTimeout(()=>adminMedia(),500);
+  }catch(e){st.innerHTML='<div class="notice danger">'+esc(e.message)+'</div>'}
+};
+
+// Vídeos nos destaques da Home.
+window.patchHomeMediaV97=function(){
+  const root=document.querySelector('.premiumHomeV34');if(!root)return;
+  const slots=['home_hero_1','home_hero_2','home_hero_3'],els=[...root.querySelectorAll('.campaignPhotoV34')];
+  slots.forEach((id,i)=>{
+    const x=appImageSlot(id),old=els[i];if(!old||mediaTypeV97(x)!=='video'||old.tagName==='VIDEO')return;
+    const v=document.createElement('video');v.className=old.className;v.src=x.url||'';v.muted=true;v.loop=true;v.autoplay=true;v.playsInline=true;v.preload='metadata';v.style.objectPosition=x.position||'center center';old.replaceWith(v);
+  });
+};
+const _initHomeV34V97=initHomeV34;
+initHomeV34=function(){patchHomeMediaV97();_initHomeV34V97()};
+const _homeSlideV34V97=homeSlideV34;
+homeSlideV34=function(i){
+  _homeSlideV34V97(i);
+  document.querySelectorAll('video.campaignPhotoV34').forEach(v=>{
+    if(v.classList.contains('active'))v.play().catch(()=>{});else v.pause();
+  });
+};
+
+// Vídeo na capa da comunidade.
+const _communityV97=community;
+community=function(){
+  let h=_communityV97(),x=appImageSlot('community_cover');
+  if(mediaTypeV97(x)==='video'){
+    h=h.replace(/<img class=communityHeroPhotoV46[^>]*>/,
+      '<video class=communityHeroPhotoV46 src="'+esc(x.url||'')+'" style="object-position:'+esc(x.position||'center center')+'" muted loop playsinline autoplay preload="metadata"></video>');
+  }
+  return h;
+};
+
+// Ticket médio histórico acumulado.
+window.adminHistoricalTicketsV97=async function(){
+  try{
+    const j=await loadContentAdmin();window.ADMCONTENT=j;
+    setHistoricalTicketsV97(j.historicalTickets||{});
+    const stores=Object.keys(DEFAULT_HISTORICAL_TICKETS_V97).sort();
+    const today=new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'});
+    const info=HISTORICAL_TICKET_INFO_V97;
+    const hist=(info.history||[]).slice().reverse().slice(0,5);
+    $('#adminWork').innerHTML=
+      '<div class=card><div class=title>Ticket Médio Histórico • Acumulado Ano</div>'+
+      '<div class=ticketHeroV97><h3>Base oficial da meta de pedidos</h3><p>A meta de pedidos de cada filial será calculada com o ticket médio histórico acumulado: <b>Meta eStore ÷ Ticket Médio da filial</b>, arredondando para cima. Ao atualizar esta base, as metas de pedidos já cadastradas também são recalculadas.</p></div>'+
+      '<div class=ticketMetaV97><div><label class=muted>Data de referência do acumulado</label><input id=ticketRefDateV97 type=date class=field value="'+esc(info.reference_date||today)+'"></div>'+
+      '<div><label class=muted>Última atualização</label><div class=notice>'+(info.updated_at?formatAppTime(info.updated_at):'Base inicial do App • ainda sem atualização manual')+'</div></div></div>'+
+      '<div class=ticketGridV97>'+stores.map(st=>'<div class=ticketItemV97><label>Filial '+st+'</label><input id="ticketV97_'+st+'" inputmode=decimal value="'+String(historicalTicketV97(st)).replace('.',',')+'"></div>').join('')+'</div>'+
+      '<div id=ticketStatusV97></div><div class=toolbar><button class=btn onclick="saveHistoricalTicketsV97()">Salvar nova base histórica</button></div>'+
+      '<div class=title style="margin-top:22px">Atualizar por planilha</div>'+
+      '<div class=muted>Colunas aceitas: Loja/Filial e Ticket Médio. A planilha pode trazer as 19 lojas; valores informados substituem a base atual.</div>'+
+      '<input id=ticketFileV97 type=file accept=".xlsx,.xls" class=field><button class="btn alt" style="margin-top:9px" onclick="uploadHistoricalTicketsV97()">Importar ticket acumulado</button>'+
+      '<div class=ticketHistoryV97><b>Histórico recente de bases</b>'+(hist.length?hist.map(x=>'<div class=hourrow><b>'+esc(String(x.reference_date||'').split('-').reverse().join('/'))+'</b><div>19 filiais<div class=muted>Atualizado em '+esc(formatAppTime(x.updated_at))+'</div></div><small>'+esc(x.updated_by||'')+'</small></div>').join(''):'<div class=muted style="margin-top:8px">O histórico começará a ser registrado na primeira atualização.</div>')+'</div>'+
+      '</div>';
+  }catch(e){$('#adminWork').innerHTML='<div class="notice danger">'+esc(e.message)+'</div>'}
+};
+window.collectHistoricalTicketsV97=function(){
+  const out={};
+  Object.keys(DEFAULT_HISTORICAL_TICKETS_V97).forEach(st=>{
+    const raw=String($('#ticketV97_'+st)?.value||'').replace(/\./g,'').replace(',','.');
+    const v=Number(raw);if(!Number.isFinite(v)||v<=0)throw new Error('Informe um ticket médio válido para a filial '+st+'.');out[st]=v;
+  });
+  return out;
+};
+window.saveHistoricalTicketsV97=async function(){
+  const st=$('#ticketStatusV97');
+  try{
+    const values=collectHistoricalTicketsV97(),reference_date=$('#ticketRefDateV97')?.value||'';
+    st.innerHTML='<div class=notice>Atualizando base histórica e recalculando metas de pedidos...</div>';
+    const j=await api({action:'ticket_history_save',matricula:U.u.id,password:adminPwd(),reference_date,values});
+    setHistoricalTicketsV97(j.historicalTickets||{});await refreshExtras();
+    st.innerHTML='<div class="notice success">'+esc(j.message||'Ticket médio histórico atualizado.')+'</div>';
+    setTimeout(()=>adminHistoricalTicketsV97(),700);
+  }catch(e){st.innerHTML='<div class="notice danger">'+esc(e.message)+'</div>'}
+};
+window.uploadHistoricalTicketsV97=async function(){
+  const f=$('#ticketFileV97')?.files?.[0],st=$('#ticketStatusV97');if(!f)return alert('Selecione a planilha de ticket médio.');
+  try{
+    st.innerHTML='<div class=notice>Processando ticket médio acumulado...</div>';
+    const fd=new FormData();fd.append('action','ticket_history_upload');fd.append('matricula',U.u.id);fd.append('password',adminPwd());fd.append('reference_date',$('#ticketRefDateV97')?.value||'');fd.append('ticket_history',f);
+    const j=await apiForm(fd);setHistoricalTicketsV97(j.historicalTickets||{});await refreshExtras();
+    st.innerHTML='<div class="notice success">'+esc(j.message||'Base histórica atualizada.')+'<br>'+num(j.rows||0)+' filiais lidas.</div>';
+    setTimeout(()=>adminHistoricalTicketsV97(),700);
+  }catch(e){st.innerHTML='<div class="notice danger">'+esc(e.message)+'</div>'}
+};
+</script>
+
 </body>
 </html>
