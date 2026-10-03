@@ -1,17 +1,20 @@
-const CACHE='estore-cepi-shell-v103';
-const BUILD='v103';
+const CACHE='estore-cepi-shell-v104';
+const BUILD='v104';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v103';
-const SHELL=['./presentation-v103.js','./assets/campaign-popup-v86.svg','./assets/campaign-hero-v84.svg','./assets/riachuelo-logo-exact-v75.svg','./assets/campaign-share-v76.svg','./assets/campaign-share-v75.jpg','./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon.svg','./riachuelo-horizontal-oficial.png'];
+const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
+const SHELL=['./presentation-v103.js','./hourly-meta-v104.js','./assets/campaign-popup-v86.svg','./assets/campaign-hero-v84.svg','./assets/riachuelo-logo-exact-v75.svg','./assets/campaign-share-v76.svg','./assets/campaign-share-v75.jpg','./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon.svg','./riachuelo-horizontal-oficial.png'];
 
-function injectPresentationV103(html){
+function injectAppV104(html){
   if(!html) return html;
-  html=html.replace(/\n?<script[^>]+src=["']\.\/presentation-v10[123]\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n');
-  const tag='\n<script src="'+PRESENTATION_SCRIPT+'"></script>\n';
-  return html.replace(/<\/body>\s*<\/html>\s*$/i, tag+'</body></html>');
+  html=html
+    .replace(/\n?<script[^>]+src=["']\.\/presentation-v10[123]\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
+    .replace(/\n?<script[^>]+src=["']\.\/hourly-meta-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n');
+  const tags='\n<script src="'+PRESENTATION_SCRIPT+'"></script>\n<script src="'+HOURLY_META_SCRIPT+'"></script>\n';
+  return html.replace(/<\/body>\s*<\/html>\s*$/i, tags+'</body></html>');
 }
 async function htmlResponseWithInjection(res){
   const text=await res.text();
-  return new Response(injectPresentationV103(text),{status:res.status,statusText:res.statusText,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}});
+  return new Response(injectAppV104(text),{status:res.status,statusText:res.statusText,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}});
 }
 
 self.addEventListener('install',event=>{
