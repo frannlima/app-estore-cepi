@@ -1,6 +1,17 @@
-const CACHE='estore-cepi-shell-v100';
-const BUILD='v100';
-const SHELL=['./assets/campaign-popup-v86.svg','./assets/campaign-hero-v84.svg','./assets/riachuelo-logo-exact-v75.svg','./assets/campaign-share-v76.svg','./assets/campaign-share-v75.jpg','./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon.svg','./riachuelo-horizontal-oficial.png'];
+const CACHE='estore-cepi-shell-v101';
+const BUILD='v101';
+const PRESENTATION_SCRIPT='./presentation-v101.js?build=v101';
+const SHELL=['./presentation-v101.js','./assets/campaign-popup-v86.svg','./assets/campaign-hero-v84.svg','./assets/riachuelo-logo-exact-v75.svg','./assets/campaign-share-v76.svg','./assets/campaign-share-v75.jpg','./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon.svg','./riachuelo-horizontal-oficial.png'];
+
+function injectPresentationV101(html){
+  if(!html || html.includes('presentation-v101.js')) return html;
+  const tag='\n<script src="'+PRESENTATION_SCRIPT+'"></script>\n';
+  return html.replace(/<\/body>\s*<\/html>\s*$/i, tag+'</body></html>');
+}
+async function htmlResponseWithInjection(res){
+  const text=await res.text();
+  return new Response(injectPresentationV101(text),{status:res.status,statusText:res.statusText,headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store'}});
+}
 
 self.addEventListener('install',event=>{
   self.skipWaiting();
@@ -36,13 +47,13 @@ self.addEventListener('fetch',event=>{
     event.respondWith(
       fetch(new Request(req,{cache:'no-store'}))
         .then(res=>{
-          if(res&&res.ok){
-            const copy=res.clone();
-            caches.open(CACHE).then(cache=>cache.put('./index.html',copy)).catch(()=>{});
-          }
-          return res;
+          if(!res||!res.ok) return res;
+          return htmlResponseWithInjection(res.clone()).then(injected=>{
+            caches.open(CACHE).then(cache=>cache.put('./index.html',injected.clone())).catch(()=>{});
+            return injected;
+          });
         })
-        .catch(()=>caches.match('./index.html'))
+        .catch(()=>caches.match('./index.html').then(async res=>res?htmlResponseWithInjection(res.clone()):res))
     );
     return;
   }
