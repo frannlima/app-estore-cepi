@@ -1868,7 +1868,7 @@ function storeDisplayName(st){let code=String(st||U?.u?.st||'').padStart(3,'0'),
 function profile(){let dn=displayName();if(isDemo())return '<div class=card><div class=profileHead>'+photo(U.u.id,dn,'photoBig')+'<div><div class=title>'+esc(dn)+'</div><div class=muted>Modo Demonstração • Filial '+esc(U.u.st)+'</div></div></div><div class=notice>Este perfil permite conhecer todas as áreas do App sem alterar dados, configurações ou registros.</div></div>';return '<div class=card><div class=profileHead>'+photo(U.u.id,dn,'photoBig')+'<div><div class=title>'+esc(dn)+'</div><div class=muted>Matrícula '+esc(U.u.id)+' • Filial '+esc(U.u.st)+'<br>'+esc(U.u.role)+'</div></div></div><div class=card style="box-shadow:none;background:#f7f6f2"><div class=title>Personalizar meu perfil</div><div class=muted>Escolha como seu nome aparecerá na tela inicial e adicione sua foto.</div><input id=prefName class=field maxlength=40 value="'+esc(dn)+'" placeholder="Nome de preferência"><input id=profilePhoto type=file accept="image/*" class=field><button class=btn onclick="saveMyProfile()">Salvar perfil</button><div id=profileSaveStatus></div></div><div class=notice>Moda que inspira o Brasil.<br><br>Vontade de crescer • Ninguém faz nada sozinho • O simples é incrível • Talento é conquista</div></div>'}
 async function saveMyProfile(){let name=$('#prefName').value.trim(),file=$('#profilePhoto').files[0],st=$('#profileSaveStatus');if(!name)return alert('Informe o nome de preferência.');st.innerHTML='<div class=notice>Salvando perfil...</div>';try{await api({action:'profile_preferences_set',matricula:U.u.id,preferred_name:name});CONTENT.preferredNames=CONTENT.preferredNames||{};CONTENT.preferredNames[String(U.u.id)]=name;if(file){let dataUrl=await resizeProfilePhoto(file);let j=await api({action:'profile_photo_set',matricula:U.u.id,dataUrl});CONTENT.profilePhotos[String(U.u.id)]=j.photo_url}st.innerHTML='<div class="notice success">Perfil atualizado com sucesso.</div>';setTimeout(()=>go('profile'),500)}catch(e){st.innerHTML='<div class="notice danger">'+esc(e.message)+'</div>'}}
 function resizeProfilePhoto(file){return new Promise((resolve,reject)=>{let r=new FileReader();r.onerror=reject;r.onload=()=>{let im=new Image();im.onerror=reject;im.onload=()=>{let size=Math.min(im.width,im.height),sx=(im.width-size)/2,sy=(im.height-size)/2,c=document.createElement('canvas');c.width=c.height=640;c.getContext('2d').drawImage(im,sx,sy,size,size,0,0,640,640);resolve(c.toDataURL('image/jpeg',.82))};im.src=r.result};r.readAsDataURL(file)})}
-function admin(){if(!isAdmin())return '<div class=notice>Acesso administrativo não autorizado.</div>';if(isDemo())return '<div class="card readOnlyAdmin"><div class=title>Central Administrativa • Demonstração</div><div class=muted>Você pode conhecer a estrutura administrativa, mas alterações ficam bloqueadas no modo visitante.</div><div class=adminGrid style="margin-top:14px"><button class=btn>Atualizar Resultados</button><button class=btn>Comparativo Semanal</button><button class=btn>Atualizar Metas</button><button class=btn>Ticket Médio Histórico</button><button class=btn>Banco de Dados</button><button class=btn>Informações Importantes</button><button class=btn>Cupons e Campanhas</button><button class=btn>eDay</button><button class=btn>Notificações</button><button class=btn>Mídias do App</button><button class=btn>Hora a Hora</button><button class=btn>Chat / Suporte</button><button class=btn>Ritual eStore</button></div><div class=notice style="margin-top:14px">🔒 Somente leitura. Nenhum dado pode ser incluído, alterado ou excluído.</div></div>';return '<div class=card><div class=title>Central Administrativa</div><div class=muted>Atualização de dados, configurações e gestão do App.</div><div class=adminGrid style="margin-top:14px"><button class=btn onclick="adminResults()">Atualizar Resultados</button><button class=btn onclick="adminWeeklyComparisonV70()">Comparativo Semanal</button><button class=btn onclick="adminTargets()">Atualizar Metas</button><button class=btn onclick="adminHistoricalTicketsV97()">Ticket Médio Histórico</button><button class=btn onclick="adminDatabase()">Banco de Dados</button><button class=btn onclick="adminInfo()">Informações Importantes</button><button class=btn onclick="adminCampaign()">Cupons e Campanhas</button><button class=btn onclick="adminEday()">eDay</button><button class=btn onclick="adminNotify()">Notificações</button><button class=btn onclick="adminMedia()">Mídias do App</button><button class=btn onclick="go(&quot;hourly&quot;)">Hora a Hora</button><button class=btn onclick="go(&quot;support&quot;)">Chat / Suporte</button><button class=btn onclick="adminRitualV52()">Ritual eStore</button><button class=btn onclick="go(&quot;fca&quot;)">FCA e Performance</button></div></div><div id=adminWork></div><div class=card><div class=title>Auditoria recente</div><div id=audit class=muted>Carregando...</div></div>'}
+function admin(){if(!isAdmin())return '<div class=notice>Acesso administrativo não autorizado.</div>';if(isDemo())return '<div class="card readOnlyAdmin"><div class=title>Central Administrativa • Demonstração</div><div class=muted>Você pode conhecer a estrutura administrativa, mas alterações ficam bloqueadas no modo visitante.</div><div class=adminGrid style="margin-top:14px"><button class=btn>Atualizar Resultados</button><button class=btn>Comparativo Semanal</button><button class=btn>Atualizar Metas</button><button class=btn>Ticket Médio Histórico</button><button class=btn>Banco de Dados</button><button class=btn>Informações Importantes</button><button class=btn>Cupons e Campanhas</button><button class=btn>eDay</button><button class=btn>Notificações</button><button class=btn>Mídias do App</button><button class=btn>Hora a Hora</button><button class=btn>Chat / Suporte</button><button class=btn>Ritual eStore</button><button class=btn>Apresentação eStore</button></div><div class=notice style="margin-top:14px">🔒 Somente leitura. Nenhum dado pode ser incluído, alterado ou excluído.</div></div>';return '<div class=card><div class=title>Central Administrativa</div><div class=muted>Atualização de dados, configurações e gestão do App.</div><div class=adminGrid style="margin-top:14px"><button class=btn onclick="adminResults()">Atualizar Resultados</button><button class=btn onclick="adminWeeklyComparisonV70()">Comparativo Semanal</button><button class=btn onclick="adminTargets()">Atualizar Metas</button><button class=btn onclick="adminHistoricalTicketsV97()">Ticket Médio Histórico</button><button class=btn onclick="adminDatabase()">Banco de Dados</button><button class=btn onclick="adminInfo()">Informações Importantes</button><button class=btn onclick="adminCampaign()">Cupons e Campanhas</button><button class=btn onclick="adminEday()">eDay</button><button class=btn onclick="adminNotify()">Notificações</button><button class=btn onclick="adminMedia()">Mídias do App</button><button class=btn onclick="go(&quot;hourly&quot;)">Hora a Hora</button><button class=btn onclick="go(&quot;support&quot;)">Chat / Suporte</button><button class=btn onclick="adminRitualV52()">Ritual eStore</button><button class=btn onclick="adminPresentationV99()">Apresentação eStore</button><button class=btn onclick="go(&quot;fca&quot;)">FCA e Performance</button></div></div><div id=adminWork></div><div class=card><div class=title>Auditoria recente</div><div id=audit class=muted>Carregando...</div></div>'}
 
 let WEEKLY_COMPARE_V70=null;
 function weeklyDateLabelV70(v){return v?fcaDateV61(v):'—'}
@@ -2653,7 +2653,7 @@ window.deletePopupV72=async function(id){
 <!-- V74-FORCE-SW-UPDATE -->
 <script>
 (function(){
-  const BUILD='v98';
+  const BUILD='v99';
   if(!('serviceWorker' in navigator))return;
   let reloading=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{
@@ -2688,8 +2688,8 @@ window.deletePopupV72=async function(id){
   };
   let TAB75='campaigns';
   const LOGO75='./assets/riachuelo-logo-exact-v75.svg';
-  const CARD75='./assets/campaign-hero-v84.svg?build=v98';
-  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v98';
+  const CARD75='./assets/campaign-hero-v84.svg?build=v99';
+  const CARD_SOURCE75='./assets/campaign-share-v75.jpg?build=v99';
   const esc75=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const today75=()=>{try{return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})}catch(e){return new Date().toISOString().slice(0,10)}};
   const active75=x=>{if(!x||x.active===false)return false;const d=today75(),s=String(x.start_at||x.start||'').slice(0,10),e=String(x.end_at||x.end||'').slice(0,10);return(!s||d>=s)&&(!e||d<=e)};
@@ -2915,8 +2915,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART83='./assets/campaign-share-v76.svg?build=v98';
-  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v98';
+  const ART83='./assets/campaign-share-v76.svg?build=v99';
+  const LOGO83='./assets/riachuelo-logo-exact-v75.svg?build=v99';
 
   function closeV83(){
     document.getElementById('campaignPopV83')?.remove();
@@ -3066,8 +3066,8 @@ window.deletePopupV72=async function(id){
 </style>
 <script>
 (function(){
-  const ART84='./assets/campaign-hero-v84.svg?build=v98';
-  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v98';
+  const ART84='./assets/campaign-hero-v84.svg?build=v99';
+  const LOGO84='./assets/riachuelo-logo-exact-v75.svg?build=v99';
 
   function close84(){
     document.getElementById('campaignPopV84')?.remove();
@@ -3437,7 +3437,7 @@ window.deletePopupV72=async function(id){
     const asset=k=>API+'?asset='+encodeURIComponent(k)+'&v=90';
     try{
       const [logo,samsung,tune720,waveBeam2,waveBuds2,go4,tune520]=await Promise.all([
-        loadCampaignImgV90('./assets/riachuelo-logo-exact-v75.svg?build=v98'),
+        loadCampaignImgV90('./assets/riachuelo-logo-exact-v75.svg?build=v99'),
         loadCampaignImgV90(asset('samsung')),
         loadCampaignImgV90(asset('tune720')),
         loadCampaignImgV90(asset('waveBeam2')),
@@ -4419,6 +4419,503 @@ window.uploadHistoricalTicketsV97=async function(){
     setTimeout(()=>adminHistoricalTicketsV97(),700);
   }catch(e){st.innerHTML='<div class="notice danger">'+esc(e.message)+'</div>'}
 };
+</script>
+
+
+<!-- V99-ADMIN-PRESENTATION-ESTORE -->
+<style id="presentation-v99-style">
+.presAdmV99{display:grid;gap:14px}
+.presHeroV99{background:linear-gradient(135deg,#173F35 0%,#244f45 70%,#466964 100%);color:#fff;border-radius:24px;padding:20px;position:relative;overflow:hidden}
+.presHeroV99:after{content:"";position:absolute;width:190px;height:190px;border-radius:50%;right:-55px;top:-65px;border:24px solid rgba(222,124,0,.24)}
+.presHeroV99 h2{margin:0;font-size:24px}.presHeroV99 p{margin:7px 0 0;color:#e4ece8;max-width:720px;font-size:12px;line-height:1.45}
+.presBrandV99{display:flex;align-items:center;gap:10px;margin-bottom:12px}.presBrandV99 img{height:24px;width:auto}.presBrandV99 span{font-size:10px;letter-spacing:.17em;text-transform:uppercase;color:#f2d398}
+.presControlsV99{display:grid;grid-template-columns:1.2fr 1fr;gap:10px}.presChoiceV99{background:#fff;border:1px solid #e3e0d8;border-radius:18px;padding:14px}
+.presChoiceV99 label{display:block;font-size:10px;font-weight:900;color:#68736f;text-transform:uppercase;margin-bottom:7px}
+.presSegmentV99{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.presSegmentV99 button{border:1px solid #d7ddd8;background:#f7f5ef;color:#173F35;border-radius:12px;padding:11px 7px;font-weight:900}.presSegmentV99 button.on{background:#173F35;color:#fff;border-color:#173F35}
+.presActionsV99{display:grid;grid-template-columns:1fr 1fr;gap:8px}.presActionsV99 .btn{width:100%;min-height:46px}
+.presStatusV99{min-height:18px}
+.presPreviewV99{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.presThumbV99{background:#f7f5ef;border:1px solid #e1ded5;border-radius:17px;padding:12px;min-height:118px;position:relative;overflow:hidden}
+.presThumbV99:before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:#173F35}.presThumbV99.orange:before{background:#DE7C00}.presThumbV99.wine:before{background:#76232F}.presThumbV99.sage:before{background:#466964}
+.presThumbV99 b{display:block;color:#173F35;font-size:13px;padding-left:4px}.presThumbV99 small{display:block;color:#707872;font-size:10px;line-height:1.35;margin-top:5px;padding-left:4px}.presThumbV99 .k{display:flex;gap:5px;margin-top:10px;padding-left:4px}.presThumbV99 .k i{font-style:normal;background:#fff;border:1px solid #e3e0d8;border-radius:8px;padding:5px 7px;color:#173F35;font-size:9px;font-weight:900}
+.presRulesV99{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.presRuleV99{border:1px solid #e1ded5;border-radius:14px;padding:11px;background:#fff;color:#53605b;font-size:10px;line-height:1.35}.presRuleV99 b{display:block;color:#173F35;margin-bottom:3px}
+@media(max-width:620px){.presControlsV99{grid-template-columns:1fr}.presPreviewV99{grid-template-columns:1fr}.presRulesV99{grid-template-columns:1fr}}
+</style>
+<script>
+(function(){
+  const PRES_C99={
+    green:'173F35',sage:'466964',gray:'DAD9D6',sand:'D6D2C4',orange:'DE7C00',orangeU:'D37C32',
+    wine:'76232F',wineU:'AE535C',brown:'6B3529',brownU:'9C5B4A',red:'E03C31',coral:'E45D50',
+    pink:'E68699',pinkU:'E98F9D',cream:'F7F5EF',white:'FFFFFF',ink:'173F35',muted:'68736F',greenUp:'157349'
+  };
+  let PRES_PERIOD_V99='week',PRES_DATA_V99=null,PRES_LOADING_V99=false;
+
+  function presPeriodLabelV99(p){
+    if(p==='week')return 'Semana';
+    if(p==='month')return 'Mês';
+    if(p==='year')return 'Ano';
+    return 'Período';
+  }
+  function presPctV99(v,d=2){
+    if(v===null||v===undefined||!Number.isFinite(Number(v)))return '—';
+    return (Number(v)*100).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d})+'%';
+  }
+  function presPpV99(v){
+    if(v===null||v===undefined||!Number.isFinite(Number(v)))return '—';
+    const n=Number(v);
+    return (n>0?'+':'')+(n*100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' p.p.';
+  }
+  function presMoneyV99(v){
+    return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0}).format(Number(v)||0);
+  }
+  function presMoneyCompactV99(v){
+    const n=Number(v)||0;
+    if(Math.abs(n)>=1000000)return 'R$ '+(n/1000000).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+' mi';
+    if(Math.abs(n)>=1000)return 'R$ '+(n/1000).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+' mil';
+    return presMoneyV99(n);
+  }
+  function presNumV99(v){return new Intl.NumberFormat('pt-BR').format(Math.round(Number(v)||0))}
+  function presFirstNamesV99(store){
+    const a=(store?.supervisors||[]).filter(u=>supervisorEligibleRoleV49(u.role)).map(u=>supervisorFirstNameV48(u.id,u.name)).filter(Boolean);
+    return [...new Set(a)].join(' • ')||'Supervisores da loja';
+  }
+  function presSummaryFromSupervisorV99(sup){
+    const stores=Array.isArray(sup?.stores)?sup.stores:[];
+    const captured=stores.reduce((a,x)=>a+(+x.c||0),0),orders=stores.reduce((a,x)=>a+(+x.o||0),0);
+    const total=stores.reduce((a,x)=>a+(+x.total||0),0),zeros=stores.reduce((a,x)=>a+(+x.zeros||0),0);
+    let share=Number(sup?.shareReference?.regionalShare);
+    if(!Number.isFinite(share)||share<=0){
+      let denom=0;
+      for(const x of stores)if((+x.c||0)>0&&(+x.share||0)>0)denom+=(+x.c)/(+x.share);
+      share=denom>0?captured/denom:0;
+    }
+    return {captured,orders,ticket:orders?captured/orders:0,total,zeros,dispersion:total?zeros/total:0,share};
+  }
+  function presSummaryV99(data){
+    if(data.period==='week'&&data.fca?.summary){
+      const s=data.fca.summary,disp=presSummaryFromSupervisorV99(data.supervisors);
+      return {share:+s.share||0,captured:+s.captured||0,orders:+s.orders||0,ticket:+s.ticket||0,
+        share_delta:+s.share_delta||0,captured_change:s.captured_change,orders_change:s.orders_change,ticket_change:s.ticket_change,
+        total:disp.total,zeros:disp.zeros,dispersion:disp.dispersion};
+    }
+    const s=presSummaryFromSupervisorV99(data.supervisors);
+    return {...s,share_delta:null,captured_change:null,orders_change:null,ticket_change:null};
+  }
+  function presPeriodDescriptorV99(data){
+    if(data.period==='week'){
+      const d=data.fca||{};
+      return 'Semana '+(d.weekNumber||'')+' vs Semana '+(d.previousWeekNumber||'');
+    }
+    if(data.period==='month'){
+      const d=new Date((data.month||'2026-10')+'-01T12:00:00');
+      const lab=d.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+      return lab.charAt(0).toUpperCase()+lab.slice(1);
+    }
+    return String((data.asof||COMMON?.asof||'2026').slice(0,4));
+  }
+
+  window.adminPresentationV99=async function(){
+    PRES_DATA_V99=null;
+    const asof=String(COMMON?.asof||new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'}));
+    const currentMonth=asof.slice(0,7);
+    const w=document.getElementById('adminWork');if(!w)return;
+    w.innerHTML=
+      '<div class="card presAdmV99">'+
+        '<div class=presHeroV99><div class=presBrandV99><img src="./assets/riachuelo-logo-exact-v75.svg" alt="Riachuelo"><span>Moda que inspira o Brasil</span></div>'+
+          '<h2>Apresentação eStore • CE+PI</h2>'+
+          '<p>Gere uma apresentação executiva em PowerPoint usando os dados consolidados do App. O conteúdo se adapta ao período selecionado e aplica automaticamente a identidade Riachuelo.</p></div>'+
+        '<div class=presControlsV99>'+
+          '<div class=presChoiceV99><label>Período da apresentação</label><div class=presSegmentV99>'+
+            '<button id=presPWeekV99 class=on onclick="presSetPeriodV99(\'week\')">Semana</button>'+
+            '<button id=presPMonthV99 onclick="presSetPeriodV99(\'month\')">Mês</button>'+
+            '<button id=presPYearV99 onclick="presSetPeriodV99(\'year\')">Ano</button>'+
+          '</div><div id=presMonthBoxV99 style="display:none;margin-top:9px"><label>Mês de referência</label><input id=presMonthV99 type=month class=field value="'+esc(currentMonth)+'"></div></div>'+
+          '<div class=presChoiceV99><label>Saída</label><div class=presActionsV99>'+
+            '<button class="btn ghost" onclick="presPreviewV99()">Gerar prévia</button>'+
+            '<button class=btn onclick="presGeneratePptxV99()">Gerar PowerPoint</button>'+
+          '</div><div id=presStatusV99 class=presStatusV99></div></div>'+
+        '</div>'+
+        '<div class=presRulesV99>'+
+          '<div class=presRuleV99><b>Lojas Priorizadas</b>Termo padrão em toda a apresentação. O slide mostra resultado, share, variação, captado, pedidos, ticket e dispersão — sem causas, fatores externos ou plano de ação.</div>'+
+          '<div class=presRuleV99><b>Reconhecimento</b>Pódio Top 3 + ranking 4º ao 10º para colaboradores e supervisores. Supervisores são classificados pelo volume captado total da loja.</div>'+
+          '<div class=presRuleV99><b>Identidade</b>Logo oficial, Pantones institucionais e slogan “Moda que inspira o Brasil”.</div>'+
+          '<div class=presRuleV99><b>Direcionamento final</b>Encerramento visual com Esquadrão do Cliente, sem bloco de “Próximos passos”.</div>'+
+        '</div>'+
+        '<div id=presPreviewV99 class=presPreviewV99>'+
+          presPreviewStructureV99('week')+
+        '</div>'+
+      '</div>';
+  };
+
+  window.presSetPeriodV99=function(p){
+    PRES_PERIOD_V99=p;PRES_DATA_V99=null;
+    ['week','month','year'].forEach(k=>document.getElementById('presP'+k.charAt(0).toUpperCase()+k.slice(1)+'V99')?.classList.toggle('on',k===p));
+    const mb=document.getElementById('presMonthBoxV99');if(mb)mb.style.display=p==='month'?'block':'none';
+    const pv=document.getElementById('presPreviewV99');if(pv)pv.innerHTML=presPreviewStructureV99(p);
+  };
+  function presPreviewStructureV99(p){
+    const base=[
+      ['Capa Executiva','Panorama Regional eStore • CE+PI','green'],
+      ['Resumo Executivo','Share, Captado, Pedidos, Ticket Médio e Dispersão','orange'],
+      [p==='week'?'Evolução / Retração de Share':'Share e Performance por Loja',p==='week'?'Comparativo com a semana anterior':'Leitura regional do período','sage']
+    ];
+    if(p==='week'){
+      base.push(['Top Recuperações e Retrações','Ranking de evolução/retração de Share','wine']);
+      base.push(['Lojas Priorizadas / FCA','Somente indicadores de performance — sem causas ou plano de ação','orange']);
+    }
+    base.push(['Dispersões','Leitura regional e lojas com maior oportunidade','sage']);
+    base.push(['Reconhecimento • Colaboradores','Top 3 captado + Top 3 pedidos + 4º ao 10º','orange']);
+    base.push(['Reconhecimento • Supervisores','Pódio por volume da loja + 4º ao 10º','green']);
+    base.push(['Direcionamento Final','Esquadrão do Cliente • fechamento executivo','wine']);
+    return base.map((x,i)=>'<div class="presThumbV99 '+x[2]+'"><b>'+String(i+1).padStart(2,'0')+' • '+x[0]+'</b><small>'+x[1]+'</small><div class=k><i>'+presPeriodLabelV99(p)+'</i><i>CE+PI</i></div></div>').join('');
+  }
+
+  async function presLoadDataV99(){
+    if(PRES_LOADING_V99)throw new Error('A apresentação já está sendo processada.');
+    PRES_LOADING_V99=true;
+    try{
+      const period=PRES_PERIOD_V99,month=period==='month'?(document.getElementById('presMonthV99')?.value||String(COMMON?.asof||'2026-10-01').slice(0,7)):'';
+      const req=[
+        api({action:'ranking_period',matricula:U.u.id,period,month:period==='month'?month:undefined,store:U.u.st}),
+        api({action:'supervisor_highlights',matricula:U.u.id,period})
+      ];
+      if(period==='week')req.push(api({action:'fca_dashboard',matricula:U.u.id}));
+      const out=await Promise.all(req);
+      const ranking=out[0]||{},supervisors=out[1]||{},fca=period==='week'?(out[2]||null):null;
+      const regional=(ranking.regional||[]).filter(x=>(+x.c||0)>0);
+      const collabCaptured=[...regional].sort((a,b)=>(+b.c||0)-(+a.c||0)).slice(0,10);
+      const collabOrders=[...regional].sort((a,b)=>(+b.o||0)-(+a.o||0)||(+b.c||0)-(+a.c||0)).slice(0,10);
+      const supervisorRanking=[...(supervisors.sales||[])].sort((a,b)=>(+b.c||0)-(+a.c||0)).slice(0,10);
+      const dispersion=[...(supervisors.stores||[])].filter(x=>(+x.total||0)>0).sort((a,b)=>(+b.disp||0)-(+a.disp||0)||(+b.zeros||0)-(+a.zeros||0));
+      PRES_DATA_V99={period,month,ranking,supervisors,fca,collabCaptured,collabOrders,supervisorRanking,dispersion,asof:supervisors.asof||COMMON?.asof||''};
+      return PRES_DATA_V99;
+    }finally{PRES_LOADING_V99=false}
+  }
+  function presStatusV99(msg,type=''){
+    const e=document.getElementById('presStatusV99');if(e)e.innerHTML='<div class="notice '+type+'">'+esc(msg)+'</div>';
+  }
+  window.presPreviewV99=async function(){
+    try{
+      presStatusV99('Consolidando dados da apresentação...');
+      const d=await presLoadDataV99(),s=presSummaryV99(d),pv=document.getElementById('presPreviewV99');
+      if(pv)pv.innerHTML=
+        '<div class=presThumbV99><b>Resumo • '+esc(presPeriodDescriptorV99(d))+'</b><small>Share '+presPctV99(s.share)+' • Captado '+presMoneyCompactV99(s.captured)+' • '+presNumV99(s.orders)+' pedidos • Ticket '+presMoneyV99(s.ticket)+'</small><div class=k><i>Dispersão '+presPctV99(s.dispersion,1)+'</i><i>'+presNumV99(s.zeros)+' sem venda</i></div></div>'+
+        '<div class="presThumbV99 orange"><b>Reconhecimento</b><small>1º captado: '+esc(preferredName(d.collabCaptured?.[0]?.id,d.collabCaptured?.[0]?.name)||'—')+' • 1º pedidos: '+esc(preferredName(d.collabOrders?.[0]?.id,d.collabOrders?.[0]?.name)||'—')+'</small><div class=k><i>'+d.collabCaptured.length+' no ranking</i><i>Top 10</i></div></div>'+
+        '<div class="presThumbV99 green"><b>Supervisores</b><small>'+(d.supervisorRanking[0]?esc(d.supervisorRanking[0].st+' • '+presFirstNamesV99(d.supervisorRanking[0])):'Sem dados')+'</small><div class=k><i>Ranking por loja</i><i>Top 10</i></div></div>'+
+        (d.period==='week'?'<div class="presThumbV99 wine"><b>Lojas Priorizadas</b><small>'+presNumV99(d.fca?.prioritized?.length||0)+' lojas priorizadas pela retração de Share.</small><div class=k><i>FCA</i><i>Δ p.p.</i></div></div>':'')+
+        '<div class=presThumbV99><b>Estrutura completa</b><small>'+presPreviewStructureV99(d.period).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,180)+'…</small></div>';
+      presStatusV99('Prévia atualizada com os dados do App.','success');
+    }catch(e){presStatusV99(e.message||'Não foi possível gerar a prévia.','danger')}
+  };
+
+  async function presLoadPptxLibV99(){
+    if(window.pptxgen||window.PptxGenJS)return window.pptxgen||window.PptxGenJS;
+    return new Promise((resolve,reject)=>{
+      const old=document.getElementById('pptxgen-v99');
+      if(old){old.addEventListener('load',()=>resolve(window.pptxgen||window.PptxGenJS),{once:true});old.addEventListener('error',()=>reject(new Error('Falha ao carregar o gerador PowerPoint.')),{once:true});return}
+      const s=document.createElement('script');s.id='pptxgen-v99';s.src='https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js';
+      s.onload=()=>resolve(window.pptxgen||window.PptxGenJS);s.onerror=()=>reject(new Error('Falha ao carregar o gerador PowerPoint. Verifique sua conexão.'));document.head.appendChild(s);
+    });
+  }
+  async function presDataUrlV99(url){
+    if(!url)return '';
+    try{
+      const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);
+      const b=await r.blob();
+      return await new Promise((ok,err)=>{const fr=new FileReader();fr.onload=()=>ok(fr.result);fr.onerror=err;fr.readAsDataURL(b)});
+    }catch(e){return ''}
+  }
+  async function presLogoV99(color){
+    try{
+      const r=await fetch('./assets/riachuelo-logo-exact-v75.svg?build=v99',{cache:'no-store'});
+      let svg=await r.text();svg=svg.replace(/fill="#fff"/gi,'fill="#'+color+'"').replace(/fill="#ffffff"/gi,'fill="#'+color+'"');
+      return 'data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(svg)));
+    }catch(e){return ''}
+  }
+  function presShapeV99(slide,pptx,type,opt){slide.addShape((pptx.ShapeType&&pptx.ShapeType[type])||type,opt)}
+  function presTextV99(slide,text,x,y,w,h,opt={}){
+    slide.addText(String(text??''),{x,y,w,h,fontFace:'Arial',fontSize:opt.fontSize||16,bold:!!opt.bold,color:opt.color||PRES_C99.ink,
+      align:opt.align||'left',valign:opt.valign||'mid',margin:opt.margin===undefined?0:opt.margin,breakLine:!!opt.breakLine,
+      fit:'shrink',isTextBox:true,italic:!!opt.italic,bullet:opt.bullet,hyperlink:opt.hyperlink});
+  }
+  function presHeaderV99(slide,pptx,title,subtitle,logoGreen,idx){
+    presTextV99(slide,String(idx).padStart(2,'0'),.28,.17,.38,.28,{fontSize:8,bold:true,color:PRES_C99.orange,align:'center'});
+    presTextV99(slide,title,.72,.12,8.9,.32,{fontSize:18,bold:true,color:PRES_C99.green});
+    presTextV99(slide,subtitle,.72,.44,8.9,.22,{fontSize:8,color:PRES_C99.sage});
+    if(logoGreen)slide.addImage({data:logoGreen,x:11.15,y:.16,w:1.55,h:.17});
+    presShapeV99(slide,pptx,'line',{x:.72,y:.73,w:11.95,h:0,line:{color:PRES_C99.sand,width:.8}});
+  }
+  function presFooterV99(slide){
+    presTextV99(slide,'MODA QUE INSPIRA O BRASIL',.58,7.18,3.2,.14,{fontSize:6,color:PRES_C99.sage});
+    presTextV99(slide,'App. eStore CE+PI',11.35,7.15,1.35,.16,{fontSize:6,bold:true,color:PRES_C99.green,align:'right'});
+  }
+  function presCardV99(slide,pptx,x,y,w,h,title,value,sub,accent=PRES_C99.green,subColor=PRES_C99.muted){
+    presShapeV99(slide,pptx,'roundRect',{x,y,w,h,rectRadius:.08,fill:{color:PRES_C99.white},line:{color:'E7E2D8',width:.8},shadow:{type:'outer',color:'B9B3A7',opacity:.14,blur:1.5,angle:45,distance:1}});
+    presShapeV99(slide,pptx,'ellipse',{x:x+.16,y:y+.16,w:.38,h:.38,fill:{color:accent},line:{color:accent}});
+    presTextV99(slide,title,x+.62,y+.14,w-.78,.26,{fontSize:8,bold:true,color:PRES_C99.green});
+    presTextV99(slide,value,x+.18,y+.63,w-.36,.40,{fontSize:22,bold:true,color:PRES_C99.green});
+    presTextV99(slide,sub,x+.18,y+1.10,w-.36,.34,{fontSize:7,bold:true,color:subColor});
+  }
+  function presMetricDeltaV99(v,kind){
+    if(v===null||v===undefined||!Number.isFinite(Number(v)))return {text:'Base atual',color:PRES_C99.muted};
+    const n=Number(v),sign=n>0?'+':'';
+    return {text:kind==='share'?presPpV99(n):sign+(n*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%',color:n>=0?PRES_C99.greenUp:PRES_C99.red};
+  }
+  function presRankTableV99(slide,pptx,title,rows,x,y,w,h,mode){
+    presShapeV99(slide,pptx,'roundRect',{x,y,w,h,fill:{color:PRES_C99.white},line:{color:'E5E1D8',width:.8}});
+    presShapeV99(slide,pptx,'rect',{x,y,w,h:.48,fill:{color:PRES_C99.green},line:{color:PRES_C99.green}});
+    presTextV99(slide,title,x+.18,y+.08,w-.36,.30,{fontSize:11,bold:true,color:PRES_C99.white});
+    const headers=mode==='collab'?['#','Nome / Loja','Captado','Ped.']:['#','Loja / Supervisores','Captado','Share'];
+    const hx=[x+.16,x+.52,x+w-2.40,x+w-.92],hw=[.26,w-3.15,1.38,.72];
+    headers.forEach((t,i)=>presTextV99(slide,t,hx[i],y+.55,hw[i],.20,{fontSize:6,bold:true,color:PRES_C99.muted,align:i>1?'right':'left'}));
+    const rh=(h-.84)/Math.max(1,rows.length);
+    rows.forEach((r,i)=>{
+      const yy=y+.82+i*rh;
+      if(i%2===0)presShapeV99(slide,pptx,'rect',{x:x+.07,y:yy-.02,w:w-.14,h:rh,fill:{color:'FBFAF7'},line:{color:'FBFAF7'}});
+      presTextV99(slide,String(i+1),x+.16,yy,.24,rh-.02,{fontSize:7,bold:true,color:i<3?PRES_C99.orange:PRES_C99.green});
+      if(mode==='collab'){
+        presTextV99(slide,preferredName(r.id,r.name),x+.52,yy,w-3.18,rh*.50,{fontSize:7,bold:true,color:PRES_C99.green});
+        presTextV99(slide,'Filial '+r.st,x+.52,yy+rh*.46,w-3.18,rh*.35,{fontSize:5.5,color:PRES_C99.muted});
+        presTextV99(slide,presMoneyCompactV99(r.c),x+w-2.40,yy,1.38,rh-.02,{fontSize:6.7,bold:true,color:PRES_C99.green,align:'right'});
+        presTextV99(slide,presNumV99(r.o),x+w-.92,yy,.72,rh-.02,{fontSize:6.7,bold:true,color:PRES_C99.green,align:'right'});
+      }else{
+        presTextV99(slide,r.st+' • '+supervisorPrettyStoreV46(r.st,r.name),x+.52,yy,w-3.18,rh*.48,{fontSize:6.7,bold:true,color:PRES_C99.green});
+        presTextV99(slide,presFirstNamesV99(r),x+.52,yy+rh*.44,w-3.18,rh*.37,{fontSize:5.3,color:PRES_C99.muted});
+        presTextV99(slide,presMoneyCompactV99(r.c),x+w-2.40,yy,1.38,rh-.02,{fontSize:6.5,bold:true,color:PRES_C99.green,align:'right'});
+        presTextV99(slide,presPctV99(r.share),x+w-.92,yy,.72,rh-.02,{fontSize:6.5,bold:true,color:PRES_C99.green,align:'right'});
+      }
+    });
+  }
+  function presPodiumV99(slide,pptx,rows,title,valueFn,x,y,w,h){
+    presTextV99(slide,title,x,y,w,.32,{fontSize:12,bold:true,color:PRES_C99.green,align:'center'});
+    const order=[1,0,2],colors=['C9CED1','D9A51D','C47B43'],bases=[y+1.45,y+.95,y+1.64],heights=[1.10,1.60,.91];
+    order.forEach((idx,j)=>{
+      const r=rows[idx];if(!r)return;
+      const bw=w/3-.12,bx=x+j*(w/3)+.06,by=bases[j];
+      presShapeV99(slide,pptx,'roundRect',{x:bx,y:by,w:bw,h:heights[j],fill:{color:colors[j]},line:{color:colors[j]}});
+      presTextV99(slide,(idx+1)+'º',bx,by+.08,bw,.28,{fontSize:14,bold:true,color:j===1?PRES_C99.white:PRES_C99.green,align:'center'});
+      const name=r.supervisors?presFirstNamesV99(r):preferredName(r.id,r.name);
+      presTextV99(slide,name,bx+.08,by+.42,bw-.16,.48,{fontSize:8,bold:true,color:j===1?PRES_C99.white:PRES_C99.green,align:'center'});
+      presTextV99(slide,r.supervisors?(r.st+' • '+supervisorPrettyStoreV46(r.st,r.name)):('Filial '+r.st),bx+.08,by+.88,bw-.16,.30,{fontSize:5.7,color:j===1?'FFF5D4':PRES_C99.green,align:'center'});
+      presTextV99(slide,valueFn(r),bx+.08,by+heights[j]-.32,bw-.16,.24,{fontSize:7.5,bold:true,color:j===1?PRES_C99.white:PRES_C99.green,align:'center'});
+    });
+  }
+  function presBarRowsV99(slide,pptx,rows,x,y,w,h,valueKey,labelFn,color=PRES_C99.green){
+    const max=Math.max(...rows.map(r=>Math.abs(Number(r[valueKey])||0)),.0001),rh=h/Math.max(rows.length,1);
+    rows.forEach((r,i)=>{
+      const yy=y+i*rh,val=Number(r[valueKey])||0;
+      presTextV99(slide,labelFn(r),x,yy,w*.38,rh-.04,{fontSize:6.3,bold:true,color:PRES_C99.green});
+      presShapeV99(slide,pptx,'roundRect',{x:x+w*.39,y:yy+.08,w:(w*.43)*Math.abs(val)/max,h:.18,fill:{color},line:{color}});
+      presTextV99(slide,valueKey==='disp'?presPctV99(val,1):presPpV99(val),x+w*.83,yy,w*.16,rh-.04,{fontSize:6.3,bold:true,color,align:'right'});
+    });
+  }
+
+  async function presBuildDeckV99(data){
+    const Lib=await presLoadPptxLibV99();
+    if(!Lib)throw new Error('Gerador PowerPoint indisponível.');
+    const pptx=new Lib();
+    pptx.layout='LAYOUT_WIDE';
+    pptx.author='App. eStore CE+PI';
+    pptx.company='Riachuelo';
+    pptx.subject='Panorama Regional eStore CE+PI';
+    pptx.title='Panorama Regional eStore • CE+PI';
+    pptx.lang='pt-BR';
+    pptx.theme={headFontFace:'Arial',bodyFontFace:'Arial',lang:'pt-BR'};
+    pptx.defineSlideMaster({title:'RCH_LIGHT',background:{color:PRES_C99.cream},objects:[]});
+    const ST=pptx.ShapeType||{};
+    const logoWhite=await presLogoV99(PRES_C99.white),logoGreen=await presLogoV99(PRES_C99.green);
+    const esquadrao=await presDataUrlV99('./esquadrao-cliente-card.jpg');
+    const summary=presSummaryV99(data),descriptor=presPeriodDescriptorV99(data);
+
+    // 01 Capa.
+    {
+      const s=pptx.addSlide();s.background={color:PRES_C99.green};
+      presShapeV99(s,pptx,'arc',{x:8.0,y:-1.45,w:6.8,h:7.8,adjustPoint:.35,rotate:0,fill:{color:PRES_C99.sand,transparency:3},line:{color:PRES_C99.sand,transparency:100}});
+      presShapeV99(s,pptx,'arc',{x:8.7,y:-.95,w:5.9,h:7.0,adjustPoint:.35,rotate:0,fill:{color:PRES_C99.orangeU,transparency:2},line:{color:PRES_C99.orangeU,transparency:100}});
+      if(logoWhite)s.addImage({data:logoWhite,x:.65,y:.48,w:2.25,h:.18});
+      presShapeV99(s,pptx,'line',{x:.67,y:1.08,w:.45,h:0,line:{color:PRES_C99.orange,width:2}});
+      presTextV99(s,'PANORAMA\nREGIONAL',.68,1.30,5.8,1.45,{fontSize:37,bold:true,color:PRES_C99.white});
+      presTextV99(s,'eStore • CE+PI',.68,2.82,5.1,.46,{fontSize:24,color:PRES_C99.white});
+      presTextV99(s,'Resultado '+presPeriodLabelV99(data.period)+' | Share, Venda Captada, Pedidos, Ticket Médio e Dispersão',.70,3.42,5.9,.60,{fontSize:11,color:'E8ECEA'});
+      presShapeV99(s,pptx,'roundRect',{x:.70,y:4.32,w:4.90,h:.62,fill:{color:'21483F',transparency:8},line:{color:PRES_C99.sage,width:1}});
+      presTextV99(s,'GERADO PELO APP • '+descriptor,.92,4.49,4.45,.22,{fontSize:8,bold:true,color:'F3D696'});
+      presTextV99(s,'MODA QUE INSPIRA O BRASIL',.70,6.82,3.25,.18,{fontSize:7,color:'E5D8B7'});
+      presTextV99(s,'01',12.58,.20,.35,.22,{fontSize:7,color:'F3D696',align:'right'});
+    }
+
+    // 02 Resumo executivo.
+    {
+      const s=pptx.addSlide('RCH_LIGHT');presHeaderV99(s,pptx,'RESUMO EXECUTIVO','eStore CE+PI | '+descriptor,logoGreen,2);
+      const dShare=presMetricDeltaV99(summary.share_delta,'share'),dCap=presMetricDeltaV99(summary.captured_change),dOrd=presMetricDeltaV99(summary.orders_change),dTkt=presMetricDeltaV99(summary.ticket_change);
+      const cards=[
+        ['Share eStore',presPctV99(summary.share),data.period==='week'?dShare.text:'Resultado regional',PRES_C99.green,data.period==='week'?dShare.color:PRES_C99.sage],
+        ['Venda Captada',presMoneyCompactV99(summary.captured),data.period==='week'?dCap.text:'Acumulado do período',PRES_C99.orange,data.period==='week'?dCap.color:PRES_C99.sage],
+        ['Pedidos',presNumV99(summary.orders),data.period==='week'?dOrd.text:'Volume do período',PRES_C99.sand,data.period==='week'?dOrd.color:PRES_C99.sage],
+        ['Ticket Médio',presMoneyV99(summary.ticket),data.period==='week'?dTkt.text:'Média regional',PRES_C99.wine,data.period==='week'?dTkt.color:PRES_C99.sage]
+      ];
+      cards.forEach((a,i)=>presCardV99(s,pptx,.55+i*3.15,1.02,2.85,1.72,a[0],a[1],a[2],a[3],a[4]));
+      presCardV99(s,pptx,.55,3.08,3.9,1.34,'Dispersão Regional',presPctV99(summary.dispersion,1),presNumV99(summary.zeros)+' colaboradores sem venda',PRES_C99.orange,PRES_C99.wine);
+      presCardV99(s,pptx,4.70,3.08,3.9,1.34,'Participação com venda',presPctV99(summary.total?(summary.total-summary.zeros)/summary.total:0,1),presNumV99(Math.max(0,summary.total-summary.zeros))+' de '+presNumV99(summary.total)+' colaboradores',PRES_C99.green,PRES_C99.greenUp);
+      presCardV99(s,pptx,8.85,3.08,3.9,1.34,'Lojas com venda',(data.supervisors?.stores||[]).filter(x=>(+x.c||0)>0).length+' / '+(data.supervisors?.stores||[]).length,'Regional CE+PI',PRES_C99.sage,PRES_C99.sage);
+      presTextV99(s,'LEITURA EXECUTIVA',.62,4.83,2.4,.24,{fontSize:9,bold:true,color:PRES_C99.orange});
+      let reading='O resultado consolida a performance regional do período, combinando entrega de Share, volume captado, pedidos, ticket e mobilização do time.';
+      if(data.period==='week'&&summary.share_delta!==null)reading+=(summary.share_delta>=0?' A Regional apresentou evolução de Share frente à semana anterior.':' O Share regional apresentou retração frente à semana anterior, direcionando atenção às lojas com maior perda em p.p.');
+      presTextV99(s,reading,.62,5.15,11.9,.70,{fontSize:16,bold:true,color:PRES_C99.green});
+      presFooterV99(s);
+    }
+
+    // 03 Share / evolução.
+    {
+      const s=pptx.addSlide('RCH_LIGHT');
+      presHeaderV99(s,pptx,data.period==='week'?'EVOLUÇÃO / RETRAÇÃO DE SHARE':'SHARE E PERFORMANCE POR LOJA',(data.period==='week'?'Comparativo semanal':'Leitura regional')+' | eStore CE+PI',logoGreen,3);
+      presCardV99(s,pptx,.55,1.03,2.75,1.72,'Share Regional',presPctV99(summary.share),data.period==='week'?presPpV99(summary.share_delta)+' vs semana anterior':'Resultado do período',PRES_C99.green,summary.share_delta>=0?PRES_C99.greenUp:PRES_C99.red);
+      if(data.period==='week'){
+        const growth=(data.fca?.growth||[]).slice(0,5),ret=(data.fca?.prioritized||[]).slice(0,5);
+        presTextV99(s,'Maiores recuperações',3.65,1.00,3.9,.32,{fontSize:13,bold:true,color:PRES_C99.green});
+        presBarRowsV99(s,pptx,growth,3.65,1.48,4.15,2.40,'share_delta',r=>r.st+' • '+storeDisplayName(r.st),PRES_C99.greenUp);
+        presTextV99(s,'Maiores retrações',8.15,1.00,3.9,.32,{fontSize:13,bold:true,color:PRES_C99.wine});
+        presBarRowsV99(s,pptx,ret,8.15,1.48,4.15,2.40,'share_delta',r=>r.st+' • '+storeDisplayName(r.st),PRES_C99.red);
+        const evo=data.fca?.summary?.evolved||0,down=data.fca?.summary?.retracted||0,stable=data.fca?.summary?.stable||0;
+        presCardV99(s,pptx,.55,4.35,3.75,1.25,'Lojas em evolução',presNumV99(evo),'Share superior à semana anterior',PRES_C99.greenUp,PRES_C99.greenUp);
+        presCardV99(s,pptx,4.62,4.35,3.75,1.25,'Lojas estáveis',presNumV99(stable),'Sem variação relevante',PRES_C99.sand,PRES_C99.muted);
+        presCardV99(s,pptx,8.70,4.35,3.75,1.25,'Lojas em retração',presNumV99(down),'Share inferior à semana anterior',PRES_C99.wine,PRES_C99.red);
+      }else{
+        const shares=[...(data.supervisors?.shares||[])].slice(0,10),max=Math.max(...shares.map(x=>+x.share||0),.01);
+        presTextV99(s,'Top 10 Share • Lojas',3.65,1.02,4.0,.30,{fontSize:13,bold:true,color:PRES_C99.green});
+        shares.forEach((r,i)=>{
+          const yy=1.48+i*.42;
+          presTextV99(s,(i+1)+'º  '+r.st+' • '+supervisorPrettyStoreV46(r.st,r.name),3.65,yy,4.05,.20,{fontSize:6.5,bold:true,color:PRES_C99.green});
+          presShapeV99(s,pptx,'roundRect',{x:7.85,y:yy+.02,w:3.65*(+r.share||0)/max,h:.15,fill:{color:PRES_C99.green},line:{color:PRES_C99.green}});
+          presTextV99(s,presPctV99(r.share),11.60,yy,1.0,.20,{fontSize:6.5,bold:true,color:PRES_C99.green,align:'right'});
+        });
+      }
+      presFooterV99(s);
+    }
+
+    if(data.period==='week'){
+      // 04 Recuperações e retrações.
+      {
+        const s=pptx.addSlide('RCH_LIGHT');presHeaderV99(s,pptx,'TOP RECUPERAÇÕES E TOP RETRAÇÕES','Lojas eStore CE+PI | '+descriptor,logoGreen,4);
+        const growth=(data.fca?.growth||[]).slice(0,5),ret=(data.fca?.prioritized||[]).slice(0,5);
+        const tab=(rows,title,x,col)=>{
+          presShapeV99(s,pptx,'roundRect',{x,y:1.12,w:5.92,h:4.95,fill:{color:PRES_C99.white},line:{color:'E4E0D8',width:.8}});
+          presShapeV99(s,pptx,'ellipse',{x:x+.20,y:1.34,w:.40,h:.40,fill:{color:col},line:{color:col}});
+          presTextV99(s,title,x+.72,1.27,4.80,.36,{fontSize:12,bold:true,color:PRES_C99.green});
+          const headers=['#','Loja','Captado','Share','Ped.','Ticket'];const xs=[x+.18,x+.52,x+3.00,x+4.00,x+4.72,x+5.16],ws=[.25,2.35,.92,.68,.45,.58];
+          headers.forEach((t,i)=>presTextV99(s,t,xs[i],1.83,ws[i],.20,{fontSize:5.5,bold:true,color:PRES_C99.muted,align:i>=2?'right':'left'}));
+          rows.forEach((r,i)=>{
+            const yy=2.15+i*.71;if(i%2===0)presShapeV99(s,pptx,'rect',{x:x+.12,y:yy-.06,w:5.68,h:.64,fill:{color:'FBFAF7'},line:{color:'FBFAF7'}});
+            presTextV99(s,String(i+1),x+.18,yy,.24,.26,{fontSize:7,bold:true,color:col});
+            presTextV99(s,r.st+' • '+storeDisplayName(r.st),x+.52,yy,2.36,.30,{fontSize:6.3,bold:true,color:PRES_C99.green});
+            presTextV99(s,presPpV99(r.share_delta),x+.52,yy+.30,2.36,.18,{fontSize:5.3,bold:true,color:col});
+            presTextV99(s,presMoneyCompactV99(r.captured),x+3.00,yy,.92,.28,{fontSize:5.8,bold:true,color:PRES_C99.green,align:'right'});
+            presTextV99(s,presPctV99(r.share),x+4.00,yy,.68,.28,{fontSize:5.8,bold:true,color:PRES_C99.green,align:'right'});
+            presTextV99(s,presNumV99(r.orders),x+4.72,yy,.45,.28,{fontSize:5.8,bold:true,color:PRES_C99.green,align:'right'});
+            presTextV99(s,presMoneyV99(r.ticket),x+5.16,yy,.58,.28,{fontSize:5.5,bold:true,color:PRES_C99.green,align:'right'});
+          });
+        };
+        tab(growth,'Top 5 Recuperações de Share',.55,PRES_C99.greenUp);tab(ret,'Top 5 Retrações de Share',6.83,PRES_C99.wine);
+        presFooterV99(s);
+      }
+
+      // 05 Lojas Priorizadas — no causes/actions.
+      {
+        const s=pptx.addSlide('RCH_LIGHT');presHeaderV99(s,pptx,'LOJAS PRIORIZADAS / FCA','Maiores retrações de Share | eStore CE+PI',logoGreen,5);
+        const rows=(data.fca?.prioritized||[]).slice(0,5);
+        const headers=['#','Loja','Share ant.','Share atual','Δ p.p.','Captado','Pedidos','Ticket','Dispersão'];
+        const xs=[.58,.92,4.45,5.43,6.38,7.35,8.82,9.72,10.82],ws=[.25,3.35,.75,.75,.72,1.18,.72,.85,1.30];
+        presShapeV99(s,pptx,'roundRect',{x:.48,y:1.07,w:12.35,h:4.95,fill:{color:PRES_C99.white},line:{color:'E4E0D8',width:.8}});
+        headers.forEach((t,i)=>presTextV99(s,t,xs[i],1.25,ws[i],.25,{fontSize:5.6,bold:true,color:PRES_C99.muted,align:i>=2?'right':'left'}));
+        rows.forEach((r,i)=>{
+          const yy=1.73+i*.78;if(i%2===0)presShapeV99(s,pptx,'rect',{x:.54,y:yy-.06,w:12.22,h:.69,fill:{color:'FBFAF7'},line:{color:'FBFAF7'}});
+          presShapeV99(s,pptx,'ellipse',{x:.58,y:yy+.10,w:.14,h:.14,fill:{color:i<2?PRES_C99.red:PRES_C99.orange},line:{color:i<2?PRES_C99.red:PRES_C99.orange}});
+          presTextV99(s,String(i+1),.76,yy,.16,.28,{fontSize:6,bold:true,color:PRES_C99.green});
+          presTextV99(s,r.st+' • '+storeDisplayName(r.st),.92,yy,3.35,.33,{fontSize:6.8,bold:true,color:PRES_C99.green});
+          presTextV99(s,presPctV99(r.previous_share),4.45,yy,.75,.33,{fontSize:6.3,color:PRES_C99.green,align:'right'});
+          presTextV99(s,presPctV99(r.share),5.43,yy,.75,.33,{fontSize:6.3,bold:true,color:PRES_C99.green,align:'right'});
+          presTextV99(s,presPpV99(r.share_delta),6.38,yy,.72,.33,{fontSize:6.3,bold:true,color:PRES_C99.red,align:'right'});
+          presTextV99(s,presMoneyCompactV99(r.captured),7.35,yy,1.18,.33,{fontSize:6.1,bold:true,color:PRES_C99.green,align:'right'});
+          presTextV99(s,presNumV99(r.orders),8.82,yy,.72,.33,{fontSize:6.1,bold:true,color:PRES_C99.green,align:'right'});
+          presTextV99(s,presMoneyV99(r.ticket),9.72,yy,.85,.33,{fontSize:6.1,bold:true,color:PRES_C99.green,align:'right'});
+          presTextV99(s,presPctV99(r.dispersion,1),10.82,yy,1.30,.33,{fontSize:6.1,bold:true,color:PRES_C99.green,align:'right'});
+        });
+        presTextV99(s,'A priorização considera as maiores retrações de Share da semana frente à semana anterior.',.62,6.28,8.9,.30,{fontSize:8,bold:true,color:PRES_C99.green});
+        presTextV99(s,'Sem exposição de causas, fatores externos ou plano de ação neste material executivo.',.62,6.62,8.9,.24,{fontSize:7,color:PRES_C99.muted});
+        presFooterV99(s);
+      }
+    }
+
+    // Dispersões.
+    {
+      const numSlide=data.period==='week'?6:4;
+      const s=pptx.addSlide('RCH_LIGHT');presHeaderV99(s,pptx,'DISPERSÕES','Mobilização do time | eStore CE+PI',logoGreen,numSlide);
+      const rows=data.dispersion.slice(0,8);
+      presCardV99(s,pptx,.55,1.00,3.60,1.55,'Dispersão Regional',presPctV99(summary.dispersion,1),presNumV99(summary.zeros)+' colaboradores sem venda',PRES_C99.orange,PRES_C99.wine);
+      presCardV99(s,pptx,4.42,1.00,3.60,1.55,'Time com venda',presPctV99(summary.total?(summary.total-summary.zeros)/summary.total:0,1),presNumV99(Math.max(0,summary.total-summary.zeros))+' colaboradores',PRES_C99.green,PRES_C99.greenUp);
+      presCardV99(s,pptx,8.29,1.00,4.00,1.55,'Base Regional',presNumV99(summary.total),'colaboradores considerados no período',PRES_C99.sage,PRES_C99.sage);
+      presTextV99(s,'Lojas com maior dispersão',.62,2.95,4.0,.30,{fontSize:13,bold:true,color:PRES_C99.green});
+      presBarRowsV99(s,pptx,rows,.62,3.42,7.55,2.75,'disp',r=>r.st+' • '+supervisorPrettyStoreV46(r.st,r.name),PRES_C99.orange);
+      presShapeV99(s,pptx,'roundRect',{x:8.55,y:3.02,w:3.75,h:2.88,fill:{color:'FFF8EA'},line:{color:'E9D7AE',width:.8}});
+      presTextV99(s,'LEITURA',8.82,3.30,1.4,.25,{fontSize:8,bold:true,color:PRES_C99.orange});
+      presTextV99(s,'Dispersão mede a parcela do time ativo sem venda no período. O objetivo é ampliar participação com venda e reduzir a concentração do resultado em poucos colaboradores.',8.82,3.72,3.15,1.45,{fontSize:13,bold:true,color:PRES_C99.green});
+      presFooterV99(s);
+    }
+
+    // Reconhecimento Colaboradores.
+    {
+      const numSlide=data.period==='week'?7:5;
+      const s=pptx.addSlide('RCH_LIGHT');presHeaderV99(s,pptx,'RECONHECIMENTO • COLABORADORES','Destaques da Regional | eStore CE+PI',logoGreen,numSlide);
+      presPodiumV99(s,pptx,data.collabCaptured.slice(0,3),'Top 3 • Volume Captado',r=>presMoneyCompactV99(r.c),.50,1.05,6.05,2.95);
+      presPodiumV99(s,pptx,data.collabOrders.slice(0,3),'Top 3 • Volume de Pedidos',r=>presNumV99(r.o)+' pedidos',6.78,1.05,6.05,2.95);
+      presRankTableV99(s,pptx,'4º ao 10º • Captado',data.collabCaptured.slice(3,10),.55,4.12,6.05,2.48,'collab');
+      presRankTableV99(s,pptx,'4º ao 10º • Pedidos',data.collabOrders.slice(3,10),6.75,4.12,6.05,2.48,'collab');
+      presFooterV99(s);
+    }
+
+    // Supervisores.
+    {
+      const numSlide=data.period==='week'?8:6;
+      const s=pptx.addSlide('RCH_LIGHT');presHeaderV99(s,pptx,'PÓDIO REGIONAL DE SUPERVISORES','Ranking por volume captado da loja | eStore CE+PI',logoGreen,numSlide);
+      presPodiumV99(s,pptx,data.supervisorRanking.slice(0,3),'Top 3 • Lojas da Regional',r=>presMoneyCompactV99(r.c),1.15,1.08,11.0,3.15);
+      presRankTableV99(s,pptx,'4º ao 10º • Supervisores (por volume da loja)',data.supervisorRanking.slice(3,10),1.05,4.35,11.25,2.15,'sup');
+      presTextV99(s,'Quando a loja possui mais de um supervisor elegível, todos aparecem na mesma colocação com o primeiro nome de cada um.',1.08,6.66,10.90,.25,{fontSize:7,color:PRES_C99.muted,align:'center'});
+      presFooterV99(s);
+    }
+
+    // Final.
+    {
+      const numSlide=data.period==='week'?9:7;
+      const s=pptx.addSlide('RCH_LIGHT');presHeaderV99(s,pptx,'DIRECIONAMENTO FINAL','Esquadrão do Cliente | eStore CE+PI',logoGreen,numSlide);
+      presTextV99(s,'Com foco, disciplina e time engajado,\nseguimos evoluindo o eStore na CE+PI.',.62,1.45,5.25,1.25,{fontSize:25,bold:true,color:PRES_C99.green});
+      presShapeV99(s,pptx,'line',{x:.63,y:3.10,w:.45,h:0,line:{color:PRES_C99.orange,width:2}});
+      presTextV99(s,'PERFORMANCE QUE VIRA AÇÃO',.63,3.32,4.6,.26,{fontSize:8,bold:true,color:PRES_C99.orange});
+      presTextV99(s,'Share • Venda Captada • Pedidos • Ticket • Dispersão • Reconhecimento',.63,3.70,5.10,.55,{fontSize:13,bold:true,color:PRES_C99.green});
+      if(esquadrao)s.addImage({data:esquadrao,x:6.60,y:1.08,w:5.75,h:5.55});
+      else{
+        presShapeV99(s,pptx,'ellipse',{x:7.45,y:1.50,w:4.25,h:4.25,fill:{color:PRES_C99.sand},line:{color:PRES_C99.white,width:2}});
+        presTextV99(s,'ESQUADRÃO\nDO CLIENTE',8.12,2.90,2.90,.85,{fontSize:20,bold:true,color:PRES_C99.green,align:'center'});
+      }
+      presTextV99(s,'MODA QUE INSPIRA O BRASIL',.63,6.58,3.5,.18,{fontSize:7,color:PRES_C99.sage});
+      presTextV99(s,'App. eStore CE+PI',10.85,6.54,1.75,.22,{fontSize:7,bold:true,color:PRES_C99.green,align:'right',hyperlink:{url:'https://frannlima.github.io/app-estore-cepi/'}});
+    }
+    return pptx;
+  }
+
+  window.presGeneratePptxV99=async function(){
+    try{
+      presStatusV99('Consolidando resultados e montando a apresentação...');
+      const data=await presLoadDataV99(),pptx=await presBuildDeckV99(data);
+      const suffix=data.period==='month'?(data.month||'mes'):data.period;
+      const fileName='Panorama_Regional_eStore_CEPI_'+suffix+'.pptx';
+      presStatusV99('Gerando arquivo PowerPoint...');
+      await pptx.writeFile({fileName});
+      presStatusV99('Apresentação gerada com sucesso: '+fileName,'success');
+    }catch(e){
+      console.error('presentation v99',e);
+      presStatusV99(e.message||'Não foi possível gerar a apresentação.','danger');
+    }
+  };
+})();
 </script>
 
 </body>
