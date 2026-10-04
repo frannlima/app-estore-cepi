@@ -4953,5 +4953,251 @@ window.uploadHistoricalTicketsV97=async function(){
 <script src="./team-area-regional-v117.js?build=v117"></script>
 <script src="./bopis-analytics-v117.js?build=v117"></script>
 <!-- V100-PRESENTATION-ALIGNMENT-COVER-FIX -->
+
+
+<!-- V118-CAMPAIGN-SOUND-MENU-EFFECTS -->
+<style id="campaign-v118-effects-style">
+.campaignPage75 .hero75.heroBannerV91{
+  isolation:isolate;
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.campaignPage75 .hero75.heroBannerV91::before{
+  content:"";position:absolute;inset:-55%;z-index:11;pointer-events:none;
+  background:linear-gradient(112deg,transparent 43%,rgba(255,220,111,.22) 49%,rgba(255,255,255,.24) 51%,transparent 57%);
+  transform:translateX(-62%) rotate(2deg);
+  animation:campaignSweepV118 5.4s ease-in-out infinite;
+}
+.heroBannerV91 .cb91Halo{
+  animation:campaignHaloV118 2.35s ease-in-out infinite;
+}
+.heroBannerV91 .cb91Phone{
+  animation:campaignFloatPhoneV118 3.2s ease-in-out infinite;
+  transform-origin:50% 86%;
+}
+.heroBannerV91 .cb91Headset{
+  animation:campaignFloatHeadsetV118 3.2s ease-in-out .22s infinite;
+  transform-origin:50% 82%;
+}
+.heroBannerV91 .cb91Eq i{
+  transform-origin:center bottom;
+  animation:campaignEqV118 .78s ease-in-out infinite alternate;
+}
+.heroBannerV91 .cb91Eq i:nth-child(2){animation-delay:-.31s}
+.heroBannerV91 .cb91Eq i:nth-child(3){animation-delay:-.54s}
+.heroBannerV91 .cb91Eq i:nth-child(4){animation-delay:-.17s}
+.heroBannerV91 .cb91Eq i:nth-child(5){animation-delay:-.63s}
+.heroBannerV91 .cb91Eq i:nth-child(6){animation-delay:-.39s}
+.heroBannerV91 .cb91Eq i:nth-child(7){animation-delay:-.71s}
+.heroBannerV91 .cb91Eq i:nth-child(8){animation-delay:-.24s}
+.heroBannerV91 .cb91Btn{
+  position:relative;overflow:hidden;box-shadow:0 7px 17px rgba(241,190,60,.18);
+  animation:campaignBtnV118 2.5s ease-in-out infinite;
+}
+.heroBannerV91 .cb91Btn::after{
+  content:"";position:absolute;top:-90%;bottom:-90%;width:24%;left:-38%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.58),transparent);
+  transform:rotate(18deg);animation:campaignBtnShineV118 4.6s ease-in-out infinite;
+}
+.cb118Live{
+  position:absolute;right:3.3%;top:5%;z-index:14;display:flex;align-items:center;gap:5px;
+  border:1px solid rgba(255,225,137,.48);border-radius:999px;
+  padding:5px 8px;background:rgba(6,49,41,.73);backdrop-filter:blur(5px);
+  color:#fff;font-size:clamp(6.5px,.78vw,10px);font-weight:950;letter-spacing:.055em;
+  box-shadow:0 5px 15px rgba(0,0,0,.14)
+}
+.cb118Live i{
+  width:6px;height:6px;border-radius:50%;background:#f5c94e;box-shadow:0 0 0 0 rgba(245,201,78,.55);
+  animation:campaignLiveV118 1.55s ease-out infinite
+}
+.heroBannerV91.campaignHitV118{
+  animation:campaignHeroHitV118 .48s ease-out;
+}
+.campaignPopCardV89.campaignIntroV118{
+  animation:campaignPopupBeatV118 1.12s ease-out both;
+}
+.campaignPopCardV89.campaignIntroV118 .campaignPrizeGlowV89{
+  animation:campaignPopupGlowV118 1.12s ease-out both;
+}
+@keyframes campaignSweepV118{
+  0%,62%{transform:translateX(-62%) rotate(2deg);opacity:0}
+  68%{opacity:.4}
+  82%{transform:translateX(66%) rotate(2deg);opacity:.34}
+  88%,100%{transform:translateX(66%) rotate(2deg);opacity:0}
+}
+@keyframes campaignHaloV118{
+  0%,100%{transform:translate(-50%,-50%) scale(.97);opacity:.72;box-shadow:0 0 22px rgba(239,198,75,.18),inset 0 0 28px rgba(236,206,108,.09)}
+  50%{transform:translate(-50%,-50%) scale(1.035);opacity:1;box-shadow:0 0 42px rgba(239,198,75,.34),inset 0 0 42px rgba(236,206,108,.17)}
+}
+@keyframes campaignFloatPhoneV118{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-2.5%) rotate(-.7deg)}}
+@keyframes campaignFloatHeadsetV118{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-2.1%) rotate(1deg)}}
+@keyframes campaignEqV118{from{transform:scaleY(.48);filter:brightness(.94)}to{transform:scaleY(1.04);filter:brightness(1.17)}}
+@keyframes campaignBtnV118{0%,100%{transform:translateZ(0) scale(1)}50%{transform:translateZ(0) scale(1.025)}}
+@keyframes campaignBtnShineV118{0%,62%{left:-38%;opacity:0}67%{opacity:.6}80%{left:116%;opacity:.45}84%,100%{left:116%;opacity:0}}
+@keyframes campaignLiveV118{0%{box-shadow:0 0 0 0 rgba(245,201,78,.5)}75%,100%{box-shadow:0 0 0 8px rgba(245,201,78,0)}}
+@keyframes campaignHeroHitV118{0%{transform:scale(1)}38%{transform:scale(.985)}68%{transform:scale(1.012)}100%{transform:scale(1)}}
+@keyframes campaignPopupBeatV118{
+  0%{transform:scale(.985)}
+  8%{transform:scale(1.008)}
+  17%{transform:scale(1)}
+  33%{transform:scale(1)}
+  41%{transform:scale(1.011)}
+  50%{transform:scale(1)}
+  65%{transform:scale(1)}
+  74%{transform:scale(1.016)}
+  84%,100%{transform:scale(1)}
+}
+@keyframes campaignPopupGlowV118{
+  0%,20%,52%,86%,100%{filter:brightness(1);transform:translate(-50%,-50%) scale(1)}
+  8%{filter:brightness(1.12);transform:translate(-50%,-50%) scale(1.025)}
+  41%{filter:brightness(1.18);transform:translate(-50%,-50%) scale(1.045)}
+  74%{filter:brightness(1.26);transform:translate(-50%,-50%) scale(1.075)}
+}
+@media(max-width:520px){
+  .cb118Live{right:2.5%;top:4%;padding:4px 6px;font-size:6.2px}
+  .cb118Live i{width:5px;height:5px}
+}
+@media(prefers-reduced-motion:reduce){
+  .campaignPage75 .hero75.heroBannerV91::before,
+  .heroBannerV91 .cb91Halo,.heroBannerV91 .cb91Phone,.heroBannerV91 .cb91Headset,
+  .heroBannerV91 .cb91Eq i,.heroBannerV91 .cb91Btn,.heroBannerV91 .cb91Btn::after,
+  .cb118Live i,.heroBannerV91.campaignHitV118,
+  .campaignPopCardV89.campaignIntroV118,.campaignPopCardV89.campaignIntroV118 .campaignPrizeGlowV89{
+    animation:none!important
+  }
+}
+</style>
+<script>
+(function(){
+  var audioCtxV118=null;
+  var introPlayedV118=false;
+  var armedPopupV118=null;
+
+  function audio118(){
+    if(audioCtxV118)return audioCtxV118;
+    var AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC)return null;
+    try{audioCtxV118=new AC();return audioCtxV118}catch(e){return null}
+  }
+
+  function scheduleBeat118(ctx){
+    var filter=ctx.createBiquadFilter();
+    var master=ctx.createGain();
+    filter.type='lowpass';
+    filter.frequency.setValueAtTime(190,ctx.currentTime);
+    filter.Q.setValueAtTime(.65,ctx.currentTime);
+    master.gain.setValueAtTime(.52,ctx.currentTime);
+    filter.connect(master);master.connect(ctx.destination);
+
+    var base=ctx.currentTime+.025;
+    var times=[0,.31,.68];
+    var amps=[.12,.15,.19];
+    times.forEach(function(off,i){
+      var at=base+off;
+      var osc=ctx.createOscillator();
+      var gain=ctx.createGain();
+      osc.type='sine';
+      osc.frequency.setValueAtTime(i===2?88:96,at);
+      osc.frequency.exponentialRampToValueAtTime(i===2?47:52,at+.19);
+      gain.gain.setValueAtTime(.0001,at);
+      gain.gain.exponentialRampToValueAtTime(amps[i],at+.012);
+      gain.gain.exponentialRampToValueAtTime(.0001,at+.235);
+      osc.connect(gain);gain.connect(filter);
+      osc.start(at);osc.stop(at+.25);
+    });
+    setTimeout(function(){
+      try{filter.disconnect();master.disconnect()}catch(e){}
+    },1300);
+  }
+
+  async function playIntro118(){
+    if(introPlayedV118)return true;
+    var ctx=audio118();
+    if(!ctx)return false;
+    try{
+      if(ctx.state==='suspended')await ctx.resume();
+    }catch(e){}
+    if(ctx.state!=='running')return false;
+    introPlayedV118=true;
+    scheduleBeat118(ctx);
+    return true;
+  }
+  window.playCampaignBeatV118=playIntro118;
+
+  function animatePopup118(pop){
+    var card=pop&&pop.querySelector('.campaignPopCardV89');
+    if(!card)return;
+    card.classList.remove('campaignIntroV118');
+    void card.offsetWidth;
+    card.classList.add('campaignIntroV118');
+    setTimeout(function(){card.classList.remove('campaignIntroV118')},1250);
+  }
+
+  function disarm118(){
+    if(!armedPopupV118)return;
+    armedPopupV118.el.removeEventListener('pointerdown',armedPopupV118.fn,true);
+    armedPopupV118.el.removeEventListener('keydown',armedPopupV118.fn,true);
+    armedPopupV118=null;
+  }
+
+  function armOnInteraction118(pop){
+    if(armedPopupV118||!pop)return;
+    var fn=function(ev){
+      if(ev.target&&ev.target.closest&&ev.target.closest('.campaignPopCloseV89'))return;
+      playIntro118().then(function(ok){if(ok)disarm118()});
+    };
+    armedPopupV118={el:pop,fn:fn};
+    pop.addEventListener('pointerdown',fn,true);
+    pop.addEventListener('keydown',fn,true);
+  }
+
+  function enhancePopup118(pop){
+    if(!pop||pop.dataset.v118==='1')return;
+    pop.dataset.v118='1';
+    requestAnimationFrame(function(){animatePopup118(pop)});
+    playIntro118().then(function(ok){if(!ok)armOnInteraction118(pop)});
+  }
+
+  function patchHero118(root){
+    var scope=root||document;
+    var heroes=scope.querySelectorAll?scope.querySelectorAll('.campaignPage75 .hero75.heroBannerV91'):[];
+    heroes.forEach(function(hero){
+      if(hero.dataset.v118==='1')return;
+      hero.dataset.v118='1';
+      if(!hero.querySelector('.cb118Live')){
+        hero.insertAdjacentHTML('beforeend','<span class="cb118Live" aria-hidden="true"><i></i>CAMPANHA ATIVA</span>');
+      }
+      hero.addEventListener('pointerdown',function(){
+        hero.classList.remove('campaignHitV118');
+        void hero.offsetWidth;
+        hero.classList.add('campaignHitV118');
+        setTimeout(function(){hero.classList.remove('campaignHitV118')},560);
+      },{passive:true});
+    });
+  }
+
+  function scan118(root){
+    patchHero118(root||document);
+    var pop=document.getElementById('campaignPopV89');
+    if(pop)enhancePopup118(pop);
+  }
+
+  function boot118(){
+    scan118(document);
+    var obs=new MutationObserver(function(ms){
+      ms.forEach(function(m){
+        Array.from(m.addedNodes||[]).forEach(function(n){
+          if(n&&n.nodeType===1)scan118(n);
+        });
+      });
+      scan118(document);
+    });
+    try{obs.observe(document.documentElement,{childList:true,subtree:true})}catch(e){}
+    [120,350,700,1200,2200,4000].forEach(function(ms){setTimeout(function(){scan118(document)},ms)});
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot118,{once:true});
+  else boot118();
+})();
+</script>
 </body>
 </html>
