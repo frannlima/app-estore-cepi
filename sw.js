@@ -1,6 +1,6 @@
-const CACHE='estore-cepi-shell-v106';
-const BUILD='v106';
-const PRESENTATION_SCRIPT='./presentation-v103.js?build=v106';
+const CACHE='estore-cepi-shell-v107';
+const BUILD='v107';
+const PRESENTATION_SCRIPT='./presentation-v103.js?build=v107';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const SHELL=['./presentation-v103.js','./hourly-meta-v104.js','./assets/campaign-popup-v86.svg','./assets/campaign-hero-v84.svg','./assets/riachuelo-logo-exact-v75.svg','./assets/campaign-share-v76.svg','./assets/campaign-share-v75.jpg','./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon.svg','./riachuelo-horizontal-oficial.png'];
 
