@@ -5454,5 +5454,270 @@ window.uploadHistoricalTicketsV97=async function(){
   else bootV119();
 })();
 </script>
+
+
+<!-- V120-POPUP-TEXT-PRIZE-CARDS-FREQUENCY -->
+<style id="campaign-v120-prize-fixes">
+/* Pop-up: texto solicitado */
+.campaignPopQuestionV89{
+  max-width:100%;
+}
+
+/* Cards de prêmio: reserva áreas independentes para imagem e textos */
+.campaignPage75 .prizeGrid75{
+  align-items:stretch;
+}
+.campaignPage75 .prizeCard75{
+  display:grid!important;
+  grid-template-rows:minmax(150px,1fr) auto auto!important;
+  align-content:stretch!important;
+  min-height:250px!important;
+  padding:10px 9px 13px!important;
+  overflow:hidden!important;
+}
+.campaignPage75 .prizePhoto75{
+  position:relative!important;
+  z-index:1!important;
+  height:160px!important;
+  min-height:160px!important;
+  padding:18px 7px 9px!important;
+  margin:4px 0 8px!important;
+  display:grid!important;
+  place-items:center!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+}
+.campaignPage75 .prizePhoto75 img{
+  position:relative!important;
+  z-index:4!important;
+  width:88%!important;
+  height:88%!important;
+  max-width:88%!important;
+  max-height:88%!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  margin:auto!important;
+  filter:drop-shadow(0 8px 7px rgba(11,48,39,.16))!important;
+}
+.campaignPage75 .prizeCard75>b{
+  position:relative!important;
+  z-index:7!important;
+  display:flex!important;
+  align-items:flex-start!important;
+  justify-content:center!important;
+  min-height:34px!important;
+  margin:0!important;
+  padding:2px 5px 0!important;
+  color:#102f29!important;
+  font-size:11px!important;
+  line-height:1.18!important;
+  text-align:center!important;
+  background:#fff!important;
+}
+.campaignPage75 .prizeCard75>small{
+  position:relative!important;
+  z-index:7!important;
+  display:block!important;
+  margin:5px 0 0!important;
+  padding:0 4px 2px!important;
+  color:#68756f!important;
+  font-size:8.5px!important;
+  line-height:1.2!important;
+  text-align:center!important;
+  background:#fff!important;
+}
+.campaignPage75 .rank75{
+  z-index:12!important;
+}
+
+/* Frequência/ondas atrás de cada prêmio */
+.campaignPage75 .prizePhoto75::before,
+.campaignPage75 .prizePhoto75::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:53%;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  pointer-events:none;
+  z-index:1;
+}
+.campaignPage75 .prizePhoto75::before{
+  width:82%;
+  aspect-ratio:1;
+  background:
+    repeating-radial-gradient(circle at center,
+      transparent 0 13px,
+      rgba(222,124,0,.095) 14px 15.5px,
+      transparent 16px 25px);
+  opacity:.85;
+  animation:prizeFrequencyPulseV120 3.1s ease-in-out infinite;
+}
+.campaignPage75 .prizePhoto75::after{
+  width:56%;
+  aspect-ratio:1;
+  border:1.5px solid rgba(222,124,0,.19);
+  box-shadow:
+    0 0 0 14px rgba(222,124,0,.035),
+    0 0 0 28px rgba(23,63,53,.025);
+  animation:prizeFrequencyRingV120 2.65s ease-in-out infinite;
+}
+.campaignPage75 .prizeWaveV120{
+  position:absolute;
+  left:9%;
+  right:9%;
+  bottom:12%;
+  height:31%;
+  z-index:2;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:4px;
+  opacity:.23;
+  pointer-events:none;
+}
+.campaignPage75 .prizeWaveV120 i{
+  width:5%;
+  min-width:3px;
+  border-radius:6px 6px 1px 1px;
+  transform-origin:center bottom;
+  background:linear-gradient(180deg,#f4c451,#DE7C00 52%,#173F35);
+  animation:prizeEqV120 .72s ease-in-out infinite alternate;
+}
+.campaignPage75 .prizeWaveV120 i:nth-child(1){height:30%;animation-delay:-.18s}
+.campaignPage75 .prizeWaveV120 i:nth-child(2){height:50%;animation-delay:-.41s}
+.campaignPage75 .prizeWaveV120 i:nth-child(3){height:72%;animation-delay:-.08s}
+.campaignPage75 .prizeWaveV120 i:nth-child(4){height:92%;animation-delay:-.52s}
+.campaignPage75 .prizeWaveV120 i:nth-child(5){height:64%;animation-delay:-.25s}
+.campaignPage75 .prizeWaveV120 i:nth-child(6){height:82%;animation-delay:-.63s}
+.campaignPage75 .prizeWaveV120 i:nth-child(7){height:48%;animation-delay:-.34s}
+.campaignPage75 .prizeWaveV120 i:nth-child(8){height:68%;animation-delay:-.12s}
+.campaignPage75 .prizeWaveV120 i:nth-child(9){height:38%;animation-delay:-.47s}
+
+@keyframes prizeFrequencyPulseV120{
+  0%,100%{transform:translate(-50%,-50%) scale(.94);opacity:.55}
+  50%{transform:translate(-50%,-50%) scale(1.07);opacity:.95}
+}
+@keyframes prizeFrequencyRingV120{
+  0%,100%{transform:translate(-50%,-50%) scale(.95);opacity:.55}
+  50%{transform:translate(-50%,-50%) scale(1.08);opacity:1}
+}
+@keyframes prizeEqV120{
+  from{transform:scaleY(.48);filter:brightness(.94)}
+  to{transform:scaleY(1.06);filter:brightness(1.15)}
+}
+
+/* Celular: mantém a leitura limpa e elimina a sobreposição vista no print */
+@media(max-width:560px){
+  .campaignPage75 .prizeGrid75{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+  .campaignPage75 .prizeCard75{
+    grid-template-rows:190px auto auto!important;
+    min-height:285px!important;
+    padding:10px 7px 14px!important;
+    border-radius:18px!important;
+  }
+  .campaignPage75 .prizePhoto75{
+    height:190px!important;
+    min-height:190px!important;
+    padding:24px 7px 13px!important;
+    margin:3px 0 8px!important;
+  }
+  .campaignPage75 .prizePhoto75 img{
+    width:82%!important;
+    height:82%!important;
+    max-width:82%!important;
+    max-height:82%!important;
+  }
+  .campaignPage75 .prizeCard75>b{
+    min-height:40px!important;
+    padding:3px 5px 0!important;
+    font-size:12px!important;
+    line-height:1.18!important;
+  }
+  .campaignPage75 .prizeCard75>small{
+    margin-top:6px!important;
+    font-size:9.5px!important;
+    line-height:1.2!important;
+  }
+  .campaignPage75 .prizeWaveV120{
+    left:8%;right:8%;bottom:13%;height:29%;gap:3px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .campaignPage75 .prizePhoto75::before,
+  .campaignPage75 .prizePhoto75::after,
+  .campaignPage75 .prizeWaveV120 i{
+    animation:none!important;
+  }
+}
+</style>
+<script>
+(function(){
+  const QUESTION_V120='Já pensou em transformar suas vendas no eStore em <strong>um super prêmio Samsung ou JBL?</strong>';
+
+  function patchPopupTextV120(root){
+    const scope=root&&root.querySelectorAll?root:document;
+    const selectors=[
+      '.campaignPopQuestionV89',
+      '.campaignPopQuestionV84',
+      '.campaignPopQuestionV83'
+    ];
+    selectors.forEach(function(sel){
+      scope.querySelectorAll(sel).forEach(function(el){
+        if(el.dataset.v120Text==='1')return;
+        el.dataset.v120Text='1';
+        el.innerHTML=QUESTION_V120;
+      });
+    });
+    if(root&&root.matches&&selectors.some(function(s){return root.matches(s)})){
+      root.dataset.v120Text='1';
+      root.innerHTML=QUESTION_V120;
+    }
+  }
+
+  function waveHtmlV120(){
+    return '<div class="prizeWaveV120" aria-hidden="true">'+
+      '<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>'+
+    '</div>';
+  }
+
+  function patchPrizeCardsV120(root){
+    const scope=root&&root.querySelectorAll?root:document;
+    scope.querySelectorAll('.campaignPage75 .prizePhoto75').forEach(function(photo){
+      if(photo.dataset.v120Wave==='1')return;
+      photo.dataset.v120Wave='1';
+      photo.insertAdjacentHTML('afterbegin',waveHtmlV120());
+    });
+  }
+
+  function scanV120(root){
+    patchPopupTextV120(root||document);
+    patchPrizeCardsV120(root||document);
+  }
+
+  function bootV120(){
+    scanV120(document);
+    const observer=new MutationObserver(function(ms){
+      ms.forEach(function(m){
+        Array.from(m.addedNodes||[]).forEach(function(n){
+          if(n&&n.nodeType===1)scanV120(n);
+        });
+      });
+      scanV120(document);
+    });
+    try{observer.observe(document.documentElement,{childList:true,subtree:true})}catch(e){}
+    [100,250,500,900,1500,2600,4500].forEach(function(ms){
+      setTimeout(function(){scanV120(document)},ms);
+    });
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootV120,{once:true});
+  else bootV120();
+})();
+</script>
 </body>
 </html>
