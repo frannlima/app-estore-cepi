@@ -1,8 +1,9 @@
-const CACHE='estore-cepi-shell-v108';
-const BUILD='v108';
-const PRESENTATION_SCRIPT='./presentation-v103.js?build=v108';
+const CACHE='estore-cepi-shell-v109';
+const BUILD='v109';
+const PRESENTATION_SCRIPT='./presentation-v103.js?build=v109';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
-const SHELL=['./presentation-v103.js','./hourly-meta-v104.js','./assets/campaign-popup-v86.svg','./assets/campaign-hero-v84.svg','./assets/riachuelo-logo-exact-v75.svg','./assets/campaign-share-v76.svg','./assets/campaign-share-v75.jpg','./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon.svg','./riachuelo-horizontal-oficial.png'];
+const TEAM_SCRIPT='./team-v109.js?build=v109';
+const SHELL=['./presentation-v103.js','./hourly-meta-v104.js','./team-v109.js','./assets/campaign-popup-v86.svg','./assets/campaign-hero-v84.svg','./assets/riachuelo-logo-exact-v75.svg','./assets/campaign-share-v76.svg','./assets/campaign-share-v75.jpg','./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon.svg','./riachuelo-horizontal-oficial.png'];
 
 function injectAppV104(html){
   if(!html) return html;
@@ -10,7 +11,7 @@ function injectAppV104(html){
     .replace(/\n?<script[^>]+src=["']\.\/presentation-v10[123]\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
     .replace(/\n?<script[^>]+src=["']\.\/hourly-meta-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
     .replace(/src=["']\.\/app-v2\.js(?:\?[^"']*)?["']/gi,'src="./app-v2.js?build='+BUILD+'"');
-  const tags='\n<script src="'+PRESENTATION_SCRIPT+'"></script>\n<script src="'+HOURLY_META_SCRIPT+'"></script>\n';
+  const tags='\n<script src="'+PRESENTATION_SCRIPT+'"></script>\n<script src="'+HOURLY_META_SCRIPT+'"></script>\n<script src="'+TEAM_SCRIPT+'"></script>\n';
   return html.replace(/<\/body>\s*<\/html>\s*$/i, tags+'</body></html>');
 }
 async function htmlResponseWithInjection(res){
