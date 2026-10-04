@@ -1,12 +1,13 @@
-const CACHE='estore-cepi-shell-v115';
-const BUILD='v115';
-const PRESENTATION_SCRIPT='./presentation-v103.js?build=v115';
+const CACHE='estore-cepi-shell-v116';
+const BUILD='v116';
+const PRESENTATION_SCRIPT='./presentation-v103.js?build=v116';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v112';
 const TEAM_STORE_SCRIPT='./team-store-v113.js?build=v113';
 const COMMISSION_ELIGIBILITY_SCRIPT='./commission-eligibility-v114.js?build=v114';
 const COMMISSION_BOPIS_SCRIPT='./commission-bopis-v115.js?build=v115';
-const SHELL=['./presentation-v103.js','./hourly-meta-v104.js','./team-v112.js','./team-store-v113.js','./commission-eligibility-v114.js','./commission-bopis-v115.js','./assets/campaign-popup-v86.svg','./assets/campaign-hero-v84.svg','./assets/riachuelo-logo-exact-v75.svg','./assets/campaign-share-v76.svg','./assets/campaign-share-v75.jpg','./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon.svg','./riachuelo-horizontal-oficial.png'];
+const TEAM_COLLAPSE_SCRIPT='./team-collapse-v116.js?build=v116';
+const SHELL=['./presentation-v103.js','./hourly-meta-v104.js','./team-v112.js','./team-store-v113.js','./commission-eligibility-v114.js','./commission-bopis-v115.js','./team-collapse-v116.js','./assets/campaign-popup-v86.svg','./assets/campaign-hero-v84.svg','./assets/riachuelo-logo-exact-v75.svg','./assets/campaign-share-v76.svg','./assets/campaign-share-v75.jpg','./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon.svg','./riachuelo-horizontal-oficial.png'];
 
 function injectAppV104(html){
   if(!html) return html;
@@ -15,7 +16,7 @@ function injectAppV104(html){
     .replace(/\n?<script[^>]+src=["']\.\/hourly-meta-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
     .replace(/\n?<script[^>]+src=["']\.\/team-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
     .replace(/src=["']\.\/app-v2\.js(?:\?[^"']*)?["']/gi,'src="./app-v2.js?build='+BUILD+'"');
-  const tags='\n<script src="'+PRESENTATION_SCRIPT+'"></script>\n<script src="'+HOURLY_META_SCRIPT+'"></script>\n<script src="'+TEAM_SCRIPT+'"></script>\n<script src="'+TEAM_STORE_SCRIPT+'"></script>\n<script src="'+COMMISSION_ELIGIBILITY_SCRIPT+'"></script>\n<script src="'+COMMISSION_BOPIS_SCRIPT+'"></script>\n';
+  const tags='\n<script src="'+PRESENTATION_SCRIPT+'"></script>\n<script src="'+HOURLY_META_SCRIPT+'"></script>\n<script src="'+TEAM_SCRIPT+'"></script>\n<script src="'+TEAM_STORE_SCRIPT+'"></script>\n<script src="'+COMMISSION_ELIGIBILITY_SCRIPT+'"></script>\n<script src="'+COMMISSION_BOPIS_SCRIPT+'"></script>\n<script src="'+TEAM_COLLAPSE_SCRIPT+'"></script>\n';
   return html.replace(/<\/body>\s*<\/html>\s*$/i, tags+'</body></html>');
 }
 async function htmlResponseWithInjection(res){
