@@ -615,7 +615,7 @@
 
     canvasRoundV130(c,rightX,bodyY,rightW,bodyH,20,WHITE,LINE);
     canvasTextV130(c,'RESUMO DA SEMANA',rightX+24,bodyY+38,15,'700',G);
-    canvasWrapV130(c,read,rightX+24,bodyY+82,rightW-48,23,18,14,'400',INK);
+    canvasWrapV130(c,read,rightX+24,bodyY+82,rightW-48,25,22,15,'400',INK);
 
     return cv;
   }
