@@ -76,7 +76,8 @@
   function perfSnapshotV130(d){
     var isCurrent=PERF_PERIOD_V130==='current'&&d&&d.showPartial&&d.currentPartial;
     var reg=isCurrent?(d.currentPartial.regional||{}):(d.summary||{});
-    var stores=isCurrent?currentStores(d):closedStores(d);
+    var closed=closedStores(d),closedMap={};closed.forEach(function(x){closedMap[String(x.st)]=x});
+    var stores=isCurrent?currentStores(d).map(function(x){return Object.assign({},closedMap[String(x.st)]||{},x)}):closed;
     var periodLabel=isCurrent?'Semana '+(d.currentWeekNumber||'—')+' • parcial':'Semana '+(d.weekNumber||'—')+' • fechada';
     var compareLabel=isCurrent?'vs Semana '+(d.weekNumber||'—'):'vs Semana '+(d.previousWeekNumber||'—');
     var delta=isCurrent?pnum(d.currentPartial.share_delta):pnum(d.summary&&d.summary.share_delta);
@@ -135,7 +136,14 @@
     return ppct(x.share,2);
   }
   function rankStoresV130(stores,best){
-    var a=(stores||[]).filter(function(x){return x&&x.st});
+    var a=(stores||[]).filter(function(x){
+      if(!x||!x.st)return false;
+      if(PERF_FOCUS_V130==='captured')return phas(x.captured);
+      if(PERF_FOCUS_V130==='orders')return phas(x.orders);
+      if(PERF_FOCUS_V130==='ticket')return phas(x.ticket);
+      if(PERF_FOCUS_V130==='dispersion')return phas(x.dispersion);
+      return phas(x.share);
+    });
     a.sort(function(a,b){
       var av=focusMetricV130(a),bv=focusMetricV130(b);
       if(PERF_FOCUS_V130==='dispersion')return best?av-bv:bv-av;
