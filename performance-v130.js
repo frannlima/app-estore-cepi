@@ -1,4 +1,4 @@
-/* V131 — Central de Performance | FCA Inteligente • gaps + resumo executivo + branding oficial */
+/* V132 — Central de Performance | FCA Inteligente • resumo natural + complemento + branding oficial */
 (function(){
   'use strict';
   if(window.__PERFORMANCE_V130_LOADED__)return;
@@ -43,7 +43,7 @@
   function pshort(v,max){var s=String(v||'').trim();return s.length>max?s.slice(0,max-1)+'…':s}
   function punique(arr,key){var m={};return (arr||[]).filter(function(x){var k=String(x&&x[key]||'');if(!k||m[k])return false;m[k]=1;return true})}
 
-  var PERF_LOGO_V131='./assets/riachuelo-logo-exact-v75.svg';
+  var PERF_LOGO_V131='./assets/riachuelo-logo-exact-v75.svg'; // logo oficial Riachuelo
   function pprevFromChangeV131(current,change){
     if(change===null||change===undefined||!Number.isFinite(Number(change)))return null;
     var r=Number(change),den=1+r;
@@ -338,7 +338,7 @@
 
   function diagnosisHtmlV130(d,s){
     var diag=diagnosticV130(d,s);
-    return '<section class="performancePanelV130 performanceDiagnosisV130"><div class=performancePanelHeadV130><div><h3>Diagnóstico Automático</h3><p>Leitura dos dados disponíveis, sem presumir causa raiz.</p></div></div><span class="status '+diag.status+'">'+pesc(diag.label)+'</span><p class=diagnosisText>'+pesc(diag.text)+'</p><div class=diagnosisFoot>Indicador em foco: <b>'+pesc(diag.focus)+'</b>. Causas só são tratadas como validadas quando registradas na FCA ou na leitura operacional.</div></section>';
+    return '<section class="performancePanelV130 performanceDiagnosisV130"><div class=performancePanelHeadV130><div><h3>Leitura de Performance</h3><p>Leitura dos dados disponíveis, sem presumir causa raiz.</p></div></div><span class="status '+diag.status+'">'+pesc(diag.label)+'</span><p class=diagnosisText>'+pesc(diag.text)+'</p><div class=diagnosisFoot>Indicador em foco: <b>'+pesc(diag.focus)+'</b>. Causas só são tratadas como validadas quando registradas na FCA ou na leitura operacional.</div></section>';
   }
 
   function contributionHtmlV130(d,s,top){
@@ -398,87 +398,62 @@
     var owner=s.scope==='operation'?'Supervisor da filial':'Speak eStore Regional',deadline=d&&d.deadline?pdate(d.deadline):'Próximo checkpoint';
     var rows=selected.map(function(x,i){return '<tr><td>'+(i+1)+'</td><td>'+pesc(x)+'</td><td>'+pesc(owner)+'</td><td>'+pesc(deadline)+'</td><td><span class=performancePlanStatusV130>Acompanhar</span></td></tr>'}).join('');
     return '<div class=performanceWorkbenchV130>'+
-      '<section class="performancePanelV130 performanceReadV130"><div class=performancePanelHeadV130><div><h3>Minha Leitura da Performance</h3><p>'+(s.scope==='operation'?'Supervisor • contexto que os números não mostram.':'Speak • contexto regional que os números não mostram.')+'</p></div></div><textarea id=performanceReadV130 maxlength=1200 oninput="performanceDraftInputV130(this)" placeholder="Inclua situações de campo, decisões, contexto operacional, evidências qualitativas e considerações para a reunião...">'+pesc(PERF_DRAFT_V130.note||'')+'</textarea><div class=hint><span>Salvo automaticamente neste aparelho.</span><span id=performanceReadCountV130>'+String((PERF_DRAFT_V130.note||'').length)+'/1200</span></div></section>'+
+      '<section class="performancePanelV130 performanceReadV130"><div class=performancePanelHeadV130><div><h3>Complemento do Resumo da Semana</h3><p>Inclua sua leitura, contexto da operação e informações que precisam aparecer no resumo final.</p></div></div><textarea id=performanceReadV130 maxlength=1200 oninput="performanceDraftInputV130(this)" placeholder="Ex.: cenário da semana, contexto da operação, causas confirmadas, decisões tomadas, pontos que precisam ser reforçados na tratativa...">'+pesc(PERF_DRAFT_V130.note||'')+'</textarea><div class=hint><span>Este complemento entra no resumo e no card compartilhável.</span><span id=performanceReadCountV130>'+String((PERF_DRAFT_V130.note||'').length)+'/1200</span></div></section>'+
       '<section class=performancePanelV130><div class=performancePanelHeadV130><div><h3>Plano de Ação do Período</h3><p>Ações selecionadas para acompanhar a reversão ou sustentação.</p></div></div><div class=performancePlanV130><table class=performancePlanTableV130><thead><tr><th>#</th><th>Ação</th><th>Responsável</th><th>Prazo</th><th>Status</th></tr></thead><tbody>'+(rows||'<tr><td colspan=5>Selecione ao menos uma ação sugerida.</td></tr>')+'</tbody></table></div><div class=performanceOfficialV130><button class=primary onclick="go(\'fca\')">Abrir FCA oficial</button><button class=secondary onclick="performanceRefreshV130()">Atualizar dados</button></div></section>'+
     '</div>';
   }
 
   function executiveSummaryV131(d,s,top,pri,causes){
     var best=(top||[])[0],attention=(pri||[])[0],capGap=metricGapV131(s,'captured'),ordGap=metricGapV131(s,'orders'),ticketGap=metricGapV131(s,'ticket');
-    var headline=s.shareDelta>0?'Evolução de Share com foco em sustentação':s.shareDelta<0?'Retração de Share exige atuação dirigida':'Share estável com oportunidade de ganho';
-    var result='Share '+ppct(s.share,2)+' ('+ppp(s.shareDelta)+') • Captado '+pmoney(s.captured)+(s.capturedChange!=null?' ('+pchange(s.capturedChange)+' | gap '+psignedMoneyV131(capGap)+')':'')+' • '+Math.round(s.orders).toLocaleString('pt-BR')+' pedidos'+(s.ordersChange!=null?' ('+pchange(s.ordersChange)+' | gap '+psignedIntV131(ordGap,'pedidos')+')':'')+' • Ticket '+pmoney(s.ticket)+(s.ticketChange!=null?' ('+pchange(s.ticketChange)+' | gap '+psignedMoneyV131(ticketGap)+')':'')+'.';
-    var positive=best?'Destaque: '+pstoreName(best)+' com '+PERF_FOCUS_LABELS_V130[PERF_FOCUS_V130]+' em '+focusValueV130(best)+(phas(best.share_delta)?' e '+ppp(best.share_delta)+' de Share.':''):'Destaques positivos serão exibidos quando houver base comparável.';
-    var risk=attention?'Atenção: '+pstoreName(attention)+' está entre as prioridades do ciclo, com '+ppp(attention.share_delta)+' de Share.':'Sem loja priorizada validada no ciclo atual.';
-    var direction=(s.scope==='operation'?'Direcionar a operação para frequência de captação, redução de dispersão e execução das ações validadas na FCA.':'Concentrar a tratativa nas lojas priorizadas, proteger os avanços das melhores performances e acompanhar a reação do Share na próxima parcial.');
+    var headline=s.shareDelta>0?'Semana com evolução de Share':s.shareDelta<0?'Semana com retração de Share':'Semana com Share estável';
+    var result='Encerramos o período com Share de '+ppct(s.share,2)+', '+(s.shareDelta>0?'evolução de ':s.shareDelta<0?'retração de ':'variação de ')+ppp(s.shareDelta)+' '+s.compareLabel+'. A venda captada foi de '+pmoney(s.captured)+(s.capturedChange!=null?', '+pchange(s.capturedChange)+' com gap de '+psignedMoneyV131(capGap):'')+', em '+Math.round(s.orders).toLocaleString('pt-BR')+' pedidos'+(s.ordersChange!=null?', '+pchange(s.ordersChange)+' com gap de '+psignedIntV131(ordGap,'pedidos'):'')+', e ticket médio de '+pmoney(s.ticket)+(s.ticketChange!=null?', '+pchange(s.ticketChange)+' com gap de '+psignedMoneyV131(ticketGap):'')+'.';
+    var positive=best?'Entre os destaques, a filial '+String(best.st)+' apresentou '+PERF_FOCUS_LABELS_V130[PERF_FOCUS_V130].toLowerCase()+' de '+focusValueV130(best)+(phas(best.share_delta)?' e variação de Share de '+ppp(best.share_delta):'')+'.':'Sem destaque consolidado para este recorte.';
+    var risk=attention?'Como principal ponto de atenção, a filial '+String(attention.st)+' aparece entre as prioridades do período, com variação de Share de '+ppp(attention.share_delta)+'.':'Neste ciclo não há loja priorizada no recorte disponível.';
+    var direction=s.scope==='operation'?'O foco da tratativa será sustentar o que evoluiu e atuar sobre frequência de captação, dispersão e ações já definidas para a operação.':'O foco da tratativa será atuar nas lojas priorizadas, preservar a evolução das melhores entregas e acompanhar a reação do Share na próxima parcial.';
     return {headline:headline,result:result,positive:positive,risk:risk,direction:direction};
   }
 
-  function treatmentCaptionV131(d,s,top,pri,causes){
+  function weekSummaryTextV132(d,s,top,pri,causes){
     var e=executiveSummaryV131(d,s,top,pri,causes);
+    var complement=PERF_DRAFT_V130&&String(PERF_DRAFT_V130.note||'').trim();
+    var parts=[e.result,e.positive,e.risk,e.direction];
+    if(complement)parts.push(complement);
+    return parts.join(' ');
+  }
+
+  function treatmentCaptionV131(d,s,top,pri,causes){
     var scope=s.scope==='operation'?'OPERAÇÃO '+String(s.store&&s.store.st||''):'REGIONAL CE+PI';
     var selected=(PERF_DRAFT_V130&&PERF_DRAFT_V130.selectedActions||[]).concat(PERF_DRAFT_V130&&PERF_DRAFT_V130.manualActions||[]).slice(0,3);
-    var userRead=PERF_DRAFT_V130&&String(PERF_DRAFT_V130.note||'').trim();
+    var summary=weekSummaryTextV132(d,s,top,pri,causes);
     var lines=[
       '📊 *FCA PERFORMANCE eStore | '+scope+'*',
       '*'+s.periodLabel+'* • '+s.compareLabel,
       '',
-      '📌 *Resumo executivo*',
-      e.result,
-      '',
-      '✅ *Destaque positivo*',
-      e.positive,
-      '',
-      '⚠️ *Ponto de atenção*',
-      e.risk,
-      '',
-      '🎯 *Direcionamento*',
-      e.direction
+      '📝 *Resumo da semana*',
+      summary
     ];
     if(selected.length){
-      lines.push('', '🧭 *Ações prioritárias*');
+      lines.push('', '🎯 *Ações prioritárias*');
       selected.forEach(function(a,i){lines.push((i+1)+'. '+a)});
     }
-    if(userRead)lines.push('', '🧠 *Leitura da tratativa*', userRead);
-    lines.push('', 'Material consolidado pela Central de Performance • App eStore CE+PI');
     return lines.join('\n');
   }
-  window.performanceTreatmentCaptionV131=function(){
-    if(!PERF_FCA_V130)return '';
-    syncNoteV130();
-    var d=PERF_FCA_V130,s=perfSnapshotV130(d),stores=s.stores&&s.stores.length?s.stores:closedStores(d);
-    return treatmentCaptionV131(d,s,rankStoresV130(stores,true),d.prioritized||[],causesV130(d,s));
-  };
-  window.sharePerformanceSummaryV131=async function(){
-    try{
-      var text=window.performanceTreatmentCaptionV131();if(!text)return;
-      try{if(navigator.share){await navigator.share({title:'FCA Performance eStore',text:text});return}}catch(e){if(e&&e.name==='AbortError')return}
-      await navigator.clipboard.writeText(text);alert('Resumo executivo copiado para compartilhar.');
-    }catch(e){alert('Não foi possível compartilhar o resumo executivo agora.')}
-  };
-  window.copyPerformanceSummaryV131=async function(){
-    try{var text=window.performanceTreatmentCaptionV131();await navigator.clipboard.writeText(text);alert('Legenda da tratativa copiada.')}catch(e){alert('Não foi possível copiar a legenda agora.')}
-  };
 
   function execPreviewHtmlV130(d,s,top,pri,causes){
     var e=executiveSummaryV131(d,s,top,pri,causes);
-    var read=PERF_DRAFT_V130.note||diagnosticV130(d,s).text;
+    var summary=weekSummaryTextV132(d,s,top,pri,causes);
     return '<section class=performanceExecutiveV130>'+
       '<div class=performanceExecutiveTopV130><img class=brand src="'+PERF_LOGO_V131+'" alt="Riachuelo"><span><b>FCA PERFORMANCE</b><small>'+(s.scope==='operation'?'FILIAL '+pesc(s.store&&s.store.st):'REGIONAL CE+PI')+' • '+pesc(s.periodLabel)+'</small></span></div>'+
       '<div class=performanceExecutiveSummaryV131>'+
-        '<div class=performanceExecEyebrowV131>RESUMO EXECUTIVO DA TRATATIVA</div>'+
+        '<div class=performanceExecEyebrowV131>RESUMO DA SEMANA</div>'+
         '<h3>'+pesc(e.headline)+'</h3>'+
-        '<p>'+pesc(e.result)+'</p>'+
-        '<div class=performanceExecSignalsV131>'+
-          '<div class=good><span>Destaque</span><b>'+pesc(e.positive)+'</b></div>'+
-          '<div class=attention><span>Atenção</span><b>'+pesc(e.risk)+'</b></div>'+
-          '<div class=direction><span>Direcionamento</span><b>'+pesc(e.direction)+'</b></div>'+
-        '</div>'+
-        '<div class=performanceExecLegendActionsV131><button onclick="copyPerformanceSummaryV131()">Copiar legenda da tratativa</button><button class=primary onclick="sharePerformanceSummaryV131()">Compartilhar resumo executivo</button></div>'+
+        '<p>'+pesc(summary)+'</p>'+
+        '<div class=performanceExecLegendActionsV131><button onclick="document.getElementById(\'performanceReadV130\')?.scrollIntoView({behavior:\'smooth\',block:\'center\'})">Complementar resumo</button><button onclick="copyPerformanceSummaryV131()">Copiar legenda da tratativa</button><button class=primary onclick="sharePerformanceSummaryV131()">Compartilhar resumo</button></div>'+
       '</div>'+
       '<div class=performanceExecutivePreviewV130>'+
         '<section><h4>Resultado</h4><div class=performanceExecutiveMiniKpisV130><div><span>Share</span><b>'+ppct(s.share,2)+'</b></div><div><span>Δ Share</span><b>'+ppp(s.shareDelta)+'</b></div><div><span>Captado</span><b>'+pmoney(s.captured)+'</b><small>'+pesc(metricDeviationTextV131(s,'captured'))+'</small></div><div><span>Pedidos</span><b>'+Math.round(s.orders).toLocaleString('pt-BR')+'</b><small>'+pesc(metricDeviationTextV131(s,'orders'))+'</small></div></div></section>'+
         '<section><h4>'+(s.scope==='operation'?'Referência Regional':'Top / Prioridades')+'</h4><p>'+((top||[]).slice(0,2).map(function(x){return pesc(x.st+' • '+ppct(x.share,2)+' • '+ppp(x.share_delta))}).join('<br>')||'Sem dados')+'<br>'+(pri&&pri[0]?'Prioridade: '+pesc(pri[0].st)+' • '+ppp(pri[0].share_delta):'')+'</p></section>'+
-        '<section><h4>Leitura Executiva</h4><p>'+pesc(pshort(read,420))+'</p></section>'+
+        '<section><h4>Resumo da Semana</h4><p>'+pesc(pshort(summary,520))+'</p></section>'+
       '</div>'+
       '<div class=performanceShareActionsV130><button class=preview onclick="previewPerformanceCardV130()">Visualizar prévia em alta resolução</button><button class=share onclick="sharePerformanceCardV130()">Gerar card para compartilhar</button></div>'+
     '</section>';
@@ -567,7 +542,7 @@
     var d=PERF_FCA_V130,s=perfSnapshotV130(d),stores=s.stores&&s.stores.length?s.stores:closedStores(d);
     var top=rankStoresV130(stores,true),pri=(d.prioritized||[]).slice(0,3),causes=causesV130(d,s).slice(0,4);
     var acts=(PERF_DRAFT_V130.selectedActions||[]).concat(PERF_DRAFT_V130.manualActions||[]).slice(0,3);
-    var read=String(PERF_DRAFT_V130.note||diagnosticV130(d,s).text);
+    var read=weekSummaryTextV132(d,s,top,pri,causes);
     var W=1920,H=1080,cv=document.createElement('canvas');cv.width=W;cv.height=H;
     var c=cv.getContext('2d');c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
     var G='#173F35',SAGE='#466964',PAPER='#F7F5EF',SAND='#D6D2C4',OR='#DE7C00',WINE='#76232F',RED='#C73532',WHITE='#FFFFFF',LINE='#E5E1D8',GOOD='#176843',INK='#243A33';
@@ -639,15 +614,9 @@
     }else canvasTextV130(c,'Selecione ações na Central de Performance.',midX+22,y,13,'400',SAGE);
 
     canvasRoundV130(c,rightX,bodyY,rightW,bodyH,20,WHITE,LINE);
-    canvasTextV130(c,s.scope==='operation'?'LEITURA DA OPERAÇÃO':'LEITURA SPEAK',rightX+24,bodyY+38,15,'700',G);
+    canvasTextV130(c,'RESUMO DA SEMANA',rightX+24,bodyY+38,15,'700',G);
     canvasWrapV130(c,read,rightX+24,bodyY+82,rightW-48,23,18,14,'400',INK);
-    c.strokeStyle=SAND;c.beginPath();c.moveTo(rightX+24,bodyY+548);c.lineTo(rightX+rightW-24,bodyY+548);c.stroke();
-    canvasTextV130(c,'BASE DA ANÁLISE',rightX+24,bodyY+580,11,'700',SAGE);
-    canvasWrapV130(c,'Share, venda captada, pedidos, ticket médio, dispersão, frequência de zeragem, FCA e registros do Ouça seu time.',rightX+24,bodyY+612,rightW-48,19,4,11,'400',SAGE);
-    canvasTextV130(c,'A causa raiz só é considerada validada quando registrada na tratativa.',rightX+24,bodyY+662,10,'700',WINE);
 
-    canvasTextV130(c,'App eStore CE+PI  |  '+(s.scope==='operation'?'FCA da Operação':'FCA Regional')+'  |  Atualização '+pdate(d.currentPartial&&d.currentPartial.end||d.weekStart||''),62,1053,12,'400',SAGE);
-    canvasTextV130(c,'Dados transformados em decisão.',1858,1053,12,'700',G,'right');
     return cv;
   }
   window.performanceCardCanvasV130=performanceCardCanvasV130;
