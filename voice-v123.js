@@ -323,7 +323,7 @@
     const range=rangeV127(VOICE_PERIOD_V127),curItems=itemsInRangeV127(allItems,range.from,range.to),prevItems=itemsInRangeV127(allItems,range.prevFrom,range.prevTo);
     const cur=aggregateV127(curItems),prev=aggregateV127(prevItems),topCause=cur.causeRank[0],topCauseKey=topCause?topCause[0]:'outro',topCausePct=cur.total&&topCause?topCause[1]/cur.total:0;
     const impactStores=Object.entries(cur.byStore).sort((a,b)=>b[1].count-a[1].count);
-    let priority=(Array.isArray(fca?.prioritized)?fca.prioritized:[]).filter(x=>!VOICE_STORE_V123||String(x.st)===VOICE_STORE_V123);
+    let priority=(Array.isArray(fca?.prioritized)?fca.prioritized:[]).filter(x=>isAdmin()?(!VOICE_STORE_V123||String(x.st)===VOICE_STORE_V123):String(x.st)===String(U?.u?.st||''));
     const usesFca=priority.length>0;
     if(!priority.length){
       priority=impactStores.slice(0,3).map(([st,q],i)=>({st,share:null,dispersion:null,priority_rank:i+1,priority_status:'sinal_time',_voice:q}));
@@ -393,6 +393,10 @@
   };
   window.setVoiceStatusV123=function(v){
     VOICE_STATUS_V123=v;
+    document.querySelectorAll('.voiceTabsV123 button').forEach(function(b,i){
+      const key=i===0?'open':i===1?'resolved':'all';
+      b.classList.toggle('on',key===VOICE_STATUS_V123);
+    });
     renderVoiceRecordsV127();
   };
   window.setVoiceStoreV123=function(v){
