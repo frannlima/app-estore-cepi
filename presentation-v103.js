@@ -1,5 +1,5 @@
 (function(){
-  const BUILD='v105';
+  const BUILD='v106';
   const C={green:'#173F35',sage:'#466964',gray:'#DAD9D6',sand:'#D6D2C4',orange:'#DE7C00',orangeU:'#D37C32',wine:'#76232F',red:'#E03C31',up:'#157349',cream:'#F7F5EF',white:'#FFFFFF',ink:'#173F35',muted:'#68736F',line:'#E4E0D8',soft:'#FBFAF7',rose:'#FCE7E7',mint:'#E7F3E9'};
   let PERIOD='week', LAST=null, LAST_CANVAS=null, BUSY=false;
   const $id=id=>document.getElementById(id);
@@ -13,7 +13,22 @@
   const storeName=st=>{try{return typeof storeDisplayName==='function'?storeDisplayName(st):st}catch(e){return st}};
   const supStore=(st,n)=>{try{return typeof supervisorPrettyStoreV46==='function'?supervisorPrettyStoreV46(st,n):storeName(st)}catch(e){return storeName(st)}};
   const pref=(id,n)=>{try{return typeof preferredName==='function'?preferredName(id,n):(n||'')}catch(e){return n||''}};
-  const supFirsts=store=>{try{const a=(store?.supervisors||[]).filter(u=>typeof supervisorEligibleRoleV49!=='function'||supervisorEligibleRoleV49(u.role)).map(u=>typeof supervisorFirstNameV48==='function'?supervisorFirstNameV48(u.id,u.name):(u.name||'').split(' ')[0]).filter(Boolean);return [...new Set(a)].join(' • ')||'Supervisores'}catch(e){return 'Supervisores'}};
+  const normRole=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  const eligibleSupervisor=u=>{
+    try{if(typeof supervisorEligibleRoleV49==='function')return !!supervisorEligibleRoleV49(u?.role)}catch(e){}
+    const role=normRole(u?.role);
+    if(!role)return true; // a API já pode retornar somente supervisores da filial
+    return role.includes('supervisor')&&(role.includes('operac')||role.includes('eficien')||role.includes('experien')||role.includes('comercial'));
+  };
+  const supFirsts=store=>{
+    try{
+      const a=(store?.supervisors||[])
+        .filter(eligibleSupervisor)
+        .map(u=>typeof supervisorFirstNameV48==='function'?supervisorFirstNameV48(u.id,u.name):(u.name||'').trim().split(/\s+/)[0])
+        .filter(Boolean);
+      return [...new Set(a.map(n=>String(n).trim()))].join(' • ')||'Supervisores';
+    }catch(e){return 'Supervisores'}
+  };
 
   function status(msg,type=''){const el=$id('presStatusV102');if(el)el.innerHTML='<div class="notice '+type+'">'+safe(msg)+'</div>'}
   function descriptor(d){
@@ -74,9 +89,18 @@
       const [ranking,sup,fca]=await Promise.all(calls);
       const regional=(ranking.regional||[]).filter(x=>(+x.c||0)>0);
       const collabCaptured=[...regional].sort((a,b)=>(+b.c||0)-(+a.c||0)).slice(0,3);
-      const supervisorRanking=[...(sup.sales||[])].sort((a,b)=>(+b.c||0)-(+a.c||0)).slice(0,3);
       const storeMap=new Map((sup.stores||[]).map(x=>[String(x.st),x]));
-      const shares=(sup.shares||[]).map(x=>{const st=storeMap.get(String(x.st))||{};const c=+st.c||0,o=+st.o||0;return {...x,captured:c,orders:o,ticket:o?c/o:0,dispersion:+st.disp||0}});
+      const shares=(sup.shares||[]).map(x=>{
+        const st=storeMap.get(String(x.st))||{};
+        const c=+st.c||0,o=+st.o||0;
+        return {...st,...x,st:String(x.st||st.st||''),captured:c,orders:o,ticket:o?c/o:0,dispersion:+st.disp||0,supervisors:x.supervisors||st.supervisors||[]};
+      });
+      // Ranking de supervisores = ranking da filial por SHARE.
+      // Todos os supervisores elegíveis da filial compartilham a mesma colocação.
+      const supervisorRanking=[...shares]
+        .filter(x=>String(x.st||'').trim()&&Number.isFinite(Number(x.share)))
+        .sort((a,b)=>(+b.share||0)-(+a.share||0)||(+b.captured||0)-(+a.captured||0))
+        .slice(0,3);
       let growth=[],retractions=[],prioritized=[];
       if(PERIOD==='week'){
         growth=(fca?.growth||[]).slice(0,5);
@@ -205,10 +229,21 @@
       const cx=x+i*(cw+gap);const fills=['#FFF7E8','#F1F1EF','#F8EEE7'];rr(ctx,cx,cy,cw,ch,12,fills[i],'#ECE7DE',1);
       const medal=[C.orange,'#B7BABD','#9B4E2E'][i];circle(ctx,cx+36,cy+22,18,medal);txt(ctx,String(i+1),cx+36,cy+22,24,'700 16px Arial','#FFFFFF','center');
       txt(ctx,(i+1)+'º lugar',cx+64,cy+22,cw-76,'700 15px Arial',medal);
-      const name=mode==='sup'?supFirsts(r):pref(r.id,r.name);txt(ctx,name,cx+18,cy+50,cw-36,'700 15px Arial','#203B35');
-      const sub=mode==='sup'?((r.st||'')+' • '+supStore(r.st,r.name)):((r.st||'')+' • '+storeName(r.st||''));txt(ctx,sub,cx+18,cy+74,cw-36,'500 12px Arial','#4D5A56');
+      const name=mode==='sup'?supFirsts(r):pref(r.id,r.name);
+      if(mode==='sup'){
+        const f=name.length>42?'700 11px Arial':name.length>30?'700 12px Arial':'700 14px Arial';
+        lines(ctx,name,cx+18,cy+41,cw-36,15,f,'#203B35',2);
+      }else{
+        txt(ctx,name,cx+18,cy+50,cw-36,'700 15px Arial','#203B35');
+      }
+      const sub=mode==='sup'?((r.st||'')+' • '+supStore(r.st,r.name)):((r.st||'')+' • '+storeName(r.st||''));txt(ctx,sub,cx+18,mode==='sup'?cy+76:cy+74,cw-36,'500 12px Arial','#4D5A56');
       ctx.strokeStyle='#DDD5C8';ctx.beginPath();ctx.moveTo(cx+24,cy+92);ctx.lineTo(cx+cw-24,cy+92);ctx.stroke();
-      txt(ctx,fmtMoney0(+r.c||0),cx+cw/2,cy+111,cw-30,'700 20px Arial',C.green,'center');
+      if(mode==='sup'){
+        txt(ctx,'Share '+fmtPct(rowShare(r)),cx+cw/2,cy+108,cw-30,'700 18px Arial',C.green,'center');
+        txt(ctx,'Captado '+fmtMoney0(rowCaptured(r)),cx+cw/2,cy+128,cw-30,'600 11px Arial','#596762','center');
+      }else{
+        txt(ctx,fmtMoney0(+r.c||0),cx+cw/2,cy+111,cw-30,'700 20px Arial',C.green,'center');
+      }
     });
   }
 
