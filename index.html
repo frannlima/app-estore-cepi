@@ -5719,5 +5719,281 @@ window.uploadHistoricalTicketsV97=async function(){
   else bootV120();
 })();
 </script>
+
+
+<!-- V121-HOME-CAMPAIGN-FIRST-SLIDE -->
+<style id="home-campaign-v121-style">
+.campaignHeroV34{
+  background:#0b3f35!important;
+}
+.campaignCardSlideV121{
+  display:block!important;
+  overflow:hidden!important;
+  background:
+    radial-gradient(circle at 50% 62%,rgba(241,194,66,.18),transparent 30%),
+    linear-gradient(160deg,#0c5947 0%,#094b3e 50%,#07362f 100%)!important;
+  pointer-events:none;
+  z-index:2!important;
+  isolation:isolate;
+}
+.campaignCardSlideV121.active{pointer-events:auto}
+.campaignCardSlideV121::after{
+  content:"";position:absolute;inset:-48%;z-index:12;pointer-events:none;
+  background:linear-gradient(112deg,transparent 43%,rgba(255,222,124,.14) 49%,rgba(255,255,255,.17) 51%,transparent 57%);
+  transform:translateX(-68%) rotate(4deg);
+  animation:homeCampaignSweepV121 5.8s ease-in-out infinite;
+  animation-play-state:paused
+}
+.campaignCardSlideV121.active::after{animation-play-state:running}
+.hc121Copy{
+  position:absolute;z-index:8;left:20px;right:18px;top:21px;
+  color:#fff;text-align:left
+}
+.hc121Copy h2{
+  margin:0;max-width:350px;font-size:23px;line-height:1.04;
+  letter-spacing:-.035em;font-weight:950;text-shadow:0 3px 14px rgba(0,0,0,.18)
+}
+.hc121Copy strong{color:#f4c44f;font-weight:950}
+.hc121Badge{
+  position:absolute;z-index:9;top:124px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:8px;white-space:nowrap;
+  padding:7px 11px;border-radius:999px;color:#f5d276;
+  background:rgba(8,52,43,.68);border:1px solid rgba(245,210,118,.30);
+  box-shadow:0 6px 18px rgba(0,0,0,.14);backdrop-filter:blur(5px);
+  font-size:8.5px;font-weight:950;letter-spacing:.07em
+}
+.hc121BadgeEq{height:13px;display:flex;gap:2px;align-items:flex-end}
+.hc121BadgeEq i{
+  width:2px;border-radius:2px;background:#f4c44f;transform-origin:center bottom;
+  animation:homeCampaignMiniEqV121 .62s ease-in-out infinite alternate;
+  animation-play-state:paused
+}
+.campaignCardSlideV121.active .hc121BadgeEq i{animation-play-state:running}
+.hc121BadgeEq i:nth-child(1){height:5px;animation-delay:-.21s}
+.hc121BadgeEq i:nth-child(2){height:10px;animation-delay:-.42s}
+.hc121BadgeEq i:nth-child(3){height:7px;animation-delay:-.12s}
+.hc121BadgeEq i:nth-child(4){height:12px;animation-delay:-.34s}
+.hc121Products{
+  position:absolute;left:14px;right:14px;top:145px;height:205px;z-index:4
+}
+.hc121Halo{
+  position:absolute;left:50%;top:47%;width:68%;aspect-ratio:1;
+  transform:translate(-50%,-50%);border-radius:50%;
+  border:2px solid rgba(242,203,91,.65);
+  background:radial-gradient(circle,rgba(255,214,94,.17) 0%,rgba(255,214,94,.07) 41%,transparent 67%);
+  box-shadow:0 0 34px rgba(243,199,71,.18),inset 0 0 34px rgba(245,215,118,.09);
+  animation:homeCampaignHaloV121 2.7s ease-in-out infinite;
+  animation-play-state:paused
+}
+.campaignCardSlideV121.active .hc121Halo{animation-play-state:running}
+.hc121Stage{
+  position:absolute;left:4%;right:4%;bottom:0;height:42px;border-radius:50%;
+  background:radial-gradient(ellipse,#f3ce54 0%,#ba8929 34%,rgba(35,95,74,.88) 61%,transparent 76%);
+  box-shadow:0 -4px 18px rgba(255,211,77,.48)
+}
+.hc121Product{
+  position:absolute;z-index:6;display:grid;place-items:center;
+  animation:homeCampaignFloatV121 3.4s ease-in-out infinite;
+  animation-play-state:paused
+}
+.campaignCardSlideV121.active .hc121Product{animation-play-state:running}
+.hc121Product img{
+  width:100%;height:100%;object-fit:contain;display:block;
+  filter:drop-shadow(0 12px 10px rgba(0,0,0,.35))
+}
+.hc121Product.phone{left:27%;top:4%;width:37%;height:150px;z-index:8}
+.hc121Product.headset{right:2%;top:24%;width:43%;height:132px;z-index:7;animation-delay:-.4s}
+.hc121Product.buds{left:0;bottom:7px;width:31%;height:74px;z-index:9;animation-delay:-.75s}
+.hc121Product.speaker{right:5%;bottom:2px;width:29%;height:78px;z-index:10;animation-delay:-1.05s}
+.hc121Frequency{
+  position:absolute;left:50%;top:48%;width:78%;height:80%;
+  transform:translate(-50%,-50%);z-index:2;opacity:.24;pointer-events:none
+}
+.hc121Frequency::before,
+.hc121Frequency::after{
+  content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  border-radius:50%;border:1px solid rgba(244,200,77,.42);
+  animation:homeCampaignWaveV121 3.1s ease-out infinite;
+  animation-play-state:paused
+}
+.hc121Frequency::before{width:42%;aspect-ratio:1}
+.hc121Frequency::after{width:66%;aspect-ratio:1;animation-delay:1.05s}
+.campaignCardSlideV121.active .hc121Frequency::before,
+.campaignCardSlideV121.active .hc121Frequency::after{animation-play-state:running}
+.hc121Eq{
+  position:absolute;z-index:3;left:17%;right:17%;bottom:11px;height:62px;
+  display:flex;align-items:flex-end;justify-content:center;gap:4px;opacity:.24
+}
+.hc121Eq i{
+  width:5%;min-width:3px;border-radius:5px 5px 0 0;
+  background:linear-gradient(180deg,#f4cb5e,#D98A18 55%,#346a58);
+  transform-origin:center bottom;animation:homeCampaignEqV121 .76s ease-in-out infinite alternate;
+  animation-play-state:paused
+}
+.campaignCardSlideV121.active .hc121Eq i{animation-play-state:running}
+.hc121Eq i:nth-child(2){animation-delay:-.31s}.hc121Eq i:nth-child(3){animation-delay:-.53s}
+.hc121Eq i:nth-child(4){animation-delay:-.18s}.hc121Eq i:nth-child(5){animation-delay:-.64s}
+.hc121Eq i:nth-child(6){animation-delay:-.39s}.hc121Eq i:nth-child(7){animation-delay:-.71s}
+.hc121Eq i:nth-child(8){animation-delay:-.24s}.hc121Eq i:nth-child(9){animation-delay:-.48s}
+.hc121Sub{
+  position:absolute;z-index:9;left:25px;right:25px;bottom:78px;
+  color:rgba(255,255,255,.92);text-align:center;font-size:9.5px;line-height:1.32;
+  font-weight:650;text-shadow:0 2px 8px rgba(0,0,0,.2)
+}
+.dynamicPanelV34.campaignPanelV121{
+  min-height:0!important;height:52px!important;bottom:0!important;
+  padding:0!important;border:0!important;background:transparent!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+  box-shadow:none!important
+}
+.campaignHomeCtaV121{
+  width:100%;height:50px;border-radius:17px;display:flex;align-items:center;justify-content:center;gap:9px;
+  background:linear-gradient(180deg,#ffd86b,#f2b93b);color:#173F35;
+  box-shadow:0 9px 20px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.42);
+  font-size:11px;font-weight:950;letter-spacing:.01em;
+  animation:homeCampaignCtaV121 2.5s ease-in-out infinite;
+  animation-play-state:paused
+}
+.dynamicPanelV34.campaignPanelV121.active .campaignHomeCtaV121{animation-play-state:running}
+.campaignHomeCtaV121 b{font-size:16px}
+.campaignCardSlideV121.active .hc121Copy,
+.campaignCardSlideV121.active .hc121Badge,
+.campaignCardSlideV121.active .hc121Products,
+.campaignCardSlideV121.active .hc121Sub{
+  animation:homeCampaignEnterV121 .65s cubic-bezier(.22,.8,.24,1) both
+}
+.campaignCardSlideV121.active .hc121Badge{animation-delay:.08s}
+.campaignCardSlideV121.active .hc121Products{animation-delay:.12s}
+.campaignCardSlideV121.active .hc121Sub{animation-delay:.18s}
+@keyframes homeCampaignEnterV121{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes homeCampaignSweepV121{
+  0%,62%{transform:translateX(-68%) rotate(4deg);opacity:0}
+  68%{opacity:.35}82%{transform:translateX(68%) rotate(4deg);opacity:.26}
+  88%,100%{transform:translateX(68%) rotate(4deg);opacity:0}
+}
+@keyframes homeCampaignHaloV121{
+  0%,100%{transform:translate(-50%,-50%) scale(.97);filter:brightness(.96)}
+  50%{transform:translate(-50%,-50%) scale(1.045);filter:brightness(1.12)}
+}
+@keyframes homeCampaignFloatV121{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes homeCampaignWaveV121{
+  0%{transform:translate(-50%,-50%) scale(.72);opacity:.46}
+  100%{transform:translate(-50%,-50%) scale(1.42);opacity:0}
+}
+@keyframes homeCampaignEqV121{from{transform:scaleY(.48)}to{transform:scaleY(1.06)}}
+@keyframes homeCampaignMiniEqV121{from{transform:scaleY(.45)}to{transform:scaleY(1.06)}}
+@keyframes homeCampaignCtaV121{0%,100%{transform:scale(1)}50%{transform:scale(1.018)}}
+
+@media(max-width:380px){
+  .hc121Copy{left:17px;right:15px;top:18px}
+  .hc121Copy h2{font-size:20px;max-width:330px}
+  .hc121Badge{top:112px;font-size:7.8px}
+  .hc121Products{top:132px;height:190px;left:9px;right:9px}
+  .hc121Product.phone{left:25%;width:39%;height:141px}
+  .hc121Product.headset{right:0;width:44%;height:124px}
+  .hc121Product.buds{left:-1%;width:32%;height:69px}
+  .hc121Product.speaker{right:3%;width:30%;height:72px}
+  .hc121Sub{bottom:73px;font-size:8.7px;left:18px;right:18px}
+  .campaignHomeCtaV121{height:48px;font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .campaignCardSlideV121::after,.hc121BadgeEq i,.hc121Halo,.hc121Product,
+  .hc121Frequency::before,.hc121Frequency::after,.hc121Eq i,.campaignHomeCtaV121,
+  .campaignCardSlideV121.active .hc121Copy,.campaignCardSlideV121.active .hc121Badge,
+  .campaignCardSlideV121.active .hc121Products,.campaignCardSlideV121.active .hc121Sub{
+    animation:none!important
+  }
+}
+</style>
+<script>
+(function(){
+  const assetV121=function(k){
+    try{return API+'?asset='+encodeURIComponent(k)+'&v=121'}catch(e){return ''}
+  };
+
+  function campaignSlideHtmlV121(){
+    const bars=[28,46,66,86,58,76,49,68,36];
+    return ''+
+      '<div class="campaignPhotoV34 campaignCardSlideV121 active" data-home-campaign-v121="1" role="group" aria-label="Campanha eStore no Volume Máximo">'+
+        '<div class="hc121Copy"><h2>Já pensou em transformar<br>suas vendas no eStore em<br><strong>um super prêmio Samsung<br>ou JBL?</strong></h2></div>'+
+        '<div class="hc121Badge"><span class="hc121BadgeEq"><i></i><i></i><i></i><i></i></span>VOLUME MÁXIMO</div>'+
+        '<div class="hc121Products">'+
+          '<div class="hc121Frequency"></div>'+
+          '<div class="hc121Halo"></div>'+
+          '<div class="hc121Stage"></div>'+
+          '<div class="hc121Eq">'+bars.map(function(h){return '<i style="height:'+h+'%"></i>'}).join('')+'</div>'+
+          '<div class="hc121Product buds"><img src="'+assetV121('waveBuds2')+'" alt="JBL Wave Buds 2"></div>'+
+          '<div class="hc121Product phone"><img src="'+assetV121('samsung')+'" alt="Samsung A07"></div>'+
+          '<div class="hc121Product headset"><img src="'+assetV121('tune720')+'" alt="JBL Tune 720 BT"></div>'+
+          '<div class="hc121Product speaker"><img src="'+assetV121('go4')+'" alt="JBL Go 4"></div>'+
+        '</div>'+
+        '<div class="hc121Sub">Conheça a mecânica, acompanhe os critérios e veja como concorrer às premiações de outubro.</div>'+
+      '</div>';
+  }
+
+  function campaignPanelHtmlV121(){
+    return '<button class="dynamicPanelV34 campaignPanelV121 active" data-home-campaign-panel-v121="1" onclick="go(\\'campaigns\\')" aria-label="Conhecer a mecânica da campanha">'+
+      '<span class="campaignHomeCtaV121">CONHECER A MECÂNICA <b>→</b></span>'+
+    '</button>';
+  }
+
+  function patchHomeCampaignV121(){
+    const hero=document.getElementById('campaignHeroV34');
+    if(!hero||hero.dataset.v121==='1')return;
+    hero.dataset.v121='1';
+
+    hero.querySelectorAll('.campaignPhotoV34,.dynamicPanelV34,.dynDotsV34 button').forEach(function(el){
+      el.classList.remove('active');
+    });
+
+    hero.insertAdjacentHTML('afterbegin',campaignSlideHtmlV121());
+
+    const deck=hero.querySelector('.dynamicDeckV34');
+    if(deck){
+      deck.insertAdjacentHTML('afterbegin',campaignPanelHtmlV121());
+      const dots=deck.querySelector('.dynDotsV34');
+      if(dots){
+        dots.insertAdjacentHTML('afterbegin','<button class="active" aria-label="Campanha em destaque" onclick="event.stopPropagation();homeSlideV34(0)"></button>');
+        [...dots.querySelectorAll('button')].forEach(function(btn,idx){
+          if(idx>0)btn.setAttribute('onclick','event.stopPropagation();homeSlideV34(' + idx + ')');
+          btn.setAttribute('aria-label',idx===0?'Campanha em destaque':'Destaque '+(idx+1));
+        });
+      }
+    }
+    HOME_V34_IDX=0;
+  }
+
+  const initBaseV121=window.initHomeV34||initHomeV34;
+  window.initHomeV34=initHomeV34=function(){
+    patchHomeCampaignV121();
+    return initBaseV121();
+  };
+
+  const slideBaseV121=window.homeSlideV34||homeSlideV34;
+  window.homeSlideV34=homeSlideV34=function(i){
+    slideBaseV121(i);
+    const root=document.querySelector('.premiumHomeV34');
+    if(!root)return;
+    const slide=root.querySelector('.campaignCardSlideV121');
+    if(slide&&slide.classList.contains('active')){
+      slide.classList.remove('hc121Replay');
+      void slide.offsetWidth;
+      slide.classList.add('hc121Replay');
+    }
+  };
+
+  function bootV121(){
+    if(document.getElementById('campaignHeroV34')){
+      patchHomeCampaignV121();
+      try{stopHomeV34();initHomeV34()}catch(e){}
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootV121,{once:true});
+  else setTimeout(bootV121,0);
+})();
+</script>
 </body>
 </html>
