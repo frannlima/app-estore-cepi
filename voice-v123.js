@@ -1,4 +1,4 @@
-/* ===== V125 2026-10-04: Ritmo de captação + Ouça seu time + CTA explícito ===== */
+/* ===== V127 2026-10-04: Ritmo de captação + Ouça seu time + Dashboard FCA ===== */
 (function(){
   'use strict';
   if(window.__VOICE_V123_LOADED__)return;
@@ -179,7 +179,33 @@
     finally{if(btn){btn.disabled=false;btn.textContent='Enviar para o meu supervisor'}}
   };
 
-  let VOICE_STATUS_V123='open',VOICE_STORE_V123='',VOICE_ITEMS_V123=[];
+  let VOICE_STATUS_V123='all',VOICE_STORE_V123='',VOICE_ITEMS_V123=[];
+  let VOICE_PERIOD_V127='week',VOICE_ALL_V127=[],VOICE_FCA_V127=null;
+
+  const dashStyleV127=document.createElement('style');
+  dashStyleV127.id='voice-dashboard-v127-style';
+  dashStyleV127.textContent=[
+    '.voiceDashFiltersV127{display:grid;grid-template-columns:1fr 1fr;gap:9px}',
+    '.voiceDashFilterV127{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #ddd9d0;border-radius:16px;padding:0 12px;min-height:52px}',
+    '.voiceDashFilterV127 span{font-size:18px}.voiceDashFilterV127 label{display:block;font-size:8px;color:#7c8580;margin-bottom:1px}.voiceDashFilterV127 select{width:100%;border:0;background:transparent;color:#173F35;font-weight:900;font-size:12px;outline:0;padding:0}',
+    '.voiceDashKpisV127{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}',
+    '.voiceDashKpiV127{border-radius:18px;padding:13px 10px;min-height:105px;border:1px solid rgba(23,63,53,.07);display:flex;flex-direction:column;justify-content:space-between}',
+    '.voiceDashKpiV127.red{background:linear-gradient(145deg,#fff0f0,#ffe6e7)}.voiceDashKpiV127.green{background:linear-gradient(145deg,#edf6f0,#e4f0e9)}.voiceDashKpiV127.gold{background:linear-gradient(145deg,#fff7e4,#f8edd1)}.voiceDashKpiV127.mint{background:linear-gradient(145deg,#eef8f5,#e4f3ee)}',
+    '.voiceDashKpiV127 .ico{font-size:20px}.voiceDashKpiV127 span{font-size:9px;color:#46554f;line-height:1.2}.voiceDashKpiV127 b{font-size:24px;color:#173F35}.voiceDashKpiV127.red b{color:#d82e36}.voiceDashKpiV127 small{font-size:8px;color:#74807a;line-height:1.2}',
+    '.voiceDashSectionV127{background:#fff;border:1px solid #e5e1d8;border-radius:20px;padding:14px;box-shadow:0 6px 18px rgba(23,63,53,.045)}',
+    '.voiceDashTitleV127{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:11px}.voiceDashTitleV127 h3{margin:0;color:#173F35;font-size:16px}.voiceDashTitleV127 p{margin:2px 0 0;color:#7b8580;font-size:9px}.voiceDashLinkV127{border:0;background:#f4f1ea;color:#173F35;border-radius:999px;padding:7px 10px;font-size:9px;font-weight:900}',
+    '.voiceRadarV127{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.voiceRadarCardV127{border-radius:15px;padding:11px;min-height:92px}.voiceRadarCardV127.red{background:#fff0f0}.voiceRadarCardV127.green{background:#edf6f0}.voiceRadarCardV127.gold{background:#fff7e6}.voiceRadarCardV127 span{display:block;font-size:9px;color:#66736d}.voiceRadarCardV127 b{display:block;margin-top:5px;color:#173F35;font-size:15px;line-height:1.12}.voiceRadarCardV127 small{display:block;margin-top:4px;color:#7c8580;font-size:8px;line-height:1.25}',
+    '.voiceDashSplitV127{display:grid;grid-template-columns:.95fr 1.25fr;gap:10px}',
+    '.voiceCauseRowV127{display:grid;grid-template-columns:105px 1fr 34px;gap:8px;align-items:center;margin:9px 0}.voiceCauseRowV127 label{font-size:9px;color:#3d4d47;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.voiceCauseBarV127{height:10px;background:#edf0ed;border-radius:999px;overflow:hidden}.voiceCauseBarV127 i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#1d6c57,#6ab49c)}.voiceCauseRowV127 b{font-size:9px;color:#173F35;text-align:right}',
+    '.voicePriorityV127{display:grid;gap:8px}.voicePriorityItemV127{border-top:1px solid #eeeae3;padding-top:8px}.voicePriorityItemV127:first-child{border-top:0;padding-top:0}.voicePriorityTopV127{display:flex;align-items:center;gap:8px}.voicePriorityRankV127{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#173F35;color:#fff;font-size:10px;font-weight:950}.voicePriorityTopV127 strong{flex:1;color:#173F35;font-size:11px}.voicePriorityTagV127{font-size:7px;font-weight:900;border-radius:999px;padding:5px 7px;background:#ffe7e7;color:#ce2830}.voicePriorityMetaV127{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:7px 0 0 32px}.voicePriorityMetaV127 span{font-size:7px;color:#7b8580}.voicePriorityMetaV127 b{display:block;color:#173F35;font-size:10px;margin-top:2px}.voicePriorityMetaV127 .danger{color:#d82e36}',
+    '.voiceInsightsV127{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.voiceInsightV127{border:1px solid #e4e1d9;border-radius:14px;padding:11px;background:#fff}.voiceInsightV127 span{font-size:18px}.voiceInsightV127 b{display:block;color:#173F35;font-size:10px;line-height:1.25;margin-top:5px}.voiceInsightV127 small{display:block;color:#7b8580;font-size:8px;line-height:1.3;margin-top:4px}',
+    '.voiceTrendV127{width:100%;overflow:hidden}.voiceTrendV127 svg{width:100%;height:auto;display:block}.voiceTrendLegendV127{display:flex;justify-content:flex-end;gap:12px;margin:-2px 0 5px;font-size:8px;color:#64716b}.voiceTrendLegendV127 i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}.voiceTrendLegendV127 .a{background:#173F35}.voiceTrendLegendV127 .b{background:#DE7C00}',
+    '.voiceRecordsHeadV127{display:flex;justify-content:space-between;align-items:center;margin-top:2px}.voiceRecordsHeadV127 h3{margin:0;color:#173F35;font-size:16px}.voiceRecordsHeadV127 span{font-size:9px;color:#7b8580}',
+    '.voiceDashEmptyV127{padding:16px;border-radius:14px;background:#f7f5f0;color:#6c7772;font-size:10px;line-height:1.4}',
+    '@media(max-width:620px){.voiceDashKpisV127{grid-template-columns:1fr 1fr}.voiceDashSplitV127{grid-template-columns:1fr}.voiceRadarV127{grid-template-columns:1fr 1fr}.voiceRadarCardV127:last-child{grid-column:1/-1}.voiceInsightsV127{grid-template-columns:1fr}.voiceDashFiltersV127{grid-template-columns:1fr 1fr}}',
+    '@media(max-width:370px){.voiceDashFiltersV127{grid-template-columns:1fr}.voiceRadarV127{grid-template-columns:1fr}.voiceRadarCardV127:last-child{grid-column:auto}}'
+  ].join('');
+  document.head.appendChild(dashStyleV127);
 
   function menuTileV123(){
     return '<button class="menuTileV33 sage voiceMenuV123" onclick="go(\'listen\')"><span class=menuIcon3dV33>👂</span><b>Ouça seu time</b><i>›</i><span id=voiceHomeBadgeV123 class=voiceBadgeV123></span></button>';
@@ -198,7 +224,7 @@
       const j=await api({action:'voice_badge',matricula:U.u.id}),n=+j.pendingCount||0,el=document.getElementById('voiceHomeBadgeV123');
       if(el){el.textContent=n>99?'99+':String(n);el.classList.toggle('show',n>0)}
       const top=document.getElementById('voicePageBadgeV123');if(top){top.textContent=String(n);top.style.display=n>0?'inline-flex':'none'}
-    }catch(e){console.warn('[V123] badge Ouça seu time',e)}
+    }catch(e){console.warn('[V127] badge Ouça seu time',e)}
   };
 
   const baseInitHomeV123=window.initHomeV34;
@@ -210,46 +236,213 @@
     };
   }
 
+  function isoLocalV127(d){
+    d=d||new Date();
+    try{
+      const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Fortaleza',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
+      const m={};parts.forEach(p=>m[p.type]=p.value);
+      return m.year+'-'+m.month+'-'+m.day;
+    }catch(e){return d.toISOString().slice(0,10)}
+  }
+  function dateObjV127(s){return new Date(String(s)+'T12:00:00Z')}
+  function addDaysV127(s,n){const d=dateObjV127(s);d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)}
+  function weekStartV127(s){const d=dateObjV127(s),dow=d.getUTCDay()||7;return addDaysV127(s,1-dow)}
+  function daysBetweenV127(a,b){return Math.round((dateObjV127(b)-dateObjV127(a))/86400000)}
+  function rangeV127(period){
+    const today=isoLocalV127(),day=+today.slice(8,10);
+    if(period==='month'){
+      const from=today.slice(0,7)+'-01',pmDate=dateObjV127(from);pmDate.setUTCMonth(pmDate.getUTCMonth()-1);
+      const pStart=pmDate.toISOString().slice(0,7)+'-01',pmLast=new Date(Date.UTC(pmDate.getUTCFullYear(),pmDate.getUTCMonth()+1,0,12));
+      const pTo=pmDate.getUTCFullYear()+'-'+String(pmDate.getUTCMonth()+1).padStart(2,'0')+'-'+String(Math.min(day,pmLast.getUTCDate())).padStart(2,'0');
+      return {from,to:today,prevFrom:pStart,prevTo:pTo,label:'Mês'};
+    }
+    if(period==='30d'){
+      return {from:addDaysV127(today,-29),to:today,prevFrom:addDaysV127(today,-59),prevTo:addDaysV127(today,-30),label:'30 dias'};
+    }
+    const from=weekStartV127(today),elapsed=daysBetweenV127(from,today);
+    const prevFrom=addDaysV127(from,-7);
+    return {from,to:today,prevFrom,prevTo:addDaysV127(prevFrom,elapsed),label:'Semana'};
+  }
+  function voiceStoreNameV127(st){
+    const raw=String(COMMON?.stores?.[st]?.name||'').replace(/^L?\d{3}\s*[-–•:]?\s*/,'').trim();
+    return raw?String(st)+' • '+raw:'Filial '+String(st);
+  }
+  function itemsInRangeV127(items,from,to){
+    return (items||[]).filter(x=>{const d=String(x.created_at||'').slice(0,10);return d>=from&&d<=to});
+  }
+  function aggregateV127(items){
+    const total=items.length,open=items.filter(x=>x.status!=='resolved').length,resolved=items.filter(x=>x.status==='resolved').length;
+    const stores=[...new Set(items.map(x=>String(x.store_code||'')).filter(Boolean))];
+    const collabs=[...new Set(items.filter(x=>(+x.zero_streak||0)>3).map(x=>String(x.matricula||'')).filter(Boolean))];
+    const causes={};items.forEach(x=>{const k=String(x.cause_code||'outro');causes[k]=(causes[k]||0)+1});
+    const causeRank=Object.entries(causes).sort((a,b)=>b[1]-a[1]);
+    const byStore={};items.forEach(x=>{const st=String(x.store_code||'');if(!st)return;byStore[st]=byStore[st]||{count:0,causes:{},collabs:new Set(),maxZero:0};const q=byStore[st];q.count++;q.collabs.add(String(x.matricula||''));q.maxZero=Math.max(q.maxZero,+x.zero_streak||0);const k=String(x.cause_code||'outro');q.causes[k]=(q.causes[k]||0)+1});
+    return {total,open,resolved,stores,collabs,rate:total?resolved/total:0,causeRank,byStore};
+  }
+  function deltaTextV127(cur,prev,type){
+    if(type==='pp')return ((cur-prev)*100>=0?'↑ ':'↓ ')+Math.abs((cur-prev)*100).toLocaleString('pt-BR',{maximumFractionDigits:1})+' p.p.';
+    if(prev===0)return cur===0?'—':'novo';
+    const v=(cur/prev-1)*100;return (v>=0?'↑ ':'↓ ')+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:0})+'%';
+  }
+  function insightForCauseV127(k,stores){
+    const names=(stores||[]).slice(0,2).map(x=>x.st).join(' e ');
+    if(k==='abordagem')return {title:'Reforçar script de abordagem'+(names?' nas filiais '+names:''),detail:'Maior concentração de relatos ligada à abordagem e ativação do eStore.'};
+    if(k==='instabilidade_app')return {title:'Consolidar chamados e evidências de instabilidade',detail:'Agrupar prints, horários e números de chamados para acelerar a tratativa sistêmica.'};
+    if(k==='pagamento')return {title:'Mapear falhas de pagamento e alternativas',detail:'Identificar recorrência por meio de pagamento e orientar alternativas no atendimento.'};
+    if(k==='cupom')return {title:'Reforçar regras de cupom e elegibilidade',detail:'Reduzir perda de venda por mecânica, vigência ou aplicação incorreta.'};
+    if(k==='estoque_online')return {title:'Ampliar alternativas de sortimento online',detail:'Trabalhar cor, tamanho e categoria para preservar a oportunidade de venda.'};
+    if(k==='outra_atividade')return {title:'Redistribuir foco operacional',detail:'Organizar janelas de atuação eStore nas lojas com maior dispersão.'};
+    if(k==='escala_folga')return {title:'Cruzar alertas com escala e jornada',detail:'Separar oportunidade real de venda de dias sem atuação do colaborador.'};
+    return {title:'Aprofundar escuta com o time',detail:'Usar os relatos para qualificar a causa raiz antes da próxima ação.'};
+  }
+  function causeLabelV127(k){return causeV123(k).label}
+  function topCauseStoreV127(agg,st){
+    const q=agg.byStore[String(st)]?.causes||{};
+    const top=Object.entries(q).sort((a,b)=>b[1]-a[1])[0];
+    return top?causeLabelV127(top[0]):'—';
+  }
+  function trendDataV127(items){
+    const today=isoLocalV127(),currentStart=weekStartV127(today),weeks=[];
+    for(let i=3;i>=0;i--){
+      const from=addDaysV127(currentStart,-7*i),to=i===0?today:addDaysV127(from,6);
+      const arr=itemsInRangeV127(items,from,to),collabs=new Set(arr.filter(x=>(+x.zero_streak||0)>3).map(x=>String(x.matricula||'')));
+      weeks.push({from,to,records:arr.length,alerts:collabs.size});
+    }
+    return weeks;
+  }
+  function trendSvgV127(weeks){
+    const max=Math.max(1,...weeks.flatMap(x=>[x.records,x.alerts])),xs=[34,116,198,280],y=v=>82-(v/max)*58;
+    const ptsA=weeks.map((x,i)=>xs[i]+','+y(x.records)).join(' '),ptsB=weeks.map((x,i)=>xs[i]+','+y(x.alerts)).join(' ');
+    const dotsA=weeks.map((x,i)=>'<circle cx="'+xs[i]+'" cy="'+y(x.records)+'" r="3.5" fill="#173F35"/>').join('');
+    const dotsB=weeks.map((x,i)=>'<circle cx="'+xs[i]+'" cy="'+y(x.alerts)+'" r="3.5" fill="#DE7C00"/>').join('');
+    const labels=weeks.map((x,i)=>'<text x="'+xs[i]+'" y="98" text-anchor="middle" font-size="7" fill="#77817d">S'+String(Math.ceil(((dateObjV127(x.from)-new Date(Date.UTC(dateObjV127(x.from).getUTCFullYear(),0,1,12)))/86400000+1)/7))+'</text>').join('');
+    return '<div class=voiceTrendLegendV127><span><i class=a></i>Registros</span><span><i class=b></i>Colaboradores em alerta</span></div><div class=voiceTrendV127><svg viewBox="0 0 314 104" aria-label="Evolução das últimas quatro semanas"><line x1="24" y1="82" x2="294" y2="82" stroke="#e6e2da"/><line x1="24" y1="53" x2="294" y2="53" stroke="#f0ede7"/><line x1="24" y1="24" x2="294" y2="24" stroke="#f0ede7"/><polyline points="'+ptsA+'" fill="none" stroke="#173F35" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><polyline points="'+ptsB+'" fill="none" stroke="#DE7C00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+dotsA+dotsB+labels+'</svg></div>';
+  }
+
+  function dashboardHtmlV127(allItems,fca){
+    const range=rangeV127(VOICE_PERIOD_V127),curItems=itemsInRangeV127(allItems,range.from,range.to),prevItems=itemsInRangeV127(allItems,range.prevFrom,range.prevTo);
+    const cur=aggregateV127(curItems),prev=aggregateV127(prevItems),topCause=cur.causeRank[0],topCauseKey=topCause?topCause[0]:'outro',topCausePct=cur.total&&topCause?topCause[1]/cur.total:0;
+    const impactStores=Object.entries(cur.byStore).sort((a,b)=>b[1].count-a[1].count);
+    let priority=(Array.isArray(fca?.prioritized)?fca.prioritized:[]).filter(x=>!VOICE_STORE_V123||String(x.st)===VOICE_STORE_V123);
+    const usesFca=priority.length>0;
+    if(!priority.length){
+      priority=impactStores.slice(0,3).map(([st,q],i)=>({st,share:null,dispersion:null,priority_rank:i+1,priority_status:'sinal_time',_voice:q}));
+    }
+    const biggest=usesFca?priority[0]:(impactStores[0]?{st:impactStores[0][0]}:null),biggestLabel=biggest?voiceStoreNameV127(biggest.st):'Sem sinalização';
+    const opportunity=insightForCauseV127(topCauseKey,priority);
+    const causeRows=cur.causeRank.slice(0,6).map(([k,n])=>{
+      const pct=cur.total?n/cur.total:0;
+      return '<div class=voiceCauseRowV127><label>'+esc(causeLabelV127(k))+'</label><div class=voiceCauseBarV127><i style="width:'+Math.max(4,pct*100)+'%"></i></div><b>'+Math.round(pct*100)+'%</b></div>';
+    }).join('')||'<div class=voiceDashEmptyV127>Os motivos começarão a aparecer conforme os colaboradores registrarem os impactos.</div>';
+
+    const priorityRows=priority.slice(0,5).map((x,i)=>{
+      const st=String(x.st),cause=topCauseStoreV127(cur,st),tag=usesFca?(x.priority_status==='critico'?'Priorizar':'Acompanhar'):'Sinal do time';
+      return '<div class=voicePriorityItemV127><div class=voicePriorityTopV127><span class=voicePriorityRankV127>'+(i+1)+'</span><strong>'+esc(voiceStoreNameV127(st))+'</strong><span class=voicePriorityTagV127>'+tag+'</span></div>'+
+        '<div class=voicePriorityMetaV127><span>Share<b>'+(x.share==null?'—':(+x.share*100).toLocaleString('pt-BR',{maximumFractionDigits:2})+'%')+'</b></span><span>% zerados<b class=danger>'+(x.dispersion==null?'—':(+x.dispersion*100).toLocaleString('pt-BR',{maximumFractionDigits:0})+'%')+'</b></span><span>Causa principal<b>'+esc(cause)+'</b></span></div></div>';
+    }).join('')||'<div class=voiceDashEmptyV127>Nenhuma filial priorizada ou sinalizada neste período.</div>';
+
+    const topStoresForInsight=priority.slice(0,2);
+    const insight1=insightForCauseV127(topCauseKey,topStoresForInsight);
+    const systemic=curItems.filter(x=>['instabilidade_app','pagamento','cupom','estoque_online'].includes(String(x.cause_code))).length;
+    const insight2=systemic>0?{title:'Consolidar '+systemic+' relato'+(systemic===1?'':'s')+' de impacto sistêmico',detail:'Usar evidências e recorrência por filial para qualificar chamados e escalonamentos.'}:{title:'Manter leitura das causas sistêmicas',detail:'Acompanhar App, pagamento, cupom e estoque online mesmo sem concentração relevante.'};
+    const highDisp=(Array.isArray(fca?.stores)?fca.stores:[]).filter(x=>(+x.dispersion||0)>=.5).sort((a,b)=>b.dispersion-a.dispersion);
+    const insight3=highDisp.length?{title:'Atuar na dispersão de '+highDisp.slice(0,2).map(x=>x.st).join(' e '),detail:'Mais de 50% da base está zerada; combinar meta individual, abordagem e acompanhamento.'}:{title:'Sustentar ritmo e reduzir recorrência',detail:'Priorizar os colaboradores que voltam a aparecer com sequência superior a 3 dias sem captar.'};
+
+    const weeks=trendDataV127(allItems);
+    const compareLabel=VOICE_PERIOD_V127==='week'?'vs. semana anterior':'vs. período anterior';
+
+    return '<div class=voiceDashFiltersV127>'+
+      '<div class=voiceDashFilterV127><span>🗓️</span><div style="flex:1"><label>Período</label><select onchange="setVoicePeriodV127(this.value)"><option value=week '+(VOICE_PERIOD_V127==='week'?'selected':'')+'>Semana</option><option value=month '+(VOICE_PERIOD_V127==='month'?'selected':'')+'>Mês</option><option value=30d '+(VOICE_PERIOD_V127==='30d'?'selected':'')+'>Últimos 30 dias</option></select></div></div>'+
+      '<div class=voiceDashFilterV127><span>📍</span><div style="flex:1"><label>Visão</label>'+(isAdmin()?'<select onchange="setVoiceStoreV123(this.value)"><option value="">CE+PI • Todas as filiais</option>'+Object.keys(COMMON?.stores||{}).sort().map(st=>'<option value="'+esc(st)+'" '+(VOICE_STORE_V123===st?'selected':'')+'>'+esc(voiceStoreNameV127(st))+'</option>').join('')+'</select>':'<div style="font-size:12px;font-weight:900;color:#173F35">'+esc(voiceStoreNameV127(U?.u?.st||''))+'</div>')+'</div></div>'+
+    '</div>'+
+    '<div class=voiceDashKpisV127>'+
+      '<div class="voiceDashKpiV127 red"><div><span class=ico>📄</span><span>Registros abertos</span></div><b>'+num(cur.open)+'</b><small>'+deltaTextV127(cur.open,prev.open)+' • '+compareLabel+'</small></div>'+
+      '<div class="voiceDashKpiV127 green"><div><span class=ico>🏬</span><span>Filiais impactadas</span></div><b>'+num(cur.stores.length)+'</b><small>'+deltaTextV127(cur.stores.length,prev.stores.length)+' • '+compareLabel+'</small></div>'+
+      '<div class="voiceDashKpiV127 gold"><div><span class=ico>👥</span><span>Colaboradores em alerta</span></div><b>'+num(cur.collabs.length)+'</b><small>'+deltaTextV127(cur.collabs.length,prev.collabs.length)+' • '+compareLabel+'</small></div>'+
+      '<div class="voiceDashKpiV127 mint"><div><span class=ico>✅</span><span>% tratativas concluídas</span></div><b>'+Math.round(cur.rate*100)+'%</b><small>'+deltaTextV127(cur.rate,prev.rate,'pp')+' • '+compareLabel+'</small></div>'+
+    '</div>'+
+    '<section class=voiceDashSectionV127><div class=voiceDashTitleV127><div><h3>🎯 Radar FCA da semana</h3><p>Principais sinais da escuta para complementar foco, causa e ação.</p></div><button class=voiceDashLinkV127 onclick="go(\'fca\')">Ver FCA →</button></div>'+
+      '<div class=voiceRadarV127><div class="voiceRadarCardV127 red"><span>Top causa</span><b>'+esc(topCause?causeLabelV127(topCauseKey):'Sem registros')+'</b><small>'+(topCause?Math.round(topCausePct*100)+'% dos registros do período':'Aguardando registros')+'</small></div><div class="voiceRadarCardV127 green"><span>Maior impacto</span><b>'+esc(biggestLabel)+'</b><small>'+(usesFca?'Prioridade baseada na leitura FCA semanal':'Maior concentração de relatos do time')+'</small></div><div class="voiceRadarCardV127 gold"><span>Oportunidade</span><b>'+esc(opportunity.title)+'</b><small>'+esc(opportunity.detail)+'</small></div></div>'+
+    '</section>'+
+    '<div class=voiceDashSplitV127>'+
+      '<section class=voiceDashSectionV127><div class=voiceDashTitleV127><div><h3>📊 Principais causas</h3><p>% dos registros no período selecionado.</p></div></div>'+causeRows+'</section>'+
+      '<section class=voiceDashSectionV127><div class=voiceDashTitleV127><div><h3>🏬 '+(usesFca?'Filiais priorizadas':'Filiais sinalizadas pelo time')+'</h3><p>'+(usesFca?'Priorização oficial do FCA com complemento da escuta.':'Sinalização de escuta; não substitui a priorização FCA.')+'</p></div><button class=voiceDashLinkV127 onclick="go(\'fca\')">Ver todas →</button></div><div class=voicePriorityV127>'+priorityRows+'</div></section>'+
+    '</div>'+
+    '<section class=voiceDashSectionV127><div class=voiceDashTitleV127><div><h3>💡 Insights para tratativa</h3><p>Ações recomendadas a partir dos dados da escuta + FCA.</p></div></div><div class=voiceInsightsV127>'+
+      '<div class=voiceInsightV127><span>💬</span><b>'+esc(insight1.title)+'</b><small>'+esc(insight1.detail)+'</small></div>'+
+      '<div class=voiceInsightV127><span>📋</span><b>'+esc(insight2.title)+'</b><small>'+esc(insight2.detail)+'</small></div>'+
+      '<div class=voiceInsightV127><span>👥</span><b>'+esc(insight3.title)+'</b><small>'+esc(insight3.detail)+'</small></div>'+
+    '</div></section>'+
+    '<section class=voiceDashSectionV127><div class=voiceDashTitleV127><div><h3>📈 Evolução semanal</h3><p>Registros e colaboradores em alerta • últimas 4 semanas.</p></div></div>'+trendSvgV127(weeks)+'</section>';
+  }
+
   window.listenTeamV123=function(){
     if(!isLead())return '<div class=notice>Acesso exclusivo para supervisores e gestores.</div>';
-    const opts=isAdmin()?'<div class=voiceFilterV123><select id=voiceStoreFilterV123 onchange="setVoiceStoreV123(this.value)"><option value="">Todas as filiais • CE+PI</option>'+Object.keys(COMMON?.stores||{}).sort().map(st=>'<option value="'+esc(st)+'" '+(VOICE_STORE_V123===st?'selected':'')+'>Filial '+esc(st)+'</option>').join('')+'</select></div>':'';
     return '<div class=voicePageV123>'+
-      '<section class=voiceHeroV123><h2>Ouça seu time <span id=voicePageBadgeV123 class=voiceBadgeV123 style="position:static;vertical-align:middle"></span></h2><p>'+(isAdmin()?'Visão regional CE+PI dos impactos e sugestões registrados pelos colaboradores.':'Acompanhe os impactos, causas e sugestões registradas pelos colaboradores da sua filial.')+'</p></section>'+
-      opts+
+      '<section class=voiceHeroV123><h2>Ouça seu time <span id=voicePageBadgeV123 class=voiceBadgeV123 style="position:static;vertical-align:middle"></span></h2><p>'+(isAdmin()?'Dashboard consolidado CE+PI para insights, causas e tratativas da regional.':'Dashboard da filial para transformar a escuta do time em causas e ações objetivas.')+'</p></section>'+
+      '<div id=voiceDashboardV127><div class=card><div class=muted>Construindo dashboard...</div></div></div>'+
+      '<div class=voiceRecordsHeadV127><h3>Registros do time</h3><span>Detalhamento e acompanhamento</span></div>'+
       '<div class=voiceTabsV123><button class="'+(VOICE_STATUS_V123==='open'?'on':'')+'" onclick="setVoiceStatusV123(\'open\')">Aguardando</button><button class="'+(VOICE_STATUS_V123==='resolved'?'on':'')+'" onclick="setVoiceStatusV123(\'resolved\')">Resolvidos</button><button class="'+(VOICE_STATUS_V123==='all'?'on':'')+'" onclick="setVoiceStatusV123(\'all\')">Todos</button></div>'+
       '<div id=voiceTeamBodyV123><div class=card><div class=muted>Carregando registros...</div></div></div>'+
     '</div>';
   };
 
+  window.setVoicePeriodV127=function(v){
+    VOICE_PERIOD_V127=['week','month','30d'].includes(String(v))?String(v):'week';
+    loadVoiceTeamV123();
+  };
   window.setVoiceStatusV123=function(v){
     VOICE_STATUS_V123=v;
-    const view=document.getElementById('view');
-    if(view&&CUR==='listen'){view.innerHTML=listenTeamV123();loadVoiceTeamV123()}
+    renderVoiceRecordsV127();
   };
-  window.setVoiceStoreV123=function(v){VOICE_STORE_V123=String(v||'');loadVoiceTeamV123()};
+  window.setVoiceStoreV123=function(v){
+    VOICE_STORE_V123=String(v||'');
+    loadVoiceTeamV123();
+  };
+
+  function renderVoiceRecordsV127(){
+    const body=document.getElementById('voiceTeamBodyV123');if(!body)return;
+    const range=rangeV127(VOICE_PERIOD_V127);
+    let arr=itemsInRangeV127(VOICE_ALL_V127,range.from,range.to);
+    if(VOICE_STATUS_V123==='open')arr=arr.filter(x=>x.status!=='resolved');
+    else if(VOICE_STATUS_V123==='resolved')arr=arr.filter(x=>x.status==='resolved');
+    VOICE_ITEMS_V123=arr;
+    const s={pending:arr.filter(x=>x.status==='pending').length,reviewed:arr.filter(x=>x.status==='reviewed').length,resolved:arr.filter(x=>x.status==='resolved').length};
+    const cards=arr.map(item=>{
+      const cc=causeV123(item.cause_code),resolved=item.status==='resolved';
+      return '<article class="voiceItemV123 '+(resolved?'resolved':'')+'">'+
+        '<div class=voiceItemTopV123><span class=voiceDotV123></span><div><h4>'+esc(item.collaborator_name||('Matrícula '+item.matricula))+'</h4><div class=meta>'+esc(voiceStoreNameV127(item.store_code))+' • '+fmtDateV123(String(item.created_at||'').slice(0,10))+' • '+statusLabelV123(item.status)+'</div></div><div class=voiceDaysV123>'+num(item.zero_streak)+' dias<br><span style="font-size:9px;font-weight:700">sem captar</span></div></div>'+
+        '<span class=voiceReasonV123>'+cc.icon+' '+esc(cc.label)+'</span>'+
+        '<p>'+esc(item.cause_detail||'')+'</p>'+
+        (item.action_plan?'<p><b>Ação informada:</b> '+esc(item.action_plan)+'</p>':'')+
+        '<div class=voiceActionsV123><button onclick="openVoiceItemV123(\''+item.id+'\')">'+(resolved?'Ver registro':'Ver / tratar')+'</button></div>'+
+      '</article>';
+    }).join('');
+    body.innerHTML='<div class=voiceKpisV123><div class="voiceKpiV123 danger"><span>Aguardando</span><b>'+num(s.pending)+'</b></div><div class=voiceKpiV123><span>Em análise</span><b>'+num(s.reviewed)+'</b></div><div class=voiceKpiV123><span>Resolvidos</span><b>'+num(s.resolved)+'</b></div></div>'+
+      '<div class=voiceListV123 style="margin-top:10px">'+(cards||'<div class=card><div class=muted>Nenhum registro neste filtro.</div></div>')+'</div>';
+  }
 
   window.loadVoiceTeamV123=async function(){
     if(!isLead())return;
-    const body=document.getElementById('voiceTeamBodyV123');
+    const dash=document.getElementById('voiceDashboardV127'),body=document.getElementById('voiceTeamBodyV123');
+    if(dash)dash.innerHTML='<div class=card><div class=muted>Atualizando dashboard...</div></div>';
     if(body)body.innerHTML='<div class=card><div class=muted>Atualizando registros...</div></div>';
     try{
-      const j=await api({action:'voice_list',matricula:U.u.id,status:VOICE_STATUS_V123,store:VOICE_STORE_V123});
-      VOICE_ITEMS_V123=Array.isArray(j.items)?j.items:[];
-      const s=j.summary||{},cards=VOICE_ITEMS_V123.map(item=>{
-        const c=causeV123(item.cause_code),resolved=item.status==='resolved';
-        return '<article class="voiceItemV123 '+(resolved?'resolved':'')+'">'+
-          '<div class=voiceItemTopV123><span class=voiceDotV123></span><div><h4>'+esc(item.collaborator_name||('Matrícula '+item.matricula))+'</h4><div class=meta>Filial '+esc(item.store_code)+' • '+fmtDateV123(String(item.created_at||'').slice(0,10))+' • '+statusLabelV123(item.status)+'</div></div><div class=voiceDaysV123>'+num(item.zero_streak)+' dias<br><span style="font-size:9px;font-weight:700">sem captar</span></div></div>'+
-          '<span class=voiceReasonV123>'+c.icon+' '+esc(c.label)+'</span>'+
-          '<p>'+esc(item.cause_detail||'')+'</p>'+
-          (item.action_plan?'<p><b>Ação informada:</b> '+esc(item.action_plan)+'</p>':'')+
-          '<div class=voiceActionsV123><button onclick="openVoiceItemV123(\''+item.id+'\')">'+(resolved?'Ver registro':'Ver / tratar')+'</button></div>'+
-        '</article>';
-      }).join('');
-      if(body)body.innerHTML='<div class=voiceKpisV123><div class="voiceKpiV123 danger"><span>Aguardando</span><b>'+num(s.pending||0)+'</b></div><div class=voiceKpiV123><span>Em análise</span><b>'+num(s.reviewed||0)+'</b></div><div class=voiceKpiV123><span>Resolvidos</span><b>'+num(s.resolved||0)+'</b></div></div>'+
-        '<div class=voiceListV123 style="margin-top:10px">'+(cards||'<div class=card><div class=muted>Nenhum registro neste filtro.</div></div>')+'</div>';
+      const range=rangeV127(VOICE_PERIOD_V127),trendStart=addDaysV127(weekStartV127(range.to),-21),
+            fetchFrom=[range.from,range.prevFrom,trendStart].sort()[0];
+      const jobs=[
+        api({action:'voice_list',matricula:U.u.id,status:'all',store:VOICE_STORE_V123,from:fetchFrom,to:range.to,limit:1000}),
+        api({action:'fca_dashboard',matricula:U.u.id}).catch(e=>({ok:false,error:e.message||'FCA indisponível'}))
+      ];
+      const out=await Promise.all(jobs),j=out[0],fca=out[1];
+      VOICE_ALL_V127=Array.isArray(j.items)?j.items:[];
+      VOICE_FCA_V127=fca&&fca.ok!==false?fca:null;
+      if(dash)dash.innerHTML=dashboardHtmlV127(VOICE_ALL_V127,VOICE_FCA_V127);
+      renderVoiceRecordsV127();
       refreshVoiceBadgeV123();
     }catch(e){
-      if(body)body.innerHTML='<div class=notice danger>Não foi possível carregar os registros: '+esc(e.message||'erro')+'</div>'
+      if(dash)dash.innerHTML='<div class=notice danger>Não foi possível consolidar o dashboard: '+esc(e.message||'erro')+'</div>';
+      if(body)body.innerHTML='<div class=notice danger>Não foi possível carregar os registros.</div>';
     }
   };
 
