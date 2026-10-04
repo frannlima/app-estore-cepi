@@ -5995,5 +5995,166 @@ window.uploadHistoricalTicketsV97=async function(){
   else setTimeout(bootV121,0);
 })();
 </script>
+
+
+<!-- V128-FCA-PERFORMANCE-PULSE -->
+<style id="fca-performance-v128-style">
+.fcaPerfPulseV128{margin:14px 0;padding:15px;border:1px solid #e5e1d8;border-radius:22px;background:linear-gradient(145deg,#fff,#f8f6f1);box-shadow:0 7px 20px rgba(23,63,53,.05)}
+.fcaPerfHeadV128{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.fcaPerfHeadV128 h3{margin:0;color:#173F35;font-size:18px}.fcaPerfHeadV128 p{margin:3px 0 0;color:#77817d;font-size:10px;line-height:1.35}
+.fcaPerfGridV128{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.fcaPerfCardV128{border-radius:17px;padding:13px;min-height:116px;border:1px solid rgba(23,63,53,.06);display:flex;flex-direction:column;justify-content:space-between}
+.fcaPerfCardV128.blue{background:linear-gradient(145deg,#edf6fb,#e7f0f5)}
+.fcaPerfCardV128.gold{background:linear-gradient(145deg,#fff6e4,#f8ecd0)}
+.fcaPerfCardV128.green{background:linear-gradient(145deg,#edf7f1,#e4f0e9)}
+.fcaPerfCardV128 .ico{font-size:21px}.fcaPerfCardV128 span{display:block;margin-top:4px;color:#45564f;font-size:9px;line-height:1.2}
+.fcaPerfCardV128 b{display:block;color:#173F35;font-size:24px;margin-top:4px}.fcaPerfCardV128 small{display:block;color:#78817d;font-size:8px;line-height:1.3;margin-top:3px}
+.fcaPerfActionsV128{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}
+.fcaPerfActionsV128 button{border-radius:14px;padding:12px;border:1px solid #173F35;font-weight:950;font-size:11px}
+.fcaPerfActionsV128 .share{background:#fff;color:#173F35}.fcaPerfActionsV128 .dash{background:#173F35;color:#fff}
+.fcaDashV128{display:none;margin:13px 0}.fcaDashV128.show{display:block}
+.fcaDashSignalsV128{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.fcaSignalV128{background:#fff;border:1px solid #e6e2da;border-radius:16px;padding:12px}
+.fcaSignalV128 span{font-size:9px;color:#74807a}.fcaSignalV128 b{display:block;margin-top:5px;color:#173F35;font-size:17px}.fcaSignalV128 b.bad{color:#d43139}.fcaSignalV128 small{display:block;margin-top:4px;color:#7d8681;font-size:8px;line-height:1.25}
+.fcaDashTableWrapV128{overflow:auto;border:1px solid #e5e1d8;border-radius:17px;background:#fff}
+.fcaDashTableV128{width:100%;min-width:760px;border-collapse:collapse}
+.fcaDashTableV128 th{position:sticky;top:0;background:#f1f2ef;color:#50615b;font-size:9px;text-align:left;padding:9px}
+.fcaDashTableV128 td{font-size:9px;color:#30443d;padding:9px;border-top:1px solid #eeeae3;white-space:nowrap}
+.fcaDashTableV128 td b{font-size:10px}.fcaDashTableV128 .neg{color:#d43139}.fcaDashTableV128 .pos{color:#16704d}
+.fcaStatusDotV128{display:inline-flex;align-items:center;gap:5px;padding:5px 7px;border-radius:999px;font-size:8px;font-weight:900}
+.fcaStatusDotV128.critical{background:#ffe6e6;color:#c92b32}.fcaStatusDotV128.attention{background:#fff0cf;color:#966008}.fcaStatusDotV128.evolution{background:#e6f4eb;color:#1a6e4f}
+.fcaDashColumnsV128{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fcaVoiceCauseV128{display:grid;grid-template-columns:120px 1fr 34px;gap:8px;align-items:center;margin:8px 0}
+.fcaVoiceCauseV128 label{font-size:9px;color:#3c4e47;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fcaVoiceCauseV128 div{height:10px;border-radius:999px;background:#edf0ed;overflow:hidden}.fcaVoiceCauseV128 i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#1d6c57,#67b39a)}.fcaVoiceCauseV128 b{font-size:9px;text-align:right;color:#173F35}
+.fcaInsightListV128{display:grid;gap:8px}.fcaInsightItemV128{display:grid;grid-template-columns:30px 1fr;gap:9px;align-items:start;background:#f7f6f2;border-radius:14px;padding:10px}.fcaInsightItemV128 i{width:30px;height:30px;border-radius:10px;background:#e5f1eb;display:grid;place-items:center;font-style:normal}.fcaInsightItemV128 b{display:block;color:#173F35;font-size:10px}.fcaInsightItemV128 small{display:block;color:#74807a;font-size:8px;line-height:1.35;margin-top:3px}
+.fcaPerfNoteV128{margin-top:9px;font-size:8px;color:#78817d;line-height:1.35}
+@media(max-width:620px){.fcaPerfGridV128{grid-template-columns:1fr 1fr}.fcaPerfCardV128:last-child{grid-column:1/-1}.fcaDashSignalsV128{grid-template-columns:1fr}.fcaDashColumnsV128{grid-template-columns:1fr}}
+@media(max-width:370px){.fcaPerfGridV128{grid-template-columns:1fr}.fcaPerfCardV128:last-child{grid-column:auto}.fcaPerfActionsV128{grid-template-columns:1fr}}
+</style>
+<script>
+(function(){
+  const VOICE_LABELS_V128={
+    instabilidade_app:'Instabilidade App/eStore',pagamento:'Problema de pagamento',cupom:'Cupom não aplicou',
+    estoque_online:'Estoque online',outra_atividade:'Foco em outra atividade',abordagem:'Abordagem',
+    escala_folga:'Escala/Folga',outro:'Outro motivo'
+  };
+  const baseExecV128=window.fcaExecutiveHtmlV61||fcaExecutiveHtmlV61;
+
+  function ticketPpV128(v){
+    if(v===null||v===undefined)return '—';
+    const n=Number(v)||0;
+    return (n>0?'+':'')+(n*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+' p.p.';
+  }
+  function statusV128(x){
+    const adverseShare=Number(x.share_delta||0)<0,disp=Number(x.dispersion||0),z=Number(x.zero_over3||0),ticket=Number(x.ticket_change||0);
+    if((adverseShare&&(disp>=.5||z>=3||ticket<=-.10))||z>=5||disp>=.6)return ['critical','Crítico'];
+    if(adverseShare||disp>=.35||z>=2||ticket<0)return ['attention','Atenção'];
+    return ['evolution','Em evolução'];
+  }
+  function storeNameV128(x){return String(x?.st||'')+' • '+esc(x?.name||storeDisplayName(x?.st))}
+  function topStoreV128(d,key,dir){
+    const arr=[...(d.stores||[])].filter(x=>x[key]!==null&&x[key]!==undefined);
+    arr.sort((a,b)=>dir==='asc'?Number(a[key])-Number(b[key]):Number(b[key])-Number(a[key]));
+    return arr[0]||null;
+  }
+  function insightV128(d){
+    const p=d.performance||{},voice=p.voice||{},causes=voice.causes||[],topCause=causes[0]?.key||'';
+    const disp=topStoreV128(d,'dispersion','desc'),zero=topStoreV128(d,'zero_over3','desc'),ticket=topStoreV128(d,'ticket_change','asc');
+    const out=[];
+    if(topCause==='abordagem')out.push(['💬','Reforçar abordagem eStore','A escuta do time aponta abordagem como principal causa. Trabalhar script, objeções e benefícios do eStore.']);
+    else if(topCause==='instabilidade_app')out.push(['📋','Consolidar evidências sistêmicas','Agrupar horários, prints e chamados para dar robustez à tratativa de instabilidade do App/eStore.']);
+    else if(topCause==='pagamento'||topCause==='cupom')out.push(['💳','Atuar na conversão da jornada','Cruzar falhas de pagamento/cupom com perda de venda e orientar alternativas no atendimento.']);
+    else out.push(['🎯','Cruzar causa raiz com a escuta','Use os relatos do time para complementar o FCA e qualificar a causa operacional ou sistêmica.']);
+    if(zero&&Number(zero.zero_over3)>0)out.push(['👥','Atuar na frequência de zeragem','Filial '+zero.st+' concentra '+zero.zero_over3+' colaborador(es) com mais de 3 dias zerados na semana.']);
+    if(disp&&Number(disp.dispersion)>0)out.push(['📊','Reduzir dispersão operacional','Filial '+disp.st+' tem a maior dispersão ('+pct(disp.dispersion)+'). Priorizar meta individual e acompanhamento diário.']);
+    if(ticket&&Number(ticket.ticket_change)<0)out.push(['↘','Proteger ticket médio','Filial '+ticket.st+' apresenta a maior retração de ticket ('+ticketPpV128(ticket.ticket_change)+'). Cruzá-la com mix, abordagem e conversão.']);
+    return out.slice(0,4);
+  }
+
+  function fcaPerfSummaryV128(d){
+    const s=d.summary||{},p=d.performance||{},partial=d.showPartial&&d.currentPartial?fcaPartialHtmlV61(d):'';
+    const ticketChange=s.ticket_change;
+    return partial+
+      '<section class=fcaPerfPulseV128>'+
+        '<div class=fcaPerfHeadV128><div><h3>Pulso Operacional da Semana</h3><p>Frequência de zeragem, dispersão e ticket médio para complementar a leitura FCA.</p></div><span>📊</span></div>'+
+        '<div class=fcaPerfGridV128>'+
+          '<div class="fcaPerfCardV128 blue"><div><span class=ico>👥</span><span>Colaboradores com +3 dias zerados</span></div><b>'+num(p.critical_zero_collaborators||0)+'</b><small>Semana '+d.weekNumber+' • frequência crítica de não captação</small></div>'+
+          '<div class="fcaPerfCardV128 gold"><div><span class=ico>📶</span><span>% de dispersão regional</span></div><b>'+pct(p.regional_dispersion||0)+'</b><small>Colaboradores sem venda ÷ base elegível das lojas</small></div>'+
+          '<div class="fcaPerfCardV128 green"><div><span class=ico>'+(Number(ticketChange||0)>=0?'↗':'↘')+'</span><span>Ticket médio • ganho/perda</span></div><b>'+ticketPpV128(ticketChange)+'</b><small>'+money(s.previous_ticket)+' → '+money(s.ticket)+' • Sem. '+d.previousWeekNumber+' vs '+d.weekNumber+'</small></div>'+
+        '</div>'+
+        '<div class=fcaPerfActionsV128><button class=share onclick="shareFcaPerformanceV128()">↗ Compartilhar resumo</button><button class=dash onclick="fcaToggleDashboardV128()">▥ Visualizar dashboard</button></div>'+
+        '<div class=fcaPerfNoteV128>Os indicadores complementam a priorização oficial do FCA. A prioridade continua sendo definida pela retração de Share semanal validada.</div>'+
+      '</section>';
+  }
+
+  function fcaDashboardV128(d){
+    const p=d.performance||{},voice=p.voice||{},maxDisp=p.max_dispersion,maxTicket=p.max_ticket_loss,maxZero=p.max_zero;
+    const rows=[...(d.stores||[])].sort((a,b)=>{
+      const sa=statusV128(a)[0],sb=statusV128(b)[0],rank={critical:3,attention:2,evolution:1};
+      return rank[sb]-rank[sa]||Number(b.zero_over3||0)-Number(a.zero_over3||0)||Number(b.dispersion||0)-Number(a.dispersion||0);
+    }).map(x=>{
+      const st=statusV128(x),tc=x.ticket_change;
+      return '<tr><td><b>'+esc(String(x.st))+'</b> • '+esc(x.name||storeDisplayName(x.st))+'</td>'+
+        '<td>'+pct(x.share)+'</td><td class="'+(Number(x.share_delta||0)<0?'neg':'pos')+'">'+fcaPpV61(x.share_delta)+'</td>'+
+        '<td>'+pct(x.dispersion)+'</td><td>'+money(x.ticket)+'</td><td class="'+(Number(tc||0)<0?'neg':'pos')+'">'+ticketPpV128(tc)+'</td>'+
+        '<td class="'+(Number(x.zero_over3||0)>3?'neg':'')+'">'+num(x.zero_over3||0)+'</td>'+
+        '<td><span class="fcaStatusDotV128 '+st[0]+'">● '+st[1]+'</span></td></tr>';
+    }).join('');
+
+    const causeRows=(voice.causes||[]).slice(0,6).map(c=>{
+      const label=VOICE_LABELS_V128[c.key]||c.key||'Outro',pctv=Math.round(Number(c.pct||0)*100);
+      return '<div class=fcaVoiceCauseV128><label>'+esc(label)+'</label><div><i style="width:'+Math.max(3,pctv)+'%"></i></div><b>'+pctv+'%</b></div>';
+    }).join('')||'<div class=muted>Ainda não há registros do “Ouça seu time” nesta semana.</div>';
+
+    const insights=insightV128(d).map(x=>'<div class=fcaInsightItemV128><i>'+x[0]+'</i><div><b>'+esc(x[1])+'</b><small>'+esc(x[2])+'</small></div></div>').join('');
+    return '<div id=fcaDashboardV128 class=fcaDashV128>'+
+      '<div class=fcaSectionV61><div class=fcaSectionHeadV61><div><b>Sinais críticos da semana</b><small>Pontos que merecem leitura conjunta com Share, causa raiz e plano de ação.</small></div></div>'+
+        '<div class=fcaDashSignalsV128>'+
+          '<div class=fcaSignalV128><span>Maior frequência crítica</span><b class="'+(Number(maxZero?.zero_over3||0)>0?'bad':'')+'">'+num(maxZero?.zero_over3||0)+' colaboradores</b><small>'+(maxZero?storeNameV128(maxZero):'Sem sinal crítico')+'</small></div>'+
+          '<div class=fcaSignalV128><span>Maior dispersão</span><b class="'+(Number(maxDisp?.dispersion||0)>=.5?'bad':'')+'">'+pct(maxDisp?.dispersion||0)+'</b><small>'+(maxDisp?storeNameV128(maxDisp):'—')+'</small></div>'+
+          '<div class=fcaSignalV128><span>Maior perda de ticket</span><b class="'+(Number(maxTicket?.ticket_change||0)<0?'bad':'')+'">'+ticketPpV128(maxTicket?.ticket_change)+'</b><small>'+(maxTicket?storeNameV128(maxTicket):'—')+'</small></div>'+
+        '</div></div>'+
+      '<div class=fcaSectionV61><div class=fcaSectionHeadV61><div><b>Lojas em foco</b><small>Share, dispersão, ticket e frequência de zeragem no mesmo painel.</small></div></div><div class=fcaDashTableWrapV128><table class=fcaDashTableV128><thead><tr><th>Filial</th><th>Share</th><th>Δ Share</th><th>Dispersão</th><th>Ticket</th><th>Δ Ticket p.p.</th><th>+3 dias</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>'+
+      '<div class=fcaDashColumnsV128>'+
+        '<div class=fcaSectionV61><div class=fcaSectionHeadV61><div><b>Causas • Ouça seu time</b><small>'+num(voice.records||0)+' registros na Semana '+d.weekNumber+'.</small></div><button class=btn onclick="go(\\'listen\\')">Abrir escuta</button></div>'+causeRows+'</div>'+
+        '<div class=fcaSectionV61><div class=fcaSectionHeadV61><div><b>Insights para tratativa</b><small>Direcionamentos automáticos para complementar o FCA.</small></div></div><div class=fcaInsightListV128>'+insights+'</div></div>'+
+      '</div>'+
+    '</div>';
+  }
+
+  window.fcaToggleDashboardV128=function(){
+    const el=document.getElementById('fcaDashboardV128');
+    if(!el)return;
+    el.classList.toggle('show');
+    if(el.classList.contains('show'))el.scrollIntoView({behavior:'smooth',block:'start'});
+  };
+
+  window.shareFcaPerformanceV128=async function(){
+    const d=FCA_DATA_V60;if(!d)return;
+    const s=d.summary||{},p=d.performance||{},maxDisp=p.max_dispersion,maxTicket=p.max_ticket_loss,maxZero=p.max_zero;
+    const text='📊 *FCA & PERFORMANCE | CE+PI • SEMANA '+d.weekNumber+'*\\n'+
+      'Comparativo vs Semana '+d.previousWeekNumber+'\\n\\n'+
+      '• *Share:* '+pct(s.share)+' ('+fcaPpV61(s.share_delta)+')\\n'+
+      '• *Colaboradores +3 dias zerados:* '+num(p.critical_zero_collaborators||0)+'\\n'+
+      '• *Dispersão regional:* '+pct(p.regional_dispersion||0)+'\\n'+
+      '• *Ticket médio:* '+money(s.ticket)+' ('+ticketPpV128(s.ticket_change)+')\\n\\n'+
+      (maxZero?'⚠️ *Maior frequência crítica:* '+maxZero.st+' • '+num(maxZero.zero_over3)+' colaboradores\\n':'')+
+      (maxDisp?'📶 *Maior dispersão:* '+maxDisp.st+' • '+pct(maxDisp.dispersion)+'\\n':'')+
+      (maxTicket?'🎫 *Maior perda de ticket:* '+maxTicket.st+' • '+ticketPpV128(maxTicket.ticket_change)+'\\n':'')+
+      '\\n🎯 *Leitura:* cruzar Share, dispersão, ticket e frequência de zeragem com a causa raiz e a escuta do time para direcionar a tratativa.';
+    try{
+      if(navigator.share){await navigator.share({title:'FCA & Performance • CE+PI',text});return}
+    }catch(e){if(e?.name==='AbortError')return}
+    try{await navigator.clipboard.writeText(text);alert('Resumo copiado para compartilhar.')}catch(e){alert(text)}
+  };
+
+  window.fcaExecutiveHtmlV61=fcaExecutiveHtmlV61=function(d){
+    const summary=fcaPerfSummaryV128(d);
+    const base=baseExecV128(d);
+    const dash=fcaDashboardV128(d);
+    return summary+base+dash;
+  };
+})();
+</script>
 </body>
 </html>
