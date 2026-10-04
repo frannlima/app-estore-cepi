@@ -1,5 +1,5 @@
 (function(){
-  const BUILD='v103';
+  const BUILD='v105';
   const C={green:'#173F35',sage:'#466964',gray:'#DAD9D6',sand:'#D6D2C4',orange:'#DE7C00',orangeU:'#D37C32',wine:'#76232F',red:'#E03C31',up:'#157349',cream:'#F7F5EF',white:'#FFFFFF',ink:'#173F35',muted:'#68736F',line:'#E4E0D8',soft:'#FBFAF7',rose:'#FCE7E7',mint:'#E7F3E9'};
   let PERIOD='week', LAST=null, LAST_CANVAS=null, BUSY=false;
   const $id=id=>document.getElementById(id);
@@ -130,10 +130,20 @@
   function circle(ctx,x,y,r,fill){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill()}
   async function loadLogo(){
     try{
-      const r=await fetch('./assets/riachuelo-logo-exact-v75.svg?build='+BUILD,{cache:'no-store'});let svg=await r.text();
-      svg=svg.replace(/fill="#[0-9a-f]{3,6}"/gi,'fill="#FFFFFF"').replace(/fill="[^"]+"/gi,'fill="#FFFFFF"');
-      const u='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(svg)));
-      return await loadImg(u);
+      // Usa o wordmark oficial aprovado (mesma silhueta do modelo enviado).
+      const im=await loadImg('./riachuelo-horizontal-oficial.png?build='+BUILD);
+      const c=document.createElement('canvas');
+      c.width=im.naturalWidth||im.width;
+      c.height=im.naturalHeight||im.height;
+      const x=c.getContext('2d');
+      x.clearRect(0,0,c.width,c.height);
+      x.drawImage(im,0,0,c.width,c.height);
+      // Versão negativa branca para preservar contraste no cabeçalho verde.
+      x.globalCompositeOperation='source-in';
+      x.fillStyle='#FFFFFF';
+      x.fillRect(0,0,c.width,c.height);
+      x.globalCompositeOperation='source-over';
+      return c;
     }catch(e){return null}
   }
   function loadImg(src){return new Promise((ok,err)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=err;im.src=src})}
@@ -190,15 +200,15 @@
   function drawPodiumGroup(ctx,x,y,w,h,label,rows,mode){
     txt(ctx,mode==='sup'?'♟':'●',x+10,y+18,18,'700 17px Arial',C.green);
     txt(ctx,label,x+34,y+18,w-40,'700 16px Arial',C.green);
-    const gap=14,cw=(w-gap*2)/3,cy=y+39,ch=h-46;
+    const gap=14,cw=(w-gap*2)/3,cy=y+34,ch=h-38;
     rows.slice(0,3).forEach((r,i)=>{
       const cx=x+i*(cw+gap);const fills=['#FFF7E8','#F1F1EF','#F8EEE7'];rr(ctx,cx,cy,cw,ch,12,fills[i],'#ECE7DE',1);
-      const medal=[C.orange,'#B7BABD','#9B4E2E'][i];circle(ctx,cx+36,cy+28,18,medal);txt(ctx,String(i+1),cx+36,cy+28,24,'700 16px Arial','#FFFFFF','center');
-      txt(ctx,(i+1)+'º lugar',cx+64,cy+28,cw-76,'700 15px Arial',medal);
-      const name=mode==='sup'?supFirsts(r):pref(r.id,r.name);txt(ctx,name,cx+18,cy+62,cw-36,'700 15px Arial','#203B35');
-      const sub=mode==='sup'?((r.st||'')+' • '+supStore(r.st,r.name)):((r.st||'')+' • '+storeName(r.st||''));txt(ctx,sub,cx+18,cy+88,cw-36,'500 12px Arial','#4D5A56');
-      ctx.strokeStyle='#DDD5C8';ctx.beginPath();ctx.moveTo(cx+24,cy+110);ctx.lineTo(cx+cw-24,cy+110);ctx.stroke();
-      txt(ctx,fmtMoney0(mode==='sup'?(+r.c||0):(+r.c||0)),cx+cw/2,cy+136,cw-30,'700 20px Arial',C.green,'center');
+      const medal=[C.orange,'#B7BABD','#9B4E2E'][i];circle(ctx,cx+36,cy+22,18,medal);txt(ctx,String(i+1),cx+36,cy+22,24,'700 16px Arial','#FFFFFF','center');
+      txt(ctx,(i+1)+'º lugar',cx+64,cy+22,cw-76,'700 15px Arial',medal);
+      const name=mode==='sup'?supFirsts(r):pref(r.id,r.name);txt(ctx,name,cx+18,cy+50,cw-36,'700 15px Arial','#203B35');
+      const sub=mode==='sup'?((r.st||'')+' • '+supStore(r.st,r.name)):((r.st||'')+' • '+storeName(r.st||''));txt(ctx,sub,cx+18,cy+74,cw-36,'500 12px Arial','#4D5A56');
+      ctx.strokeStyle='#DDD5C8';ctx.beginPath();ctx.moveTo(cx+24,cy+92);ctx.lineTo(cx+cw-24,cy+92);ctx.stroke();
+      txt(ctx,fmtMoney0(+r.c||0),cx+cw/2,cy+111,cw-30,'700 20px Arial',C.green,'center');
     });
   }
 
@@ -208,7 +218,7 @@
     // Header
     rr(ctx,18,14,W-36,122,15,C.green,C.green,0);
     const logo=await loadLogo();
-    if(logo)ctx.drawImage(logo,62,50,355,43);else txt(ctx,'RIACHUELO',62,73,350,'600 44px Arial','#FFFFFF');
+    if(logo)ctx.drawImage(logo,58,41,370,68);else txt(ctx,'RIACHUELO',62,73,350,'600 44px Arial','#FFFFFF');
     ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(485,37);ctx.lineTo(485,110);ctx.stroke();
     txt(ctx,'Painel Regional eStore • CE+PI',530,60,650,'700 34px Arial','#FFFFFF');
     txt(ctx,descriptor(d),530,99,690,'500 20px Arial','#F2E6C7');
@@ -232,15 +242,15 @@
     drawTable(ctx,18+leftW+gap,midY,leftW,midH,d.period==='week'?'Maiores retrações de Share':'Menores Shares',d.retractions,'down');
     drawPriorities(ctx,18+(leftW+gap)*2,midY,rightW,midH,d.prioritized);
 
-    const podY=656,podH=206;rr(ctx,18,podY,W-36,podH,16,C.white,'#E5E1D8',1);
+    const podY=648,podH=226;rr(ctx,18,podY,W-36,podH,16,C.white,'#E5E1D8',1);
     ctx.fillStyle=C.green;rr(ctx,18,podY,W-36,42,16,C.green,C.green,0);ctx.fillRect(18,podY+21,W-36,21);
     txt(ctx,'🏆',48,podY+21,28,'700 20px Arial','#FFFFFF','center');txt(ctx,'Pódio Regional',76,podY+21,250,'700 19px Arial','#FFFFFF');
     ctx.strokeStyle='#D7D1C8';ctx.beginPath();ctx.moveTo(W/2,podY+56);ctx.lineTo(W/2,podY+podH-12);ctx.stroke();
     drawPodiumGroup(ctx,46,podY+48,W/2-78,podH-58,'Colaboradores',d.collabCaptured,'collab');
     drawPodiumGroup(ctx,W/2+30,podY+48,W/2-78,podH-58,'Supervisores',d.supervisorRanking,'sup');
 
-    txt(ctx,'MODA QUE INSPIRA O BRASIL',30,885,360,'600 15px Arial',C.green);
-    ctx.strokeStyle=C.sage;ctx.beginPath();ctx.moveTo(356,884);ctx.lineTo(1550,884);ctx.stroke();
+    txt(ctx,'MODA QUE INSPIRA O BRASIL',30,889,300,'600 14px Arial',C.green);
+    ctx.strokeStyle=C.sage;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(300,889);ctx.lineTo(1550,889);ctx.stroke();
     return canvas;
   }
 
