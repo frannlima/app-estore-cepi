@@ -1,4 +1,4 @@
-/* V130 — Central de Performance | FCA Inteligente */
+/* V131 — Central de Performance | FCA Inteligente • gaps + resumo executivo + branding oficial */
 (function(){
   'use strict';
   if(window.__PERFORMANCE_V130_LOADED__)return;
@@ -43,11 +43,45 @@
   function pshort(v,max){var s=String(v||'').trim();return s.length>max?s.slice(0,max-1)+'…':s}
   function punique(arr,key){var m={};return (arr||[]).filter(function(x){var k=String(x&&x[key]||'');if(!k||m[k])return false;m[k]=1;return true})}
 
+  var PERF_LOGO_V131='./assets/riachuelo-logo-exact-v75.svg';
+  function pprevFromChangeV131(current,change){
+    if(change===null||change===undefined||!Number.isFinite(Number(change)))return null;
+    var r=Number(change),den=1+r;
+    if(!Number.isFinite(den)||Math.abs(den)<.000001)return null;
+    return pnum(current)/den;
+  }
+  function pgapFromChangeV131(current,change,previous){
+    var prev=phas(previous)?pnum(previous):pprevFromChangeV131(current,change);
+    return prev===null?null:pnum(current)-prev;
+  }
+  function psignedMoneyV131(v){
+    if(v===null||v===undefined||!Number.isFinite(Number(v)))return '—';
+    var n=Number(v);return (n>0?'+':n<0?'-':'')+pmoney(Math.abs(n));
+  }
+  function psignedIntV131(v,label){
+    if(v===null||v===undefined||!Number.isFinite(Number(v)))return '—';
+    var n=Math.round(Number(v));return (n>0?'+':'')+n.toLocaleString('pt-BR')+(label?' '+label:'');
+  }
+  function metricGapV131(s,type){
+    if(type==='captured')return pgapFromChangeV131(s.captured,s.capturedChange,s.previousCaptured);
+    if(type==='orders')return pgapFromChangeV131(s.orders,s.ordersChange,s.previousOrders);
+    if(type==='ticket')return pgapFromChangeV131(s.ticket,s.ticketChange,s.previousTicket);
+    return null;
+  }
+  function metricDeviationTextV131(s,type){
+    if(type==='share')return ppp(s.shareDelta);
+    var change=type==='captured'?s.capturedChange:type==='orders'?s.ordersChange:s.ticketChange;
+    if(change===null||change===undefined||!Number.isFinite(Number(change)))return type==='orders'?'Volume do período':'Resultado do período';
+    var gap=metricGapV131(s,type),gapTxt=type==='orders'?psignedIntV131(gap,'pedidos'):psignedMoneyV131(gap);
+    return pchange(change)+'  |  gap '+gapTxt;
+  }
+
   function performanceViewV130(){
     if(typeof isLead==='function'&&!isLead())return '<div class=notice>Central de Performance disponível para supervisores e gestores.</div>';
     return '<div class=performancePageV130>'+
       '<section class=performanceHeroV130>'+
-        '<img class=brand src="./assets/riachuelo-logo-exact-v75.svg" alt="Riachuelo">'+
+        '<button class=performanceBackTopV131 onclick="goBackApp()" aria-label="Voltar">← <span>Voltar</span></button>'+
+        '<img class=brand src="'+PERF_LOGO_V131+'" alt="Riachuelo">'+
         '<h1>Central de Performance | FCA Inteligente</h1>'+
         '<p>Da análise à ação. Resultado, sinais de performance, causas registradas, priorização e plano de reversão reunidos em uma única leitura executiva.</p>'+
         '<div class=performanceHeroMetaV130><span>eStore CE+PI</span><span>Fonte oficial do App</span><span>FCA pré-pronta</span></div>'+
@@ -82,36 +116,45 @@
     var compareLabel=isCurrent?'vs Semana '+(d.weekNumber||'—'):'vs Semana '+(d.previousWeekNumber||'—');
     var delta=isCurrent?pnum(d.currentPartial.share_delta):pnum(d.summary&&d.summary.share_delta);
     var prevShare=isCurrent?pnum(d.summary&&d.summary.share):pnum(reg.share)-delta;
+    var capChange=isCurrent?null:(d.summary&&d.summary.captured_change);
+    var ordChange=isCurrent?null:(d.summary&&d.summary.orders_change);
+    var ticketChange=isCurrent?(d.summary&&d.summary.ticket?pnum(reg.ticket)/pnum(d.summary.ticket)-1:null):(d.summary&&d.summary.ticket_change);
     var snap={
       isCurrent:isCurrent,periodLabel:periodLabel,compareLabel:compareLabel,stores:stores,
       share:pnum(reg.share),previousShare:prevShare,shareDelta:delta,
       captured:pnum(reg.captured),orders:pnum(reg.orders),ticket:pnum(reg.ticket),
-      capturedChange:isCurrent?null:(d.summary&&d.summary.captured_change),
-      ordersChange:isCurrent?null:(d.summary&&d.summary.orders_change),
-      ticketChange:isCurrent?(d.summary&&d.summary.ticket?pnum(reg.ticket)/pnum(d.summary.ticket)-1:null):(d.summary&&d.summary.ticket_change),
+      capturedChange:capChange,ordersChange:ordChange,ticketChange:ticketChange,
+      previousCaptured:phas(reg.previous_captured)?pnum(reg.previous_captured):phas(d.summary&&d.summary.previous_captured)?pnum(d.summary.previous_captured):pprevFromChangeV131(reg.captured,capChange),
+      previousOrders:phas(reg.previous_orders)?pnum(reg.previous_orders):phas(d.summary&&d.summary.previous_orders)?pnum(d.summary.previous_orders):pprevFromChangeV131(reg.orders,ordChange),
+      previousTicket:phas(reg.previous_ticket)?pnum(reg.previous_ticket):phas(d.summary&&d.summary.previous_ticket)?pnum(d.summary.previous_ticket):pprevFromChangeV131(reg.ticket,ticketChange),
       dispersion:pnum((reg&&reg.dispersion)!=null?reg.dispersion:(d.performance&&d.performance.regional_dispersion)),
       active:stores.filter(function(x){return pnum(x.captured)>0}).length,
-      activeBase:stores.length,
+      activeBase:stores.length||closed.length,
       scope:'regional',
       store:null,
       partialFallback:false
     };
     if(PERF_SCOPE_V130==='operation'){
       var cur=isCurrent?ownCurrentStore(d):null;
-      var closed=ownClosedStore(d);
-      var x=cur||closed;
+      var closedStore=ownClosedStore(d);
+      var x=cur||closedStore;
       if(x){
         snap.scope='operation';snap.store=x;
         snap.partialFallback=!!(isCurrent&&!cur);
         snap.share=pnum(x.share);
-        snap.shareDelta=cur?pnum(x.share_delta):pnum(x.share_delta);
+        snap.shareDelta=pnum(x.share_delta);
         snap.previousShare=phas(x.previous_share)?pnum(x.previous_share):snap.share-snap.shareDelta;
         snap.captured=pnum(x.captured);snap.orders=pnum(x.orders);snap.ticket=pnum(x.ticket);
-        snap.dispersion=phas(x.dispersion)?pnum(x.dispersion):pnum(closed&&closed.dispersion);
+        snap.capturedChange=phas(x.captured_change)?pnum(x.captured_change):null;
+        snap.ordersChange=phas(x.orders_change)?pnum(x.orders_change):null;
         snap.ticketChange=phas(x.ticket_change)?pnum(x.ticket_change):null;
-        snap.zeroOver3=pnum(x.zero_over3||closed&&closed.zero_over3);
+        snap.previousCaptured=phas(x.previous_captured)?pnum(x.previous_captured):pprevFromChangeV131(snap.captured,snap.capturedChange);
+        snap.previousOrders=phas(x.previous_orders)?pnum(x.previous_orders):pprevFromChangeV131(snap.orders,snap.ordersChange);
+        snap.previousTicket=phas(x.previous_ticket)?pnum(x.previous_ticket):pprevFromChangeV131(snap.ticket,snap.ticketChange);
+        snap.dispersion=phas(x.dispersion)?pnum(x.dispersion):pnum(closedStore&&closedStore.dispersion);
+        snap.zeroOver3=pnum(x.zero_over3||closedStore&&closedStore.zero_over3);
         snap.priority=priorityForStore(d,x.st);
-        snap.participation=phas(x.participation)?pnum(x.participation):pnum(closed&&closed.participation);
+        snap.participation=phas(x.participation)?pnum(x.participation):pnum(closedStore&&closedStore.participation);
         if(snap.partialFallback){
           snap.periodLabel='Semana '+(d.weekNumber||'—')+' • último fechamento da filial';
           snap.compareLabel='parcial atual sem recorte individual disponível';
@@ -263,12 +306,12 @@
     var shareClass=ptrend(s.shareDelta),capt=s.capturedChange,ord=s.ordersChange,ticket=s.ticketChange;
     var sixth=s.scope==='operation'?
       '<div class=performanceKpiV130><span>Frequência crítica</span><b>'+Math.round(pnum(s.zeroOver3))+'</b><small>colaborador(es) com +3 dias zerados</small></div>':
-      '<div class=performanceKpiV130><span>Lojas com venda</span><b>'+Math.round(s.active)+' / '+Math.round(s.activeBase||closedStores(d).length)+'</b><small>no recorte disponível</small></div>';
+      '<div class=performanceKpiV130><span>Lojas com venda</span><b>'+Math.round(s.active)+' / '+Math.round(s.activeBase||closedStores(d).length)+'</b><small class="'+((s.active-(s.activeBase||closedStores(d).length))<0?'down':'up')+'">gap '+psignedIntV131(s.active-(s.activeBase||closedStores(d).length),'loja'+(Math.abs(s.active-(s.activeBase||closedStores(d).length))===1?'':'s'))+' para cobertura total</small></div>';
     return '<div class=performanceKpisV130>'+
-      '<div class=performanceKpiV130><span>Share eStore</span><b>'+ppct(s.share,2)+'</b><small class='+shareClass+'>'+ppp(s.shareDelta)+' • '+pesc(s.compareLabel)+'</small></div>'+
-      '<div class=performanceKpiV130><span>Venda captada</span><b>'+pmoney(s.captured)+'</b><small class="'+ptrend(capt)+'">'+(capt==null?'Resultado do período':pchange(capt)+' vs período anterior')+'</small></div>'+
-      '<div class=performanceKpiV130><span>Pedidos</span><b>'+Math.round(s.orders).toLocaleString('pt-BR')+'</b><small class="'+ptrend(ord)+'">'+(ord==null?'Volume do período':pchange(ord)+' vs período anterior')+'</small></div>'+
-      '<div class=performanceKpiV130><span>Ticket médio</span><b>'+pmoney(s.ticket)+'</b><small class="'+ptrend(ticket)+'">'+(ticket==null?'Ticket do período':pchange(ticket)+' vs período anterior')+'</small></div>'+
+      '<div class=performanceKpiV130><span>Share eStore</span><b>'+ppct(s.share,2)+'</b><small class='+shareClass+'>'+metricDeviationTextV131(s,'share')+' • '+pesc(s.compareLabel)+'</small></div>'+
+      '<div class=performanceKpiV130><span>Venda captada</span><b>'+pmoney(s.captured)+'</b><small class="'+ptrend(capt)+'">'+pesc(metricDeviationTextV131(s,'captured'))+'</small></div>'+
+      '<div class=performanceKpiV130><span>Pedidos</span><b>'+Math.round(s.orders).toLocaleString('pt-BR')+'</b><small class="'+ptrend(ord)+'">'+pesc(metricDeviationTextV131(s,'orders'))+'</small></div>'+
+      '<div class=performanceKpiV130><span>Ticket médio</span><b>'+pmoney(s.ticket)+'</b><small class="'+ptrend(ticket)+'">'+pesc(metricDeviationTextV131(s,'ticket'))+'</small></div>'+
       '<div class=performanceKpiV130><span>Dispersão</span><b>'+ppct(s.dispersion,1)+'</b><small>'+(s.scope==='operation'?'Filial '+pesc(s.store&&s.store.st):'Regional CE+PI')+'</small></div>'+
       sixth+
     '</div>';
@@ -360,14 +403,81 @@
     '</div>';
   }
 
+  function executiveSummaryV131(d,s,top,pri,causes){
+    var best=(top||[])[0],attention=(pri||[])[0],capGap=metricGapV131(s,'captured'),ordGap=metricGapV131(s,'orders'),ticketGap=metricGapV131(s,'ticket');
+    var headline=s.shareDelta>0?'Evolução de Share com foco em sustentação':s.shareDelta<0?'Retração de Share exige atuação dirigida':'Share estável com oportunidade de ganho';
+    var result='Share '+ppct(s.share,2)+' ('+ppp(s.shareDelta)+') • Captado '+pmoney(s.captured)+(s.capturedChange!=null?' ('+pchange(s.capturedChange)+' | gap '+psignedMoneyV131(capGap)+')':'')+' • '+Math.round(s.orders).toLocaleString('pt-BR')+' pedidos'+(s.ordersChange!=null?' ('+pchange(s.ordersChange)+' | gap '+psignedIntV131(ordGap,'pedidos')+')':'')+' • Ticket '+pmoney(s.ticket)+(s.ticketChange!=null?' ('+pchange(s.ticketChange)+' | gap '+psignedMoneyV131(ticketGap)+')':'')+'.';
+    var positive=best?'Destaque: '+pstoreName(best)+' com '+PERF_FOCUS_LABELS_V130[PERF_FOCUS_V130]+' em '+focusValueV130(best)+(phas(best.share_delta)?' e '+ppp(best.share_delta)+' de Share.':''):'Destaques positivos serão exibidos quando houver base comparável.';
+    var risk=attention?'Atenção: '+pstoreName(attention)+' está entre as prioridades do ciclo, com '+ppp(attention.share_delta)+' de Share.':'Sem loja priorizada validada no ciclo atual.';
+    var direction=(s.scope==='operation'?'Direcionar a operação para frequência de captação, redução de dispersão e execução das ações validadas na FCA.':'Concentrar a tratativa nas lojas priorizadas, proteger os avanços das melhores performances e acompanhar a reação do Share na próxima parcial.');
+    return {headline:headline,result:result,positive:positive,risk:risk,direction:direction};
+  }
+
+  function treatmentCaptionV131(d,s,top,pri,causes){
+    var e=executiveSummaryV131(d,s,top,pri,causes);
+    var scope=s.scope==='operation'?'OPERAÇÃO '+String(s.store&&s.store.st||''):'REGIONAL CE+PI';
+    var selected=(PERF_DRAFT_V130&&PERF_DRAFT_V130.selectedActions||[]).concat(PERF_DRAFT_V130&&PERF_DRAFT_V130.manualActions||[]).slice(0,3);
+    var userRead=PERF_DRAFT_V130&&String(PERF_DRAFT_V130.note||'').trim();
+    var lines=[
+      '📊 *FCA PERFORMANCE eStore | '+scope+'*',
+      '*'+s.periodLabel+'* • '+s.compareLabel,
+      '',
+      '📌 *Resumo executivo*',
+      e.result,
+      '',
+      '✅ *Destaque positivo*',
+      e.positive,
+      '',
+      '⚠️ *Ponto de atenção*',
+      e.risk,
+      '',
+      '🎯 *Direcionamento*',
+      e.direction
+    ];
+    if(selected.length){
+      lines.push('', '🧭 *Ações prioritárias*');
+      selected.forEach(function(a,i){lines.push((i+1)+'. '+a)});
+    }
+    if(userRead)lines.push('', '🧠 *Leitura da tratativa*', userRead);
+    lines.push('', 'Material consolidado pela Central de Performance • App eStore CE+PI');
+    return lines.join('\n');
+  }
+  window.performanceTreatmentCaptionV131=function(){
+    if(!PERF_FCA_V130)return '';
+    syncNoteV130();
+    var d=PERF_FCA_V130,s=perfSnapshotV130(d),stores=s.stores&&s.stores.length?s.stores:closedStores(d);
+    return treatmentCaptionV131(d,s,rankStoresV130(stores,true),d.prioritized||[],causesV130(d,s));
+  };
+  window.sharePerformanceSummaryV131=async function(){
+    try{
+      var text=window.performanceTreatmentCaptionV131();if(!text)return;
+      try{if(navigator.share){await navigator.share({title:'FCA Performance eStore',text:text});return}}catch(e){if(e&&e.name==='AbortError')return}
+      await navigator.clipboard.writeText(text);alert('Resumo executivo copiado para compartilhar.');
+    }catch(e){alert('Não foi possível compartilhar o resumo executivo agora.')}
+  };
+  window.copyPerformanceSummaryV131=async function(){
+    try{var text=window.performanceTreatmentCaptionV131();await navigator.clipboard.writeText(text);alert('Legenda da tratativa copiada.')}catch(e){alert('Não foi possível copiar a legenda agora.')}
+  };
+
   function execPreviewHtmlV130(d,s,top,pri,causes){
-    var selected=(PERF_DRAFT_V130.selectedActions||[]).concat(PERF_DRAFT_V130.manualActions||[]).slice(0,3);
+    var e=executiveSummaryV131(d,s,top,pri,causes);
     var read=PERF_DRAFT_V130.note||diagnosticV130(d,s).text;
     return '<section class=performanceExecutiveV130>'+
-      '<div class=performanceExecutiveTopV130><img class=brand src="./assets/riachuelo-logo-exact-v75.svg" alt="Riachuelo"><span><b>FCA PERFORMANCE</b><small>'+(s.scope==='operation'?'FILIAL '+pesc(s.store&&s.store.st):'REGIONAL CE+PI')+' • '+pesc(s.periodLabel)+'</small></span></div>'+
+      '<div class=performanceExecutiveTopV130><img class=brand src="'+PERF_LOGO_V131+'" alt="Riachuelo"><span><b>FCA PERFORMANCE</b><small>'+(s.scope==='operation'?'FILIAL '+pesc(s.store&&s.store.st):'REGIONAL CE+PI')+' • '+pesc(s.periodLabel)+'</small></span></div>'+
+      '<div class=performanceExecutiveSummaryV131>'+
+        '<div class=performanceExecEyebrowV131>RESUMO EXECUTIVO DA TRATATIVA</div>'+
+        '<h3>'+pesc(e.headline)+'</h3>'+
+        '<p>'+pesc(e.result)+'</p>'+
+        '<div class=performanceExecSignalsV131>'+
+          '<div class=good><span>Destaque</span><b>'+pesc(e.positive)+'</b></div>'+
+          '<div class=attention><span>Atenção</span><b>'+pesc(e.risk)+'</b></div>'+
+          '<div class=direction><span>Direcionamento</span><b>'+pesc(e.direction)+'</b></div>'+
+        '</div>'+
+        '<div class=performanceExecLegendActionsV131><button onclick="copyPerformanceSummaryV131()">Copiar legenda da tratativa</button><button class=primary onclick="sharePerformanceSummaryV131()">Compartilhar resumo executivo</button></div>'+
+      '</div>'+
       '<div class=performanceExecutivePreviewV130>'+
-        '<section><h4>Resultado</h4><div class=performanceExecutiveMiniKpisV130><div><span>Share</span><b>'+ppct(s.share,2)+'</b></div><div><span>Δ Share</span><b>'+ppp(s.shareDelta)+'</b></div><div><span>Captado</span><b>'+pmoney(s.captured)+'</b></div><div><span>Pedidos</span><b>'+Math.round(s.orders).toLocaleString('pt-BR')+'</b></div></div></section>'+
-        '<section><h4>'+(s.scope==='operation'?'Referência Regional':'Top / Prioridades')+'</h4><p>'+((top||[]).slice(0,2).map(function(x){return x.st+' • '+ppct(x.share,2)}).join('<br>')||'Sem dados')+'<br>'+(pri&&pri[0]?'Prioridade: '+pri[0].st+' • '+ppp(pri[0].share_delta):'')+'</p></section>'+
+        '<section><h4>Resultado</h4><div class=performanceExecutiveMiniKpisV130><div><span>Share</span><b>'+ppct(s.share,2)+'</b></div><div><span>Δ Share</span><b>'+ppp(s.shareDelta)+'</b></div><div><span>Captado</span><b>'+pmoney(s.captured)+'</b><small>'+pesc(metricDeviationTextV131(s,'captured'))+'</small></div><div><span>Pedidos</span><b>'+Math.round(s.orders).toLocaleString('pt-BR')+'</b><small>'+pesc(metricDeviationTextV131(s,'orders'))+'</small></div></div></section>'+
+        '<section><h4>'+(s.scope==='operation'?'Referência Regional':'Top / Prioridades')+'</h4><p>'+((top||[]).slice(0,2).map(function(x){return pesc(x.st+' • '+ppct(x.share,2)+' • '+ppp(x.share_delta))}).join('<br>')||'Sem dados')+'<br>'+(pri&&pri[0]?'Prioridade: '+pesc(pri[0].st)+' • '+ppp(pri[0].share_delta):'')+'</p></section>'+
         '<section><h4>Leitura Executiva</h4><p>'+pesc(pshort(read,420))+'</p></section>'+
       '</div>'+
       '<div class=performanceShareActionsV130><button class=preview onclick="previewPerformanceCardV130()">Visualizar prévia em alta resolução</button><button class=share onclick="sharePerformanceCardV130()">Gerar card para compartilhar</button></div>'+
@@ -463,16 +573,16 @@
     var G='#173F35',SAGE='#466964',PAPER='#F7F5EF',SAND='#D6D2C4',OR='#DE7C00',WINE='#76232F',RED='#C73532',WHITE='#FFFFFF',LINE='#E5E1D8',GOOD='#176843',INK='#243A33';
     c.fillStyle=PAPER;c.fillRect(0,0,W,H);
     c.fillStyle=G;c.fillRect(0,0,W,126);
-    var logo=await loadImgV130('./assets/riachuelo-logo-exact-v75.svg');
+    var logo=await loadImgV130(PERF_LOGO_V131);
     if(logo)c.drawImage(logo,62,44,292,24);
     canvasTextV130(c,'FCA PERFORMANCE',1855,55,31,'700',WHITE,'right');
     canvasTextV130(c,(s.scope==='operation'?'FILIAL '+String(s.store&&s.store.st||''):'REGIONAL CE+PI')+'  |  '+s.periodLabel.toUpperCase(),1855,91,17,'400','#DCE6E2','right');
 
     var kpis=[
-      ['SHARE',ppct(s.share,2),ppp(s.shareDelta)],
-      ['VENDA CAPTADA',pmoney(s.captured),s.capturedChange==null?'Resultado do período':pchange(s.capturedChange)],
-      ['PEDIDOS',Math.round(s.orders).toLocaleString('pt-BR'),s.ordersChange==null?'Volume do período':pchange(s.ordersChange)],
-      ['TICKET MÉDIO',pmoney(s.ticket),s.ticketChange==null?'Resultado do período':pchange(s.ticketChange)],
+      ['SHARE',ppct(s.share,2),metricDeviationTextV131(s,'share')],
+      ['VENDA CAPTADA',pmoney(s.captured),metricDeviationTextV131(s,'captured')],
+      ['PEDIDOS',Math.round(s.orders).toLocaleString('pt-BR'),metricDeviationTextV131(s,'orders')],
+      ['TICKET MÉDIO',pmoney(s.ticket),metricDeviationTextV131(s,'ticket')],
       ['DISPERSÃO',ppct(s.dispersion,1),s.scope==='operation'?'Filial '+String(s.store&&s.store.st||''):'Regional CE+PI']
     ];
     var gap=16,kx=62,kw=(1796-gap*4)/5,ky=153,kh=142;
@@ -561,7 +671,8 @@
       var week=s.isCurrent?d.currentWeekNumber:d.weekNumber;
       var name='FCA_Performance_'+scope+'_Semana_'+String(week||'')+'.png';
       var file=new File([out.blob],name,{type:'image/png'});
-      var text='FCA Performance | '+(s.scope==='operation'?'Filial '+String(s.store&&s.store.st||''):'Regional CE+PI')+' | '+s.periodLabel+'\nShare '+ppct(s.share,2)+' ('+ppp(s.shareDelta)+') • '+pmoney(s.captured)+' • '+Math.round(s.orders)+' pedidos.';
+      var stores=s.stores&&s.stores.length?s.stores:closedStores(d);
+      var text=treatmentCaptionV131(d,s,rankStoresV130(stores,true),d.prioritized||[],causesV130(d,s));
       try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({title:'FCA Performance eStore',text:text,files:[file]});return}}catch(e){if(e&&e.name==='AbortError')return}
       try{await navigator.clipboard.writeText(text)}catch(e){}
       var a=document.createElement('a');a.href=URL.createObjectURL(out.blob);a.download=name;a.click();setTimeout(function(){URL.revokeObjectURL(a.href)},1800);
@@ -598,10 +709,10 @@
       if(typeof isLead==='function'&&!isLead())return baseGoV130('home');
       if(typeof APP_BACKING!=='undefined'&&!APP_BACKING&&typeof CUR!=='undefined'&&CUR&&CUR!==v&&Array.isArray(APP_NAV_STACK))APP_NAV_STACK.push(CUR);
       CUR=v;
-      document.getElementById('shell')&&document.getElementById('shell').classList.remove('homeMode');
+      var shell=document.getElementById('shell');if(shell){shell.classList.remove('homeMode');shell.classList.add('performanceModeV131')}
       var dr=document.querySelector('.drawer');if(dr)dr.classList.remove('open');
       document.querySelectorAll('.bottom button').forEach(function(b){b.classList.remove('navOn')});
-      var back=document.getElementById('appBackBottom');if(back)back.classList.add('show');
+      var back=document.getElementById('appBackBottom');if(back)back.classList.remove('show');
       var view=document.getElementById('view');if(view)view.innerHTML=performanceViewV130();
       window.scrollTo(0,0);
       try{if(typeof stopHomeV34==='function')stopHomeV34()}catch(e){}
@@ -610,6 +721,7 @@
       setTimeout(function(){loadPerformanceV130(false)},0);
       return;
     }
+    var shell=document.getElementById('shell');if(shell)shell.classList.remove('performanceModeV131');
     var out=baseGoV130(v);setTimeout(patchPerformanceNavV130,0);return out;
   };
 
