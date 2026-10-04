@@ -5199,5 +5199,260 @@ window.uploadHistoricalTicketsV97=async function(){
   else boot118();
 })();
 </script>
+
+
+<!-- V119-POPUP-SOUND-WAVES-AND-STRONGER-BEAT -->
+<style id="campaign-v119-popup-upgrade">
+.campaignPrizeStageV89{position:relative;isolation:isolate}
+.campaignSoundBackdropV119{
+  position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden
+}
+.campaignSoundRingV119{
+  position:absolute;left:50%;top:49%;
+  transform:translate(-50%,-50%) scale(.72);
+  border:2px solid rgba(243,200,84,.28);
+  border-radius:50%;opacity:0;
+  animation:waveRingV119 3.4s ease-out infinite
+}
+.campaignSoundRingV119.r1{width:38%;aspect-ratio:1;animation-delay:0s}
+.campaignSoundRingV119.r2{width:52%;aspect-ratio:1;animation-delay:.55s}
+.campaignSoundRingV119.r3{width:66%;aspect-ratio:1;animation-delay:1.1s}
+.campaignSoundRingV119.r4{width:80%;aspect-ratio:1;animation-delay:1.65s}
+.campaignEqBackdropV119{
+  position:absolute;left:50%;bottom:42px;transform:translateX(-50%);
+  width:42%;height:30%;display:flex;align-items:flex-end;justify-content:center;
+  gap:6px;z-index:2;opacity:.34;pointer-events:none
+}
+.campaignEqBackdropV119 i{
+  width:7%;min-width:6px;border-radius:10px 10px 0 0;
+  background:linear-gradient(180deg,rgba(255,216,102,.95),rgba(213,150,30,.88));
+  transform-origin:center bottom;
+  animation:eqBarsV119 .72s ease-in-out infinite alternate;
+  box-shadow:0 0 14px rgba(244,195,70,.15)
+}
+.campaignEqBackdropV119 i:nth-child(1){height:28%;animation-delay:-.15s}
+.campaignEqBackdropV119 i:nth-child(2){height:42%;animation-delay:-.34s}
+.campaignEqBackdropV119 i:nth-child(3){height:56%;animation-delay:-.09s}
+.campaignEqBackdropV119 i:nth-child(4){height:70%;animation-delay:-.43s}
+.campaignEqBackdropV119 i:nth-child(5){height:84%;animation-delay:-.22s}
+.campaignEqBackdropV119 i:nth-child(6){height:66%;animation-delay:-.48s}
+.campaignEqBackdropV119 i:nth-child(7){height:50%;animation-delay:-.18s}
+.campaignEqBackdropV119 i:nth-child(8){height:36%;animation-delay:-.39s}
+.campaignPrizeGlowV89{z-index:2}
+.campaignPrizeStageBaseV89{z-index:3}
+.campaignPrizeV89{z-index:6}
+.campaignPopCardV89.campaignBeatPulseV119{animation:popupBeatPulseV119 1.15s ease-out both}
+.campaignPopCardV89.campaignBeatPulseV119 .campaignPrizeGlowV89{animation:popupGlowPulseV119 1.15s ease-out both}
+.campaignSoundHintV119{
+  position:absolute;left:50%;top:14px;transform:translateX(-50%);z-index:15;
+  display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;
+  background:rgba(5,44,36,.62);border:1px solid rgba(255,221,120,.30);
+  color:#f5d068;font-size:9px;font-weight:900;letter-spacing:.05em;
+  backdrop-filter:blur(4px);pointer-events:none
+}
+.campaignSoundHintV119 i{
+  display:flex;align-items:flex-end;gap:2px;height:10px
+}
+.campaignSoundHintV119 i b{
+  display:block;width:2px;border-radius:2px;background:#f5d068;
+  animation:eqHintV119 .58s ease-in-out infinite alternate
+}
+.campaignSoundHintV119 i b:nth-child(1){height:4px;animation-delay:-.2s}
+.campaignSoundHintV119 i b:nth-child(2){height:8px;animation-delay:-.4s}
+.campaignSoundHintV119 i b:nth-child(3){height:6px;animation-delay:-.1s}
+.campaignSoundHintV119 i b:nth-child(4){height:10px;animation-delay:-.32s}
+@keyframes waveRingV119{
+  0%{transform:translate(-50%,-50%) scale(.68);opacity:0}
+  14%{opacity:.42}
+  100%{transform:translate(-50%,-50%) scale(1.28);opacity:0}
+}
+@keyframes eqBarsV119{
+  from{transform:scaleY(.5);filter:brightness(.95)}
+  to{transform:scaleY(1.08);filter:brightness(1.18)}
+}
+@keyframes eqHintV119{from{transform:scaleY(.45)}to{transform:scaleY(1.05)}}
+@keyframes popupBeatPulseV119{
+  0%{transform:scale(.988)}
+  12%{transform:scale(1.01)}
+  24%{transform:scale(1)}
+  40%{transform:scale(1)}
+  52%{transform:scale(1.014)}
+  65%{transform:scale(1)}
+  78%{transform:scale(1.018)}
+  100%{transform:scale(1)}
+}
+@keyframes popupGlowPulseV119{
+  0%,100%{filter:brightness(1);transform:translate(-50%,-50%) scale(1)}
+  12%{filter:brightness(1.12);transform:translate(-50%,-50%) scale(1.03)}
+  52%{filter:brightness(1.18);transform:translate(-50%,-50%) scale(1.05)}
+  78%{filter:brightness(1.24);transform:translate(-50%,-50%) scale(1.08)}
+}
+@media(max-width:520px){
+  .campaignEqBackdropV119{width:54%;bottom:34px;gap:4px;opacity:.32}
+  .campaignSoundHintV119{top:11px;font-size:8px;padding:5px 8px}
+}
+@media(prefers-reduced-motion:reduce){
+  .campaignSoundRingV119,.campaignEqBackdropV119 i,.campaignSoundHintV119 i b,
+  .campaignPopCardV89.campaignBeatPulseV119,
+  .campaignPopCardV89.campaignBeatPulseV119 .campaignPrizeGlowV89{
+    animation:none!important
+  }
+}
+</style>
+<script>
+(function(){
+  var ctxV119=null;
+  var playedV119=false;
+  var armedV119=false;
+
+  function getCtxV119(){
+    if(ctxV119)return ctxV119;
+    var AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC)return null;
+    try{ctxV119=new AC();return ctxV119}catch(e){return null}
+  }
+
+  function vibrateV119(){
+    try{if(navigator.vibrate)navigator.vibrate([70,55,90,55,125])}catch(e){}
+  }
+
+  function buildBackdropV119(){
+    return ''+
+      '<div class="campaignSoundBackdropV119" aria-hidden="true">'+
+        '<span class="campaignSoundRingV119 r1"></span>'+
+        '<span class="campaignSoundRingV119 r2"></span>'+
+        '<span class="campaignSoundRingV119 r3"></span>'+
+        '<span class="campaignSoundRingV119 r4"></span>'+
+        '<div class="campaignEqBackdropV119">'+
+          '<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>'+
+        '</div>'+
+      '</div>'+
+      '<span class="campaignSoundHintV119" aria-hidden="true"><i><b></b><b></b><b></b><b></b></i> VOLUME MÁXIMO</span>';
+  }
+
+  function ensureBackdropV119(pop){
+    var stage=pop&&pop.querySelector('.campaignPrizeStageV89');
+    if(!stage||stage.querySelector('.campaignSoundBackdropV119'))return;
+    stage.insertAdjacentHTML('afterbegin',buildBackdropV119());
+  }
+
+  function visualBeatV119(pop){
+    var card=pop&&pop.querySelector('.campaignPopCardV89');
+    if(!card)return;
+    card.classList.remove('campaignBeatPulseV119');
+    void card.offsetWidth;
+    card.classList.add('campaignBeatPulseV119');
+    setTimeout(function(){card.classList.remove('campaignBeatPulseV119')},1250);
+  }
+
+  function beatSynthV119(ctx){
+    var master=ctx.createGain();
+    var low=ctx.createBiquadFilter();
+    var comp=ctx.createDynamicsCompressor();
+    low.type='lowpass';
+    low.frequency.setValueAtTime(175,ctx.currentTime);
+    low.Q.setValueAtTime(.8,ctx.currentTime);
+    master.gain.setValueAtTime(.78,ctx.currentTime);
+    comp.threshold.setValueAtTime(-18,ctx.currentTime);
+    comp.knee.setValueAtTime(18,ctx.currentTime);
+    comp.ratio.setValueAtTime(4,ctx.currentTime);
+    comp.attack.setValueAtTime(.004,ctx.currentTime);
+    comp.release.setValueAtTime(.18,ctx.currentTime);
+    low.connect(comp);comp.connect(master);master.connect(ctx.destination);
+
+    var now=ctx.currentTime+.025;
+    [
+      {t:0.00,f1:92,f2:47,g:.28,d:.30},
+      {t:0.34,f1:86,f2:43,g:.33,d:.32},
+      {t:0.79,f1:80,f2:39,g:.40,d:.38}
+    ].forEach(function(b){
+      var osc=ctx.createOscillator();
+      var gain=ctx.createGain();
+      osc.type='sine';
+      osc.frequency.setValueAtTime(b.f1,now+b.t);
+      osc.frequency.exponentialRampToValueAtTime(b.f2,now+b.t+b.d);
+      gain.gain.setValueAtTime(.0001,now+b.t);
+      gain.gain.exponentialRampToValueAtTime(b.g,now+b.t+.014);
+      gain.gain.exponentialRampToValueAtTime(.0001,now+b.t+b.d);
+      osc.connect(gain);gain.connect(low);
+      osc.start(now+b.t);osc.stop(now+b.t+b.d+.025);
+    });
+
+    setTimeout(function(){
+      try{low.disconnect();comp.disconnect();master.disconnect()}catch(e){}
+    },1750);
+  }
+
+  async function playBeatV119(pop){
+    if(playedV119)return true;
+    var ctx=getCtxV119();
+    if(!ctx)return false;
+    try{if(ctx.state==='suspended')await ctx.resume()}catch(e){}
+    if(ctx.state!=='running')return false;
+
+    playedV119=true;
+    ensureBackdropV119(pop);
+    visualBeatV119(pop);
+    vibrateV119();
+    beatSynthV119(ctx);
+    return true;
+  }
+  window.playCampaignBeatV119=playBeatV119;
+
+  function armPopupInteractionV119(pop){
+    if(!pop||armedV119)return;
+    armedV119=true;
+    var unlock=function(ev){
+      if(ev&&ev.target&&ev.target.closest&&ev.target.closest('.campaignPopCloseV89'))return;
+      playBeatV119(pop).then(function(ok){
+        if(!ok)return;
+        pop.removeEventListener('pointerdown',unlock,true);
+        pop.removeEventListener('touchstart',unlock,true);
+        pop.removeEventListener('click',unlock,true);
+        pop.removeEventListener('keydown',unlock,true);
+        armedV119=false;
+      });
+    };
+    pop.addEventListener('pointerdown',unlock,true);
+    pop.addEventListener('touchstart',unlock,true);
+    pop.addEventListener('click',unlock,true);
+    pop.addEventListener('keydown',unlock,true);
+  }
+
+  function patchPopupV119(root){
+    var pop=document.getElementById('campaignPopV89')||(root&&root.id==='campaignPopV89'?root:null);
+    if(!pop||pop.dataset.v119==='1')return;
+    pop.dataset.v119='1';
+    ensureBackdropV119(pop);
+    requestAnimationFrame(function(){visualBeatV119(pop)});
+    playBeatV119(pop).then(function(ok){if(!ok)armPopupInteractionV119(pop)});
+
+    var cta=pop.querySelector('.campaignPopCtaV89');
+    if(cta&&!cta.dataset.v119Click){
+      cta.dataset.v119Click='1';
+      cta.addEventListener('pointerdown',function(){playBeatV119(pop)},{passive:true});
+    }
+  }
+
+  function bootV119(){
+    patchPopupV119(document);
+    var obs=new MutationObserver(function(ms){
+      ms.forEach(function(m){
+        Array.from(m.addedNodes||[]).forEach(function(n){
+          if(n&&n.nodeType===1)patchPopupV119(n);
+        });
+      });
+      patchPopupV119(document);
+    });
+    try{obs.observe(document.documentElement,{childList:true,subtree:true})}catch(e){}
+    [120,350,700,1200,2200,4000].forEach(function(ms){
+      setTimeout(function(){patchPopupV119(document)},ms);
+    });
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootV119,{once:true});
+  else bootV119();
+})();
+</script>
 </body>
 </html>
