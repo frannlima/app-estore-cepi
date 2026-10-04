@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v123';
-const BUILD='v123';
+const CACHE='estore-cepi-shell-v124';
+const BUILD='v124';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v117';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v112';
@@ -19,7 +19,7 @@ function injectAppV104(html){
     .replace(/\n?<script[^>]+src=["']\.\/hourly-meta-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
     .replace(/\n?<script[^>]+src=["']\.\/team-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
     .replace(/src=["']\.\/app-v2\.js(?:\?[^"']*)?["']/gi,'src="./app-v2.js?build='+BUILD+'"');
-  const tags='\n<script src="'+PRESENTATION_SCRIPT+'"></script>\n<script src="'+HOURLY_META_SCRIPT+'"></script>\n<script src="'+TEAM_SCRIPT+'"></script>\n<script src="'+TEAM_STORE_SCRIPT+'"></script>\n<script src="'+COMMISSION_ELIGIBILITY_SCRIPT+'"></script>\n<script src="'+COMMISSION_BOPIS_SCRIPT+'"></script>\n<script src="'+TEAM_COLLAPSE_SCRIPT+'"></script>\n<script src="'+TEAM_AREA_REGIONAL_SCRIPT+'"></script>\n<script src="'+BOPIS_ANALYTICS_SCRIPT+'"></script>\n';
+  const tags='\n<script src="'+PRESENTATION_SCRIPT+'"></script>\n<script src="'+HOURLY_META_SCRIPT+'"></script>\n<script src="'+TEAM_SCRIPT+'"></script>\n<script src="'+TEAM_STORE_SCRIPT+'"></script>\n<script src="'+COMMISSION_ELIGIBILITY_SCRIPT+'"></script>\n<script src="'+COMMISSION_BOPIS_SCRIPT+'"></script>\n<script src="'+TEAM_COLLAPSE_SCRIPT+'"></script>\n<script src="'+TEAM_AREA_REGIONAL_SCRIPT+'"></script>\n<script src="'+BOPIS_ANALYTICS_SCRIPT+'"></script>\n<script src="'+VOICE_SCRIPT+'"></script>\n';
   return html.replace(/<\/body>\s*<\/html>\s*$/i, tags+'</body></html>');
 }
 async function htmlResponseWithInjection(res){
