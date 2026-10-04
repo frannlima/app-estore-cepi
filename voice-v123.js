@@ -144,7 +144,7 @@
     d.id='voiceOverlayV123';d.className='voiceOverlayV123';
     d.innerHTML='<div class=voiceSheetV123>'+
       '<div class=voiceSheetHeadV123><div><h3>Registro de impacto</h3><div class=muted>Conte o que aconteceu e como podemos apoiar.</div></div><button class=voiceCloseV123 onclick="closeVoiceSheetV123()">×</button></div>'+
-      '<div class=voiceCriticalV123><b>Você está há '+num(r.zeroStreak)+' dias sem captar venda.</b>Este registro ficará visível para o seu supervisor. O ADV terá visão regional consolidada.</div>'+
+      '<div class=voiceCriticalV123><b>Você está há '+num(r.zeroStreak)+' dias sem captar venda.</b>Este registro ficará visível para o seu supervisor. O Speak eStore regional terá visão regional consolidada.</div>'+
       '<div class=voiceFieldV123><label>Qual foi o principal motivo?</label><div class=voiceCauseGridV123>'+
         Object.entries(CAUSES).map(([k,v])=>'<button type=button class=voiceCauseV123 data-cause="'+k+'" onclick="selectVoiceCauseV123(\''+k+'\')"><i>'+v.icon+'</i><span>'+esc(v.label)+'</span></button>').join('')+
       '</div></div>'+
@@ -264,7 +264,7 @@
       '<div class=voiceFieldV123><label>O que aconteceu</label><div class=voiceSuggestionV123>'+esc(item.cause_detail||'—')+'</div></div>'+
       '<div class=voiceFieldV123><label>Sugestão apresentada ao colaborador</label><div class=voiceSuggestionV123>'+esc(item.suggested_improvement||c.suggestion)+'</div></div>'+
       '<div class=voiceFieldV123><label>Ação informada pelo colaborador</label><div class=voiceSuggestionV123>'+esc(item.action_plan||'Não informada.')+'</div></div>'+
-      '<div class=voiceFieldV123><label>Retorno do supervisor / ADV</label><textarea id=voiceSupervisorNoteV123 maxlength=1500 placeholder="Registre orientação, alinhamento ou acompanhamento...">'+esc(item.supervisor_note||'')+'</textarea></div>'+
+      '<div class=voiceFieldV123><label>Retorno do supervisor / Speak eStore regional</label><textarea id=voiceSupervisorNoteV123 maxlength=1500 placeholder="Registre orientação, alinhamento ou acompanhamento...">'+esc(item.supervisor_note||'')+'</textarea></div>'+
       (resolved?'<div class=notice success>Registro resolvido.</div>':'<div class=voiceResolveBtnsV123><button class=review onclick="updateVoiceItemV123(\''+item.id+'\',\'reviewed\')">Marcar em análise</button><button class=resolve onclick="updateVoiceItemV123(\''+item.id+'\',\'resolved\')">Resolver</button></div>')+
     '</div>';
     d.addEventListener('click',e=>{if(e.target===d)closeVoiceSheetV123()});
