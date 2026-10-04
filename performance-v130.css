@@ -143,3 +143,35 @@
   .performanceShareActionsV130{grid-template-columns:1fr}
   .performanceShareCompareV130{grid-template-columns:1fr 30px 1fr}.performanceSharePointV130 b{font-size:19px}
 }
+
+
+/* V131 • refinamento executivo, branding oficial e navegação sem sobreposição */
+.performanceHeroV130{padding-top:54px}
+.performanceHeroV130 .brand{width:185px;max-width:52%;margin-bottom:18px}
+.performanceBackTopV131{position:absolute;left:16px;top:14px;z-index:4;display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(255,255,255,.10);color:#fff;padding:8px 11px;font:850 9px/1 inherit;backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+.performanceBackTopV131 span{font-size:9px}
+.performanceModeV131 .appBackBottom{display:none!important}
+
+.performanceExecutiveSummaryV131{padding:16px 16px 14px;background:linear-gradient(145deg,#FBFAF6,#F2F1EB);border-bottom:1px solid #E4E0D8}
+.performanceExecEyebrowV131{font-size:7.5px;font-weight:900;letter-spacing:.11em;color:#466964;text-transform:uppercase}
+.performanceExecutiveSummaryV131 h3{margin:7px 0 6px;color:#173F35;font-size:17px;line-height:1.18;letter-spacing:-.2px}
+.performanceExecutiveSummaryV131>p{margin:0;color:#344A42;font-size:9.5px;line-height:1.55}
+.performanceExecSignalsV131{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.performanceExecSignalsV131>div{border-radius:13px;padding:10px;border:1px solid #E5E2DA;background:#fff}
+.performanceExecSignalsV131 span{display:block;font-size:7px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.performanceExecSignalsV131 b{display:block;font-size:8.6px;line-height:1.38;color:#31463F}
+.performanceExecSignalsV131 .good{border-top:3px solid #176843}.performanceExecSignalsV131 .good span{color:#176843}
+.performanceExecSignalsV131 .attention{border-top:3px solid #DE7C00}.performanceExecSignalsV131 .attention span{color:#A35F00}
+.performanceExecSignalsV131 .direction{border-top:3px solid #466964}.performanceExecSignalsV131 .direction span{color:#466964}
+.performanceExecLegendActionsV131{display:flex;gap:7px;justify-content:flex-end;flex-wrap:wrap;margin-top:11px}
+.performanceExecLegendActionsV131 button{border:1px solid #173F35;border-radius:11px;background:#fff;color:#173F35;padding:9px 11px;font:850 8.5px/1 inherit}
+.performanceExecLegendActionsV131 button.primary{background:#173F35;color:#fff}
+.performanceExecutiveMiniKpisV130 small{display:block;margin-top:3px;font-size:6.3px;line-height:1.2;color:#6C7873;font-weight:700}
+
+@media(max-width:620px){
+  .performanceHeroV130{padding-top:52px}
+  .performanceHeroV130 .brand{width:165px;max-width:60%}
+  .performanceExecSignalsV131{grid-template-columns:1fr}
+  .performanceExecLegendActionsV131{display:grid;grid-template-columns:1fr}
+  .performanceExecLegendActionsV131 button{width:100%}
+}
