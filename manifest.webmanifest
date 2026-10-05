@@ -3,7 +3,7 @@
   "name": "App. eStore CE+PI",
   "short_name": "eStore CE+PI",
   "description": "Painel regional eStore CE+PI",
-  "start_url": "./?build=v74",
+  "start_url": "./?build=v136",
   "scope": "./",
   "display": "standalone",
   "display_override": [
@@ -15,13 +15,13 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "./icon.svg",
+      "src": "./icon-v136.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     },
     {
-      "src": "./icon.svg",
+      "src": "./icon-v136.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "maskable"
