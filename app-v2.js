@@ -656,7 +656,7 @@ async function shareHourlyV5(){
  const j=HOURLY_CACHE,stores=[...(j.stores||[])].sort((a,b)=>Number(b.captured||0)-Number(a.captured||0)),r=hourlySnapshotV6(j),prev=hourlyPreviousV6(j)?.regional||null;
  const c=document.createElement('canvas');c.width=1080;c.height=1920;const x=c.getContext('2d');
  x.fillStyle='#F8F7F4';x.fillRect(0,0,1080,1920);x.fillStyle='#173F35';x.fillRect(0,0,1080,210);
- const logo=document.querySelector('header img');if(logo&&logo.complete){try{x.drawImage(logo,60,42,230,92)}catch(e){}}
+ const logo=await new Promise(ok=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>ok(null);im.src='./assets/riachuelo-logo-horizontal-oficial-white-v133.svg?build=v133'});if(logo){try{const ratio=logo.naturalWidth/logo.naturalHeight,lw=300,lh=lw/ratio;x.drawImage(logo,60,54,lw,lh)}catch(e){}}
  x.fillStyle='#fff';x.textAlign='right';x.font='700 38px Arial';x.fillText('HORA A HORA | '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),1020,78);x.font='24px Arial';x.fillText('Moda que inspira o Brasil',1020,124);x.fillText(new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR'),1020,162);x.textAlign='left';
  const k=[['VENDA CAPTADA',money(r.captured),deltaMarkText(r.captured,prev?.captured,'money')],['PEDIDOS',num(r.orders)+' / '+num(r.orderTarget),deltaMarkText(r.orders,prev?.orders,'orders')],['META REGIONAL',money(r.meta),''],['ATINGIMENTO',r.meta?pct(r.att):'—',deltaMarkText(r.att,prev?.att,'pp')],['SHARE REGIONAL',r.storeSales?pct(r.share):'—',deltaMarkText(r.share,prev?.share,'pp')],['LOJAS COM VENDA',num(r.active)+' / 19',deltaMarkText(r.active,prev?.active,'number')]];
  let ky=245;k.forEach((a,i)=>{const col=i%3,row=Math.floor(i/3),xx=55+col*335,yy=ky+row*150;x.fillStyle='#fff';x.fillRect(xx,yy,305,126);x.fillStyle='#466964';x.font='700 18px Arial';x.fillText(a[0],xx+18,yy+30);x.fillStyle='#173F35';x.font='700 30px Arial';x.fillText(a[1],xx+18,yy+70);x.font='16px Arial';x.fillStyle=a[2].startsWith('▲')?'#287A55':a[2].startsWith('▼')?'#B23A3A':'#6B6B68';x.fillText(a[2],xx+18,yy+101)});
@@ -1852,7 +1852,7 @@ showCampaignPopupV37=function(){
       '<div class="campaignPopupCopyV38"><small>CAMPANHA • '+campaignPeriodV38(x)+'</small><h2>'+escV3(x.title||'Campanha eStore')+'</h2><b>Aumente o som das vendas.</b><p>'+escV3(x.employeeBenefit||x.description||x.text||'Confira os detalhes e aproveite a campanha.')+'</p>'+
       '<button class="campaignPrimaryV38" onclick="closeCampaignPopupV37(false);go(\'campaigns\')">Quero conferir <span>→</span></button>'+
       '<button class="campaignSecondaryV38" onclick="closeCampaignPopupV37(false)">Agora não</button>'+
-      '<img class="campaignBrandV38" src="./assets/riachuelo-logo-exact-v75.svg" alt="Riachuelo"></div>'+
+      '<img class="campaignBrandV38" src="./assets/riachuelo-logo-horizontal-oficial-v133.svg" alt="Riachuelo"></div>'+
     '</div>';
   document.body.appendChild(el);requestAnimationFrame(()=>el.classList.add('show'));
 };
@@ -1920,8 +1920,8 @@ adminV3=function(){
    no card do menu Campanhas e no arquivo de compartilhamento.
 */
 (function(){
-  const V76_LOGO = './assets/riachuelo-logo-exact-v75.svg';
-  const V76_LOCAL_LOGO = './assets/riachuelo-logo-exact-v75.svg';
+  const V76_LOGO = './assets/riachuelo-logo-horizontal-oficial-v133.svg';
+  const V76_LOCAL_LOGO = './assets/riachuelo-logo-horizontal-oficial-v133.svg';
   const P76 = {
     samsung:'https://images.samsung.com/is/image/samsung/p6pim/br/sm-a075mlgjzto/gallery/br-galaxy-a07-sm-a075-541551-sm-a075mlgjzto-548184945?$Q80_1368_AMP_PNG$',
     tune720:'https://www.jbl.com.br/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dwf4654304/JBL_TUNE_720BT_Product%20Image_Hero_Black.png?sw=680&sh=680',
@@ -2070,7 +2070,7 @@ adminV3=function(){
 /* V82_CAMPAIGN_POPUP_AND_BANNER_2026 */
 (function(){
   const V82_ART='./assets/campaign-share-v76.svg';
-  const V82_LOGO='./assets/riachuelo-logo-exact-v75.svg';
+  const V82_LOGO='./assets/riachuelo-logo-horizontal-oficial-v133.svg';
   let popupShownV82=false;
 
   const previousCampaignArtV82=typeof campaignArtV38==='function'?campaignArtV38:null;
@@ -2411,7 +2411,7 @@ showCampaignPopupV37=function(){
   };
 
   function loadLogo108(){
-    return new Promise(function(ok){var im=new Image();im.onload=function(){ok(im)};im.onerror=function(){ok(null)};im.src='./riachuelo-horizontal-oficial.png?build=v108'});
+    return new Promise(function(ok){var im=new Image();im.onload=function(){ok(im)};im.onerror=function(){ok(null)};im.src='./assets/riachuelo-logo-horizontal-oficial-v133.svg?build=v133'});
   }
   function round108(x,cx,cy,w,h,r,fill){
     x.beginPath();x.roundRect(cx,cy,w,h,r);x.fillStyle=fill;x.fill();
@@ -2435,7 +2435,7 @@ showCampaignPopupV37=function(){
       var c=document.createElement('canvas');c.width=1080;c.height=1650;var x=c.getContext('2d');
       x.fillStyle=BG;x.fillRect(0,0,c.width,c.height);
       var logo=await loadLogo108();
-      if(logo)x.drawImage(logo,54,38,310,57);else{ctext108(x,'RIACHUELO',205,70,'700 34px Arial',G,310)}
+      if(logo){const ratio=logo.naturalWidth/logo.naturalHeight,lw=310,lh=lw/ratio;x.drawImage(logo,54,48,lw,lh)}
       x.strokeStyle='#D6D2C4';x.lineWidth=2;x.beginPath();x.moveTo(405,32);x.lineTo(405,112);x.stroke();
       x.textAlign='left';x.textBaseline='middle';x.fillStyle=G;x.font='700 31px Arial';x.fillText('MEU TIME',445,55);x.font='700 16px Arial';x.fillText(regional?'REGIONAL CE+PI':'FILIAL '+TEAM_STORE_V19,445,83);x.font='14px Arial';x.fillStyle=S;x.fillText(pLabel[PER]+' • '+new Date(d.range.asof+'T12:00:00').toLocaleDateString('pt-BR'),445,105);
 
