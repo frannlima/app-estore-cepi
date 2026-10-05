@@ -197,7 +197,7 @@
   async function loadLogo(){
     try{
       // Usa o wordmark oficial aprovado (mesma silhueta do modelo enviado).
-      const im=await loadImg('./riachuelo-horizontal-oficial.png?build='+BUILD);
+      const im=await loadImg('./assets/riachuelo-logo-horizontal-oficial-white-v133.svg?build='+BUILD);
       const c=document.createElement('canvas');
       c.width=im.naturalWidth||im.width;
       c.height=im.naturalHeight||im.height;
@@ -303,7 +303,7 @@
     // Header
     rr(ctx,18,14,W-36,122,15,C.green,C.green,0);
     const logo=await loadLogo();
-    if(logo)ctx.drawImage(logo,58,41,370,68);else txt(ctx,'RIACHUELO',62,73,350,'600 44px Arial','#FFFFFF');
+    if(logo){const ratio=logo.width/logo.height,lw=370,lh=lw/ratio;ctx.drawImage(logo,58,55,lw,lh);}
     ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(485,37);ctx.lineTo(485,110);ctx.stroke();
     txt(ctx,'Painel Regional eStore • CE+PI',530,60,650,'700 34px Arial','#FFFFFF');
     txt(ctx,descriptor(d),530,99,690,'500 20px Arial','#F2E6C7');
