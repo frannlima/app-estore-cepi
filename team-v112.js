@@ -241,7 +241,7 @@
   function logoV112(){
     return new Promise(ok=>{
       const im=new Image();im.onload=()=>ok(im);im.onerror=()=>ok(null);
-      im.src='./riachuelo-horizontal-oficial.png?v=109';
+      im.src='./assets/riachuelo-logo-horizontal-oficial-v133.svg?v=133';
     });
   }
   function listTop(stores,asc){
