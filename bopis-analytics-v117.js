@@ -125,7 +125,7 @@
     ctx.fillText(s,x,y);
   }
   async function logo117(){
-    return await new Promise(ok=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>ok(null);i.src='./riachuelo-horizontal-oficial.png?v=117'});
+    return await new Promise(ok=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>ok(null);i.src='./assets/riachuelo-logo-horizontal-oficial-white-v133.svg?v=133'});
   }
   async function bopisCanvas117(){
     if(!BOPIS_DATA_V117)BOPIS_DATA_V117=await loadBopisV117('');
