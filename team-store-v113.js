@@ -90,12 +90,7 @@
     }
   }
   async function officialLogoWhite(){
-    const im=await new Promise(ok=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>ok(null);i.src='./riachuelo-horizontal-oficial.png?v=113'});
-    if(!im)return null;
-    const c=document.createElement('canvas'),w=im.naturalWidth||im.width,h=im.naturalHeight||im.height;
-    c.width=w;c.height=h;const x=c.getContext('2d');x.drawImage(im,0,0,w,h);
-    x.globalCompositeOperation='source-in';x.fillStyle='#FFFFFF';x.fillRect(0,0,w,h);x.globalCompositeOperation='source-over';
-    return c;
+    return await new Promise(ok=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>ok(null);i.src='./assets/riachuelo-logo-horizontal-oficial-white-v133.svg?v=133'});
   }
   async function previousTeamData(current){
     const end=String(current?.endDate||current?.asof||'').slice(0,10);
@@ -161,7 +156,7 @@
     if(logo){
       const ratio=logo.width/logo.height,lw=370,lh=Math.min(70,lw/ratio);
       ctx.drawImage(logo,(W-lw)/2,37,lw,lh);
-    }else txt(ctx,'RIACHUELO',W/2,69,'700 43px Arial',P.white,'center');
+    }
     txt(ctx,'Moda que inspira o Brasil',W/2,132,'500 17px Arial',P.white,'center');
 
     txt(ctx,'MEU TIME',W/2,225,'700 43px Arial',P.green,'center');
