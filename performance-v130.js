@@ -200,7 +200,7 @@
     if(s.scope==='operation'&&s.store){
       var x=s.store,p=s.priority,txt='A filial '+String(x.st)+' fechou o recorte analisado com Share de '+ppct(s.share,2)+', '+trend+' de '+ppp(s.shareDelta)+'. ';
       txt+='A entrega foi de '+pmoney(s.captured)+' em venda captada, '+Math.round(s.orders).toLocaleString('pt-BR')+' pedidos e ticket médio de '+pmoney(s.ticket)+'. ';
-      if(p)txt+='A loja está entre as lojas priorizadas na FCA, na '+String(p.priority_rank||'—')+'ª posição de retração. ';
+      if(p)txt+='A loja está entre as lojas Priorizadas na FCA, na '+String(p.priority_rank||'—')+'ª posição de retração. ';
       else txt+='A loja não aparece entre as cinco prioridades oficiais de retração do último fechamento. ';
       if(x.fca&&x.fca.root_cause)txt+='Causa raiz registrada: '+pshort(x.fca.root_cause,220)+'.';
       else txt+='Os sinais operacionais abaixo devem ser validados com a leitura de campo antes de serem tratados como causa raiz.';
@@ -274,7 +274,7 @@
     if(/abordagem/.test(labels))add('Reforçar script de abordagem eStore, objeções e benefícios com prática rápida no início do turno.');
     if(/distribui[cç][aã]o de meta|meta individual/.test(labels))add('Revisar distribuição da meta por HC e garantir acompanhamento individual da execução.');
     if(s.scope==='operation'&&s.priority)add('Concluir a FCA oficial da filial com causa raiz validada, responsável, prazo e resultado esperado.');
-    if(s.scope==='regional'&&(d&&d.prioritized||[]).length)add('Fazer checkpoint das lojas priorizadas e acompanhar a reação do Share na parcial da semana seguinte.');
+    if(s.scope==='regional'&&(d&&d.prioritized||[]).length)add('Fazer checkpoint das lojas Priorizadas e acompanhar a reação do Share na parcial da semana seguinte.');
     if(!a.length)add('Manter acompanhamento do Share, pedidos, ticket e dispersão, preservando as práticas que sustentaram a evolução.');
     if(a.length<3)add('Compartilhar os destaques positivos e replicar as práticas das lojas com melhor evolução no período.');
     return a.slice(0,7);
@@ -352,9 +352,9 @@
     }
     var body=s.scope==='operation'&&s.store?
       line('Participação da filial no resultado regional',own,pmoney(s.captured),'')+
-      line('Lojas priorizadas no volume regional',total?priCap/total:0,pmoney(priCap),'priority'):
+      line('Lojas Priorizadas no volume regional',total?priCap/total:0,pmoney(priCap),'priority'):
       line('Top 5 lojas no volume regional',total?topCap/total:0,pmoney(topCap),'')+
-      line('Lojas priorizadas no volume regional',total?priCap/total:0,pmoney(priCap),'priority');
+      line('Lojas Priorizadas no volume regional',total?priCap/total:0,pmoney(priCap),'priority');
     return '<section class=performancePanelV130><div class=performancePanelHeadV130><div><h3>Contribuição para o Resultado</h3><p>Representatividade financeira no consolidado.</p></div></div><div class=performanceContributionV130>'+body+'</div></section>';
   }
 
@@ -408,8 +408,8 @@
     var headline=s.shareDelta>0?'Semana com evolução de Share':s.shareDelta<0?'Semana com retração de Share':'Semana com Share estável';
     var result='Encerramos o período com Share de '+ppct(s.share,2)+', '+(s.shareDelta>0?'evolução de ':s.shareDelta<0?'retração de ':'variação de ')+ppp(s.shareDelta)+' '+s.compareLabel+'. A venda captada foi de '+pmoney(s.captured)+(s.capturedChange!=null?', '+pchange(s.capturedChange)+' com gap de '+psignedMoneyV131(capGap):'')+', em '+Math.round(s.orders).toLocaleString('pt-BR')+' pedidos'+(s.ordersChange!=null?', '+pchange(s.ordersChange)+' com gap de '+psignedIntV131(ordGap,'pedidos'):'')+', e ticket médio de '+pmoney(s.ticket)+(s.ticketChange!=null?', '+pchange(s.ticketChange)+' com gap de '+psignedMoneyV131(ticketGap):'')+'.';
     var positive=best?'Entre os destaques, a filial '+String(best.st)+' apresentou '+PERF_FOCUS_LABELS_V130[PERF_FOCUS_V130].toLowerCase()+' de '+focusValueV130(best)+(phas(best.share_delta)?' e variação de Share de '+ppp(best.share_delta):'')+'.':'Sem destaque consolidado para este recorte.';
-    var risk=attention?'Como principal ponto de atenção, a filial '+String(attention.st)+' aparece entre as prioridades do período, com variação de Share de '+ppp(attention.share_delta)+'.':'Neste ciclo não há loja priorizada no recorte disponível.';
-    var direction=s.scope==='operation'?'O foco da tratativa será sustentar o que evoluiu e atuar sobre frequência de captação, dispersão e ações já definidas para a operação.':'O foco da tratativa será atuar nas lojas priorizadas, preservar a evolução das melhores entregas e acompanhar a reação do Share na próxima parcial.';
+    var risk=attention?'Como principal ponto de atenção, a filial '+String(attention.st)+' aparece entre as prioridades do período, com variação de Share de '+ppp(attention.share_delta)+'.':'Neste ciclo não há loja Priorizada no recorte disponível.';
+    var direction=s.scope==='operation'?'O foco da tratativa será sustentar o que evoluiu e atuar sobre frequência de captação, dispersão e ações já definidas para a operação.':'O foco da tratativa será atuar nas lojas Priorizadas, preservar a evolução das melhores entregas e acompanhar a reação do Share na próxima parcial.';
     return {headline:headline,result:result,positive:positive,risk:risk,direction:direction};
   }
 
@@ -549,7 +549,7 @@
     c.fillStyle=PAPER;c.fillRect(0,0,W,H);
     c.fillStyle=G;c.fillRect(0,0,W,126);
     var logo=await loadImgV130(PERF_LOGO_V131);
-    if(logo)c.drawImage(logo,62,44,292,24);
+    if(logo){const ratio=logo.naturalWidth/logo.naturalHeight,lw=300,lh=lw/ratio;c.drawImage(logo,62,39,lw,lh);}
     canvasTextV130(c,'FCA PERFORMANCE',1855,55,31,'700',WHITE,'right');
     canvasTextV130(c,(s.scope==='operation'?'FILIAL '+String(s.store&&s.store.st||''):'REGIONAL CE+PI')+'  |  '+s.periodLabel.toUpperCase(),1855,91,17,'400','#DCE6E2','right');
 
@@ -591,7 +591,7 @@
         canvasTextV130(c,priorityReasonV130(x),leftX+24,y+22,11,'400',SAGE);
         y+=70;
       });
-    }else canvasTextV130(c,'Nenhuma loja priorizada no ciclo.',leftX+24,y,13,'400',SAGE);
+    }else canvasTextV130(c,'Nenhuma loja Priorizada no ciclo.',leftX+24,y,13,'400',SAGE);
 
     canvasRoundV130(c,midX,bodyY,midW,bodyH,20,WHITE,LINE);
     canvasTextV130(c,'PRINCIPAIS CAUSAS / SINAIS',midX+22,bodyY+38,15,'700',G);
