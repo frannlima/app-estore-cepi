@@ -632,9 +632,9 @@ function renderHourlyV5(){
  '<div class=hourKpiV6><span>Meta Regional</span><b>'+money(regional.meta)+'</b>'+deltaMarkV6(regional.meta,p?.meta,'money')+'</div>'+
  '<div class=hourKpiV6><span>Atingimento</span><b>'+(regional.meta?pct(regional.att):'—')+'</b>'+deltaMarkV6(regional.att,p?.att,'pp')+'</div>'+
  '<div class=hourKpiV6><span>Share Regional</span><b>'+(regional.storeSales?pct(regional.share):'—')+'</b>'+deltaMarkV6(regional.share,p?.share,'pp')+'</div>'+
- '<div class=hourKpiV6><span>Lojas com venda</span><b>'+num(regional.active)+' / 19</b>'+deltaMarkV6(regional.active,p?.active)+'</div></div>'+
+ '<div class=hourKpiV6><span>Lojas com venda</span><b>'+num(regional.active)+' / 18</b>'+deltaMarkV6(regional.active,p?.active)+'</div></div>'+
  '<div class=hourTopV6><div class=hourBlockTitleV6>Top do Momento</div><div class=hourTopGridV6>'+top.map((r,i)=>'<div><strong>'+(i+1)+'º</strong><b>Loja '+escV3(r.st)+'</b><span>'+money(r.captured)+'</span></div>').join('')+'</div></div>'+
- '<div class=hourBlockTitleV6>Desempenho por Loja <small>Ordenado por venda captada • todas as 19 lojas</small></div><div class="table hourTableV6"><table><tr><th>Loja</th><th>Captado</th><th>Pedidos</th><th>Atingimento</th><th>Share</th><th>Desvio</th><th>Status</th></tr>'+
+ '<div class=hourBlockTitleV6>Desempenho por Loja <small>Ordenado por venda captada • todas as 18 lojas</small></div><div class="table hourTableV6"><table><tr><th>Loja</th><th>Captado</th><th>Pedidos</th><th>Atingimento</th><th>Share</th><th>Desvio</th><th>Status</th></tr>'+
  sorted.map(r=>{const s=hourStatusV6(r),dev=Number(r.captured||0)-Number(r.metaValue||0),share=Number(r.share||0);return '<tr class="hourRowV6 '+s.cls+'"><td><b>'+escV3(r.st)+'</b></td><td>'+money(r.captured)+'</td><td>'+num(r.orders)+'/'+num(r.orderTarget)+'</td><td>'+pct(r.att)+'</td><td class="'+(share===0?'shareZeroV6':'')+'">'+(r.storeSales?pct(share):'0,00%')+'</td><td class="'+(dev>=0?'devPosV6':'devNegV6')+'">'+money(dev)+'</td><td><span class="hourLightV6 '+s.cls+'">'+s.dot+' '+s.label+'</span></td></tr>'}).join('')+'</table></div>'+
  (notFed.length?'<div class=hourAlertV6><b>⚠ Lojas que ainda não alimentaram o Hora a Hora</b><span>'+notFed.join(' • ')+'</span></div>':'')+
  '<div class=hourFooterV6><span>Moda que inspira o Brasil</span><b>Fran Lima</b></div></div>';
@@ -646,7 +646,7 @@ function hourlyCaptionV6(j){
  '🎯 Meta Regional: '+money(r.meta)+'\n'+
  '📈 Atingimento: '+(r.meta?pct(r.att):'—')+'\n'+
  '🛍️ Pedidos: '+num(r.orders)+' / '+num(r.orderTarget)+'\n'+
- '🏬 Lojas com venda: '+num(r.active)+' / 19\n\n'+
+ '🏬 Lojas com venda: '+num(r.active)+' / 18\n\n'+
  '⚠️ Ainda não alimentaram o Hora a Hora:\n'+(notFed.length?notFed.join(' • '):'Nenhuma')+'\n\n'+
  '🔴 Lojas zeradas na parcial:\n'+(zero.length?zero.join(' • '):'Nenhuma')+'\n\n'+
  '🚀 Vamos acelerar a próxima hora!';
@@ -658,7 +658,7 @@ async function shareHourlyV5(){
  x.fillStyle='#F8F7F4';x.fillRect(0,0,1080,1920);x.fillStyle='#173F35';x.fillRect(0,0,1080,210);
  const logo=await new Promise(ok=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>ok(null);im.src='./assets/riachuelo-logo-horizontal-oficial-white-v133.svg?build=v133'});if(logo){try{const ratio=logo.naturalWidth/logo.naturalHeight,lw=300,lh=lw/ratio;x.drawImage(logo,60,54,lw,lh)}catch(e){}}
  x.fillStyle='#fff';x.textAlign='right';x.font='700 38px Arial';x.fillText('HORA A HORA | '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),1020,78);x.font='24px Arial';x.fillText('Moda que inspira o Brasil',1020,124);x.fillText(new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR'),1020,162);x.textAlign='left';
- const k=[['VENDA CAPTADA',money(r.captured),deltaMarkText(r.captured,prev?.captured,'money')],['PEDIDOS',num(r.orders)+' / '+num(r.orderTarget),deltaMarkText(r.orders,prev?.orders,'orders')],['META REGIONAL',money(r.meta),''],['ATINGIMENTO',r.meta?pct(r.att):'—',deltaMarkText(r.att,prev?.att,'pp')],['SHARE REGIONAL',r.storeSales?pct(r.share):'—',deltaMarkText(r.share,prev?.share,'pp')],['LOJAS COM VENDA',num(r.active)+' / 19',deltaMarkText(r.active,prev?.active,'number')]];
+ const k=[['VENDA CAPTADA',money(r.captured),deltaMarkText(r.captured,prev?.captured,'money')],['PEDIDOS',num(r.orders)+' / '+num(r.orderTarget),deltaMarkText(r.orders,prev?.orders,'orders')],['META REGIONAL',money(r.meta),''],['ATINGIMENTO',r.meta?pct(r.att):'—',deltaMarkText(r.att,prev?.att,'pp')],['SHARE REGIONAL',r.storeSales?pct(r.share):'—',deltaMarkText(r.share,prev?.share,'pp')],['LOJAS COM VENDA',num(r.active)+' / 18',deltaMarkText(r.active,prev?.active,'number')]];
  let ky=245;k.forEach((a,i)=>{const col=i%3,row=Math.floor(i/3),xx=55+col*335,yy=ky+row*150;x.fillStyle='#fff';x.fillRect(xx,yy,305,126);x.fillStyle='#466964';x.font='700 18px Arial';x.fillText(a[0],xx+18,yy+30);x.fillStyle='#173F35';x.font='700 30px Arial';x.fillText(a[1],xx+18,yy+70);x.font='16px Arial';x.fillStyle=a[2].startsWith('▲')?'#287A55':a[2].startsWith('▼')?'#B23A3A':'#6B6B68';x.fillText(a[2],xx+18,yy+101)});
  const top=stores.slice(0,3);x.fillStyle='#173F35';x.font='700 25px Arial';x.fillText('TOP DO MOMENTO',55,575);top.forEach((a,i)=>{x.fillStyle=['#D6D2C4','#E68699','#DE7C00'][i];x.fillRect(55+i*335,600,305,72);x.fillStyle='#173F35';x.font='700 20px Arial';x.fillText((i+1)+'º  Loja '+a.st,72+i*335,628);x.font='700 19px Arial';x.fillText(money(a.captured),72+i*335,655)});
  x.fillStyle='#173F35';x.font='700 24px Arial';x.fillText('DESEMPENHO POR LOJA',55,725);x.font='15px Arial';x.fillText('Loja     Captado       Ped.     Ating.    Share      Desvio        Status',55,760);
