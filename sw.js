@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v136';
-const BUILD='v136';
+const CACHE='estore-cepi-shell-v137';
+const BUILD='v137';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v133';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v133';
@@ -56,6 +56,11 @@ self.addEventListener('fetch',event=>{
   if(req.method!=='GET') return;
   const url=new URL(req.url);
   if(url.origin!==self.location.origin) return;
+
+  if(url.pathname.endsWith('/abrir.html')){
+    event.respondWith(fetch(new Request(req,{cache:'no-store'})));
+    return;
+  }
 
   if(req.mode==='navigate'){
     event.respondWith(
