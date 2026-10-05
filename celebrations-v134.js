@@ -1,4 +1,4 @@
-/* V134 — Celebrações pessoais */
+/* V135 — Celebrações pessoais • correção de sessão global */
 (function(){
   'use strict';
   if(window.__CELEBRATIONS_V134__)return;
@@ -7,11 +7,18 @@
   const API=()=>window.API||window.ESTORE_API||'https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-api';
   const LOGO='./assets/riachuelo-logo-horizontal-oficial-white-v133.svg';
 
+  function currentUserV135(){
+    try{
+      if(typeof U!=='undefined' && U && U.u)return U;
+    }catch(_){}
+    return window.U||null;
+  }
+
   function escV134(v){
     return String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   }
   function keyV134(data){
-    const id=String(data?.matricula||window.U?.u?.id||'');
+    const id=String(data?.matricula||currentUserV135()?.u?.id||'');
     const types=(data?.events||[]).map(x=>x.type+(x.years?'-'+x.years:'')).sort().join('|');
     return 'estore_celebration_v134|'+id+'|'+String(data?.date||'')+'|'+types;
   }
@@ -44,7 +51,7 @@
     try{if(localStorage.getItem(key)==='shown')return}catch(_){}
     if(document.getElementById('celebrationOverlayV134'))return;
 
-    const first=String(data.first_name||window.U?.u?.name||'Você').trim().split(/\s+/)[0]||'Você';
+    const first=String(data.first_name||currentUserV135()?.u?.name||'Você').trim().split(/\s+/)[0]||'Você';
     const both=data.events.length>1;
     const primary=data.events[0];
     const top=both
@@ -84,7 +91,7 @@
     el.classList.remove('show');setTimeout(()=>el.remove(),220);
   };
   async function loadV134(){
-    const id=String(window.U?.u?.id||'').trim();
+    const id=String(currentUserV135()?.u?.id||'').trim();
     if(!id||id==='0000000')return;
     try{
       const r=await fetch(API(),{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:'celebration_get',matricula:id})});
@@ -93,9 +100,17 @@
     }catch(e){console.warn('[V134] celebração indisponível',e)}
   }
   window.celebrate=loadV134;
+  window.recheckCelebrationV135=async function(){
+    try{
+      const u=currentUserV135();
+      if(!u?.u?.id)return false;
+      await loadV134();
+      return true;
+    }catch(_){return false}
+  };
 
   function bootV134(){
-    [700,1500,3000,5500].forEach(ms=>setTimeout(()=>{if(window.U?.u?.id)loadV134()},ms));
+    [700,1500,3000,5500].forEach(ms=>setTimeout(()=>{if(currentUserV135()?.u?.id)loadV134()},ms));
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootV134,{once:true});
   else bootV134();
