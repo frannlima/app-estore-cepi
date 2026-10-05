@@ -1,0 +1,90 @@
+/* V136 — Desktop responsivo da Home; mobile preservado */
+@media (min-width: 700px){
+  #shell.homeMode .wrap{
+    width:100%;
+    max-width:760px;
+    padding:0 22px 98px!important;
+  }
+  #shell.homeMode .bottom{
+    width:min(720px,calc(100vw - 32px));
+    border-radius:24px 24px 0 0;
+  }
+  .menuGridV33{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:12px;
+  }
+}
+@media (min-width: 980px){
+  #shell.homeMode{
+    background:
+      radial-gradient(circle at 12% 8%,rgba(214,210,196,.32),transparent 28%),
+      radial-gradient(circle at 88% 18%,rgba(70,105,100,.10),transparent 28%),
+      #f5f0e7;
+  }
+  #shell.homeMode .wrap{
+    width:100%;
+    max-width:1080px;
+    padding:0 30px 104px!important;
+  }
+  #shell.homeMode #view{width:100%}
+  .premiumHomeV33,.premiumHomeV34{
+    width:100%;
+    min-height:100vh;
+  }
+  .homeTopV33{
+    height:88px;
+    grid-template-columns:52px 1fr auto;
+    padding:14px 4px 12px;
+  }
+  .homeBrandV33 b{font-size:30px}
+  .homeBrandV33 span{font-size:12px}
+  .homeTopBtnV33{width:46px;height:46px}
+  .campaignHeroV34{
+    height:500px;
+    border-radius:32px;
+  }
+  .campaignPhotoV34{object-position:center 24%}
+  .dynamicDeckV34{
+    left:24px;
+    right:auto;
+    width:min(560px,56%);
+    bottom:20px;
+    min-height:148px;
+  }
+  .dynamicPanelV34{
+    border-radius:24px;
+    padding:18px 18px 15px;
+  }
+  .dynHeadV34{
+    grid-template-columns:50px 1fr 20px;
+    gap:12px;
+  }
+  .dynHeadV34 .dynIconV34{width:48px;height:48px}
+  .dynHeadV34 b{font-size:18px}
+  .dynHeadV34 small{font-size:12px}
+  .menuGridV33{
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:14px;
+    padding:18px 0 6px;
+  }
+  .menuTileV33{
+    min-height:94px;
+    border-radius:22px;
+    grid-template-columns:54px 1fr 16px;
+    gap:11px;
+    padding:13px 13px;
+  }
+  .menuIcon3dV33{width:52px;height:52px;border-radius:17px}
+  .menuTileV33 b{font-size:14px}
+  #shell.homeMode .bottom{
+    width:min(820px,calc(100vw - 56px));
+    border-radius:27px 27px 0 0;
+    padding-left:18px;
+    padding-right:18px;
+  }
+  #shell.homeMode .bottom button{font-size:11px}
+}
+@media (min-width: 1280px){
+  #shell.homeMode .wrap{max-width:1160px}
+  .campaignHeroV34{height:520px}
+}
