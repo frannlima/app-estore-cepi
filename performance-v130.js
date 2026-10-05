@@ -43,7 +43,7 @@
   function pshort(v,max){var s=String(v||'').trim();return s.length>max?s.slice(0,max-1)+'…':s}
   function punique(arr,key){var m={};return (arr||[]).filter(function(x){var k=String(x&&x[key]||'');if(!k||m[k])return false;m[k]=1;return true})}
 
-  var PERF_LOGO_V131='./assets/riachuelo-logo-exact-v75.svg'; // logo oficial Riachuelo
+  var PERF_LOGO_V131='./assets/riachuelo-logo-horizontal-oficial-white-v133.svg'; // logo oficial Riachuelo • modelo aprovado
   function pprevFromChangeV131(current,change){
     if(change===null||change===undefined||!Number.isFinite(Number(change)))return null;
     var r=Number(change),den=1+r;
@@ -200,7 +200,7 @@
     if(s.scope==='operation'&&s.store){
       var x=s.store,p=s.priority,txt='A filial '+String(x.st)+' fechou o recorte analisado com Share de '+ppct(s.share,2)+', '+trend+' de '+ppp(s.shareDelta)+'. ';
       txt+='A entrega foi de '+pmoney(s.captured)+' em venda captada, '+Math.round(s.orders).toLocaleString('pt-BR')+' pedidos e ticket médio de '+pmoney(s.ticket)+'. ';
-      if(p)txt+='A loja está entre as prioridades oficiais da FCA, na '+String(p.priority_rank||'—')+'ª posição de retração. ';
+      if(p)txt+='A loja está entre as lojas priorizadas na FCA, na '+String(p.priority_rank||'—')+'ª posição de retração. ';
       else txt+='A loja não aparece entre as cinco prioridades oficiais de retração do último fechamento. ';
       if(x.fca&&x.fca.root_cause)txt+='Causa raiz registrada: '+pshort(x.fca.root_cause,220)+'.';
       else txt+='Os sinais operacionais abaixo devem ser validados com a leitura de campo antes de serem tratados como causa raiz.';
@@ -378,7 +378,7 @@
     return '<div class=performanceRankGridV130>'+
       '<section class="performancePanelV130 performanceRankPanelV130"><div class="performanceRankHeaderV130 top"><div><h3>Top 5 Performance</h3><small>'+pesc(PERF_FOCUS_LABELS_V130[PERF_FOCUS_V130])+' • resultado entregue</small></div></div><div class=performanceRankTableV130>'+(top.length?top.map(function(x,i){return rankRowV130(x,i,false)}).join(''):'<div class=performanceEmptyV130>Sem dados suficientes.</div>')+'</div></section>'+
       '<section class="performancePanelV130 performanceRankPanelV130"><div class="performanceRankHeaderV130 bottom"><div><h3>Bottom 5 Performance</h3><small>'+pesc(PERF_FOCUS_LABELS_V130[PERF_FOCUS_V130])+' • menor desempenho</small></div></div><div class=performanceRankTableV130>'+(bottom.length?bottom.map(function(x,i){return rankRowV130(x,i,false)}).join(''):'<div class=performanceEmptyV130>Sem dados suficientes.</div>')+'</div></section>'+
-      '<section class="performancePanelV130 performanceRankPanelV130"><div class="performanceRankHeaderV130 priority"><div><h3>Lojas Prioritárias FCA</h3><small>Prioridade oficial por retração de Share</small></div></div><div class=performanceRankTableV130>'+(pri.length?pri.slice(0,5).map(priorityRowV130).join(''):'<div class=performanceEmptyV130>Nenhuma prioridade validada neste ciclo.</div>')+'</div></section>'+
+      '<section class="performancePanelV130 performanceRankPanelV130"><div class="performanceRankHeaderV130 priority"><div><h3>Lojas Priorizadas FCA</h3><small>Priorizadas por retração de Share</small></div></div><div class=performanceRankTableV130>'+(pri.length?pri.slice(0,5).map(priorityRowV130).join(''):'<div class=performanceEmptyV130>Nenhuma prioridade validada neste ciclo.</div>')+'</div></section>'+
     '</div>';
   }
 
@@ -452,7 +452,7 @@
       '</div>'+
       '<div class=performanceExecutivePreviewV130>'+
         '<section><h4>Resultado</h4><div class=performanceExecutiveMiniKpisV130><div><span>Share</span><b>'+ppct(s.share,2)+'</b></div><div><span>Δ Share</span><b>'+ppp(s.shareDelta)+'</b></div><div><span>Captado</span><b>'+pmoney(s.captured)+'</b><small>'+pesc(metricDeviationTextV131(s,'captured'))+'</small></div><div><span>Pedidos</span><b>'+Math.round(s.orders).toLocaleString('pt-BR')+'</b><small>'+pesc(metricDeviationTextV131(s,'orders'))+'</small></div></div></section>'+
-        '<section><h4>'+(s.scope==='operation'?'Referência Regional':'Top / Prioridades')+'</h4><p>'+((top||[]).slice(0,2).map(function(x){return pesc(x.st+' • '+ppct(x.share,2)+' • '+ppp(x.share_delta))}).join('<br>')||'Sem dados')+'<br>'+(pri&&pri[0]?'Prioridade: '+pesc(pri[0].st)+' • '+ppp(pri[0].share_delta):'')+'</p></section>'+
+        '<section><h4>'+(s.scope==='operation'?'Referência Regional':'Top / Priorizadas')+'</h4><p>'+((top||[]).slice(0,2).map(function(x){return pesc(x.st+' • '+ppct(x.share,2)+' • '+ppp(x.share_delta))}).join('<br>')||'Sem dados')+'<br>'+(pri&&pri[0]?'Priorizada: '+pesc(pri[0].st)+' • '+ppp(pri[0].share_delta):'')+'</p></section>'+
         '<section><h4>Resumo da Semana</h4><p>'+pesc(pshort(summary,520))+'</p></section>'+
       '</div>'+
       '<div class=performanceShareActionsV130><button class=preview onclick="previewPerformanceCardV130()">Visualizar prévia em alta resolução</button><button class=share onclick="sharePerformanceCardV130()">Gerar card para compartilhar</button></div>'+
@@ -583,7 +583,7 @@
       canvasTextV130(c,ppp(x.share_delta),leftX+leftW-38,y+31,12,'700',pnum(x.share_delta)>=0?GOOD:RED,'right');
       y+=102;
     });
-    y=bodyY+420;canvasTextV130(c,'PRIORIDADES FCA',leftX+22,y,15,'700',G);y+=34;
+    y=bodyY+420;canvasTextV130(c,'PRIORIZADAS FCA',leftX+22,y,15,'700',G);y+=34;
     if(pri.length){
       pri.forEach(function(x,i){
         canvasTextV130(c,String(x.priority_rank||i+1)+'º  '+pstoreName(x),leftX+24,y,14,'700',INK);
