@@ -212,6 +212,8 @@
     text+='Foram captados '+pmoney(s.captured)+' em '+Math.round(s.orders).toLocaleString('pt-BR')+' pedidos, com ticket médio de '+pmoney(s.ticket)+'. ';
     if(pos)text+='A maior evolução identificada foi a filial '+String(pos.st)+' ('+ppp(pos.share_delta)+'). ';
     if(neg&&pnum(neg.share_delta)<0)text+='A principal pressão negativa foi a filial '+String(neg.st)+' ('+ppp(neg.share_delta)+'), considerada na priorização quando aplicável. ';
+    var rc=d&&d.regionalContext||d&&d.executive&&d.executive.regional_context;
+    if(rc&&rc.active)text+='Há um evento regional pontual registrado: '+pshort(rc.event_label||'evento externo',120)+' em '+pdate(rc.event_date)+', classificado como não recorrente. ';
     text+='A leitura de '+focus+' está cruzada com dispersão, frequência de zeragem, ticket e causas registradas; correlação não é tratada automaticamente como causa raiz.';
     return {text:text,status:s.shareDelta>0?'good':s.shareDelta<0?'bad':'neutral',label:s.shareDelta>0?'Performance em evolução':s.shareDelta<0?'Performance em atenção':'Performance estável',focus:focus};
   }
@@ -232,7 +234,8 @@
       if(pnum(s.zeroOver3)>0)out.push({label:String(s.zeroOver3)+' colaborador(es) com +3 dias zerados',source:'Indicador',cls:'kpi'});
       if(phas(s.ticketChange)&&pnum(s.ticketChange)<0)out.push({label:'Ticket médio em retração',source:'Indicador',cls:'kpi'});
     }else{
-      var e=d&&d.executive||{},voice=d&&d.performance&&d.performance.voice||{};
+      var e=d&&d.executive||{},voice=d&&d.performance&&d.performance.voice||{},rc=d&&d.regionalContext||e.regional_context;
+      if(rc&&rc.active)out.push({label:rc.event_label||'Evento externo regional',source:'Contexto Regional',cls:'fca'});
       (e.external||[]).slice(0,3).forEach(function(x){out.push({label:x.label||mapFactorLabelV130(x.key),source:'FCA',cls:'fca',pct:x.pct})});
       (e.operational||[]).slice(0,3).forEach(function(x){out.push({label:x.label||mapFactorLabelV130(x.key),source:'FCA',cls:'fca',pct:x.pct})});
       (voice.causes||[]).slice(0,3).forEach(function(x){out.push({label:PERF_VOICE_LABELS_V130[x.key]||x.label||x.key,source:'Ouça seu time',cls:'voice',pct:x.pct})});
@@ -255,7 +258,8 @@
       if(Array.isArray(f.evidences)&&f.evidences.length)out.push({title:'Anexos da FCA',detail:f.evidences.length+' evidência(s) registrada(s)'});
       if(f.system_description)out.push({title:'Relato sistêmico',detail:pshort(f.system_description,130)});
     }else{
-      var p=d&&d.performance||{};
+      var p=d&&d.performance||{},rc=d&&d.regionalContext||d&&d.executive&&d.executive.regional_context;
+      if(rc&&rc.active)out.push({title:'Evento regional pontual',detail:pshort((rc.event_label||'Evento externo')+' • '+pdate(rc.event_date)+' • impacto potencial '+pmoney(rc.estimated_impact||0),150)});
       out.push({title:'Dispersão regional',detail:ppct(p.regional_dispersion||0,1)});
       out.push({title:'Frequência crítica',detail:Math.round(p.critical_zero_collaborators||0)+' colaborador(es) com +3 dias zerados'});
       if(d&&d.summary&&d.summary.fca_submitted!=null)out.push({title:'Tratativas FCA',detail:Math.round(pnum(d.summary.fca_submitted))+' concluída(s) de '+Math.round(pnum(d.summary.prioritized))+' priorizada(s)'});
@@ -273,6 +277,8 @@
     if(/instabilidade|sist[eê]mica|pagamento|cupom/.test(labels))add('Consolidar horários, evidências e chamados dos impactos sistêmicos e escalar a recorrência com o time responsável.');
     if(/abordagem/.test(labels))add('Reforçar script de abordagem eStore, objeções e benefícios com prática rápida no início do turno.');
     if(/distribui[cç][aã]o de meta|meta individual/.test(labels))add('Revisar distribuição da meta por HC e garantir acompanhamento individual da execução.');
+    var rc=d&&d.regionalContext||d&&d.executive&&d.executive.regional_context;
+    if(s.scope==='regional'&&rc&&rc.active&&rc.action_plan)add(pshort(rc.action_plan,280));
     if(s.scope==='operation'&&s.priority)add('Concluir a FCA oficial da filial com causa raiz validada, responsável, prazo e resultado esperado.');
     if(s.scope==='regional'&&(d&&d.prioritized||[]).length)add('Fazer checkpoint das lojas Priorizadas e acompanhar a reação do Share na parcial da semana seguinte.');
     if(!a.length)add('Manter acompanhamento do Share, pedidos, ticket e dispersão, preservando as práticas que sustentaram a evolução.');
