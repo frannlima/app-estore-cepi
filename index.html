@@ -2046,7 +2046,7 @@ async function loadAudit(){try{let j=await api({action:'audit_get',matricula:U.u
 // Bind resiliente para navegadores móveis que bloqueiam handlers inline
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();DEFERRED_INSTALL_PROMPT=e;document.getElementById('installAppBtn')?.classList.remove('hide')});
 window.addEventListener('appinstalled',()=>{DEFERRED_INSTALL_PROMPT=null;document.getElementById('installAppBtn')?.classList.add('hide')});
-window.addEventListener('DOMContentLoaded',()=>{loadPublicBranding();const b=document.getElementById('loginBtn');if(b)b.addEventListener('click',()=>{try{login()}catch(e){const er=document.getElementById('err');if(er)er.textContent='Erro ao iniciar acesso: '+e.message;console.error(e)}});const m=document.getElementById('mat');if(m)m.addEventListener('keydown',e=>{if(e.key==='Enter')b?.click()});if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(e=>console.warn('sw',e));setTimeout(async()=>{if(U)return;let s=null;try{s=JSON.parse(localStorage.getItem('estorePersistSession')||'null')}catch(e){}if(!s)return;if(s.type==='guest'){await guestLogin();return}if(s.type==='user'&&s.id){if(m)m.value=s.id;await login()}},120)});
+window.addEventListener('DOMContentLoaded',()=>{loadPublicBranding();const b=document.getElementById('loginBtn');if(b)b.addEventListener('click',()=>{try{login()}catch(e){const er=document.getElementById('err');if(er)er.textContent='Erro ao iniciar acesso: '+e.message;console.error(e)}});const m=document.getElementById('mat');if(m)m.addEventListener('keydown',e=>{if(e.key==='Enter')b?.click()});if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js',{scope:'./',updateViaCache:'none'}).catch(e=>console.warn('sw',e));setTimeout(async()=>{if(U)return;let s=null;try{s=JSON.parse(localStorage.getItem('estorePersistSession')||'null')}catch(e){}if(!s)return;if(s.type==='guest'){await guestLogin();return}if(s.type==='user'&&s.id){if(m)m.value=s.id;await login()}},120)});
 
 /* V27 Regional executivo */
 const renderTeamV22Base=renderTeamV22;
@@ -2685,29 +2685,7 @@ window.deletePopupV72=async function(id){
 @media(max-width:620px){.campaignApprovedHeroV73{grid-template-columns:1fr;min-height:500px;padding:22px}.campaignApprovedProductsV73{min-height:260px}.campaignApprovedCopyV73{padding-right:20px}.campaignInfoGridV73{grid-template-columns:1fr 1fr}.collabPrizeGridV73{grid-template-columns:1fr 1fr}.collabPrizeImgV73{height:138px}.campaignApprovedHeroV73.feed{min-height:455px}.approvedBadgeV73{right:12px;top:12px}.approvedProductV73.p1{left:12px}.approvedProductV73.p2{right:0}}
 </style>
 
-<!-- V74-FORCE-SW-UPDATE -->
-<script>
-(function(){
-  const BUILD='v100';
-  if(!('serviceWorker' in navigator))return;
-  let reloading=false;
-  navigator.serviceWorker.addEventListener('controllerchange',()=>{
-    if(reloading)return;
-    try{
-      const k='estoreControllerReload:'+BUILD;
-      if(sessionStorage.getItem(k))return;
-      sessionStorage.setItem(k,'1');
-    }catch(e){}
-    reloading=true;
-    location.reload();
-  });
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('./sw.js?build='+BUILD,{scope:'./',updateViaCache:'none'})
-      .then(reg=>reg.update())
-      .catch(e=>console.warn('sw update',e));
-  });
-})();
-</script>
+<!-- V139-STABLE-SW: atualização gerenciada por um único registro, sem reload automático -->
 
 <!-- V75-2026-10-01-APPROVED-CAMPAIGN-FINAL -->
 <script>
