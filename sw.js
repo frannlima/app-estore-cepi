@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v139';
-const BUILD='v139';
+const CACHE='estore-cepi-shell-v140';
+const BUILD='v140';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v133';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v133';
@@ -18,6 +18,13 @@ function injectAppV104(html){
     .replace(/\n?<script[^>]+src=["']\.\/presentation-v10[123]\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
     .replace(/\n?<script[^>]+src=["']\.\/hourly-meta-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
     .replace(/\n?<script[^>]+src=["']\.\/team-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
+    .replace(/\n?<script[^>]+src=["']\.\/team-store-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
+    .replace(/\n?<script[^>]+src=["']\.\/commission-eligibility-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
+    .replace(/\n?<script[^>]+src=["']\.\/commission-bopis-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
+    .replace(/\n?<script[^>]+src=["']\.\/team-collapse-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
+    .replace(/\n?<script[^>]+src=["']\.\/team-area-regional-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
+    .replace(/\n?<script[^>]+src=["']\.\/bopis-analytics-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
+    .replace(/\n?<script[^>]+src=["']\.\/voice-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
     .replace(/src=["']\.\/app-v2\.js(?:\?[^"']*)?["']/gi,'src="./app-v2.js?build='+BUILD+'"');
   const tags='\n<script src="'+PRESENTATION_SCRIPT+'"></script>\n<script src="'+HOURLY_META_SCRIPT+'"></script>\n<script src="'+TEAM_SCRIPT+'"></script>\n<script src="'+TEAM_STORE_SCRIPT+'"></script>\n<script src="'+COMMISSION_ELIGIBILITY_SCRIPT+'"></script>\n<script src="'+COMMISSION_BOPIS_SCRIPT+'"></script>\n<script src="'+TEAM_COLLAPSE_SCRIPT+'"></script>\n<script src="'+TEAM_AREA_REGIONAL_SCRIPT+'"></script>\n<script src="'+BOPIS_ANALYTICS_SCRIPT+'"></script>\n<script src="'+VOICE_SCRIPT+'"></script>\n';
   return html.replace(/<\/body>\s*<\/html>\s*$/i, tags+'</body></html>');
