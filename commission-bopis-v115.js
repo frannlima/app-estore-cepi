@@ -120,36 +120,44 @@
     try{
       let req={action:'pool_rankings',matricula:U.u.id,period:PER};if(PER==='month')req.month=COMM_MONTH;
       let j=await api(req),mine=j.mySupervisor,stores=j.stores||[],sups=j.supervisors||[],
-          validSups=sups.filter(x=>x.commissionVerified!==false),
+          validSups=sups.filter(x=>x.poolAvailable!==false),
           avg=validSups.length?validSups.reduce((a,x)=>a+(+x.pool||0),0)/validSups.length:0,
-          myVerified=mine?mine.commissionVerified!==false:true,
-          myPool=mine&&myVerified?+mine.pool:0;
+          myAvailable=mine?mine.poolAvailable!==false:true,
+          myPartial=mine?.commissionPartial===true,
+          myPool=mine&&myAvailable?+mine.pool:0;
 
-      if($('#poolKpi'))$('#poolKpi').textContent=mine&&!myVerified?'—':money(myPool);
+      if($('#poolKpi'))$('#poolKpi').textContent=mine&&!myAvailable?'—':money(myPool);
       if($('#poolTotal')){
         const indivText=$('#commIndividual')?.textContent||'';
         const indiv=indivText.includes('—')?null:+indivText.replace(/[^0-9,]/g,'').replace(',','.');
-        $('#poolTotal').textContent=mine&&!myVerified||indiv==null?'—':money(myPool+(indiv||0));
+        $('#poolTotal').textContent=mine&&!myAvailable||indiv==null?'—':money(myPool+(indiv||0));
       }
 
       if($('#poolStores'))$('#poolStores').innerHTML=stores.map((x,i)=>{
-        const verified=x.commissionVerified!==false;
+        const available=x.poolAvailable!==false,partial=x.commissionPartial===true;
+        const baseText=available
+          ?'Base aprovada sem BOPIS: '+money(x.approved)+(partial?' • parcial verificada • '+Number(x.pendingRows||0)+' pendência(s) Tipo Entrega':'')
+          :'Base aprovada: '+money(x.grossApproved||0)+' • aguardando Tipo Entrega';
         return '<div class=rankrow><b>'+(i+1)+'º</b><div>Filial '+esc(x.st)+
-          '<div class=muted>'+x.eligible+' supervisores elegíveis • Base aprovada sem BOPIS: '+(verified?money(x.approved):'aguardando Tipo Entrega')+
-          (verified&&(+x.bopisApproved||0)>0?' • BOPIS excluído '+money(x.bopisApproved):'')+'</div></div><b>'+(verified?money(x.pool):'—')+'</b></div>';
+          '<div class=muted>'+x.eligible+' supervisores elegíveis • '+baseText+
+          (available&&(+x.bopisApproved||0)>0?' • BOPIS excluído '+money(x.bopisApproved):'')+'</div></div><b>'+(available?money(x.pool):'—')+'</b></div>';
       }).join('');
 
       if(isAdmin()){
-        if($('#poolMine'))$('#poolMine').innerHTML=sups.length?sups.map(x=>'<div class=rankrow><b>'+x.rank+'º</b><div><b>'+esc(preferredName(x.id,x.name))+'</b><div class=muted>Filial '+esc(x.st)+' • '+esc(x.role)+(x.commissionVerified===false?' • Base BOPIS pendente':'')+'</div></div><b>'+(x.commissionVerified===false?'—':money(x.pool))+'</b></div>').join(''):'<div class=muted>Sem supervisores elegíveis neste período.</div>';
+        if($('#poolMine'))$('#poolMine').innerHTML=sups.length?sups.map(x=>{
+          const available=x.poolAvailable!==false,partial=x.commissionPartial===true;
+          return '<div class=rankrow><b>'+x.rank+'º</b><div><b>'+esc(preferredName(x.id,x.name))+'</b><div class=muted>Filial '+esc(x.st)+' • '+esc(x.role)+(partial?' • Pool parcial verificado':(!available?' • Base BOPIS pendente':''))+'</div></div><b>'+(available?money(x.pool):'—')+'</b></div>';
+        }).join(''):'<div class=muted>Sem supervisores elegíveis neste período.</div>';
         return;
       }
       if(mine){
-        if(!myVerified){
-          if($('#poolMine'))$('#poolMine').innerHTML='<div class="notice warn"><b>Pool aguardando base com Tipo Entrega.</b><br>O App não exibe valor até conseguir separar e excluir BOPIS do aprovado da filial.</div>';
+        if(!myAvailable){
+          if($('#poolMine'))$('#poolMine').innerHTML='<div class="notice warn"><b>Pool aguardando base com Tipo Entrega.</b><br>Ainda não há base verificada suficiente para separar e excluir BOPIS da sua filial.</div>';
           return;
         }
+        let partialMsg=myPartial?'<div class="notice warn"><b>Pool parcial de outubro.</b><br>Valor calculado somente sobre a base já verificada sem BOPIS. '+Number(mine.pendingRows||0)+' registro(s) ainda aguardam Tipo Entrega e serão incorporados após validação.</div>':'';
         let msg=myPool<avg?'<div class="notice warn"><b>Tem espaço para crescer.</b><br>Seu Pool está abaixo da média regional de '+money(avg)+'.</div>':'<div class="notice success"><b>Acima da média regional!</b><br>Continue acelerando a entrega da filial e defendendo sua posição.</div>';
-        if($('#poolMine'))$('#poolMine').innerHTML='<div class=grid><div class=kpi>Minha posição<b>'+mine.rank+'º</b></div><div class=kpi>Meu Pool<b>'+money(mine.pool)+'</b><small>BOPIS excluído</small></div><div class=kpi>Média Regional<b>'+money(avg)+'</b></div></div>'+msg;
+        if($('#poolMine'))$('#poolMine').innerHTML='<div class=grid><div class=kpi>Minha posição<b>'+mine.rank+'º</b></div><div class=kpi>Meu Pool<b>'+money(mine.pool)+'</b><small>'+(myPartial?'Parcial verificado • BOPIS excluído':'BOPIS excluído')+'</small></div><div class=kpi>Média Regional<b>'+money(avg)+'</b></div></div>'+partialMsg+msg;
       }else if($('#poolMine'))$('#poolMine').innerHTML='<div class=notice>Seu cadastro não está entre os supervisores elegíveis ao Pool neste período.</div>';
     }catch(e){
       if($('#poolStores'))$('#poolStores').innerHTML='<div class="notice danger">'+esc(e.message)+'</div>';
