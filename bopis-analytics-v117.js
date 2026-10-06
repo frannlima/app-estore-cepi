@@ -17,7 +17,7 @@
   function storeName117(st){try{return storeDisplayName(st)}catch{return 'Filial '+st}}
   function verifiedWarning117(d){
     return d&&d.commissionVerifiedCoverage<1
-      ?'<div class="notice warn" style="margin:12px 0"><b>Cobertura BOPIS parcial.</b><br>Parte do histórico foi importada antes da identificação de Tipo Entrega. Os indicadores abaixo consideram somente registros em que BOPIS pôde ser separado com segurança.</div>'
+      ?'<div class="notice warn" style="margin:12px 0"><b>Base BOPIS parcial.</b><br>O painel considera as ocorrências já registradas pelo relatório administrativo BOPIS.</div>'
       :'';
   }
   function injectStyle117(){
@@ -75,9 +75,45 @@
       (p.orders>0?'<div class="notice warn"><b>Atenção:</b> foram identificadas ocorrências BOPIS/Retira em Loja no período. Esses valores não compõem a base de comissão.</div>':'<div class="notice success">Nenhuma ocorrência BOPIS identificada para esta matrícula no período.</div>')+
       '</div>';
   }
+  function bopisImportPanelV117(){
+    if(!isAdmin())return '';
+    return '<div class=bopisPanelV117 style="margin-bottom:12px">'+
+      '<h3>Importar relatório BOPIS</h3>'+
+      '<small>Envie a relação de vendas identificadas como BOPIS. Somente esses valores serão descontados da base aprovada usada no cálculo do Pool.</small>'+
+      '<div class="notice" style="margin-top:10px"><b>Regra do Pool:</b> Venda aprovada da filial − BOPIS informado neste relatório = base comissionável. Sobre essa base, o App calcula 3% e faz o rateio entre os supervisores elegíveis.</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 220px auto;gap:8px;align-items:end;margin-top:12px">'+
+        '<label class=muted>Relatório BOPIS<input id=bopisImportFileV117 class=field type=file accept=".xlsx,.xls,.csv"></label>'+
+        '<label class=muted>Senha ADM<input id=bopisImportPwdV117 class=field type=password placeholder="Senha administrativa"></label>'+
+        '<button class=btn onclick="importBopisReportV117()">Importar e recalcular</button>'+
+      '</div><div id=bopisImportOutV117></div>'+
+      '</div>';
+  }
+
+  window.importBopisReportV117=async function(){
+    const file=document.getElementById('bopisImportFileV117')?.files?.[0],
+          pwd=document.getElementById('bopisImportPwdV117')?.value||'',
+          out=document.getElementById('bopisImportOutV117');
+    if(!file){if(out)out.innerHTML='<div class="notice warn">Selecione o relatório BOPIS.</div>';return}
+    if(out)out.innerHTML='<div class=notice>Importando relatório e recalculando o Pool...</div>';
+    try{
+      const fd=new FormData();
+      fd.append('action','bopis_import');
+      fd.append('matricula',String(U.u.id));
+      fd.append('password',pwd);
+      fd.append('bopis_report',file);
+      const r=await fetch(ESTORE_API,{method:'POST',body:fd}),j=await r.json();
+      if(!r.ok||!j.ok)throw new Error(j.error||'Falha ao importar relatório BOPIS.');
+      if(out)out.innerHTML='<div class="notice success"><b>Relatório incorporado.</b><br>'+esc(j.rows)+' registro(s) • '+esc(j.stores)+' loja(s) • '+fmtMoney117(j.approved)+' BOPIS descontado da base do Pool.</div>';
+      BOPIS_DATA_V117=await loadBopisV117(BOPIS_SEARCH_V117);
+      setTimeout(()=>adminBopisV117(),700);
+    }catch(e){
+      if(out)out.innerHTML='<div class="notice danger">'+esc(e.message||e)+'</div>';
+    }
+  };
+
   function renderBopisV117(d){
     const s=d.summary||{},coverage=+d.commissionVerifiedCoverage||0;
-    return '<div class=bopisHeroV117><h2>BOPIS • Retira em Loja</h2><p>Painel regional para leitura de ocorrências, frequência, recorrência e impacto no comissionamento.</p></div>'+
+    return bopisImportPanelV117()+'<div class=bopisHeroV117><h2>BOPIS • Retira em Loja</h2><p>Painel regional para leitura de ocorrências, frequência, recorrência e impacto no comissionamento.</p></div>'+
       '<div class=bopisTabsV117>'+['day','week','month','year'].map(k=>'<button class="'+(BOPIS_PERIOD_V117===k?'on':'')+'" onclick="setBopisPeriodV117(\''+k+'\')">'+({day:'Dia',week:'Semana',month:'Mês',year:'Ano'})[k]+'</button>').join('')+'</div>'+
       '<div class=muted>'+periodLabel117()+' • '+fmtDate117(d.startDate)+' a '+fmtDate117(d.endDate)+'</div>'+
       verifiedWarning117(d)+
