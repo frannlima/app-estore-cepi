@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v138';
-const BUILD='v138';
+const CACHE='estore-cepi-shell-v139';
+const BUILD='v139';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v133';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v133';
@@ -39,15 +39,6 @@ self.addEventListener('activate',event=>{
     caches.keys()
       .then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))
       .then(()=>self.clients.claim())
-      .then(()=>self.clients.matchAll({type:'window',includeUncontrolled:true}))
-      .then(clients=>Promise.all(clients.map(client=>{
-        try{
-          const u=new URL(client.url);
-          if(u.origin!==self.location.origin)return Promise.resolve();
-          u.searchParams.set('build',BUILD);
-          return client.navigate(u.toString()).catch(()=>{});
-        }catch(e){return Promise.resolve();}
-      })))
   );
 });
 
@@ -63,29 +54,57 @@ self.addEventListener('fetch',event=>{
   }
 
   if(req.mode==='navigate'){
+    const cachePromise=caches.open(CACHE);
+    const networkPromise=fetch(new Request(req,{cache:'no-store'}))
+      .then(async res=>{
+        if(!res||!res.ok) return res;
+        try{
+          const cache=await cachePromise;
+          await cache.put('./index.html',res.clone());
+        }catch(e){}
+        return res;
+      })
+      .catch(()=>null);
+
+    // Atualiza silenciosamente em segundo plano, sem navegar/recarregar a página.
+    event.waitUntil(networkPromise.then(()=>{}));
+
     event.respondWith(
-      fetch(new Request(req,{cache:'no-store'}))
-        .then(res=>{
-          if(!res||!res.ok) return res;
-          return htmlResponseWithInjection(res.clone()).then(injected=>{
-            caches.open(CACHE).then(cache=>cache.put('./index.html',injected.clone())).catch(()=>{});
-            return injected;
-          });
-        })
-        .catch(()=>caches.match('./index.html').then(async res=>res?htmlResponseWithInjection(res.clone()):res))
+      cachePromise.then(async cache=>{
+        const cached=await cache.match('./index.html');
+        if(cached) return htmlResponseWithInjection(cached.clone());
+        const res=await networkPromise;
+        if(res) return htmlResponseWithInjection(res.clone());
+        return new Response('App temporariamente indisponível offline.',{
+          status:503,
+          headers:{'content-type':'text/plain; charset=utf-8'}
+        });
+      })
     );
     return;
   }
 
+  // Assets locais: resposta imediata do cache + atualização silenciosa.
+  const cachePromise=caches.open(CACHE);
+  const networkPromise=fetch(req)
+    .then(async res=>{
+      if(res&&res.ok){
+        try{
+          const cache=await cachePromise;
+          await cache.put(req,res.clone());
+        }catch(e){}
+      }
+      return res;
+    })
+    .catch(()=>null);
+
+  event.waitUntil(networkPromise.then(()=>{}));
   event.respondWith(
-    fetch(req)
-      .then(res=>{
-        if(res&&res.ok){
-          const copy=res.clone();
-          caches.open(CACHE).then(cache=>cache.put(req,copy)).catch(()=>{});
-        }
-        return res;
-      })
-      .catch(()=>caches.match(req))
+    cachePromise.then(async cache=>{
+      const cached=await cache.match(req,{ignoreSearch:true});
+      if(cached) return cached;
+      const res=await networkPromise;
+      return res||Response.error();
+    })
   );
 });
