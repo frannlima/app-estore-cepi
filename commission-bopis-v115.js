@@ -8,6 +8,7 @@
   const CONTRACT_NOTE='Não elegível a comissionamento por conta da modalidade de contrato e política interna de benefícios.';
   const baseCommissionV115=window.commission;
   const baseSimV115=window.sim;
+  let POOL_DATA_V143=null;
 
   function norm115(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()}
   function contractEligible115(){return !/(intermitente|aprendiz)/.test(norm115(U?.u?.role||''))}
@@ -83,7 +84,128 @@
     }
   };
 
+
+  function injectPoolStyleV143(){
+    if(document.getElementById('pool-v143-style'))return;
+    const st=document.createElement('style');st.id='pool-v143-style';
+    st.textContent=
+      '.poolToolbarV143{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}.poolRowV143{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 10px;border-bottom:1px solid #ebe8e0}.poolRankV143{width:38px;height:38px;border-radius:12px;background:#eef3f0;color:#173F35;display:grid;place-items:center;font-weight:900}.poolRowV143:nth-child(1) .poolRankV143{background:#f6d466}.poolRowV143:nth-child(2) .poolRankV143{background:#e3e5e4}.poolRowV143:nth-child(3) .poolRankV143{background:#e9bc8f}.poolStoreV143{font-weight:900;color:#173F35;font-size:15px}.poolMetaV143{font-size:10px;color:#66736f;line-height:1.45;margin-top:3px}.poolAmountV143{min-width:108px;text-align:right;font-size:19px!important;font-weight:950!important;color:#173F35!important;background:#edf4f1;border-radius:12px;padding:9px 10px;box-shadow:inset 0 0 0 1px #dbe7e2}.poolBopisV143{display:inline-flex;align-items:center;gap:5px;background:#e62b2b;color:white;border-radius:999px;padding:4px 8px;font-size:9px;font-weight:900;margin-left:5px;white-space:nowrap}.poolBopisV143 b{color:white!important}.poolSupervisorValueV143{display:inline-block;background:#173F35;color:white!important;border-radius:10px;padding:7px 10px;min-width:96px;text-align:center;font-size:16px!important}.poolRuleV143{background:#f1f5f2;border-left:4px solid #173F35;border-radius:12px;padding:10px 12px;margin:10px 0;font-size:11px;color:#284a42}@media(max-width:600px){.poolRowV143{grid-template-columns:42px minmax(0,1fr) auto}.poolAmountV143{min-width:96px;font-size:17px!important;padding:8px}.poolBopisV143{margin-left:0;margin-top:4px}}';
+    document.head.appendChild(st);
+  }
+
+  function poolMonthLabelV143(){
+    const ym=/^\d{4}-\d{2}$/.test(String(COMM_MONTH||''))?COMM_MONTH:new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'}).slice(0,7);
+    const [y,m]=ym.split('-').map(Number);
+    return new Date(y,m-1,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'}).replace(/^./,x=>x.toUpperCase());
+  }
+  function poolDateV143(s){try{return new Date(String(s)+'T12:00:00').toLocaleDateString('pt-BR')}catch{return String(s||'')}}
+  function poolMoneyV143(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+  function poolRoundRectV143(ctx,x,y,w,h,r,fill,stroke){
+    ctx.beginPath();
+    if(ctx.roundRect)ctx.roundRect(x,y,w,h,r);else ctx.rect(x,y,w,h);
+    ctx.fillStyle=fill;ctx.fill();
+    if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke()}
+  }
+  function poolTextV143(ctx,t,x,y,font,color,align='left',maxW){
+    ctx.font=font;ctx.fillStyle=color;ctx.textAlign=align;ctx.textBaseline='middle';
+    let s=String(t??'');
+    if(maxW){while(s.length>2&&ctx.measureText(s).width>maxW)s=s.slice(0,-1);if(s!==String(t??''))s=s.slice(0,-1)+'…'}
+    ctx.fillText(s,x,y);
+  }
+  async function poolLogoV143(){
+    return await new Promise(ok=>{
+      const i=new Image();i.onload=()=>ok(i);i.onerror=()=>ok(null);
+      i.src='./assets/riachuelo-logo-horizontal-oficial-v133.svg?v=133';
+    });
+  }
+  async function loadPoolCardDataV143(){
+    const req={action:'pool_rankings',matricula:U.u.id,period:'month',month:COMM_MONTH};
+    POOL_DATA_V143=await api(req);
+    return POOL_DATA_V143;
+  }
+  async function poolCanvasV143(){
+    const d=await loadPoolCardDataV143(),stores=(d.stores||[]).slice().sort((a,b)=>(+b.pool||0)-(+a.pool||0));
+    const rows=stores.slice(0,8),regional=stores.reduce((s,x)=>s+(+x.pool||0),0),bopisStores=stores.filter(x=>(+x.bopisApproved||0)>0).length,top=stores[0]||{};
+    const W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');
+    const GREEN='#173F35',GREEN2='#315E54',PAPER='#F7F5EF',WHITE='#FFFFFF',TEXT='#173F35',MUTED='#64726D',RED='#E62B2B',BORDER='#E5E2DA',GOLD='#F2CC5D',SILVER='#DFE2E1',BRONZE='#E7B686';
+    x.fillStyle=PAPER;x.fillRect(0,0,W,H);
+
+    const logo=await poolLogoV143();
+    if(logo){const ratio=(logo.naturalWidth||400)/(logo.naturalHeight||90),lw=360,lh=lw/ratio;x.drawImage(logo,48,34,lw,lh)}
+    poolTextV143(x,'Moda que inspira o Brasil',1030,63,'600 22px Arial',TEXT,'right');
+
+    poolRoundRectV143(x,30,110,1020,330,28,WHITE);
+    poolTextV143(x,'POOL DE COMISSÃO',54,162,'900 48px Arial',TEXT);
+    poolTextV143(x,'Parcial do mês • CE+PI',54,210,'700 26px Arial',MUTED);
+    poolTextV143(x,'Atualizado até '+poolDateV143(d.endDate),54,248,'600 18px Arial',GREEN2);
+    poolRoundRectV143(x,650,138,365,98,18,'#EEF3F0');
+    poolTextV143(x,'Base do Pool =',680,168,'700 17px Arial',TEXT);
+    poolTextV143(x,'Aprovado da loja − BOPIS',680,202,'600 17px Arial',TEXT);
+
+    poolRoundRectV143(x,50,285,430,125,18,GREEN);
+    poolTextV143(x,'Pool regional estimado',78,318,'600 18px Arial','#F0F5F2');
+    poolTextV143(x,poolMoneyV143(regional),78,365,'900 38px Arial',WHITE);
+    poolRoundRectV143(x,500,285,220,125,18,'#F0F3F0');
+    poolTextV143(x,'Lojas com BOPIS',525,318,'600 16px Arial',MUTED);
+    poolTextV143(x,String(bopisStores),525,365,'900 34px Arial',TEXT);
+    poolRoundRectV143(x,740,285,275,125,18,'#F0F3F0');
+    poolTextV143(x,'Maior Pool da regional',765,318,'600 15px Arial',MUTED);
+    poolTextV143(x,String(top.st||'—')+' • '+poolMoneyV143(top.pool||0),765,365,'900 23px Arial',TEXT);
+
+    poolRoundRectV143(x,30,462,1020,748,28,WHITE);
+    poolTextV143(x,'Ranking Pool por Loja',55,505,'900 30px Arial',TEXT);
+
+    let y=548;
+    rows.forEach((r,i)=>{
+      poolRoundRectV143(x,50,y,980,70,13,'#FCFBF8',BORDER);
+      const badge=i===0?GOLD:i===1?SILVER:i===2?BRONZE:'#EAF0EC';
+      poolRoundRectV143(x,64,y+12,48,46,12,badge);
+      poolTextV143(x,(i+1)+'º',88,y+35,'900 18px Arial',TEXT,'center');
+      poolTextV143(x,'Loja '+String(r.st),136,y+28,'800 18px Arial',TEXT);
+      poolTextV143(x,'Pool da loja',330,y+19,'600 12px Arial',MUTED);
+      poolTextV143(x,poolMoneyV143(r.pool),330,y+45,'900 25px Arial',TEXT);
+      poolTextV143(x,'Base comissionável',570,y+19,'600 12px Arial',MUTED);
+      poolTextV143(x,poolMoneyV143(r.approved),570,y+45,'600 17px Arial','#344B45');
+      if((+r.bopisApproved||0)>0){
+        poolRoundRectV143(x,840,y+9,82,25,13,RED);
+        poolTextV143(x,'BOPIS',881,y+21,'900 12px Arial',WHITE,'center');
+        poolTextV143(x,'-'+poolMoneyV143(r.bopisApproved).replace(/\s/g,''),1012,y+48,'900 18px Arial',RED,'right');
+      }
+      y+=82;
+    });
+
+    poolRoundRectV143(x,30,1230,1020,95,22,GREEN);
+    poolTextV143(x,'Quanto maior a base sem BOPIS, maior o Pool da loja.',58,1265,'800 22px Arial',WHITE);
+    poolTextV143(x,'Siga acelerando a captação com qualidade para ampliar o ganho do time.',58,1298,'500 17px Arial','#E3ECE8');
+    return cv;
+  }
+  function poolCaptionV143(d){
+    const stores=(d?.stores||[]).slice().sort((a,b)=>(+b.pool||0)-(+a.pool||0)),regional=stores.reduce((s,x)=>s+(+x.pool||0),0);
+    return ['📲 *POOL DE COMISSÃO | CE+PI*','*'+poolMonthLabelV143()+' • atualizado até '+poolDateV143(d?.endDate)+'*','','💰 *Pool regional estimado:* '+poolMoneyV143(regional),'🏆 *Maior Pool:* '+(stores[0]?.st||'—')+' • '+poolMoneyV143(stores[0]?.pool||0),'','*Top lojas:*',...stores.slice(0,5).map((x,i)=>(i+1)+'º • *'+x.st+'* — '+poolMoneyV143(x.pool)+((+x.bopisApproved||0)>0?' | BOPIS -'+poolMoneyV143(x.bopisApproved):'')),'','Quanto maior a base sem BOPIS, maior o Pool da loja.'].join('\n');
+  }
+  window.previewPoolCardV143=async function(){
+    try{
+      const c=await poolCanvasV143(),m=document.createElement('div');m.className='previewModal';
+      m.innerHTML='<div class=box><img src="'+c.toDataURL('image/png')+'" alt="Pool de Comissão CE+PI"><div class=toolbar><button class=btn onclick="sharePoolCardV143()">Compartilhar</button><button class="btn ghost" onclick="this.closest(\'.previewModal\').remove()">Fechar</button></div></div>';
+      m.onclick=e=>{if(e.target===m)m.remove()};document.body.appendChild(m);
+    }catch(e){alert('Não foi possível gerar o card do Pool.')}
+  };
+  window.sharePoolCardV143=async function(){
+    try{
+      const cv=await poolCanvasV143(),d=POOL_DATA_V143,b=await new Promise(r=>cv.toBlob(r,'image/png',.98)),caption=poolCaptionV143(d);
+      if(!b)throw new Error('Falha ao gerar imagem');
+      const f=new File([b],'Pool_Comissao_CEPI_'+String(COMM_MONTH||'mes')+'.png',{type:'image/png'});
+      if(navigator.share){
+        try{if(!navigator.canShare||navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Pool de Comissão • CE+PI',text:caption});return}}
+        catch(e){if(e?.name==='AbortError')return}
+      }
+      try{await navigator.clipboard.writeText(caption)}catch(e){}
+      const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1200);
+    }catch(e){alert('Não foi possível compartilhar o card do Pool.')}
+  };
+
   window.commission=function(){
+    injectPoolStyleV143();
     if(!commissionEligible115()){
       if(PER==='year')PER='month';
       return '<div class=card><div class=title>Comissão</div>'+commissionTabs()+
@@ -91,6 +213,12 @@
         '<div class="notice warn"><b>Obs:</b> '+CONTRACT_NOTE+'</div>'+bopisNotice115()+'</div>';
     }
     let html=typeof baseCommissionV115==='function'?baseCommissionV115():'';
+    if(isLead()){
+      html=html.replace(
+        '<div class=title>Ranking Pool • Lojas CE+PI</div><div id=poolStores',
+        '<div class=title>Ranking Pool • Lojas CE+PI</div><div class=poolRuleV143><b>Pool da loja = 3%</b> sobre a venda aprovada, descontando somente as vendas BOPIS registradas.</div><div class=poolToolbarV143><button class="btn alt" onclick="previewPoolCardV143()">Visualizar card</button><button class=btn onclick="sharePoolCardV143()">Compartilhar parcial do mês</button></div><div id=poolStores'
+      );
+    }
     return html+bopisNotice115();
   };
 
@@ -117,47 +245,38 @@
 
   window.loadPoolRankings=async function(){
     if(!isLead())return;
+    injectPoolStyleV143();
     try{
       let req={action:'pool_rankings',matricula:U.u.id,period:PER};if(PER==='month')req.month=COMM_MONTH;
       let j=await api(req),mine=j.mySupervisor,stores=j.stores||[],sups=j.supervisors||[],
           validSups=sups.filter(x=>x.poolAvailable!==false),
           avg=validSups.length?validSups.reduce((a,x)=>a+(+x.pool||0),0)/validSups.length:0,
           myAvailable=mine?mine.poolAvailable!==false:true,
-          myPartial=mine?.commissionPartial===true,
           myPool=mine&&myAvailable?+mine.pool:0;
+      POOL_DATA_V143=j;
 
-      if($('#poolKpi'))$('#poolKpi').textContent=mine&&!myAvailable?'—':money(myPool);
+      if($('#poolKpi')){$('#poolKpi').textContent=mine&&!myAvailable?'—':money(myPool);$('#poolKpi').classList.add('poolSupervisorValueV143')}
       if($('#poolTotal')){
         const indivText=$('#commIndividual')?.textContent||'';
         const indiv=indivText.includes('—')?null:+indivText.replace(/[^0-9,]/g,'').replace(',','.');
         $('#poolTotal').textContent=mine&&!myAvailable||indiv==null?'—':money(myPool+(indiv||0));
+        $('#poolTotal').classList.add('poolSupervisorValueV143');
       }
 
       if($('#poolStores'))$('#poolStores').innerHTML=stores.map((x,i)=>{
-        const available=x.poolAvailable!==false,partial=x.commissionPartial===true;
-        const baseText=available
-          ?'Base aprovada sem BOPIS: '+money(x.approved)+(partial?' • parcial verificada • '+Number(x.pendingRows||0)+' pendência(s) Tipo Entrega':'')
-          :'Base aprovada: '+money(x.grossApproved||0)+' • aguardando Tipo Entrega';
-        return '<div class=rankrow><b>'+(i+1)+'º</b><div>Filial '+esc(x.st)+
-          '<div class=muted>'+x.eligible+' supervisores elegíveis • '+baseText+
-          (available&&(+x.bopisApproved||0)>0?' • BOPIS excluído '+money(x.bopisApproved):'')+'</div></div><b>'+(available?money(x.pool):'—')+'</b></div>';
+        const bop=+x.bopisApproved||0,bopis=bop>0?'<span class=poolBopisV143>BOPIS <b>-'+money(bop)+'</b></span>':'';
+        return '<div class=poolRowV143><div class=poolRankV143>'+(i+1)+'º</div><div><div class=poolStoreV143>Filial '+esc(x.st)+'</div><div class=poolMetaV143>Base comissionável '+money(x.approved)+' • '+x.eligible+' supervisor'+(x.eligible===1?'':'es')+' elegível'+(x.eligible===1?'':'eis')+' '+bopis+'</div></div><b class=poolAmountV143>'+money(x.pool)+'</b></div>';
       }).join('');
 
       if(isAdmin()){
         if($('#poolMine'))$('#poolMine').innerHTML=sups.length?sups.map(x=>{
-          const available=x.poolAvailable!==false,partial=x.commissionPartial===true;
-          return '<div class=rankrow><b>'+x.rank+'º</b><div><b>'+esc(preferredName(x.id,x.name))+'</b><div class=muted>Filial '+esc(x.st)+' • '+esc(x.role)+(partial?' • Pool parcial verificado':(!available?' • Base BOPIS pendente':''))+'</div></div><b>'+(available?money(x.pool):'—')+'</b></div>';
+          return '<div class=rankrow><b>'+x.rank+'º</b><div><b>'+esc(preferredName(x.id,x.name))+'</b><div class=muted>Filial '+esc(x.st)+' • '+esc(x.role)+'</div></div><b class=poolSupervisorValueV143>'+money(x.pool)+'</b></div>';
         }).join(''):'<div class=muted>Sem supervisores elegíveis neste período.</div>';
         return;
       }
       if(mine){
-        if(!myAvailable){
-          if($('#poolMine'))$('#poolMine').innerHTML='<div class="notice warn"><b>Pool aguardando base com Tipo Entrega.</b><br>Ainda não há base verificada suficiente para separar e excluir BOPIS da sua filial.</div>';
-          return;
-        }
-        let partialMsg=myPartial?'<div class="notice warn"><b>Pool parcial de outubro.</b><br>Valor calculado somente sobre a base já verificada sem BOPIS. '+Number(mine.pendingRows||0)+' registro(s) ainda aguardam Tipo Entrega e serão incorporados após validação.</div>':'';
-        let msg=myPool<avg?'<div class="notice warn"><b>Tem espaço para crescer.</b><br>Seu Pool está abaixo da média regional de '+money(avg)+'.</div>':'<div class="notice success"><b>Acima da média regional!</b><br>Continue acelerando a entrega da filial e defendendo sua posição.</div>';
-        if($('#poolMine'))$('#poolMine').innerHTML='<div class=grid><div class=kpi>Minha posição<b>'+mine.rank+'º</b></div><div class=kpi>Meu Pool<b>'+money(mine.pool)+'</b><small>'+(myPartial?'Parcial verificado • BOPIS excluído':'BOPIS excluído')+'</small></div><div class=kpi>Média Regional<b>'+money(avg)+'</b></div></div>'+partialMsg+msg;
+        let msg=myPool<avg?'<div class="notice warn"><b>Tem espaço para crescer.</b><br>Seu Pool está abaixo da média regional de '+money(avg)+'. Cada venda aprovada sem BOPIS aumenta o potencial de ganho do time.</div>':'<div class="notice success"><b>Acima da média regional!</b><br>Continue acelerando a entrega da filial e defendendo sua posição.</div>';
+        if($('#poolMine'))$('#poolMine').innerHTML='<div class=grid><div class=kpi>Minha posição<b>'+mine.rank+'º</b></div><div class=kpi>Meu Pool<b class=poolSupervisorValueV143>'+money(mine.pool)+'</b><small>Base aprovada menos BOPIS</small></div><div class=kpi>Média Regional<b>'+money(avg)+'</b></div></div>'+msg;
       }else if($('#poolMine'))$('#poolMine').innerHTML='<div class=notice>Seu cadastro não está entre os supervisores elegíveis ao Pool neste período.</div>';
     }catch(e){
       if($('#poolStores'))$('#poolStores').innerHTML='<div class="notice danger">'+esc(e.message)+'</div>';
