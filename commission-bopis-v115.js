@@ -1,4 +1,4 @@
-/* ===== V115 2026-10-04: BOPIS não comissionável + transparência ===== */
+/* ===== V144 2026-10-07: Pool regional completo + card HD ===== */
 (function(){
   'use strict';
   if(window.__BOPIS_COMMISSION_V115__)return;
@@ -125,8 +125,9 @@
   }
   async function poolCanvasV143(){
     const d=await loadPoolCardDataV143(),stores=(d.stores||[]).slice().sort((a,b)=>(+b.pool||0)-(+a.pool||0));
-    const rows=stores.slice(0,8),regional=stores.reduce((s,x)=>s+(+x.pool||0),0),bopisStores=stores.filter(x=>(+x.bopisApproved||0)>0).length,top=stores[0]||{};
-    const W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');
+    const rows=stores,regional=stores.reduce((s,x)=>s+(+x.pool||0),0),bopisStores=stores.filter(x=>(+x.bopisApproved||0)>0).length,top=stores[0]||{};
+    const W=1080,cols=2,rowH=72,rowStart=558,gridRows=Math.ceil(Math.max(rows.length,1)/cols),gridBottom=rowStart+(gridRows*rowH),footerY=gridBottom+24,H=footerY+120;
+    const SCALE=2,cv=document.createElement('canvas');cv.width=W*SCALE;cv.height=H*SCALE;const x=cv.getContext('2d');x.scale(SCALE,SCALE);
     const GREEN='#173F35',GREEN2='#315E54',PAPER='#F7F5EF',WHITE='#FFFFFF',TEXT='#173F35',MUTED='#64726D',RED='#E62B2B',BORDER='#E5E2DA',GOLD='#F2CC5D',SILVER='#DFE2E1',BRONZE='#E7B686';
     x.fillStyle=PAPER;x.fillRect(0,0,W,H);
 
@@ -152,31 +153,33 @@
     poolTextV143(x,'Maior Pool da regional',765,318,'600 15px Arial',MUTED);
     poolTextV143(x,String(top.st||'—')+' • '+poolMoneyV143(top.pool||0),765,365,'900 23px Arial',TEXT);
 
-    poolRoundRectV143(x,30,462,1020,748,28,WHITE);
+    const rankBoxH=(gridBottom-462)+18;
+    poolRoundRectV143(x,30,462,1020,rankBoxH,28,WHITE);
     poolTextV143(x,'Ranking Pool por Loja',55,505,'900 30px Arial',TEXT);
+    poolTextV143(x,'Ranking completo • todas as lojas da regional',1020,505,'600 16px Arial',MUTED,'right');
 
-    let y=548;
+    const colW=480,gap=20,leftX=50;
     rows.forEach((r,i)=>{
-      poolRoundRectV143(x,50,y,980,70,13,'#FCFBF8',BORDER);
+      const col=i%2,row=Math.floor(i/2),rx=leftX+col*(colW+gap),ry=rowStart+row*rowH;
+      poolRoundRectV143(x,rx,ry,colW,60,13,'#FCFBF8',BORDER);
       const badge=i===0?GOLD:i===1?SILVER:i===2?BRONZE:'#EAF0EC';
-      poolRoundRectV143(x,64,y+12,48,46,12,badge);
-      poolTextV143(x,(i+1)+'º',88,y+35,'900 18px Arial',TEXT,'center');
-      poolTextV143(x,'Loja '+String(r.st),136,y+28,'800 18px Arial',TEXT);
-      poolTextV143(x,'Pool da loja',330,y+19,'600 12px Arial',MUTED);
-      poolTextV143(x,poolMoneyV143(r.pool),330,y+45,'900 25px Arial',TEXT);
-      poolTextV143(x,'Base comissionável',570,y+19,'600 12px Arial',MUTED);
-      poolTextV143(x,poolMoneyV143(r.approved),570,y+45,'600 17px Arial','#344B45');
-      if((+r.bopisApproved||0)>0){
-        poolRoundRectV143(x,840,y+9,82,25,13,RED);
-        poolTextV143(x,'BOPIS',881,y+21,'900 12px Arial',WHITE,'center');
-        poolTextV143(x,'-'+poolMoneyV143(r.bopisApproved).replace(/\s/g,''),1012,y+48,'900 18px Arial',RED,'right');
+      poolRoundRectV143(x,rx+12,ry+11,42,38,10,badge);
+      poolTextV143(x,(i+1)+'º',rx+33,ry+30,'900 15px Arial',TEXT,'center');
+      poolTextV143(x,'Loja '+String(r.st),rx+68,ry+20,'900 17px Arial',TEXT);
+      poolTextV143(x,poolMoneyV143(r.pool),rx+462,ry+20,'900 19px Arial',TEXT,'right');
+      const base='Base '+poolMoneyV143(r.approved);
+      poolTextV143(x,base,rx+68,ry+43,'600 12px Arial',MUTED,'left',220);
+      const bop=+r.bopisApproved||0;
+      if(bop>0){
+        poolRoundRectV143(x,rx+315,ry+34,55,18,9,RED);
+        poolTextV143(x,'BOPIS',rx+342.5,ry+43,'900 9px Arial',WHITE,'center');
+        poolTextV143(x,'-'+poolMoneyV143(bop).replace(/\s/g,''),rx+462,ry+43,'800 11px Arial',RED,'right',88);
       }
-      y+=82;
     });
 
-    poolRoundRectV143(x,30,1230,1020,95,22,GREEN);
-    poolTextV143(x,'Quanto maior a base sem BOPIS, maior o Pool da loja.',58,1265,'800 22px Arial',WHITE);
-    poolTextV143(x,'Siga acelerando a captação com qualidade para ampliar o ganho do time.',58,1298,'500 17px Arial','#E3ECE8');
+    poolRoundRectV143(x,30,footerY,1020,95,22,GREEN);
+    poolTextV143(x,'Quanto maior a base sem BOPIS, maior o Pool da loja.',58,footerY+35,'800 22px Arial',WHITE);
+    poolTextV143(x,'Siga acelerando a captação com qualidade para ampliar o ganho do time.',58,footerY+68,'500 17px Arial','#E3ECE8');
     return cv;
   }
   function poolCaptionV143(d){
