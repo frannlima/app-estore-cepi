@@ -175,3 +175,67 @@
   .performanceExecLegendActionsV131{display:grid;grid-template-columns:1fr}
   .performanceExecLegendActionsV131 button{width:100%}
 }
+
+
+/* V148 | Refinamento responsivo dos paineis FCA / Performance */
+.performancePageV130,.performancePageV130 *{box-sizing:border-box}
+.performancePageV130{width:100%;min-width:0;gap:16px}
+.performancePageV130 :is(.performancePanelV130,.performanceKpiV130,.performanceFilterV130,.performanceScopeV130,.performanceRankPanelV130){min-width:0}
+.performancePageV130 :is(h1,h2,h3,h4,p,small,span,b,strong){overflow-wrap:break-word}
+.performanceKpiV130{padding:16px;min-height:120px;border-radius:19px;gap:5px}
+.performanceKpiV130 span{font-size:11px;line-height:1.35}
+.performanceKpiV130 b{font-size:clamp(18px,1.65vw,25px);line-height:1.14;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.performanceKpiV130 small{font-size:10px;line-height:1.45;padding-top:10px}
+.performanceFilterV130,.performanceScopeV130{padding:12px;min-height:76px}
+.performanceFilterV130 label{font-size:10px;line-height:1.3}
+.performanceFilterV130 select{font-size:13px;min-height:28px;max-width:100%;text-overflow:ellipsis}
+.performanceFilterV130 small{font-size:10px;line-height:1.4}
+.performanceScopeV130{padding:6px}
+.performanceScopeV130 button{font-size:12px;line-height:1.3;padding:12px 8px;white-space:normal}
+.performancePanelV130{padding:20px}
+.performancePanelHeadV130 h3{font-size:16px;line-height:1.3}
+.performancePanelHeadV130 p{font-size:11px;line-height:1.5}
+.performanceShareCompareV130{grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr);gap:6px}
+.performanceSharePointV130{min-width:0;padding:13px 10px}
+.performanceSharePointV130 span,.performanceSharePointV130 small{font-size:10px;line-height:1.45}
+.performanceSharePointV130 b{font-size:clamp(18px,2vw,26px);font-variant-numeric:tabular-nums}
+.performanceRankGridV130{gap:16px}
+.performanceRankPanelV130{padding:0}
+.performanceRankHeaderV130{padding:17px}
+.performanceRankHeaderV130 h3{font-size:14px;line-height:1.3}
+.performanceRankHeaderV130 small{font-size:10px}
+.performanceRankRowV130{grid-template-columns:30px minmax(0,1fr) minmax(70px,auto);gap:10px;padding:13px 15px}
+.performanceRankRowV130 .main b{font-size:12px;line-height:1.35;white-space:normal;overflow:visible;text-overflow:clip}
+.performanceRankRowV130 .main small{font-size:10px;line-height:1.35;white-space:normal;overflow:visible;text-overflow:clip}
+.performanceRankRowV130 .value{min-width:70px;max-width:112px}
+.performanceRankRowV130 .value b{font-size:13px;font-variant-numeric:tabular-nums}
+.performanceRankRowV130 .value small{font-size:10px;line-height:1.35}
+.performanceExecutivePreviewV130{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;padding:18px}
+.performanceExecutivePreviewV130 section{min-width:0;padding:14px}
+.performanceExecutivePreviewV130 p{font-size:11px;line-height:1.55}
+.performanceExecutivePreviewV130 h4{font-size:10px}
+.performanceExecutiveMiniKpisV130 b{font-size:14px;overflow-wrap:anywhere}
+.performanceExecutiveMiniKpisV130 span,.performanceExecutiveMiniKpisV130 small{font-size:9px;line-height:1.4}
+.performanceActionAddV130{grid-template-columns:minmax(0,1fr) auto}
+.performanceActionAddV130 input{min-width:0;font-size:12px}
+.performanceActionAddV130 button{font-size:11px;min-height:40px}
+.performancePageV130 button{max-width:100%}
+@media(min-width:1250px){
+ .performancePageV130 .performanceFiltersV130{grid-template-columns:minmax(210px,1.25fr) repeat(3,minmax(150px,1fr));gap:12px}
+ .performancePageV130 .performanceKpisV130{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+ .performancePageV130 .performanceGridV130{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+ .performancePageV130 .performanceGridV130>.performancePanelV130:last-child{grid-column:1/-1}
+ .performancePageV130 .performanceRankGridV130{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(min-width:700px) and (max-width:1249px){
+ .performancePageV130 .performanceFiltersV130{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .performancePageV130 .performanceKpisV130{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .performancePageV130 .performanceGridV130,.performancePageV130 .performanceRankGridV130{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .performancePageV130 .performanceGridV130>.performancePanelV130:last-child,.performancePageV130 .performanceRankGridV130>.performanceRankPanelV130:last-child{grid-column:1/-1}
+}
+@media(max-width:699px){
+ .performancePageV130 .performanceKpiV130{min-height:110px;padding:12px}
+ .performancePageV130 .performanceKpiV130 b{font-size:20px}
+ .performancePageV130 .performanceGridV130,.performancePageV130 .performanceRankGridV130{grid-template-columns:minmax(0,1fr)}
+ .performancePageV130 .performanceExecutivePreviewV130{grid-template-columns:minmax(0,1fr)}
+}
