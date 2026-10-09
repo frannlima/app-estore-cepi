@@ -2494,3 +2494,113 @@ showCampaignPopupV37=function(){
   };
   styles108();
 })();
+
+
+/* V149 | Alertas sonoros e hapticos para atualizacoes e compartilhamentos.
+   Os navegadores so permitem som apos interacao; vibracao depende do aparelho. */
+(function(){
+ if(window.__ESTORE_ALERT_V149__)return;
+ window.__ESTORE_ALERT_V149__=true;
+ const PREF='estore_alert_preferences_v149', STATE='estore_alert_snapshot_v149';
+ let preferences={sound:true,vibration:true};
+ try{preferences=Object.assign(preferences,JSON.parse(localStorage.getItem(PREF)||'{}'))}catch(_){}
+ let lastUser='',baseline=null,pollBusy=false,unlocked=false,audio=null;
+ function getUser(){return String(window.U?.u?.id||'')}
+ function savePref(){try{localStorage.setItem(PREF,JSON.stringify(preferences))}catch(_){}}
+ function hash(v){return JSON.stringify(v==null?null:v)}
+ function dateKey(){return new Date().toISOString().slice(0,10)}
+ async function request(action,id){
+   const response=await fetch(window.ESTORE_API||'https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-api',{
+     method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',
+     body:JSON.stringify({action,matricula:id})
+   });
+   if(!response.ok)throw new Error('Falha ao consultar '+action);
+   const data=await response.json();if(!data.ok)throw new Error(data.error||'Consulta indisponivel');
+   return data;
+ }
+ function unlock(){
+   unlocked=true;
+   try{
+     const C=window.AudioContext||window.webkitAudioContext;
+     if(C){audio=audio||new C();if(audio.state==='suspended')audio.resume().catch(()=>{});}
+   }catch(_){}
+ }
+ document.addEventListener('pointerdown',unlock,{passive:true});
+ document.addEventListener('keydown',unlock);
+ function signal(){
+   if(preferences.vibration&&navigator.vibrate)try{navigator.vibrate([420,170,520,170,580])}catch(_){}
+   if(preferences.sound&&unlocked&&audio){
+     try{
+       if(audio.state==='suspended')audio.resume().catch(()=>{});
+       [0,.22,.44].forEach(function(t,i){
+         const o=audio.createOscillator(),g=audio.createGain(),at=audio.currentTime+t;
+         o.type='sine';o.frequency.value=[660,790,950][i];
+         g.gain.setValueAtTime(.0001,at);g.gain.exponentialRampToValueAtTime(.11,at+.025);
+         g.gain.exponentialRampToValueAtTime(.0001,at+.16);
+         o.connect(g);g.connect(audio.destination);o.start(at);o.stop(at+.17);
+       });
+     }catch(_){}
+   }
+ }
+ function toast(text){
+   if(document.getElementById('estoreAlertToastV149'))return;
+   const el=document.createElement('div');el.id='estoreAlertToastV149';
+   el.setAttribute('role','status');el.textContent='🔔 '+text;
+   Object.assign(el.style,{position:'fixed',right:'18px',bottom:'85px',zIndex:'99999',background:'#173F35',
+     color:'#fff',borderRadius:'16px',padding:'14px 18px',boxShadow:'0 12px 35px #173f353d',
+     font:'700 13px/1.4 system-ui',maxWidth:'min(350px,calc(100vw - 30px))'});
+   document.body.appendChild(el);setTimeout(()=>el.remove(),6500);
+ }
+ function extract(d){
+   const notices=(d[0]?.items||[]).map(x=>String(x.id||x.created_at||x.title||'')).sort();
+   const posts=(d[1]?.items||[]).map(x=>String(x.id||'')).sort();
+   const content=d[2]||{};
+   const info=(content.importantInfo||content.important_info||[]).map(x=>String(x.id||x.updated_at||x.title||'')).sort();
+   const campaign=(content.campaigns||[]).map(x=>String(x.id||x.updated_at||x.title||'')).sort();
+   const dashboard=d[3]||{};
+   const asof=String(dashboard.common?.asof||dashboard.asof||dashboard.common?.date||'');
+   return {notices,posts,info,campaign,asof};
+ }
+ function changed(next,prev){
+   if(next.notices.some(x=>!prev.notices.includes(x)))return 'Novo aviso ou compartilhamento eStore';
+   if(next.posts.some(x=>!prev.posts.includes(x)))return 'Nova publicacao na Conexao eStore';
+   if(next.info.some(x=>!prev.info.includes(x))||next.campaign.some(x=>!prev.campaign.includes(x)))
+     return 'Novas informacoes ou campanhas disponiveis';
+   if(next.asof&&prev.asof&&next.asof!==prev.asof)return 'Resultado eStore atualizado';
+   return '';
+ }
+ async function poll(){
+   if(pollBusy||document.hidden||!getUser()||getUser()==='0000000')return;
+   const id=getUser();pollBusy=true;
+   try{
+     const results=await Promise.allSettled(['notifications_get','community_get','content_get','dashboard'].map(a=>request(a,id)));
+     // Nunca sinalizar alteracoes com amostra incompleta.
+     if(results.some(x=>x.status!=='fulfilled'))return;
+     const snap=extract(results.map(x=>x.value));
+     if(id!==lastUser){lastUser=id;baseline=null}
+     if(!baseline){baseline=snap;return}
+     const event=changed(snap,baseline);baseline=snap;
+     if(event){signal();toast(event);if(typeof window.loadNotificationsV14==='function')window.loadNotificationsV14().catch(()=>{});}
+   }catch(_){/* falha de rede nao e notificacao */}
+   finally{pollBusy=false}
+ }
+ function settings(){
+   const box=document.createElement('div');box.id='estoreAlertSettingsV149';
+   box.style.cssText='position:fixed;right:16px;bottom:16px;z-index:99980;background:#fff;border:1px solid #dcded8;border-radius:18px;padding:12px;box-shadow:0 8px 24px #173f3522;font:12px system-ui;color:#173F35;max-width:calc(100vw - 32px)';
+   box.innerHTML='<button type="button" id="estoreAlertSettingsToggleV149" aria-expanded="false" style="border:0;background:#173F35;color:white;border-radius:13px;padding:10px 13px;font-weight:800;cursor:pointer">🔔 Alertas</button><div id="estoreAlertSettingsBodyV149" hidden style="padding-top:12px;min-width:195px"><strong>Alertas do eStore</strong><label style="display:block;margin-top:12px"><input type="checkbox" id="estoreAlertSoundV149"> Som</label><label style="display:block;margin-top:10px"><input type="checkbox" id="estoreAlertVibrateV149"> Vibração</label><button type="button" id="estoreAlertTestV149" style="margin-top:12px;border:0;border-radius:9px;background:#eef3ef;color:#173F35;padding:8px 11px;font-weight:700">Testar alerta</button><p style="max-width:230px;line-height:1.4;font-size:10px;color:#68736e">Som depende de interação prévia. Vibração está disponível somente em aparelhos e navegadores compatíveis.</p></div>';
+   document.body.appendChild(box);
+   const toggle=box.querySelector('#estoreAlertSettingsToggleV149'),body=box.querySelector('#estoreAlertSettingsBodyV149');
+   toggle.onclick=()=>{body.hidden=!body.hidden;toggle.setAttribute('aria-expanded',String(!body.hidden))};
+   const sound=box.querySelector('#estoreAlertSoundV149'),vib=box.querySelector('#estoreAlertVibrateV149');
+   sound.checked=preferences.sound;vib.checked=preferences.vibration;
+   sound.onchange=()=>{preferences.sound=sound.checked;savePref();unlock()};
+   vib.onchange=()=>{preferences.vibration=vib.checked;savePref()};
+   box.querySelector('#estoreAlertTestV149').onclick=()=>{unlock();signal();toast('Alerta de teste')};
+ }
+ function init(){
+   if(!document.body)return;
+   settings();poll();setInterval(poll,90000);
+   document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
