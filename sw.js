@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v147';
-const BUILD='v147';
+const CACHE='estore-cepi-shell-v148';
+const BUILD='v148';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v133';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v133';
@@ -10,7 +10,7 @@ const TEAM_COLLAPSE_SCRIPT='./team-collapse-v116.js?build=v116';
 const TEAM_AREA_REGIONAL_SCRIPT='./team-area-regional-v117.js?build=v117';
 const BOPIS_ANALYTICS_SCRIPT='./bopis-analytics-v117.js?build=v142';
 const VOICE_SCRIPT='./voice-v123.js?build=v133';
-const MEU_ACOMPANHAMENTO_BRIDGE='./bridge-meu-acompanhamento-v1.js?build=v147';
+const MEU_ACOMPANHAMENTO_BRIDGE='./bridge-meu-acompanhamento-v1.js?build=v148';
 const SHELL=['./presentation-v103.js','./hourly-meta-v104.js','./team-v112.js','./team-store-v113.js','./commission-eligibility-v114.js','./commission-bopis-v146.js','./team-collapse-v116.js','./team-area-regional-v117.js','./bopis-analytics-v117.js','./voice-v123.js','./bridge-meu-acompanhamento-v1.js','./performance-v130.js','./performance-v130.css','./celebrations-v134.js','./celebrations-v134.css','./assets/campaign-popup-v86.svg','./assets/campaign-hero-v84.svg','./assets/riachuelo-logo-exact-v75.svg','./assets/riachuelo-logo-horizontal-oficial-v133.svg','./assets/riachuelo-logo-horizontal-oficial-white-v133.svg','./assets/campaign-share-v76.svg','./assets/campaign-share-v75.jpg','./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon-v136.svg','./desktop-v136.css','./icon.svg','./riachuelo-horizontal-oficial.png'];
 
 function injectAppV104(html){
@@ -27,7 +27,7 @@ function injectAppV104(html){
     .replace(/\n?<script[^>]+src=["']\.\/bopis-analytics-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
     .replace(/\n?<script[^>]+src=["']\.\/voice-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
     .replace(/src=["']\.\/app-v2\.js(?:\?[^"']*)?["']/gi,'src="./app-v2.js?build='+BUILD+'"');
-  const tags='\n<script src="'+PRESENTATION_SCRIPT+'"></script>\n<script src="'+HOURLY_META_SCRIPT+'"></script>\n<script src="'+TEAM_SCRIPT+'"></script>\n<script src="'+TEAM_STORE_SCRIPT+'"></script>\n<script src="'+COMMISSION_ELIGIBILITY_SCRIPT+'"></script>\n<script src="'+COMMISSION_BOPIS_SCRIPT+'"></script>\n<script src="'+TEAM_COLLAPSE_SCRIPT+'"></script>\n<script src="'+TEAM_AREA_REGIONAL_SCRIPT+'"></script>\n<script src="'+BOPIS_ANALYTICS_SCRIPT+'"></script>\n<script src="'+VOICE_SCRIPT+'"></script>\n';
+  const tags='\n<script src="'+PRESENTATION_SCRIPT+'"></script>\n<script src="'+HOURLY_META_SCRIPT+'"></script>\n<script src="'+TEAM_SCRIPT+'"></script>\n<script src="'+TEAM_STORE_SCRIPT+'"></script>\n<script src="'+COMMISSION_ELIGIBILITY_SCRIPT+'"></script>\n<script src="'+COMMISSION_BOPIS_SCRIPT+'"></script>\n<script src="'+TEAM_COLLAPSE_SCRIPT+'"></script>\n<script src="'+TEAM_AREA_REGIONAL_SCRIPT+'"></script>\n<script src="'+BOPIS_ANALYTICS_SCRIPT+'"></script>\n<script src="'+VOICE_SCRIPT+'"></script>\n<script src="'+MEU_ACOMPANHAMENTO_BRIDGE+'"></script>\n';
   return html.replace(/<\/body>\s*<\/html>\s*$/i, tags+'</body></html>');
 }
 async function htmlResponseWithInjection(res){
