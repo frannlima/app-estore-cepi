@@ -2505,7 +2505,7 @@ showCampaignPopupV37=function(){
  let preferences={sound:true,vibration:true};
  try{preferences=Object.assign(preferences,JSON.parse(localStorage.getItem(PREF)||'{}'))}catch(_){}
  let lastUser='',baseline=null,pollBusy=false,unlocked=false,audio=null;
- function getUser(){return String(window.U?.u?.id||'')}
+ function getUser(){return String(typeof U!=='undefined'&&U?.u?.id||'')}
  function savePref(){try{localStorage.setItem(PREF,JSON.stringify(preferences))}catch(_){}}
  function hash(v){return JSON.stringify(v==null?null:v)}
  function dateKey(){return new Date().toISOString().slice(0,10)}
@@ -2575,11 +2575,18 @@ showCampaignPopupV37=function(){
    try{
      const results=await Promise.allSettled(['notifications_get','community_get','content_get','dashboard'].map(a=>request(a,id)));
      // Nunca sinalizar alteracoes com amostra incompleta.
-     if(results.some(x=>x.status!=='fulfilled'))return;
-     const snap=extract(results.map(x=>x.value));
+     if(results.every(x=>x.status!=='fulfilled'))return;
+     const values=results.map(x=>x.status==='fulfilled'?x.value:null);
+     const snap=extract(values);
+     const available=results.map(x=>x.status==='fulfilled');
      if(id!==lastUser){lastUser=id;baseline=null}
      if(!baseline){baseline=snap;return}
-     const event=changed(snap,baseline);baseline=snap;
+     const stable={...snap};
+     ['notices','posts','info','campaign','asof'].forEach((key)=>{
+       const idx=key==='notices'?0:key==='posts'?1:key==='asof'?3:2;
+       if(!available[idx])stable[key]=baseline[key];
+     });
+     const event=changed(stable,baseline);baseline=stable;
      if(event){signal();toast(event);if(typeof window.loadNotificationsV14==='function')window.loadNotificationsV14().catch(()=>{});}
    }catch(_){/* falha de rede nao e notificacao */}
    finally{pollBusy=false}
