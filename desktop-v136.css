@@ -88,3 +88,26 @@
   #shell.homeMode .wrap{max-width:1160px}
   .campaignHeroV34{height:520px}
 }
+
+
+/* V148 | Legibilidade desktop - eStore CE+PI; preserva dispositivos moveis */
+@media(min-width:700px){
+ #shell:not(.homeMode) .wrap{width:100%;max-width:1480px;padding-left:clamp(18px,3vw,48px)!important;padding-right:clamp(18px,3vw,48px)!important}
+ #shell:not(.homeMode) #view{width:100%;min-width:0}
+ #shell:not(.homeMode) #view :is(.card,.panel,section,article){min-width:0;box-sizing:border-box}
+ #shell:not(.homeMode) #view :is(.metricGridV3,.metaSnapshotV4,.teamKpisV26){gap:14px}
+ #shell:not(.homeMode) #view .metricCardV3{min-width:0;min-height:115px;padding:18px;border-radius:20px}
+ #shell:not(.homeMode) #view .metricCardV3 b{font-size:clamp(19px,1.65vw,27px);line-height:1.2;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+ #shell:not(.homeMode) #view .metricCardV3 :is(span,small){line-height:1.4}
+ #shell:not(.homeMode) #view .teamRankV3>div{min-width:0}
+ #shell:not(.homeMode) #view :is(.teamRankV3,.rankV3) b{overflow-wrap:anywhere}
+ #shell:not(.homeMode) #view .card{border-radius:22px}
+ #shell:not(.homeMode) #view :is(.card,.performancePanelV130){box-shadow:0 8px 28px rgba(23,63,53,.055)}
+ #shell:not(.homeMode) #view table{border-collapse:separate;border-spacing:0;width:100%;font-variant-numeric:tabular-nums}
+ #shell:not(.homeMode) #view th{line-height:1.35;white-space:normal}
+ #shell:not(.homeMode) #view td{line-height:1.45;overflow-wrap:break-word}
+ #shell:not(.homeMode) #view :is(.tableScroll,.tableWrap,.tableResponsive){max-width:100%;overflow-x:auto}
+}
+@media(min-width:700px) and (max-width:1100px){
+ #shell:not(.homeMode) #view .metricGridV3{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
