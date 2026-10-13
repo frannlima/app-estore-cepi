@@ -94,6 +94,7 @@
           pwd=document.getElementById('bopisImportPwdV117')?.value||'',
           out=document.getElementById('bopisImportOutV117');
     if(!file){if(out)out.innerHTML='<div class="notice warn">Selecione o relatório BOPIS.</div>';return}
+    if(!pwd.trim()){if(out)out.innerHTML='<div class="notice warn">Informe a senha administrativa para importar o relatório BOPIS.</div>';return}
     if(out)out.innerHTML='<div class=notice>Importando relatório e recalculando o Pool...</div>';
     try{
       const fd=new FormData();
@@ -101,7 +102,15 @@
       fd.append('matricula',String(U.u.id));
       fd.append('password',pwd);
       fd.append('bopis_report',file);
-      const r=await fetch(ESTORE_API,{method:'POST',body:fd}),j=await r.json();
+      // O módulo BOPIS pode ser carregado sem o script que declara ESTORE_API.
+      // Prioriza a configuração utilizada pelo runtime principal do eStore.
+      const endpoint=(
+        (typeof API==='string'&&API.trim())||
+        (typeof window.API==='string'&&window.API.trim())||
+        (typeof window.ESTORE_API==='string'&&window.ESTORE_API.trim())||
+        'https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-api'
+      );
+      const r=await fetch(endpoint,{method:'POST',body:fd}),j=await r.json();
       if(!r.ok||!j.ok)throw new Error(j.error||'Falha ao importar relatório BOPIS.');
       if(out)out.innerHTML='<div class="notice success"><b>Relatório incorporado.</b><br>'+esc(j.rows)+' registro(s) • '+esc(j.stores)+' loja(s) • '+fmtMoney117(j.approved)+' BOPIS descontado da base do Pool.</div>';
       BOPIS_DATA_V117=await loadBopisV117(BOPIS_SEARCH_V117);
