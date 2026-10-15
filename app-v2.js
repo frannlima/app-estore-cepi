@@ -575,7 +575,7 @@ async function submitHourlyV5(){
  try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'hourly_submit',matricula:String(U.u.id),store_code:String(U.u.st),result_date:d,captured:c,orders:o,store_sales:ss})}),j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Não foi possível registrar.');out.innerHTML='<div class=notice>Atualização registrada.</div>';await loadHourlyV5()}catch(e){out.innerHTML='<p class=bad>'+escV3(e.message||e)+'</p>'}
 }
 async function loadHourlyV5(){
- const d=$('#hourDateV5')?.value||localIsoV4();try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'hourly_get',result_date:d})}),j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Falha ao carregar.');HOURLY_CACHE=j;renderHourlyV5()}catch(e){$('#hourlyDashboardV5').innerHTML='<div class=card><p class=bad>'+escV3(e.message||e)+'</p></div>'}
+ const d=$('#hourDateV5')?.value||localIsoV4();try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'hourly_get',matricula:String(U?.u?.id||''),result_date:d})}),j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Falha ao carregar.');HOURLY_CACHE=j;renderHourlyV5()}catch(e){$('#hourlyDashboardV5').innerHTML='<div class=card><p class=bad>'+escV3(e.message||e)+'</p></div>'}
 }
 function setHourlySortV5(v){HOURLY_SORT=v;renderHourlyV5()}
 function hourlySortValueV5(x){return HOURLY_SORT==='sales'?x.captured:HOURLY_SORT==='share'?x.share:x.att}
