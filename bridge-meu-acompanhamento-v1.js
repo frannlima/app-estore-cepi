@@ -109,4 +109,41 @@
   }else{
     setTimeout(launch,120);
   }
+
+  // Os dois aplicativos escrevem na mesma tabela oficial; emitir apenas sinal de atualização.
+  function broadcastHourlyUpdate(){
+    try{
+      localStorage.setItem("estore_hourly_changed_v3",JSON.stringify({
+        store:String(U?.u?.st||""),date:localIsoV4(),at:Date.now()
+      }));
+    }catch(_){}
+  }
+  function hourlyOpen(){
+    return !document.hidden && !!document.getElementById("hourlyDashboardV5") &&
+      typeof U!=="undefined" && !!U?.u?.id;
+  }
+  let lastSync=0;
+  function refreshHourlyIfOpen(force=false){
+    if(!hourlyOpen()||typeof window.loadHourlyV5!=="function")return;
+    if(!force&&Date.now()-lastSync<30000)return;
+    lastSync=Date.now();
+    void window.loadHourlyV5();
+  }
+  if(typeof window.submitHourlyV5==="function"){
+    const originalSubmit=window.submitHourlyV5;
+    window.submitHourlyV5=async function(){
+      const answer=await originalSubmit.apply(this,arguments);
+      const message=document.getElementById("hourOutV5")?.textContent||"";
+      if(/atualização adicionada ao acumulado/i.test(message))broadcastHourlyUpdate();
+      return answer;
+    };
+  }
+  window.addEventListener("storage",event=>{
+    if(event.key==="estore_hourly_changed_v3")refreshHourlyIfOpen(true);
+  });
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden)refreshHourlyIfOpen(true)});
+  window.addEventListener("focus",()=>refreshHourlyIfOpen(true));
+  window.addEventListener("pageshow",()=>refreshHourlyIfOpen(true));
+  setInterval(()=>refreshHourlyIfOpen(false),30000);
+
 })();
