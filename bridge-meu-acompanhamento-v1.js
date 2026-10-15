@@ -24,39 +24,47 @@
     }catch(_){}
   }
 
-  // Só oferece retorno contextual quando a sessão chegou pelo Meu Acompanhamento.
-  // Faixa no fluxo do layout: não cobre os dados durante a rolagem.
-  const linkedEntry=source==="meu-acompanhamento";
+  // Persistir a origem também após o redirecionamento remover "?from=" da URL.
+  // A chave é de sessão da aba: o acesso direto em uma nova aba não ganha
+  // controles de retorno desnecessários.
+  const linkedEntry=source==="meu-acompanhamento" || (()=>{
+    try{return sessionStorage.getItem("estore_entry_source")==="meu-acompanhamento";}catch(_){return false;}
+  })();
+
+  function ensureReturnStyle(){
+    if(document.getElementById("maReturnStyleV3"))return;
+    const style=document.createElement("style");
+    style.id="maReturnStyleV3";
+    style.textContent=[
+      // Legado: não permitir que o botão grande volte a ficar sobre o conteúdo.
+      "#backMeuAcompanhamentoV2{display:none!important}",
+      // Barra inserida no fluxo, sem position:fixed nem sticky. Rola com a página.
+      "#maReturnBarV3{box-sizing:border-box;position:relative!important;top:auto!important;z-index:1;"+
+        "display:flex;align-items:center;justify-content:space-between;gap:10px;"+
+        "width:100%;padding:7px 13px;min-height:44px;"+
+        "background:#173F35;color:#fff;border-bottom:1px solid rgba(255,255,255,.15)}",
+      "#maReturnBarV3 *{box-sizing:border-box}",
+      "#maReturnBarV3 .ma-return-action{display:inline-flex;align-items:center;gap:7px;"+
+        "min-height:30px;padding:6px 10px;max-width:calc(100% - 92px);"+
+        "border:1px solid rgba(255,255,255,.24);border-radius:999px;"+
+        "background:rgba(255,255,255,.08);color:#fff;"+
+        "font:700 11px/1.2 system-ui,Arial,sans-serif;white-space:nowrap;cursor:pointer}",
+      "#maReturnBarV3 .ma-return-action:focus-visible{outline:2px solid #FF9B13;outline-offset:3px}",
+      "#maReturnBarV3 .ma-return-arrow{font-size:15px;font-weight:600;line-height:1}",
+      "#maReturnBarV3 .ma-return-brand{width:84px;max-height:22px;object-fit:contain}",
+      "@media(max-width:380px){#maReturnBarV3{padding:6px 10px;gap:6px}"+
+        "#maReturnBarV3 .ma-return-action{font-size:10px;padding:6px 9px;max-width:calc(100% - 79px)}"+
+        "#maReturnBarV3 .ma-return-brand{width:75px}}"
+    ].join("\n");
+    document.head.appendChild(style);
+  }
+
   function mountReturnBar(){
-    const old=document.getElementById("backMeuAcompanhamentoV2");
-    if(old)old.remove();
+    document.getElementById("backMeuAcompanhamentoV2")?.remove();
     if(!linkedEntry)return;
     const view=document.getElementById("view");
-    if(!view||!view.parentElement)return;
-    if(document.getElementById("maReturnBarV3"))return;
-    if(!document.getElementById("maReturnStyleV3")){
-      const style=document.createElement("style");
-      style.id="maReturnStyleV3";
-      style.textContent=[
-        "#maReturnBarV3{box-sizing:border-box;position:sticky;top:0;z-index:90;"+
-          "display:flex;align-items:center;justify-content:space-between;gap:12px;"+
-          "padding:7px 14px;min-height:48px;background:#173F35;color:#fff;"+
-          "border-bottom:1px solid rgba(255,255,255,.14)}",
-        "#maReturnBarV3 *{box-sizing:border-box}",
-        "#maReturnBarV3 .ma-return-action{display:inline-flex;align-items:center;gap:7px;"+
-          "min-height:34px;padding:7px 12px;max-width:calc(100% - 112px);"+
-          "border:1px solid rgba(255,255,255,.26);border-radius:999px;"+
-          "background:rgba(255,255,255,.09);color:#fff;font:700 12px/1.2 system-ui,Arial,sans-serif;"+
-          "white-space:nowrap;cursor:pointer}",
-        "#maReturnBarV3 .ma-return-action:focus-visible{outline:2px solid #FF9B13;outline-offset:3px}",
-        "#maReturnBarV3 .ma-return-arrow{font-size:16px;font-weight:600;line-height:1}",
-        "#maReturnBarV3 .ma-return-brand{max-width:95px;width:24%;max-height:23px;object-fit:contain}",
-        "@media(max-width:380px){#maReturnBarV3{padding:6px 10px;min-height:46px;gap:6px}"+
-          "#maReturnBarV3 .ma-return-action{font-size:11px;padding:7px 9px;max-width:calc(100% - 86px)}"+
-          "#maReturnBarV3 .ma-return-brand{max-width:79px}}"
-      ].join("\n");
-      document.head.appendChild(style);
-    }
+    if(!view?.parentElement||document.getElementById("maReturnBarV3"))return;
+    ensureReturnStyle();
     const row=document.createElement("div");
     row.id="maReturnBarV3";
     row.setAttribute("aria-label","Retorno ao Meu Acompanhamento");
@@ -68,50 +76,59 @@
     view.parentElement.insertBefore(row,view);
   }
 
-  // Remover APENAS o botão branco "Voltar" que flutua no canto inferior
-  // (caso seja produzido por outras rotinas do app). Nunca remover a navegação
-  // nativa do rodapé nem botões "Voltar" de páginas ou modais.
-  function dismissLegacyFloatingBack(){
-    if(!linkedEntry)return;
-    const candidates=document.querySelectorAll("button,a,[role='button']");
-    for(const button of candidates){
-      if(button.closest("#maReturnBarV3"))continue;
-      const title=String(button.textContent||button.getAttribute("aria-label")||"")
-        .replace(/\s+/g," ").trim();
-      if(!/^(?:←|↩|⟵|‹)?\s*Voltar$/i.test(title))continue;
-      let fixed=null,node=button;
-      for(let i=0;i<5&&node;i++,node=node.parentElement){
-        if(getComputedStyle(node).position==="fixed"){fixed=node;break;}
-      }
-      if(!fixed)continue;
+  // Remover o controle EXTRA "← Voltar" sobreposto ao conteúdo, independente
+  // de o CSS legado usar position:fixed, sticky, absolute ou um contêiner.
+  // Não alterar menus de navegação e botões Voltar dentro de modais/formulários.
+  function dismissObstructingBack(){
+    document.getElementById("backMeuAcompanhamentoV2")?.remove();
+    const width=window.innerWidth||document.documentElement.clientWidth;
+    const height=window.innerHeight||document.documentElement.clientHeight;
+    document.querySelectorAll("button,a,[role='button']").forEach(button=>{
+      if(button.closest("#maReturnBarV3,nav,#nav,.bottom,[role='dialog'],[aria-modal='true']"))return;
+      const label=String(button.textContent||button.getAttribute("aria-label")||"")
+        .replace(/[\u2190\u21a9\u27f5\u2039]/g,"").replace(/\s+/g," ").trim();
+      if(!/^voltar$/i.test(label))return;
       const rect=button.getBoundingClientRect();
-      if(!rect.width||!rect.height)continue;
-      const nearBottom=rect.bottom>window.innerHeight-320&&rect.top>window.innerHeight*.45;
-      const nearRight=rect.right>window.innerWidth*.55;
-      if(!nearBottom||!nearRight)continue;
-      const wrapper=fixed!==button&&fixed.querySelectorAll("button,a,[role='button']").length===1?fixed:button;
-      wrapper.remove();
-    }
+      if(!rect.width||!rect.height)return;
+      const atBottomRight=rect.left>width*.52 && rect.right>width*.77 &&
+        rect.top>height*.55 && rect.bottom>height*.67;
+      if(!atBottomRight)return;
+      let fixedContainer=null;
+      for(let node=button,level=0;node&&level<7;node=node.parentElement,level++){
+        const position=getComputedStyle(node).position;
+        if(position==="fixed"||position==="sticky"){fixedContainer=node;break;}
+      }
+      // A sobreposição foi confirmada pela posição inferior direita. Não
+      // depender apenas de position:fixed: alguns temas usam absolute.
+      const container=fixedContainer&&fixedContainer!==button&&
+        fixedContainer.querySelectorAll("button,a,[role='button']").length===1
+          ?fixedContainer:button;
+      container.remove();
+    });
   }
-  let cleanupFrame=0;
-  function scheduleReturnLayout(){
-    if(cleanupFrame)return;
-    cleanupFrame=requestAnimationFrame(()=>{
-      cleanupFrame=0;
+
+  let pendingScan=false;
+  function scanReturnLayout(){
+    if(pendingScan)return;
+    pendingScan=true;
+    requestAnimationFrame(()=>{
+      pendingScan=false;
       mountReturnBar();
-      dismissLegacyFloatingBack();
+      dismissObstructingBack();
     });
   }
   function enableReturnLayout(){
-    if(!linkedEntry)return;
-    scheduleReturnLayout();
+    ensureReturnStyle();
+    scanReturnLayout();
     const observer=new MutationObserver(mutations=>{
-      // Ignorar mudanças de texto e atributos: observar somente novas interfaces.
-      if(mutations.some(m=>m.addedNodes.length||m.removedNodes.length))scheduleReturnLayout();
+      if(mutations.some(m=>m.addedNodes.length||m.removedNodes.length))scanReturnLayout();
     });
     observer.observe(document.body,{childList:true,subtree:true});
-    window.addEventListener("pageshow",scheduleReturnLayout);
-    window.addEventListener("resize",scheduleReturnLayout,{passive:true});
+    window.addEventListener("pageshow",scanReturnLayout);
+    window.addEventListener("resize",scanReturnLayout,{passive:true});
+    // Alguns componentes só surgem ao rolar/abrir menus, sem novos nós no DOM.
+    document.addEventListener("scroll",scanReturnLayout,{passive:true});
+    setInterval(scanReturnLayout,3500);
   }
 
   function userReady(){
