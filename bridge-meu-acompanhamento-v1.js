@@ -24,24 +24,94 @@
     }catch(_){}
   }
 
-  function ensureBackButton(){
-    let btn=document.getElementById("backMeuAcompanhamentoV2");
-    if(btn) return btn;
-    btn=document.createElement("button");
-    btn.id="backMeuAcompanhamentoV2";
-    btn.type="button";
-    btn.setAttribute("aria-label","Voltar para Meu Acompanhamento");
-    btn.innerHTML='<span aria-hidden="true">←</span><b>Meu Acompanhamento</b>';
-    btn.style.cssText=[
-      "position:fixed","left:max(10px,env(safe-area-inset-left))","top:max(10px,env(safe-area-inset-top))",
-      "z-index:2147483000","display:flex","align-items:center","gap:7px","min-height:38px",
-      "padding:7px 11px","border:1px solid rgba(255,255,255,.42)","border-radius:999px",
-      "background:#173F35","color:#fff","font:700 11px Arial,sans-serif",
-      "box-shadow:0 8px 22px rgba(23,63,53,.22)","cursor:pointer"
-    ].join(";");
-    btn.onclick=function(){location.href=MAIN_URL};
-    document.body.appendChild(btn);
-    return btn;
+  // Só oferece retorno contextual quando a sessão chegou pelo Meu Acompanhamento.
+  // Faixa no fluxo do layout: não cobre os dados durante a rolagem.
+  const linkedEntry=source==="meu-acompanhamento";
+  function mountReturnBar(){
+    const old=document.getElementById("backMeuAcompanhamentoV2");
+    if(old)old.remove();
+    if(!linkedEntry)return;
+    const view=document.getElementById("view");
+    if(!view||!view.parentElement)return;
+    if(document.getElementById("maReturnBarV3"))return;
+    if(!document.getElementById("maReturnStyleV3")){
+      const style=document.createElement("style");
+      style.id="maReturnStyleV3";
+      style.textContent=[
+        "#maReturnBarV3{box-sizing:border-box;position:sticky;top:0;z-index:90;"+
+          "display:flex;align-items:center;justify-content:space-between;gap:12px;"+
+          "padding:7px 14px;min-height:48px;background:#173F35;color:#fff;"+
+          "border-bottom:1px solid rgba(255,255,255,.14)}",
+        "#maReturnBarV3 *{box-sizing:border-box}",
+        "#maReturnBarV3 .ma-return-action{display:inline-flex;align-items:center;gap:7px;"+
+          "min-height:34px;padding:7px 12px;max-width:calc(100% - 112px);"+
+          "border:1px solid rgba(255,255,255,.26);border-radius:999px;"+
+          "background:rgba(255,255,255,.09);color:#fff;font:700 12px/1.2 system-ui,Arial,sans-serif;"+
+          "white-space:nowrap;cursor:pointer}",
+        "#maReturnBarV3 .ma-return-action:focus-visible{outline:2px solid #FF9B13;outline-offset:3px}",
+        "#maReturnBarV3 .ma-return-arrow{font-size:16px;font-weight:600;line-height:1}",
+        "#maReturnBarV3 .ma-return-brand{max-width:95px;width:24%;max-height:23px;object-fit:contain}",
+        "@media(max-width:380px){#maReturnBarV3{padding:6px 10px;min-height:46px;gap:6px}"+
+          "#maReturnBarV3 .ma-return-action{font-size:11px;padding:7px 9px;max-width:calc(100% - 86px)}"+
+          "#maReturnBarV3 .ma-return-brand{max-width:79px}}"
+      ].join("\n");
+      document.head.appendChild(style);
+    }
+    const row=document.createElement("div");
+    row.id="maReturnBarV3";
+    row.setAttribute("aria-label","Retorno ao Meu Acompanhamento");
+    row.innerHTML='<button type="button" class="ma-return-action" aria-label="Voltar para Meu Acompanhamento">'+
+      '<span class="ma-return-arrow" aria-hidden="true">←</span>'+
+      '<span>Meu Acompanhamento</span></button>'+
+      '<img class="ma-return-brand" src="./assets/riachuelo-logo-horizontal-oficial-white-v133.svg" alt="Riachuelo">';
+    row.querySelector("button").addEventListener("click",()=>{location.href=MAIN_URL;});
+    view.parentElement.insertBefore(row,view);
+  }
+
+  // Remover APENAS o botão branco "Voltar" que flutua no canto inferior
+  // (caso seja produzido por outras rotinas do app). Nunca remover a navegação
+  // nativa do rodapé nem botões "Voltar" de páginas ou modais.
+  function dismissLegacyFloatingBack(){
+    if(!linkedEntry)return;
+    const candidates=document.querySelectorAll("button,a,[role='button']");
+    for(const button of candidates){
+      if(button.closest("#maReturnBarV3"))continue;
+      const title=String(button.textContent||button.getAttribute("aria-label")||"")
+        .replace(/\s+/g," ").trim();
+      if(!/^(?:←|↩|⟵|‹)?\s*Voltar$/i.test(title))continue;
+      let fixed=null,node=button;
+      for(let i=0;i<5&&node;i++,node=node.parentElement){
+        if(getComputedStyle(node).position==="fixed"){fixed=node;break;}
+      }
+      if(!fixed)continue;
+      const rect=button.getBoundingClientRect();
+      if(!rect.width||!rect.height)continue;
+      const nearBottom=rect.bottom>window.innerHeight-320&&rect.top>window.innerHeight*.45;
+      const nearRight=rect.right>window.innerWidth*.55;
+      if(!nearBottom||!nearRight)continue;
+      const wrapper=fixed!==button&&fixed.querySelectorAll("button,a,[role='button']").length===1?fixed:button;
+      wrapper.remove();
+    }
+  }
+  let cleanupFrame=0;
+  function scheduleReturnLayout(){
+    if(cleanupFrame)return;
+    cleanupFrame=requestAnimationFrame(()=>{
+      cleanupFrame=0;
+      mountReturnBar();
+      dismissLegacyFloatingBack();
+    });
+  }
+  function enableReturnLayout(){
+    if(!linkedEntry)return;
+    scheduleReturnLayout();
+    const observer=new MutationObserver(mutations=>{
+      // Ignorar mudanças de texto e atributos: observar somente novas interfaces.
+      if(mutations.some(m=>m.addedNodes.length||m.removedNodes.length))scheduleReturnLayout();
+    });
+    observer.observe(document.body,{childList:true,subtree:true});
+    window.addEventListener("pageshow",scheduleReturnLayout);
+    window.addEventListener("resize",scheduleReturnLayout,{passive:true});
   }
 
   function userReady(){
@@ -78,7 +148,7 @@
   }
 
   async function launch(){
-    ensureBackButton();
+    enableReturnLayout();
 
     if(source!=="meu-acompanhamento" || !target) return;
 
