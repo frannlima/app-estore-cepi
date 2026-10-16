@@ -2322,6 +2322,9 @@ showCampaignPopupV37=function(){
   el.innerHTML=
     '<div class="campaignModalV86" role="dialog" aria-modal="true" aria-label="Campanha eStore outubro">'+
       '<button class="campaignCloseV86" onclick="event.stopPropagation();closeCampaignPopupV37(false)" aria-label="Fechar">×</button>'+
+      '<button type="button" class="campaignPopupPartialV160" onclick="event.stopPropagation();if(window.openCampaignPartial158)window.openCampaignPartial158();else{closeCampaignPopupV37(false);CC_TAB_V38=\'partial158\';go(\'campaigns\')}" aria-label="Ver parcial do ranking nacional Top 15">'+
+        '<strong>🏆 A PARCIAL DO TOP 15 JÁ SAIU!</strong><span>🔊 Você está aumentando o volume ou deixando seu nome fora dos premiáveis? <b>Confira sua posição →</b></span>'+ 
+      '</button>'+ 
       '<button class="campaignBannerV86" onclick="closeCampaignPopupV37(true)" aria-label="Conhecer a mecânica da campanha">'+
         '<img src="./assets/campaign-popup-v86.svg?v=86" alt="Já pensou em transformar suas vendas no eStore em um Samsung ou JBL?">'+
       '</button>'+
@@ -2341,6 +2344,9 @@ showCampaignPopupV37=function(){
     '.campaignBannerV86{display:block;width:100%;padding:0;border:0;background:transparent;cursor:pointer}'+
     '.campaignBannerV86 img{display:block;width:100%;height:auto;max-height:92vh;object-fit:contain;background:#0b4037}'+
     '.campaignCloseV86{position:absolute;z-index:5;right:22px;top:22px;width:54px;height:54px;border-radius:50%;border:1.5px solid rgba(255,255,255,.9);background:rgba(5,37,32,.58);color:#fff;font-size:34px;line-height:1;font-weight:300;display:grid;place-items:center;cursor:pointer;box-shadow:0 5px 16px rgba(0,0,0,.18)}'+
+    '@keyframes campaignPartialGlowV160{0%,100%{box-shadow:0 0 0 0 rgba(222,124,0,.6)}50%{box-shadow:0 0 0 8px rgba(222,124,0,0)}}'+
+    '.campaignOverlayV86 .campaignModalV86{overflow-y:auto!important}.campaignPopupPartialV160{display:block;width:calc(100% - 24px);margin:74px 12px 10px;background:#FFDA83;border:2px solid #DE7C00;border-radius:14px;color:#173F35;text-align:left;padding:12px 15px;cursor:pointer;animation:campaignPartialGlowV160 2.3s ease-in-out infinite}.campaignPopupPartialV160 strong{font-size:14px;display:block;font-weight:950;line-height:1.25}.campaignPopupPartialV160 span{font-size:12px;display:block;line-height:1.45;margin-top:5px}.campaignPopupPartialV160 b{color:#76232F}.campaignModalV86:has(.campaignPopupPartialV160) .campaignBannerV86 img{max-height:none!important;width:100%}'+
+    '@media(prefers-reduced-motion:reduce){.campaignPopupPartialV160{animation:none!important}}'+
     '@media(max-width:560px){.campaignOverlayV86{padding:10px}.campaignOverlayV86 .campaignModalV86{width:min(96vw,520px);border-radius:22px}.campaignCloseV86{right:16px;top:16px;width:48px;height:48px;font-size:30px}}';
   document.head.appendChild(st);
 })();
