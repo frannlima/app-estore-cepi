@@ -1873,7 +1873,7 @@ async function loadContentV3(){
   }catch(e){console.warn('Conteúdo dinâmico:',e)}
 }
 
-function campaignWithinWindow165(){const now=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Fortaleza',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());return now<='2026-11-10';}
+function campaignWithinWindow165(){const p=new Intl.DateTimeFormat('en-US',{timeZone:'America/Fortaleza',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const v=k=>p.find(x=>x.type===k)?.value||'';return [v('year'),v('month'),v('day')].join('-')<='2026-11-10';}
 function ccTabsV38(){
   const items=[['campaigns','📣','Campanhas'],['coupons','🎟','Cupons'],['prizes','🎁','Premiação'],['sell','▥','Como vender']];
   if(campaignWithinWindow165())items.splice(1,0,['partial158','🏆','Parcial Top 15']);
