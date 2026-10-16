@@ -562,22 +562,22 @@ function rankingRowsV5(type){
 async function highlightsCanvasV5(type,title){
   const rows=rankingRowsV5(type),c=document.createElement('canvas');c.width=1080;c.height=1500;const x=c.getContext('2d');
   x.fillStyle='#f8f7f4';x.fillRect(0,0,c.width,c.height);x.fillStyle='#173F35';x.fillRect(0,0,c.width,210);
-  x.fillStyle='white';x.font='bold 50px Arial';x.fillText(title,65,90);x.font='30px Arial';x.fillText('Período: '+pLabel[PER]+' • '+storeFullV3(),65,145);
-  x.fillStyle='#173F35';x.font='bold 38px Arial';x.fillText('Destaques do período',65,285);
+  x.fillStyle='white';x.font='bold 50px Larsseit, Arial';x.fillText(title,65,90);x.font='30px Larsseit, Arial';x.fillText('Período: '+pLabel[PER]+' • '+storeFullV3(),65,145);
+  x.fillStyle='#173F35';x.font='bold 38px Larsseit, Arial';x.fillText('Destaques do período',65,285);
   let y=345;
   for(let i=0;i<rows.length;i++){
     const r=rows[i],url=APP_PROFILE_PHOTOS[String(r.id)]||'',img=await loadImgV5(url);
     x.fillStyle=i<3?'#fff4dc':'#ffffff';x.beginPath();x.roundRect(55,y,970,155,26);x.fill();
-    x.fillStyle='#173F35';x.font='bold 34px Arial';x.fillText((i+1)+'º',80,y+90);
+    x.fillStyle='#173F35';x.font='bold 34px Larsseit, Arial';x.fillText((i+1)+'º',80,y+90);
     if(img){x.save();x.beginPath();x.arc(175,y+77,48,0,Math.PI*2);x.clip();x.drawImage(img,127,y+29,96,96);x.restore()}
-    else{x.fillStyle='#D6D2C4';x.beginPath();x.arc(175,y+77,48,0,Math.PI*2);x.fill();x.fillStyle='#173F35';x.font='bold 34px Arial';x.fillText(String(r.name||'?').slice(0,1),164,y+89)}
-    x.fillStyle='#173F35';x.font='bold 27px Arial';const nm=String(r.name||'').split(' ').slice(0,3).join(' ');x.fillText(nm,245,y+63);
-    x.fillStyle='#466964';x.font='24px Arial';x.fillText('Filial '+(r.st||U.u.st),245,y+100);
-    x.fillStyle='#173F35';x.font='bold 28px Arial';x.textAlign='right';x.fillText(money(r.c||0),990,y+78);x.textAlign='left';
+    else{x.fillStyle='#D6D2C4';x.beginPath();x.arc(175,y+77,48,0,Math.PI*2);x.fill();x.fillStyle='#173F35';x.font='bold 34px Larsseit, Arial';x.fillText(String(r.name||'?').slice(0,1),164,y+89)}
+    x.fillStyle='#173F35';x.font='bold 27px Larsseit, Arial';const nm=String(r.name||'').split(' ').slice(0,3).join(' ');x.fillText(nm,245,y+63);
+    x.fillStyle='#466964';x.font='24px Larsseit, Arial';x.fillText('Filial '+(r.st||U.u.st),245,y+100);
+    x.fillStyle='#173F35';x.font='bold 28px Larsseit, Arial';x.textAlign='right';x.fillText(money(r.c||0),990,y+78);x.textAlign='left';
     y+=172;
   }
-  const lines=shareLinesV4(type).filter(Boolean);x.fillStyle='#173F35';x.font='bold 30px Arial';x.fillText('Resumo',65,y+30);x.font='26px Arial';let yy=y+78;for(const l of lines.slice(0,5)){x.fillText(l,65,yy);yy+=42}
-  x.fillStyle='#173F35';x.font='bold 24px Arial';x.fillText('Fran Lima',65,1440);return c;
+  const lines=shareLinesV4(type).filter(Boolean);x.fillStyle='#173F35';x.font='bold 30px Larsseit, Arial';x.fillText('Resumo',65,y+30);x.font='26px Larsseit, Arial';let yy=y+78;for(const l of lines.slice(0,5)){x.fillText(l,65,yy);yy+=42}
+  x.fillStyle='#173F35';x.font='bold 24px Larsseit, Arial';x.fillText('Fran Lima',65,1440);return c;
 }
 async function shareHighlightsV5(type,title){const c=await highlightsCanvasV5(type,title),lines=shareLinesV4(type).filter(Boolean),text=title+'\n'+lines.join('\n');shareCanvas(window.RiachueloBrandCards.decorateCanvas(c),text)}
 shareResultV4=function(){return shareHighlightsV5('result','Destaques eStore | '+pLabel[PER])};
@@ -706,13 +706,13 @@ async function shareHourlyV5(){
  const c=document.createElement('canvas');c.width=1080;c.height=1920;const x=c.getContext('2d');
  x.fillStyle='#F8F7F4';x.fillRect(0,0,1080,1920);x.fillStyle='#173F35';x.fillRect(0,0,1080,210);
  const logo=await new Promise(ok=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>ok(null);im.src='./assets/riachuelo-logo-horizontal-oficial-white-v133.svg?build=v133'});if(logo){try{const ratio=logo.naturalWidth/logo.naturalHeight,lw=300,lh=lw/ratio;x.drawImage(logo,60,54,lw,lh)}catch(e){}}
- x.fillStyle='#fff';x.textAlign='right';x.font='700 38px Arial';x.fillText('HORA A HORA | '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),1020,78);x.font='24px Arial';x.fillText('Moda que inspira o Brasil',1020,124);x.fillText(new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR'),1020,162);x.textAlign='left';
+ x.fillStyle='#fff';x.textAlign='right';x.font='700 38px Larsseit, Arial';x.fillText('HORA A HORA | '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),1020,78);x.font='24px Larsseit, Arial';x.fillText('Moda que inspira o Brasil',1020,124);x.fillText(new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR'),1020,162);x.textAlign='left';
  const k=[['VENDA CAPTADA',money(r.captured),deltaMarkText(r.captured,prev?.captured,'money')],['PEDIDOS',num(r.orders)+' / '+num(r.orderTarget),deltaMarkText(r.orders,prev?.orders,'orders')],['META REGIONAL',money(r.meta),''],['ATINGIMENTO',r.meta?pct(r.att):'—',deltaMarkText(r.att,prev?.att,'pp')],['SHARE REGIONAL',r.storeSales?pct(r.share):'—',deltaMarkText(r.share,prev?.share,'pp')],['LOJAS COM VENDA',num(r.active)+' / 18',deltaMarkText(r.active,prev?.active,'number')]];
- let ky=245;k.forEach((a,i)=>{const col=i%3,row=Math.floor(i/3),xx=55+col*335,yy=ky+row*150;x.fillStyle='#fff';x.fillRect(xx,yy,305,126);x.fillStyle='#466964';x.font='700 18px Arial';x.fillText(a[0],xx+18,yy+30);x.fillStyle='#173F35';x.font='700 30px Arial';x.fillText(a[1],xx+18,yy+70);x.font='16px Arial';x.fillStyle=a[2].startsWith('▲')?'#287A55':a[2].startsWith('▼')?'#B23A3A':'#6B6B68';x.fillText(a[2],xx+18,yy+101)});
- const top=stores.slice(0,3);x.fillStyle='#173F35';x.font='700 25px Arial';x.fillText('TOP DO MOMENTO',55,575);top.forEach((a,i)=>{x.fillStyle=['#D6D2C4','#E68699','#DE7C00'][i];x.fillRect(55+i*335,600,305,72);x.fillStyle='#173F35';x.font='700 20px Arial';x.fillText((i+1)+'º  Loja '+a.st,72+i*335,628);x.font='700 19px Arial';x.fillText(money(a.captured),72+i*335,655)});
- x.fillStyle='#173F35';x.font='700 24px Arial';x.fillText('DESEMPENHO POR LOJA',55,725);x.font='15px Arial';x.fillText('Loja     Captado       Ped.     Ating.    Share      Desvio        Status',55,760);
- let y=795;x.font='17px Arial';stores.forEach((a,i)=>{const s=hourStatusV6(a),dev=Number(a.captured||0)-Number(a.metaValue||0);x.fillStyle=s.cls==='notfed'?'#FFF1E3':s.cls==='zero'?'#FDECEC':i%2?'#FFFFFF':'#F0F2EE';x.fillRect(45,y-25,990,50);x.fillStyle='#173F35';x.fillText(a.st,58,y);x.fillText(money(a.captured),118,y);x.fillText(num(a.orders)+'/'+num(a.orderTarget),300,y);x.fillText(pct(a.att),390,y);x.fillStyle=Number(a.share||0)===0?'#B42318':'#173F35';x.fillText(a.storeSales?pct(a.share):'0,00%',505,y);x.fillStyle=dev>=0?'#287A55':'#B42318';x.fillText(money(dev),620,y);x.fillStyle=s.cls==='course'?'#287A55':s.cls==='attention'?'#DE7C00':'#D92D20';x.font='700 15px Arial';x.fillText('● '+s.label,785,y);x.font='17px Arial';y+=54});
- const nf=stores.filter(a=>!a.updated_at).map(a=>a.st);x.fillStyle='#FFF1E3';x.fillRect(45,1830,990,55);x.fillStyle='#76232F';x.font='700 18px Arial';x.fillText('⚠ Ainda não alimentaram: '+(nf.length?nf.join(' • '):'Nenhuma'),62,1864);x.fillStyle='#173F35';x.font='16px Arial';x.fillText('Moda que inspira o Brasil',55,1910);x.textAlign='right';x.fillText('Fran Lima',1025,1910);
+ let ky=245;k.forEach((a,i)=>{const col=i%3,row=Math.floor(i/3),xx=55+col*335,yy=ky+row*150;x.fillStyle='#fff';x.fillRect(xx,yy,305,126);x.fillStyle='#466964';x.font='700 18px Larsseit, Arial';x.fillText(a[0],xx+18,yy+30);x.fillStyle='#173F35';x.font='700 30px Larsseit, Arial';x.fillText(a[1],xx+18,yy+70);x.font='16px Larsseit, Arial';x.fillStyle=a[2].startsWith('▲')?'#287A55':a[2].startsWith('▼')?'#B23A3A':'#6B6B68';x.fillText(a[2],xx+18,yy+101)});
+ const top=stores.slice(0,3);x.fillStyle='#173F35';x.font='700 25px Larsseit, Arial';x.fillText('TOP DO MOMENTO',55,575);top.forEach((a,i)=>{x.fillStyle=['#D6D2C4','#E68699','#DE7C00'][i];x.fillRect(55+i*335,600,305,72);x.fillStyle='#173F35';x.font='700 20px Larsseit, Arial';x.fillText((i+1)+'º  Loja '+a.st,72+i*335,628);x.font='700 19px Larsseit, Arial';x.fillText(money(a.captured),72+i*335,655)});
+ x.fillStyle='#173F35';x.font='700 24px Larsseit, Arial';x.fillText('DESEMPENHO POR LOJA',55,725);x.font='15px Larsseit, Arial';x.fillText('Loja     Captado       Ped.     Ating.    Share      Desvio        Status',55,760);
+ let y=795;x.font='17px Larsseit, Arial';stores.forEach((a,i)=>{const s=hourStatusV6(a),dev=Number(a.captured||0)-Number(a.metaValue||0);x.fillStyle=s.cls==='notfed'?'#FFF1E3':s.cls==='zero'?'#FDECEC':i%2?'#FFFFFF':'#F0F2EE';x.fillRect(45,y-25,990,50);x.fillStyle='#173F35';x.fillText(a.st,58,y);x.fillText(money(a.captured),118,y);x.fillText(num(a.orders)+'/'+num(a.orderTarget),300,y);x.fillText(pct(a.att),390,y);x.fillStyle=Number(a.share||0)===0?'#B42318':'#173F35';x.fillText(a.storeSales?pct(a.share):'0,00%',505,y);x.fillStyle=dev>=0?'#287A55':'#B42318';x.fillText(money(dev),620,y);x.fillStyle=s.cls==='course'?'#287A55':s.cls==='attention'?'#DE7C00':'#D92D20';x.font='700 15px Larsseit, Arial';x.fillText('● '+s.label,785,y);x.font='17px Larsseit, Arial';y+=54});
+ const nf=stores.filter(a=>!a.updated_at).map(a=>a.st);x.fillStyle='#FFF1E3';x.fillRect(45,1830,990,55);x.fillStyle='#76232F';x.font='700 18px Larsseit, Arial';x.fillText('⚠ Ainda não alimentaram: '+(nf.length?nf.join(' • '):'Nenhuma'),62,1864);x.fillStyle='#173F35';x.font='16px Larsseit, Arial';x.fillText('Moda que inspira o Brasil',55,1910);x.textAlign='right';x.fillText('Fran Lima',1025,1910);
  const caption=hourlyCaptionV6(j);
  window.RiachueloBrandCards.decorateCanvas(c).toBlob(async blob=>{if(!blob)return;const file=new File([blob],'parcial-estore-hora-a-hora.png',{type:'image/png'});try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text:caption,title:'Parcial eStore'});return}}catch(e){if(e?.name==='AbortError')return}try{await navigator.clipboard.writeText(caption)}catch(e){};shareCanvas(window.RiachueloBrandCards.decorateCanvas(c),caption)},'image/png');
 }
@@ -942,13 +942,13 @@ function shareClassV15(r){if(!r.updated_at)return'#f1e7e8';if(Number(r.share)>=.
 shareHourlyV5=async function(){
  if(!HOURLY_CACHE)return;
  const j=HOURLY_CACHE,stores=[...(j.stores||[])].sort((a,b)=>Number(b.att||0)-Number(a.att||0)),active=stores.filter(r=>r.updated_at),pending=stores.filter(r=>!r.updated_at),regional={meta:stores.reduce((s,r)=>s+Number(r.metaValue||0),0),captured:stores.reduce((s,r)=>s+Number(r.captured||0),0),orders:stores.reduce((s,r)=>s+Number(r.orders||0),0),orderTarget:stores.reduce((s,r)=>s+Number(r.orderTarget||0),0),sales:stores.reduce((s,r)=>s+Number(r.storeSales||0),0)};
- const c=document.createElement('canvas');c.width=1080;c.height=1900;const x=c.getContext('2d');x.fillStyle='#f8f7f4';x.fillRect(0,0,1080,1900);x.fillStyle='#173F35';x.fillRect(0,0,1080,255);x.fillStyle='#fff';x.font='bold 48px Arial';x.fillText('eStore CE+PI | Hora a Hora',60,78);x.font='29px Arial';x.fillText('Parcial '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+' • '+new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR'),60,130);x.fillText('Filiais atualizadas: '+active.length+' / '+stores.length,60,182);
+ const c=document.createElement('canvas');c.width=1080;c.height=1900;const x=c.getContext('2d');x.fillStyle='#f8f7f4';x.fillRect(0,0,1080,1900);x.fillStyle='#173F35';x.fillRect(0,0,1080,255);x.fillStyle='#fff';x.font='bold 48px Larsseit, Arial';x.fillText('eStore CE+PI | Hora a Hora',60,78);x.font='29px Larsseit, Arial';x.fillText('Parcial '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+' • '+new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR'),60,130);x.fillText('Filiais atualizadas: '+active.length+' / '+stores.length,60,182);
  const cards=[['Realizado',money(regional.captured)],['Atingimento',regional.meta?pct(regional.captured/regional.meta):'—'],['Pedidos',num(regional.orders)+' / '+num(regional.orderTarget)],['Share',regional.sales?pct(regional.captured/regional.sales):'—']];
- let cx=50;for(const q of cards){x.fillStyle='#fff';x.beginPath();x.roundRect(cx,285,235,105,18);x.fill();x.fillStyle='#466964';x.font='20px Arial';x.fillText(q[0],cx+18,320);x.fillStyle='#173F35';x.font='bold 25px Arial';x.fillText(q[1],cx+18,360);cx+=250}
- x.fillStyle='#173F35';x.font='bold 22px Arial';x.fillText('RK',60,445);x.fillText('FILIAL',125,445);x.fillText('CAPTADO',255,445);x.fillText('ATING.',500,445);x.fillText('PEDIDOS',655,445);x.fillText('SHARE',850,445);
- let y=485;for(let i=0;i<stores.length;i++){const r=stores[i];x.fillStyle=shareClassV15(r);x.beginPath();x.roundRect(45,y-30,990,58,10);x.fill();x.fillStyle='#173F35';x.font='bold 22px Arial';x.fillText((i+1)+'º',60,y);x.fillText(r.st,130,y);x.fillText(money(r.captured),255,y);x.fillText(pct(r.att),500,y);x.fillText(num(r.orders)+'/'+num(r.orderTarget),655,y);x.fillText(r.storeSales?pct(r.share):'—',850,y);if(!r.updated_at){x.fillStyle='#76232F';x.font='bold 15px Arial';x.fillText('PENDENTE',930,y)}y+=64}
- if(pending.length){x.fillStyle='#76232F';x.font='bold 25px Arial';x.fillText('Pendentes: '+pending.map(r=>r.st).join(' • '),55,1745)}
- x.fillStyle='#173F35';x.font='bold 21px Arial';x.fillText('Share: eStore captado ÷ meta geral de vendas da filial',55,1800);x.fillText('Fran Lima',55,1845);
+ let cx=50;for(const q of cards){x.fillStyle='#fff';x.beginPath();x.roundRect(cx,285,235,105,18);x.fill();x.fillStyle='#466964';x.font='20px Larsseit, Arial';x.fillText(q[0],cx+18,320);x.fillStyle='#173F35';x.font='bold 25px Larsseit, Arial';x.fillText(q[1],cx+18,360);cx+=250}
+ x.fillStyle='#173F35';x.font='bold 22px Larsseit, Arial';x.fillText('RK',60,445);x.fillText('FILIAL',125,445);x.fillText('CAPTADO',255,445);x.fillText('ATING.',500,445);x.fillText('PEDIDOS',655,445);x.fillText('SHARE',850,445);
+ let y=485;for(let i=0;i<stores.length;i++){const r=stores[i];x.fillStyle=shareClassV15(r);x.beginPath();x.roundRect(45,y-30,990,58,10);x.fill();x.fillStyle='#173F35';x.font='bold 22px Larsseit, Arial';x.fillText((i+1)+'º',60,y);x.fillText(r.st,130,y);x.fillText(money(r.captured),255,y);x.fillText(pct(r.att),500,y);x.fillText(num(r.orders)+'/'+num(r.orderTarget),655,y);x.fillText(r.storeSales?pct(r.share):'—',850,y);if(!r.updated_at){x.fillStyle='#76232F';x.font='bold 15px Larsseit, Arial';x.fillText('PENDENTE',930,y)}y+=64}
+ if(pending.length){x.fillStyle='#76232F';x.font='bold 25px Larsseit, Arial';x.fillText('Pendentes: '+pending.map(r=>r.st).join(' • '),55,1745)}
+ x.fillStyle='#173F35';x.font='bold 21px Larsseit, Arial';x.fillText('Share: eStore captado ÷ meta geral de vendas da filial',55,1800);x.fillText('Fran Lima',55,1845);
  const txt='🎯 *eStore CE+PI | HORA A HORA*\\n💵 *Realizado:* '+money(regional.captured)+'\\n📈 *Atingimento:* '+(regional.meta?pct(regional.captured/regional.meta):'—')+'\\n🛍️ *Pedidos:* '+num(regional.orders)+' / '+num(regional.orderTarget)+'\\n📊 *Share:* '+(regional.sales?pct(regional.captured/regional.sales):'—')+'\\n🏬 *Atualizadas:* '+active.length+'/'+stores.length+(pending.length?'\\n⚠️ *Pendentes:* '+pending.map(r=>r.st).join(', '):'');
  shareCanvas(window.RiachueloBrandCards.decorateCanvas(c),txt);
 }
@@ -1016,11 +1016,11 @@ function isClosingV17(dateStr){
 shareHourlyV5=async function(){
  if(!HOURLY_CACHE)return;
  const j=HOURLY_CACHE,closing=isClosingV17(j.result_date),stores=[...(j.stores||[])].sort((a,b)=>Number(b.att||0)-Number(a.att||0)),active=stores.filter(r=>r.updated_at),missing=stores.filter(r=>!r.updated_at),regional={meta:stores.reduce((s,r)=>s+Number(r.metaValue||0),0),captured:stores.reduce((s,r)=>s+Number(r.captured||0),0),orders:stores.reduce((s,r)=>s+Number(r.orders||0),0),orderTarget:stores.reduce((s,r)=>s+Number(r.orderTarget||0),0),sales:stores.reduce((s,r)=>s+Number(r.storeSales||0),0)};
- const c=document.createElement('canvas');c.width=1080;c.height=1900;const x=c.getContext('2d');x.fillStyle='#f8f7f4';x.fillRect(0,0,1080,1900);x.fillStyle='#173F35';x.fillRect(0,0,1080,260);x.fillStyle='#fff';x.font='bold 46px Arial';x.fillText(closing?'eStore CE+PI | Fechamento':'eStore CE+PI | Hora a Hora',55,76);x.font='28px Arial';x.fillText(new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR')+' • consolidado '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),55,128);x.fillText('Cobertura de atualização: '+active.length+'/'+stores.length+' filiais'+(missing.length?' • '+missing.length+' sem informação':''),55,180);
- const cards=[['Realizado',money(regional.captured)],['Meta',money(regional.meta)],['Atingimento',regional.meta?pct(regional.captured/regional.meta):'—'],['Share',regional.sales?pct(regional.captured/regional.sales):'—']];let cx=45;for(const q of cards){x.fillStyle='#fff';x.beginPath();x.roundRect(cx,285,240,105,18);x.fill();x.fillStyle='#466964';x.font='19px Arial';x.fillText(q[0],cx+17,320);x.fillStyle='#173F35';x.font='bold 24px Arial';x.fillText(q[1],cx+17,360);cx+=250}
- x.fillStyle='#173F35';x.font='bold 20px Arial';['RK','FILIAL','CAPTADO','ATING.','PEDIDOS','SHARE'].forEach((v,i)=>x.fillText(v,[55,120,250,500,650,845][i],445));
- let y=485;for(let i=0;i<stores.length;i++){const r=stores[i];x.fillStyle=shareClassV15(r);x.beginPath();x.roundRect(42,y-29,995,58,10);x.fill();x.fillStyle='#173F35';x.font='bold 21px Arial';x.fillText((i+1)+'º',55,y);x.fillText(r.st,120,y);if(!r.updated_at&&closing){x.fillStyle='#76232F';x.font='bold 17px Arial';x.fillText('Nenhuma informação de venda ao longo do dia',250,y)}else{x.fillText(money(r.captured),250,y);x.fillText(pct(r.att),500,y);x.fillText(num(r.orders)+'/'+num(r.orderTarget),650,y);x.fillText(r.storeSales?pct(r.share):'—',845,y);if(r.updated_at&&Number(r.captured)===0){x.fillStyle='#76232F';x.font='bold 13px Arial';x.fillText('R$ 0,00 informado',250,y+18)}}y+=64}
- x.fillStyle='#173F35';x.font='bold 22px Arial';x.fillText('Pedidos: '+num(regional.orders)+' / '+num(regional.orderTarget),55,1740);x.font='20px Arial';x.fillText('Share = venda eStore captada ÷ meta geral de vendas da filial',55,1790);x.fillText('Atualizado em '+new Date().toLocaleString('pt-BR')+' • Fran Lima',55,1840);
+ const c=document.createElement('canvas');c.width=1080;c.height=1900;const x=c.getContext('2d');x.fillStyle='#f8f7f4';x.fillRect(0,0,1080,1900);x.fillStyle='#173F35';x.fillRect(0,0,1080,260);x.fillStyle='#fff';x.font='bold 46px Larsseit, Arial';x.fillText(closing?'eStore CE+PI | Fechamento':'eStore CE+PI | Hora a Hora',55,76);x.font='28px Larsseit, Arial';x.fillText(new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR')+' • consolidado '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),55,128);x.fillText('Cobertura de atualização: '+active.length+'/'+stores.length+' filiais'+(missing.length?' • '+missing.length+' sem informação':''),55,180);
+ const cards=[['Realizado',money(regional.captured)],['Meta',money(regional.meta)],['Atingimento',regional.meta?pct(regional.captured/regional.meta):'—'],['Share',regional.sales?pct(regional.captured/regional.sales):'—']];let cx=45;for(const q of cards){x.fillStyle='#fff';x.beginPath();x.roundRect(cx,285,240,105,18);x.fill();x.fillStyle='#466964';x.font='19px Larsseit, Arial';x.fillText(q[0],cx+17,320);x.fillStyle='#173F35';x.font='bold 24px Larsseit, Arial';x.fillText(q[1],cx+17,360);cx+=250}
+ x.fillStyle='#173F35';x.font='bold 20px Larsseit, Arial';['RK','FILIAL','CAPTADO','ATING.','PEDIDOS','SHARE'].forEach((v,i)=>x.fillText(v,[55,120,250,500,650,845][i],445));
+ let y=485;for(let i=0;i<stores.length;i++){const r=stores[i];x.fillStyle=shareClassV15(r);x.beginPath();x.roundRect(42,y-29,995,58,10);x.fill();x.fillStyle='#173F35';x.font='bold 21px Larsseit, Arial';x.fillText((i+1)+'º',55,y);x.fillText(r.st,120,y);if(!r.updated_at&&closing){x.fillStyle='#76232F';x.font='bold 17px Larsseit, Arial';x.fillText('Nenhuma informação de venda ao longo do dia',250,y)}else{x.fillText(money(r.captured),250,y);x.fillText(pct(r.att),500,y);x.fillText(num(r.orders)+'/'+num(r.orderTarget),650,y);x.fillText(r.storeSales?pct(r.share):'—',845,y);if(r.updated_at&&Number(r.captured)===0){x.fillStyle='#76232F';x.font='bold 13px Larsseit, Arial';x.fillText('R$ 0,00 informado',250,y+18)}}y+=64}
+ x.fillStyle='#173F35';x.font='bold 22px Larsseit, Arial';x.fillText('Pedidos: '+num(regional.orders)+' / '+num(regional.orderTarget),55,1740);x.font='20px Larsseit, Arial';x.fillText('Share = venda eStore captada ÷ meta geral de vendas da filial',55,1790);x.fillText('Atualizado em '+new Date().toLocaleString('pt-BR')+' • Fran Lima',55,1840);
  const text=(closing?'🏁 *eStore CE+PI | FECHAMENTO*':'🎯 *eStore CE+PI | HORA A HORA*')+'\\n📅 '+new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR')+'\\n💵 *Realizado:* '+money(regional.captured)+'\\n🎯 *Meta:* '+money(regional.meta)+'\\n📈 *Atingimento:* '+(regional.meta?pct(regional.captured/regional.meta):'—')+'\\n🛍️ *Pedidos:* '+num(regional.orders)+' / '+num(regional.orderTarget)+'\\n📊 *Share:* '+(regional.sales?pct(regional.captured/regional.sales):'—')+'\\n🏬 *Cobertura:* '+active.length+'/'+stores.length+(missing.length?' • '+missing.length+' sem informação':'')+(closing&&missing.length?'\\n⚠️ *Sem informação ao longo do dia:* '+missing.map(r=>r.st).join(', '):'');
  shareCanvas(window.RiachueloBrandCards.decorateCanvas(c),text);
 }
@@ -1245,11 +1245,11 @@ async function shareTeamCardV26(){
  const c=document.createElement('canvas');c.width=1080;c.height=1500;const x=c.getContext('2d'),green='#173F35',sage='#466964',sand='#D6D2C4',gray='#DAD9D6',rose='#F5DDE2',red='#76232F',orange='#DE7C00';
  x.fillStyle='#F8F7F4';x.fillRect(0,0,c.width,c.height);x.fillStyle=green;x.fillRect(0,0,1080,190);
  const logo=document.querySelector('header img');if(logo&&logo.complete){try{x.drawImage(logo,55,38,250,95)}catch(e){}}
- x.fillStyle='#fff';x.textAlign='right';x.font='700 34px Arial, sans-serif';x.fillText('MEU TIME | '+(TEAM_STORE_V19==='regional'?'REGIONAL CE+PI':'FILIAL '+TEAM_STORE_V19),1020,70);x.font='24px Arial, sans-serif';x.fillText(pLabel[PER]+' • Moda que inspira o Brasil',1020,115);x.textAlign='left';
- const k=[['COLABORADORES',s.people.length],['COM VENDA',s.yes.length],['ZERADOS',s.zero.length],['DISPERSÃO',pct(s.disp)],['VENDA CAPTADA',money(s.captured)],['PEDIDOS',s.orders]];k.forEach((a,i)=>{const col=i%3,row=Math.floor(i/3),xx=55+col*330,yy=225+row*125;x.fillStyle=i===2?rose:(i===4?sand:'#fff');x.beginPath();x.roundRect(xx,yy,300,100,18);x.fill();x.fillStyle=sage;x.font='700 16px Arial, sans-serif';x.fillText(a[0],xx+18,yy+30);x.fillStyle=green;x.font='700 29px Arial, sans-serif';x.fillText(String(a[1]),xx+18,yy+70)});
- let y=500;x.fillStyle=green;x.font='700 25px Arial, sans-serif';x.fillText('Resumo por filial',55,y);y+=45;x.font='700 17px Arial, sans-serif';['LOJA','COLAB.','COM VENDA','ZERADOS','VENDA CAPTADA'].forEach((v,i)=>x.fillText(v,[55,170,310,500,680][i],y));y+=18;
- for(const r of stores.slice(0,19)){x.fillStyle=r.zero/(r.active+r.zero||1)>.7?'#FFF0F0':'#fff';x.beginPath();x.roundRect(45,y,990,48,8);x.fill();x.fillStyle=green;x.font='700 18px Arial, sans-serif';x.fillText(r.st,60,y+31);x.font='18px Arial, sans-serif';x.fillText(String(r.active+r.zero),185,y+31);x.fillText(String(r.active),330,y+31);x.fillStyle=r.zero?red:green;x.fillText(String(r.zero),520,y+31);x.fillStyle=green;x.fillText(money(r.c),690,y+31);y+=53;if(y>1390)break}
- x.fillStyle=green;x.font='18px Arial, sans-serif';x.fillText('Moda que inspira o Brasil',55,1460);x.textAlign='right';x.fillText('App. eStore CE+PI',1020,1460);
+ x.fillStyle='#fff';x.textAlign='right';x.font='700 34px Larsseit, Arial, sans-serif';x.fillText('MEU TIME | '+(TEAM_STORE_V19==='regional'?'REGIONAL CE+PI':'FILIAL '+TEAM_STORE_V19),1020,70);x.font='24px Larsseit, Arial, sans-serif';x.fillText(pLabel[PER]+' • Moda que inspira o Brasil',1020,115);x.textAlign='left';
+ const k=[['COLABORADORES',s.people.length],['COM VENDA',s.yes.length],['ZERADOS',s.zero.length],['DISPERSÃO',pct(s.disp)],['VENDA CAPTADA',money(s.captured)],['PEDIDOS',s.orders]];k.forEach((a,i)=>{const col=i%3,row=Math.floor(i/3),xx=55+col*330,yy=225+row*125;x.fillStyle=i===2?rose:(i===4?sand:'#fff');x.beginPath();x.roundRect(xx,yy,300,100,18);x.fill();x.fillStyle=sage;x.font='700 16px Larsseit, Arial, sans-serif';x.fillText(a[0],xx+18,yy+30);x.fillStyle=green;x.font='700 29px Larsseit, Arial, sans-serif';x.fillText(String(a[1]),xx+18,yy+70)});
+ let y=500;x.fillStyle=green;x.font='700 25px Larsseit, Arial, sans-serif';x.fillText('Resumo por filial',55,y);y+=45;x.font='700 17px Larsseit, Arial, sans-serif';['LOJA','COLAB.','COM VENDA','ZERADOS','VENDA CAPTADA'].forEach((v,i)=>x.fillText(v,[55,170,310,500,680][i],y));y+=18;
+ for(const r of stores.slice(0,19)){x.fillStyle=r.zero/(r.active+r.zero||1)>.7?'#FFF0F0':'#fff';x.beginPath();x.roundRect(45,y,990,48,8);x.fill();x.fillStyle=green;x.font='700 18px Larsseit, Arial, sans-serif';x.fillText(r.st,60,y+31);x.font='18px Larsseit, Arial, sans-serif';x.fillText(String(r.active+r.zero),185,y+31);x.fillText(String(r.active),330,y+31);x.fillStyle=r.zero?red:green;x.fillText(String(r.zero),520,y+31);x.fillStyle=green;x.fillText(money(r.c),690,y+31);y+=53;if(y>1390)break}
+ x.fillStyle=green;x.font='18px Larsseit, Arial, sans-serif';x.fillText('Moda que inspira o Brasil',55,1460);x.textAlign='right';x.fillText('App. eStore CE+PI',1020,1460);
  const text='📊 *MEU TIME eStore | '+(TEAM_STORE_V19==='regional'?'REGIONAL CE+PI':'FILIAL '+TEAM_STORE_V19)+'*\\n'+pLabel[PER]+'\\n👥 Colaboradores: '+s.people.length+'\\n✅ Com venda: '+s.yes.length+'\\n🔴 Zerados: '+s.zero.length+'\\n📉 Dispersão: '+pct(s.disp)+'\\n💰 Venda captada: '+money(s.captured)+'\\n🛍️ Pedidos: '+s.orders;
  shareCanvas(window.RiachueloBrandCards.decorateCanvas(c),text);
 }
@@ -2470,7 +2470,7 @@ showCampaignPopupV37=function(){
     var s=String(t);if(max){while(s.length>2&&x.measureText(s).width>max)s=s.slice(0,-1);if(s!==String(t))s=s.slice(0,-1)+'…'}x.fillText(s,cx,cy);
   }
   function drawKpi108(x,cx,cy,w,h,label,value,sub,fill,accent){
-    round108(x,cx,cy,w,h,18,fill);ctext108(x,label,cx+w/2,cy+25,'700 13px Arial',S,w-24);ctext108(x,value,cx+w/2,cy+58,'700 25px Arial',accent||G,w-24);ctext108(x,sub,cx+w/2,cy+85,'600 11px Arial','#68736F',w-24);
+    round108(x,cx,cy,w,h,18,fill);ctext108(x,label,cx+w/2,cy+25,'700 13px Larsseit, Arial',S,w-24);ctext108(x,value,cx+w/2,cy+58,'700 25px Larsseit, Arial',accent||G,w-24);ctext108(x,sub,cx+w/2,cy+85,'600 11px Larsseit, Arial','#68736F',w-24);
   }
   function shortEvo108(v){return v==null?'—':evoText108(v)}
   function listText108(rows){
@@ -2486,7 +2486,7 @@ showCampaignPopupV37=function(){
       var logo=await loadLogo108();
       if(logo){const ratio=logo.naturalWidth/logo.naturalHeight,lw=310,lh=lw/ratio;x.drawImage(logo,54,48,lw,lh)}
       x.strokeStyle='#D6D2C4';x.lineWidth=2;x.beginPath();x.moveTo(405,32);x.lineTo(405,112);x.stroke();
-      x.textAlign='left';x.textBaseline='middle';x.fillStyle=G;x.font='700 31px Arial';x.fillText('MEU TIME',445,55);x.font='700 16px Arial';x.fillText(regional?'REGIONAL CE+PI':'FILIAL '+TEAM_STORE_V19,445,83);x.font='14px Arial';x.fillStyle=S;x.fillText(pLabel[PER]+' • '+new Date(d.range.asof+'T12:00:00').toLocaleDateString('pt-BR'),445,105);
+      x.textAlign='left';x.textBaseline='middle';x.fillStyle=G;x.font='700 31px Larsseit, Arial';x.fillText('MEU TIME',445,55);x.font='700 16px Larsseit, Arial';x.fillText(regional?'REGIONAL CE+PI':'FILIAL '+TEAM_STORE_V19,445,83);x.font='14px Larsseit, Arial';x.fillStyle=S;x.fillText(pLabel[PER]+' • '+new Date(d.range.asof+'T12:00:00').toLocaleDateString('pt-BR'),445,105);
 
       var t=d.total;
       drawKpi108(x,48,145,230,104,'COLABORADORES',num(t.hc),'HC ativo','#FFFFFF',G);
@@ -2497,28 +2497,28 @@ showCampaignPopupV37=function(){
       drawKpi108(x,366,265,300,104,'PEDIDOS',num(t.o),'Volume do período','#FFFFFF',G);
       drawKpi108(x,684,265,348,104,'POTENCIAL TOTAL',money(t.potential),'Zerados × ticket da filial','#FFF5E5',O);
 
-      x.textAlign='left';x.fillStyle=G;x.font='700 24px Arial';x.fillText('PAINEL POR FILIAL',48,414);
-      x.font='12px Arial';x.fillStyle=S;x.fillText('Dispersão = zerados ÷ HC • '+labelPrev108(),48,438);
+      x.textAlign='left';x.fillStyle=G;x.font='700 24px Larsseit, Arial';x.fillText('PAINEL POR FILIAL',48,414);
+      x.font='12px Larsseit, Arial';x.fillStyle=S;x.fillText('Dispersão = zerados ÷ HC • '+labelPrev108(),48,438);
 
       var cols=[60,125,225,315,405,515,635,770,950],heads=['LOJA','HC','COM VENDA','%','ZERADOS','DISPERSÃO','EVOLUÇÃO','TICKET MÉDIO','POTENCIAL'];
-      heads.forEach(function(h,i){ctext108(x,h,cols[i],476,'700 10px Arial','#53625D',i===8?150:95)});
+      heads.forEach(function(h,i){ctext108(x,h,cols[i],476,'700 10px Larsseit, Arial','#53625D',i===8?150:95)});
       var y=497,rowH=43,maxRows=Math.min(stores.length,19);
       for(var i=0;i<maxRows;i++){
         var r=stores[i],fill=r.disp>=.8?'#FBEAEC':r.disp>=.6?'#FFF4E6':'#EAF4EE';
         round108(x,42,y,996,37,8,fill);
         var vals=[r.st,num(r.hc),num(r.sold),pct(r.hc?r.sold/r.hc:0),num(r.zero),pct(r.disp),shortEvo108(r.evo),money(r.ticket),money(r.potential)];
-        vals.forEach(function(v,j){ctext108(x,v,cols[j],y+19,(j===0||j===4||j===5||j===8?'700 ':'500 ')+(j===8?'11':'12')+'px Arial',j===6?(r.evo<0?'#157349':r.evo>0?R:G):G,j===8?150:100)});
+        vals.forEach(function(v,j){ctext108(x,v,cols[j],y+19,(j===0||j===4||j===5||j===8?'700 ':'500 ')+(j===8?'11':'12')+'px Larsseit, Arial',j===6?(r.evo<0?'#157349':r.evo>0?R:G):G,j===8?150:100)});
         y+=rowH;
       }
       var best=stores.filter(function(r){return r.hc>0}).slice().sort(function(a,b){return a.disp-b.disp}).slice(0,5);
       var worst=stores.filter(function(r){return r.hc>0}).slice().sort(function(a,b){return b.disp-a.disp}).slice(0,5);
       var sy=Math.max(y+22,1330);
-      x.textAlign='left';x.fillStyle=G;x.font='700 17px Arial';x.fillText('LEITURA EXECUTIVA DA DISPERSÃO',48,sy);
-      x.font='13px Arial';x.fillStyle=S;x.fillText('Regional: '+pct(t.disp)+' • '+(t.evo==null?'sem base anterior':shortEvo108(t.evo)+' '+labelPrev108()),48,sy+28);
-      x.fillStyle='#157349';x.font='700 12px Arial';x.fillText('Menores dispersões: '+best.map(function(r){return r.st+' '+pct(r.disp)}).join(' • '),48,sy+55);
+      x.textAlign='left';x.fillStyle=G;x.font='700 17px Larsseit, Arial';x.fillText('LEITURA EXECUTIVA DA DISPERSÃO',48,sy);
+      x.font='13px Larsseit, Arial';x.fillStyle=S;x.fillText('Regional: '+pct(t.disp)+' • '+(t.evo==null?'sem base anterior':shortEvo108(t.evo)+' '+labelPrev108()),48,sy+28);
+      x.fillStyle='#157349';x.font='700 12px Larsseit, Arial';x.fillText('Menores dispersões: '+best.map(function(r){return r.st+' '+pct(r.disp)}).join(' • '),48,sy+55);
       x.fillStyle=R;x.fillText('Maiores dispersões: '+worst.map(function(r){return r.st+' '+pct(r.disp)}).join(' • '),48,sy+80);
       x.strokeStyle='#BFC8C3';x.beginPath();x.moveTo(48,1600);x.lineTo(1032,1600);x.stroke();
-      x.fillStyle=G;x.font='700 12px Arial';x.fillText('MODA QUE INSPIRA O BRASIL',48,1624);x.textAlign='right';x.fillText('App. eStore CE+PI',1032,1624);
+      x.fillStyle=G;x.font='700 12px Larsseit, Arial';x.fillText('MODA QUE INSPIRA O BRASIL',48,1624);x.textAlign='right';x.fillText('App. eStore CE+PI',1032,1624);
 
       var summary='📊 *DISPERSÃO eStore | '+(regional?'REGIONAL CE+PI':'FILIAL '+TEAM_STORE_V19)+'*\n'+
         '*'+pLabel[PER]+' • '+new Date(d.range.asof+'T12:00:00').toLocaleDateString('pt-BR')+'*\n\n'+
