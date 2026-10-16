@@ -332,7 +332,7 @@
       const vals=[r.st,intBRTeam(r.total),intBRTeam(r.sold),pctBRTeam(r.total?r.sold/r.total:0),intBRTeam(r.zeros),pctBRTeam(r.disp),(r.prevDisp==null?'—':pctBRTeam(r.prevDisp)),(r.evolution?.rel==null?'Sem base':evoPercent(r.evolution)+' / '+signedPp(r.evolution)),money(r.ticket),money(r.potential)];
       vals.forEach((v,i)=>{
         const col=i===7?(evoClass(r.evolution)==='good'?'#157349':evoClass(r.evolution)==='bad'?WINE:GREEN):(i===4||i===5?(r.disp>=.8?WINE:r.disp>=.6?ORANGE:GREEN):GREEN);
-        canvasText(x,v,cols[i],y-9,(i===0||i===4||i===5||i===9?'700 ':'500 ')+(i===7?'9.5':'11.5')+'px Arial',col,'center',widths[i]);
+        canvasText(x,v,cols[i],y-9,(i===0||i===4||i===5||i===9?'700 ':'500 ')+(i===7?'9.5':'11.5')+'px Larsseit, Arial',col,'center',widths[i]);
       });
       y+=rowH;
     });
