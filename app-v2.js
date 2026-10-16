@@ -133,6 +133,17 @@
  w.RiachueloBrandCards={decorateCanvas,legacyDecorateCanvas,version:"2026-trial-01"};
 })(window);
 
+/* Visualização institucional dos cards na tela — teste reversível. */
+(function(){
+  if(typeof document==="undefined")return;
+  if(document.querySelector('link[data-ria-card-ui="v1"]'))return;
+  const link=document.createElement("link");
+  link.rel="stylesheet";
+  link.href="./cards-visible-preview-v1.css?v=1";
+  link.setAttribute("data-ria-card-ui","v1");
+  (document.head||document.documentElement).appendChild(link);
+})();
+
 /* V34 bootstrap: reutiliza o runtime principal já carregado pelo index */
 var ESTORE_API=window.API||'https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-api';
 
