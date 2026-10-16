@@ -35,7 +35,7 @@ const regionalSnapshot163 = new Map();
    '<div class="cpKpis158"><div><small>Corte atual • Top 15</small><b>'+money(limit(current))+'</b></div><div><small>Premiados provisórios</small><b>15</b></div><div><small>Dias restantes</small><b>'+days()+'</b></div></div>'+
    '<div class="cpHead158"><div><h3>🏆 TOP 15 · '+esc(current)+'</h3><p>Ranking nacional por venda aprovada sem BOPIS</p></div><button onclick="shareCampaignCard158(\''+current+'\')">↗ Compartilhar Top 15 deste porte</button></div>'+
    '<div class="cpGrid158">'+ranks[current].map(row).join('')+'</div>'+
-   '<p class="cpNote158"><b>BOPIS (em vermelho):</b> valor não contabilizado, pois se trata de venda de produtos que já estavam no estoque da loja. Os prêmios indicados são provisórios e as posições podem mudar até 31/10.</p>'+
+   '<p class="cpNote158"><b>BOPIS (em vermelho):</b> valor não contabilizado no total utilizado para o ranking, pois se trata de venda de produtos já disponíveis no estoque da loja. Os prêmios indicados são provisórios e as posições podem mudar até 31/10.</p>'+
    '<div class="cpSimulator158"><h3>🎯 Descubra seu desafio para subir no ranking</h3><p>Informe apenas sua matrícula. A parcial busca automaticamente suas vendas aprovadas, exclui BOPIS e calcula seu ticket médio válido.</p>'+
    '<label>Matrícula <input id="cpMat158" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="9" autocomplete="off" value="'+esc(mat())+'" placeholder="Digite sua matrícula"></label>'+
    '<button onclick="calculateCampaign158()">Consultar meu desafio</button><div id="cpAnswer158" role="status" aria-live="polite"></div></div>'+
@@ -48,7 +48,7 @@ const regionalSnapshot163 = new Map();
    const out=document.getElementById('cpAnswer158');
    if(!field||!out)return;
    const m=String(field.value||'').replace(/[^0-9]/g,'').trim();
-   if(!/^\\d{6,9}$/.test(m)){out.textContent='Informe uma matrícula válida para consultar a parcial.';return;}
+   if(!/^[0-9]{6,9}$/.test(m)){out.textContent='Informe uma matrícula válida para consultar a parcial.';return;}
    const rec=lookup163(m);
    if(!rec){out.innerHTML='<b>Matrícula não localizada na parcial disponível.</b><br>O arquivo recebido contém o Top 45 nacional e a base completa da CE+PI até 14/10. É necessário atualizar o relatório nacional para consultar esta matrícula; não vamos estimar valores sem dados.';return;}
    if(rec.group!==current){current=rec.group;const area=document.getElementById('cpPartial158');if(area)area.innerHTML=partial();}
@@ -99,7 +99,7 @@ const regionalSnapshot163 = new Map();
    c.fillStyle='white';c.font='800 56px Arial';c.fillText('eStore no',48,192);
    c.fillStyle='#EFB657';c.fillText('Volume Máximo',335,192);
    c.textAlign='right';c.fillStyle='white';c.font='700 28px Arial';c.fillText('TOP 15 • PORTE '+k,1870,71);
-   c.font='500 20px Arial';c.fillText('PARCIAL ATÉ 14/10/2026 • NACIONAL',1870,107);
+   c.font='500 20px Arial';c.fillText('PARCIAL 01/10 A 14/10/2026 • NACIONAL',1870,107);
    c.textAlign='left';
    ranks[k].forEach(function(r,i){
      const col=Math.floor(i/5),rw=i%5,x=35+col*630,y=216+rw*141;
@@ -108,14 +108,15 @@ const regionalSnapshot163 = new Map();
      c.fillStyle='#173F35';c.font='800 28px Arial';c.textAlign='center';c.fillText(r.pos+'º',x+48,y+72);c.textAlign='left';
      c.font='800 18px Arial';c.fillText('MATRÍCULA '+r.mat,x+100,y+35);
      c.font='600 15px Arial';c.fillStyle='#466964';c.fillText('LOJA '+r.store+(r.store==='108'?' • CE+PI':''),x+100,y+60);
-     c.font='800 24px Arial';c.fillStyle='#173F35';c.fillText(money(r.approved),x+100,y+94);
+     c.font='600 12px Arial';c.fillStyle='#466964';c.fillText('APROVADO VÁLIDO',x+100,y+80);
+     c.font='800 24px Arial';c.fillStyle='#173F35';c.fillText(money(r.approved),x+100,y+111);
      c.fillStyle='#466964';c.font='700 15px Arial';c.fillText(fit(c,prize(r.pos),235),x+358,y+96);
      if(r.bopis){rr(c,x+343,y+13,247,33,10,'#FCE2E4');c.fillStyle='#B4232B';c.font='800 16px Arial';c.fillText('● BOPIS '+money(r.bopis),x+354,y+37);}
    });
    rr(c,35,943,1850,104,17,'#0A2E28');
    c.fillStyle='#FFCD75';c.font='800 28px Arial';c.fillText('CORTE TOP 15: '+money(limit(k)),60,989);
-   c.fillStyle='white';c.font='600 18px Arial';c.fillText('BOPIS em vermelho: produto disponível no estoque da loja — valor não contabilizado.',60,1023);
-   c.textAlign='right';c.font='600 18px Arial';c.fillText('PRÊMIOS PROVISÓRIOS • MODA QUE INSPIRA O BRASIL',1850,1008);
+   c.fillStyle='white';c.font='600 18px Arial';c.fillText('BOPIS: valor NÃO contabilizado no ranking, pois o produto já estava no estoque da loja.',60,1023);
+   c.textAlign='right';c.font='600 18px Arial';c.fillText('CORTE DA PARCIAL: 01/10 A 14/10/2026',1850,989);
    return can;
  }
  window.shareCampaignCard158=async function(k){
@@ -126,7 +127,7 @@ const regionalSnapshot163 = new Map();
      if(!blob)throw Error('Falha na imagem');
      const file=new File([blob],'ranking-top15-'+k.replace(/\W/g,'-')+'-14-10.png',{type:'image/png'});
      if(navigator.canShare&&navigator.canShare({files:[file]})){
-       try{await navigator.share({files:[file],title:'Parcial eStore no Volume Máximo',text:'Top 15 nacional • '+k+' • até 14/10/2026'});return;}catch(e){if(e.name==='AbortError')return;}
+       try{await navigator.share({files:[file],title:'Parcial eStore no Volume Máximo',text:'Top 15 nacional • Porte '+k+' • Parcial de 01/10 a 14/10/2026 • BOPIS não contabilizado no ranking'});return;}catch(e){if(e.name==='AbortError')return;}
      }
      const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
    }catch(e){alert('Não foi possível gerar o card: '+String(e.message||e));}
