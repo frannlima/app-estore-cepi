@@ -180,8 +180,8 @@
     x.fillStyle=GREEN;x.fillRect(0,0,W,160);
     const logo=await logo117();
     if(logo){const ratio=logo.naturalWidth/logo.naturalHeight,lw=370,lh=Math.min(70,lw/ratio);x.drawImage(logo,60,42,lw,lh)}
-    tx117(x,'BOPIS • RETIRA EM LOJA',510,62,'700 34px Arial',WHITE);
-    tx117(x,'REGIONAL CE+PI • '+periodLabel117()+' • '+fmtDate117(d.endDate),510,104,'600 15px Arial','#E6ECE9');
+    tx117(x,'BOPIS • RETIRA EM LOJA',510,62,'700 34px Larsseit, Arial',WHITE);
+    tx117(x,'REGIONAL CE+PI • '+periodLabel117()+' • '+fmtDate117(d.endDate),510,104,'600 15px Larsseit, Arial','#E6ECE9');
 
     const cards=[
       ['CAPTADO BOPIS',fmtMoney117(s.captured),ORANGE],
@@ -192,11 +192,11 @@
       ['FREQUÊNCIA',fmtInt117(s.frequencyDays)+' dias',SAGE]
     ];
     const cw=342,gap=25,sx=62;
-    cards.forEach((a,i)=>{const col=i%3,row=Math.floor(i/3),cx=sx+col*(cw+gap),cy=205+row*120;rr117(x,cx,cy,cw,98,15,WHITE,'#E4E0D8');tx117(x,a[0],cx+cw/2,cy+27,'700 11px Arial',SAGE,'center');tx117(x,a[1],cx+cw/2,cy+64,'700 24px Arial',a[2],'center')});
+    cards.forEach((a,i)=>{const col=i%3,row=Math.floor(i/3),cx=sx+col*(cw+gap),cy=205+row*120;rr117(x,cx,cy,cw,98,15,WHITE,'#E4E0D8');tx117(x,a[0],cx+cw/2,cy+27,'700 11px Larsseit, Arial',SAGE,'center');tx117(x,a[1],cx+cw/2,cy+64,'700 24px Larsseit, Arial',a[2],'center')});
 
-    tx117(x,'RELAÇÃO DAS LOJAS',62,475,'700 24px Arial',GREEN);
+    tx117(x,'RELAÇÃO DAS LOJAS',62,475,'700 24px Larsseit, Arial',GREEN);
     const cols=[75,160,300,430,555,690,870,1055],heads=['LOJA','PED.','COLAB.','FREQ.','RECOR.','CAPTADO','NÃO COMISS.','STATUS'];
-    heads.forEach((h,i)=>tx117(x,h,cols[i],515,'700 10px Arial',SAGE,'center'));
+    heads.forEach((h,i)=>tx117(x,h,cols[i],515,'700 10px Larsseit, Arial',SAGE,'center'));
     let y=548;
     stores.slice(0,19).forEach(r=>{
       rr117(x,55,y-20,1090,36,7,(+r.orders||0)>0?'#FFF5E5':'#F2F0EB');
@@ -206,18 +206,18 @@
     });
 
     const py=Math.max(1390,y+30);
-    tx117(x,'TOP 5 COLABORADORES • BOPIS',62,py,'700 22px Arial',GREEN);
+    tx117(x,'TOP 5 COLABORADORES • BOPIS',62,py,'700 22px Larsseit, Arial',GREEN);
     people.forEach((p,i)=>{
-      const yy=py+40+i*40;tx117(x,(i+1)+'º',72,yy,'700 13px Arial',ORANGE);
-      tx117(x,p.name,115,yy,'700 12px Arial',GREEN,'left',360);
-      tx117(x,p.st,500,yy,'600 12px Arial',SAGE,'center');
-      tx117(x,fmtInt117(p.orders)+' pedidos',620,yy,'600 12px Arial',GREEN,'center');
-      tx117(x,fmtMoney117(p.captured),790,yy,'600 12px Arial',GREEN,'center');
-      tx117(x,fmtMoney117(p.approved)+' não comiss.',1040,yy,'600 11px Arial',WINE,'center',220);
+      const yy=py+40+i*40;tx117(x,(i+1)+'º',72,yy,'700 13px Larsseit, Arial',ORANGE);
+      tx117(x,p.name,115,yy,'700 12px Larsseit, Arial',GREEN,'left',360);
+      tx117(x,p.st,500,yy,'600 12px Larsseit, Arial',SAGE,'center');
+      tx117(x,fmtInt117(p.orders)+' pedidos',620,yy,'600 12px Larsseit, Arial',GREEN,'center');
+      tx117(x,fmtMoney117(p.captured),790,yy,'600 12px Larsseit, Arial',GREEN,'center');
+      tx117(x,fmtMoney117(p.approved)+' não comiss.',1040,yy,'600 11px Larsseit, Arial',WINE,'center',220);
     });
     x.strokeStyle='#BFC8C3';x.beginPath();x.moveTo(62,H-60);x.lineTo(1138,H-60);x.stroke();
-    tx117(x,'MODA QUE INSPIRA O BRASIL',62,H-32,'700 11px Arial',GREEN);
-    tx117(x,'App. eStore CE+PI',1138,H-32,'700 11px Arial',GREEN,'right');
+    tx117(x,'MODA QUE INSPIRA O BRASIL',62,H-32,'700 11px Larsseit, Arial',GREEN);
+    tx117(x,'App. eStore CE+PI',1138,H-32,'700 11px Larsseit, Arial',GREEN,'right');
     return cv;
   }
   function bopisCaption117(){
