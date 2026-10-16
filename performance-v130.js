@@ -628,7 +628,7 @@
   window.performanceCardCanvasV130=performanceCardCanvasV130;
 
   async function performanceBlobV130(){
-    var cv=await performanceCardCanvasV130();
+    var cv=window.RiachueloBrandCards.decorateCanvas(await performanceCardCanvasV130());
     return new Promise(function(ok){cv.toBlob(function(b){ok({blob:b,canvas:cv})},'image/png',1)});
   }
   window.previewPerformanceCardV130=async function(){
