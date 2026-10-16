@@ -70,18 +70,57 @@ const regionalSnapshot163 = new Map();
       (r.bopis?'<span class="cpBopis158" title="Valor BOPIS excluído do resultado">BOPIS: '+money(r.bopis)+'</span>':'')+'</div>'+
       '<div class="cpValue158"><b>'+money(r.approved)+'</b><small>'+esc(prize(r.pos))+'</small></div></div>';
  }
- function partial(){
-   return '<div class="cpHero158"><small>CAMPANHA NACIONAL · 01 A 31/10/2026</small><h2>🔊 eStore no <em>Volume Máximo</em></h2><p>Uma parcial para aumentar o som das vendas. 15 premiáveis por porte · 45 posições nacionais.</p><span>PERÍODO DA PARCIAL: 01/10 A 14/10/2026</span></div>'+
-   '<div class="cpPorte158">'+groups.map(k=>'<button class="'+(k===current?'selected':'')+'" onclick="campaignPorte158(\''+k+'\')">'+esc(k)+'</button>').join('')+'</div>'+
-   '<div class="cpKpis158"><div><small>Corte atual • Top 15</small><b>'+money(limit(current))+'</b></div><div><small>Premiados provisórios</small><b>15</b></div><div><small>Dias restantes</small><b>'+days()+'</b></div></div>'+
-   '<div class="cpHead158"><div><h3>🏆 TOP 15 · '+esc(current)+'</h3><p>Ranking nacional por venda aprovada sem BOPIS</p></div><button onclick="shareCampaignCard158(\''+current+'\')">↗ Compartilhar Top 15 deste porte</button></div>'+
-   '<div class="cpGrid158">'+ranks[current].map(row).join('')+'</div>'+
-   '<p class="cpNote158"><b>BOPIS (em vermelho):</b> valor não contabilizado no total utilizado para o ranking, pois se trata de venda de produtos já disponíveis no estoque da loja. Os prêmios indicados são provisórios e as posições podem mudar até 31/10.</p>'+
-   '<div class="cpSimulator158"><h3>🎯 Seu desafio para subir no ranking</h3><p>Será que você está fazendo o necessário para conquistar um lugar entre os 15 maiores? Digite somente a matrícula e veja sua posição, o prêmio e o desafio até 31/10.</p>'+
-   '<label>Matrícula <input id="cpMat158" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="9" autocomplete="off" value="'+esc(mat())+'" placeholder="Digite sua matrícula"></label>'+
-   '<button onclick="calculateCampaign158()">Consultar meu desafio</button><div id="cpAnswer158" role="status" aria-live="polite"></div></div>'+
-   '<p class="cpMeta158">Parcial até 14/10/2026. Os nomes não constam no relatório recebido; por isso a identificação é por matrícula. Elegibilidade por cargo sujeita à validação final do regulamento.</p>';
+ function isAdmin165(){try{return typeof U!=="undefined"&&(!!U.admin||!!U.u?.admin);}catch(_){return false;}}
+ function adminImport165(){
+   if(!isAdmin165())return "";
+   return '<section class="cpAdmin165"><h3>⚙️ Atualizar parcial nacional • Administrador</h3>'+
+     '<p>Envie o relatório acumulado de vendas aprovadas no mesmo modelo Excel (.xlsx) de 14/10. A carga substitui a parcial anterior; não soma novamente pedidos já incluídos. O corte é identificado pelas datas dos pedidos.</p>'+
+     '<label>Relatório acumulado (.xlsx ou .xls)<input id="cpAdminFile165" type="file" accept=".xlsx,.xls"></label>'+
+     '<label>Senha administrativa<input id="cpAdminPassword165" type="password" autocomplete="off" placeholder="Senha do administrador"></label>'+
+     '<button type="button" onclick="importCampaignExcel165()">Importar e atualizar parcial</button>'+
+     '<div id="cpImportStatus165" role="status" aria-live="polite"></div></section>';
  }
+ function partial(){
+   if(!isVisible165())return '<div class="cpLoading165"><h2>Campanha encerrada</h2><p>A aba de parciais foi retirada de circulação após 10/11/2026.</p></div>';
+   return '<div class="cpHero158"><small>CAMPANHA NACIONAL · 01 A 31/10/2026</small><h2>🔊 eStore no <em>Volume Máximo</em></h2>'+
+     '<p>Seu resultado pode virar prêmio. Confira quem está nos 15 maiores volumes aprovados por porte — sem vendas BOPIS.</p>'+
+     '<span>PERÍODO CONSIDERADO: '+esc(sourceCaption165())+'</span></div>'+
+     '<div class="cpPorte158">'+groups.map(g=>'<button class="'+(g===current?'selected':'')+'" onclick="campaignPorte158(\''+g+'\')" aria-pressed="'+(g===current)+'">'+esc(g)+'</button>').join('')+'</div>'+
+     '<div class="cpKpis158"><div><small>Valor do 15º colocado</small><b>'+money(limit(current))+'</b></div><div><small>Premiados por porte</small><b>15</b></div><div><small>Encerramento das vendas</small><b>31/10</b></div></div>'+
+     '<div class="cpHead158"><div><h3>🏆 Top 15 · '+esc(current)+'</h3><p>Ranking nacional • aprovado válido, sem BOPIS</p></div>'+
+       '<button type="button" onclick="shareCampaignCard158(\''+current+'\')">↗ Card Top 15 deste porte</button></div>'+
+     '<div class="cpGrid158">'+(ranks[current]||[]).map(row).join('')+'</div>'+
+     '<div class="cpShareRegional165"><b>📣 Compartilhamento regional</b><p>Gere uma única imagem com as 45 posições nacionais, organizadas nos três portes, e mobilize o time CE+PI.</p>'+
+     '<button type="button" onclick="shareCampaignRegional165()">↗ Compartilhar card consolidado • 45 elegíveis</button></div>'+
+     '<p class="cpNote158"><b>🔴 BOPIS:</b> valor não contabilizado no total para o ranking, pois se trata de venda de produtos que já estavam no estoque da loja. Classificação e prêmio são provisórios.</p>'+
+     '<div class="cpSimulator158"><h3>🎯 Qual será seu próximo prêmio?</h3><p>Você vai manter sua posição ou aumentar o volume para subir? Digite somente a matrícula e confira a simulação personalizada.</p>'+
+       '<label>Matrícula<input id="cpMat158" type="text" inputmode="numeric" maxlength="9" autocomplete="off" value="'+esc(mat())+'" placeholder="Digite sua matrícula"></label>'+
+       '<button type="button" onclick="calculateCampaign158()">Consultar meu desafio</button>'+
+       '<div id="cpAnswer158" role="status" aria-live="polite"></div></div>'+
+     adminImport165()+
+     '<p class="cpMeta158"><span id="campaignSource165">Parcial '+esc(sourceCaption165())+'</span> • Ranking por matrícula (o relatório não contém nomes). A confirmação dos elegíveis depende do regulamento da campanha. Disponível no app até 10/11/2026.</p>';
+ }
+ window.importCampaignExcel165=async function(){
+   const box=document.getElementById("cpImportStatus165"),file=document.getElementById("cpAdminFile165")?.files?.[0],
+     pass=document.getElementById("cpAdminPassword165"),password=String(pass?.value||"");
+   if(!box)return;
+   if(!isAdmin165()){box.textContent="Acesso restrito ao administrador.";return;}
+   if(!file||!/\.(xlsx|xls)$/i.test(file.name)){box.textContent="Selecione o relatório Excel acumulado.";return;}
+   if(!password){box.textContent="Informe a senha administrativa.";return;}
+   const form=new FormData();form.append("action","import");form.append("matricula",mat());form.append("password",password);form.append("file",file);
+   box.textContent="Validando e consolidando a base nacional…";
+   try{
+     const response=await fetch(API165,{method:"POST",body:form,cache:"no-store"});
+     const result=await response.json();
+     if(!response.ok||!result.ok)throw new Error(result.error||"Falha na importação.");
+     if(pass)pass.value="";
+     fetchedAt165=0;
+     await window.loadCampaignSnapshot165(true);
+     const msg="Parcial atualizada até "+readable165(result.asof)+". "+result.entries+" matrículas consolidadas. Os valores da carga anterior foram substituídos.";
+     const host=document.getElementById("cpImportStatus165");if(host)host.textContent=msg;
+     alert(msg);
+   }catch(e){box.textContent="Não foi possível importar: "+String(e.message||e);}
+ };
  function amount(s){s=String(s||'').trim().replace(/[R$\s]/g,'');return s?Number(s.includes(',')?s.replace(/\./g,'').replace(',','.'):s):NaN;}
  window.campaignPorte158=function(k){if(!ranks[k])return;current=k;let el=document.getElementById('cpPartial158');if(el)el.innerHTML=partial();};
  async function findPerson165(m){
@@ -188,7 +227,7 @@ const regionalSnapshot163 = new Map();
    c.fillStyle='white';c.font='800 56px Arial';c.fillText('eStore no',48,192);
    c.fillStyle='#EFB657';c.fillText('Volume Máximo',335,192);
    c.textAlign='right';c.fillStyle='white';c.font='700 28px Arial';c.fillText('TOP 15 • PORTE '+k,1870,71);
-   c.font='500 20px Arial';c.fillText('PARCIAL 01/10 A 14/10/2026 • NACIONAL',1870,107);
+   c.font='500 20px Arial';c.fillText('PARCIAL '+sourceCaption165()+' • NACIONAL',1870,107);
    c.textAlign='left';
    ranks[k].forEach(function(r,i){
      const col=Math.floor(i/5),rw=i%5,x=35+col*630,y=216+rw*141;
@@ -205,7 +244,7 @@ const regionalSnapshot163 = new Map();
    rr(c,35,943,1850,104,17,'#0A2E28');
    c.fillStyle='#FFCD75';c.font='800 28px Arial';c.fillText('CORTE TOP 15: '+money(limit(k)),60,989);
    c.fillStyle='white';c.font='600 18px Arial';c.fillText('BOPIS: valor NÃO contabilizado no ranking, pois o produto já estava no estoque da loja.',60,1023);
-   c.textAlign='right';c.font='600 18px Arial';c.fillText('CORTE DA PARCIAL: 01/10 A 14/10/2026',1850,989);
+   c.textAlign='right';c.font='600 18px Arial';c.fillText('CORTE DA PARCIAL: '+sourceCaption165(),1850,989);
    return can;
  }
  window.shareCampaignCard158=async function(k){
@@ -214,9 +253,9 @@ const regionalSnapshot163 = new Map();
      const canvas=await canvasFor(k);
      const blob=await new Promise(done=>canvas.toBlob(done,'image/png'));
      if(!blob)throw Error('Falha na imagem');
-     const file=new File([blob],'ranking-top15-'+k.replace(/\W/g,'-')+'-14-10.png',{type:'image/png'});
+     const file=new File([blob],'ranking-top15-'+k.replace(/\W/g,'-')+'-'+campaignInfo165.asof+'.png',{type:'image/png'});
      if(navigator.canShare&&navigator.canShare({files:[file]})){
-       try{await navigator.share({files:[file],title:'Parcial eStore no Volume Máximo',text:'Top 15 nacional • Porte '+k+' • Parcial de 01/10 a 14/10/2026 • BOPIS não contabilizado no ranking'});return;}catch(e){if(e.name==='AbortError')return;}
+       try{await navigator.share({files:[file],title:'Parcial eStore no Volume Máximo',text:'Top 15 nacional • Porte '+k+' • Parcial '+sourceCaption165()+' • BOPIS excluído do ranking'});return;}catch(e){if(e.name==='AbortError')return;}
      }
      const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
    }catch(e){alert('Não foi possível gerar o card: '+String(e.message||e));}
@@ -250,6 +289,9 @@ const regionalSnapshot163 = new Map();
     '.cpChallengeAction165{padding:15px 18px;margin:5px 14px 12px;background:#EFF5EF;border-left:5px solid #466964;border-radius:10px}.cpChallengeAction165.alt{background:#FFF1DA;border-color:#DE7C00}.cpChallengeAction165 span{display:block;color:#466964;font-size:11px;font-weight:900;margin-bottom:6px}.cpChallengeAction165 b{font-size:18px;line-height:1.3}.cpChallengeAction165 p{font-size:12px;line-height:1.5;margin:7px 0 0}'+
     '.cpBopisAlert165{margin:0 14px 13px;background:#FDEBEC;color:#8B2634;border-radius:10px;padding:11px 13px;font-size:12px;line-height:1.5}.cpChallengeFoot165{font-size:11px;color:#5b6d61;padding:0 18px 16px;line-height:1.6}.cpMyShell165{margin:12px 0}.cpSeeRanking165{border:0;border-radius:12px;background:#DE7C00;color:white;padding:12px 15px;width:100%;font-weight:850}.cpLoading165{background:#f5f2ea;padding:16px;border-radius:12px;font-size:13px}'+
     '@media(max-width:520px){.cpChallengeKpis165{grid-template-columns:1fr}.cpChallengeKpi165{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}.cpChallengeKpi165 span{flex-basis:100%}.cpChallengeAction165{margin:5px 9px 9px}.cpChallengeTop165{padding:16px}}';
+   st.textContent+=
+    '.cpShareRegional165{background:#173F35;color:white;border-radius:17px;padding:17px;margin:15px 0}.cpShareRegional165 b{color:#FFE2A6;font-size:16px}.cpShareRegional165 p{color:white;font-size:12px;line-height:1.5}.cpShareRegional165 button{background:#DE7C00;color:white;border:0;padding:12px;border-radius:11px;font-size:13px;font-weight:850;width:100%}'+
+    '.cpAdmin165{background:#F4F1E9;border:1px solid #D6D2C4;border-radius:16px;padding:17px;margin:17px 0}.cpAdmin165 h3{color:#173F35}.cpAdmin165 p{font-size:12px;line-height:1.5}.cpAdmin165 label{font-size:12px;font-weight:850;display:block;margin:10px 0}.cpAdmin165 input{background:white;border:1px solid #D6D2C4;border-radius:9px;padding:12px;width:100%;margin-top:5px;box-sizing:border-box}.cpAdmin165 button{background:#173F35;border:0;color:white;border-radius:10px;padding:13px;font-weight:850}.cpAdmin165 #cpImportStatus165{color:#466964;font-size:12px;line-height:1.5;margin-top:11px}';
    document.head.appendChild(st);
  }
  function popup(){
