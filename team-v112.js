@@ -364,7 +364,7 @@
     try{
       const raw=teamCardData();if(!raw||!raw.regional)return alert('Abra a visão Regional CE+PI antes de compartilhar o painel.');
       if(!COMPARE_CACHE[compareKey(raw.j)])try{await loadPrevious(raw.j)}catch(e){}
-      const d=buildView(raw.j),caption=shareCaption(d),c=await teamCardCanvas();
+      const d=buildView(raw.j),caption=shareCaption(d),c=window.RiachueloBrandCards.decorateCanvas(await teamCardCanvas());
       if(!c)return alert('Aguarde o carregamento dos dados do Meu Time.');
       const b=await new Promise(r=>c.toBlob(r,'image/png',.98));if(!b)throw new Error('Falha ao gerar imagem');
       const f=new File([b],'Meu_Time_Dispersao_CEPI_'+PER+'.png',{type:'image/png'});
