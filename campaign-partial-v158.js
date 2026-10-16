@@ -77,49 +77,97 @@ const regionalSnapshot163 = new Map();
    '<div class="cpHead158"><div><h3>🏆 TOP 15 · '+esc(current)+'</h3><p>Ranking nacional por venda aprovada sem BOPIS</p></div><button onclick="shareCampaignCard158(\''+current+'\')">↗ Compartilhar Top 15 deste porte</button></div>'+
    '<div class="cpGrid158">'+ranks[current].map(row).join('')+'</div>'+
    '<p class="cpNote158"><b>BOPIS (em vermelho):</b> valor não contabilizado no total utilizado para o ranking, pois se trata de venda de produtos já disponíveis no estoque da loja. Os prêmios indicados são provisórios e as posições podem mudar até 31/10.</p>'+
-   '<div class="cpSimulator158"><h3>🎯 Descubra seu desafio para subir no ranking</h3><p>Informe apenas sua matrícula. A parcial busca automaticamente suas vendas aprovadas, exclui BOPIS e calcula seu ticket médio válido.</p>'+
+   '<div class="cpSimulator158"><h3>🎯 Seu desafio para subir no ranking</h3><p>Será que você está fazendo o necessário para conquistar um lugar entre os 15 maiores? Digite somente a matrícula e veja sua posição, o prêmio e o desafio até 31/10.</p>'+
    '<label>Matrícula <input id="cpMat158" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="9" autocomplete="off" value="'+esc(mat())+'" placeholder="Digite sua matrícula"></label>'+
    '<button onclick="calculateCampaign158()">Consultar meu desafio</button><div id="cpAnswer158" role="status" aria-live="polite"></div></div>'+
    '<p class="cpMeta158">Parcial até 14/10/2026. Os nomes não constam no relatório recebido; por isso a identificação é por matrícula. Elegibilidade por cargo sujeita à validação final do regulamento.</p>';
  }
  function amount(s){s=String(s||'').trim().replace(/[R$\s]/g,'');return s?Number(s.includes(',')?s.replace(/\./g,'').replace(',','.'):s):NaN;}
  window.campaignPorte158=function(k){if(!ranks[k])return;current=k;let el=document.getElementById('cpPartial158');if(el)el.innerHTML=partial();};
- window.calculateCampaign158=function(){
-   const field=document.getElementById('cpMat158');
-   const out=document.getElementById('cpAnswer158');
-   if(!field||!out)return;
-   const m=String(field.value||'').replace(/[^0-9]/g,'').trim();
-   if(!/^[0-9]{6,9}$/.test(m)){out.textContent='Informe uma matrícula válida para consultar a parcial.';return;}
-   const rec=lookup163(m);
-   if(!rec){out.innerHTML='<b>Matrícula não localizada na parcial disponível.</b><br>O arquivo recebido contém o Top 45 nacional e a base completa da CE+PI até 14/10. É necessário atualizar o relatório nacional para consultar esta matrícula; não vamos estimar valores sem dados.';return;}
-   if(rec.group!==current){current=rec.group;const area=document.getElementById('cpPartial158');if(area)area.innerHTML=partial();}
-   const updated=document.getElementById('cpMat158'),answer=document.getElementById('cpAnswer158');
-   if(updated)updated.value=m;
-   if(!answer)return;
-   const matched=ranks[rec.group].find(x=>x.mat===m);
-   const currentPosition=matched?matched.pos:null;
-   const target=currentPosition>1?ranks[rec.group][currentPosition-2]:ranks[rec.group][14];
-   const approved=Math.round(rec.approved*100);
-   const threshold=Math.round(target.approved*100);
-   const diff=currentPosition===1?0:Math.max(0,(threshold+1-approved)/100);
-   const ticket=rec.orders>0?Math.round(approved/rec.orders)/100:0;
-   const orders=ticket>0?Math.ceil((diff-0.000001)/ticket):null;
-   const remaining=days();
-   let html='<div class="cpResult163"><b>Matrícula '+esc(m)+' · Porte '+esc(rec.group)+'</b>'+
-     '<p>Venda aprovada válida: <strong>'+money(rec.approved)+'</strong> · Pedidos válidos: '+(rec.orders||0)+
-     '<br>Ticket médio individual: '+(ticket>0?money(ticket):'sem pedidos válidos')+
-     '<br>'+ (rec.bopis>0?'<span class="cpBopis158">BOPIS excluído: '+money(rec.bopis)+'</span><br>':'')+
-     '<small>O BOPIS não integra o valor total utilizado no ranking.</small></p>';
-   if(currentPosition===1)html+='<b>🥇 1º lugar parcial!</b> Mantenha o ritmo: a classificação é provisória até 31/10.';
-   else{
-     const action=currentPosition?'ultrapassar o '+(currentPosition-1)+'º colocado':'entrar no Top 15';
-     html+='<p>'+(currentPosition?'<b>Posição atual: '+currentPosition+'º • Prêmio provisório: '+esc(prize(currentPosition))+'</b><br>':'<b>Fora do Top 15 na parcial.</b><br>')+
-       'Para '+action+': <strong>'+money(diff)+'</strong> adicionais em vendas aprovadas válidas.'+
-       (orders!==null?'<br>Estimativa pelo seu ticket: <strong>'+orders+' pedido(s)</strong>.': '<br><b>Quantidade de pedidos:</b> indisponível, pois não há ticket médio individual válido.')+
-       '<br>Até 31/10: <strong>'+remaining+' dia(s)</strong> restantes.'+
-       (orders!==null&&remaining>0?'<br>Ritmo estimado: <strong>'+(orders/remaining).toLocaleString('pt-BR',{maximumFractionDigits:2,minimumFractionDigits:2})+' pedido(s)/dia</strong>.':'')+'</p>';
+ async function findPerson165(m){
+   if(serverSnapshot165){
+     try{
+       const p=await request165("lookup",{matricula:m});
+       if(p.person){
+         const v=p.person;const g=v.group;
+         const matched=ranks[g]&&ranks[g].find(r=>r.mat===m);
+         return {mat:m,group:g,store:v.store||"",approved:Number(v.approved_cents||0)/100,
+           bopis:Number(v.bopis_cents||0)/100,orders:Number(v.orders||0),
+           ticket:Number(v.orders)>0?Number(v.approved_cents||0)/100/Number(v.orders):0,
+           position:matched?matched.pos:(v.position||null)};
+       }
+     }catch(e){console.warn("Consulta individual:",e);}
    }
-   answer.innerHTML=html+'<small>Simulação com a base de 01 a 14/10/2026. O corte e a posição podem mudar até o encerramento da campanha.</small></div>';
+   const x=lookup163(m);
+   return x?{mat:m,group:x.group,store:x.store||"",approved:x.approved,bopis:x.bopis,
+     orders:x.orders||0,ticket:x.orders>0?x.approved/x.orders:0,
+     position:(ranks[x.group]||[]).find(r=>r.mat===m)?.pos||null}:null;
+ }
+ function challenge165(p){
+   const g=p.group,groupRows=ranks[g]||[],pos=p.position,approved=p.approved,
+     ticket=p.ticket>0?p.ticket:0,remaining=days(),cut=groupRows[14]?.approved||0;
+   const goal=pos===1?null:pos&&pos<=15?groupRows[pos-2]?.approved:cut;
+   const diff=goal==null?0:Math.max(0,Math.round((goal-approved+.01)*100)/100);
+   const required=ticket>0?Math.ceil(Math.max(0,diff)/ticket):null;
+   const behind=pos&&pos<15?groupRows[pos]?.approved:null;
+   const margin=behind==null?null:Math.max(0,approved-behind);
+   const passedDays=Math.max(1,Math.min(31,Math.ceil((Date.parse(campaignInfo165.asof+"T12:00:00Z")-Date.parse("2026-10-01T12:00:00Z"))/86400000)+1));
+   const estimatedSustain=Math.ceil(approved/passedDays*Math.max(0,remaining)*100)/100;
+   const expectedOrders=ticket>0?Math.ceil(estimatedSustain/ticket):null;
+   const rankText=pos&&pos<=15?pos+"º lugar nacional":"Fora do Top 15";
+   let prizeText=pos&&pos<=15?prize(pos):"Ainda sem premiação projetada";
+   let headline=pos&&pos<=15?"🏆 Você está entre os elegíveis. Vai defender sua posição ou disputar um prêmio maior?":"🎯 O Top 15 está ao seu alcance. Quantos pedidos faltam para mudar esse jogo?";
+   const moneyBox=(label,value,detail)=>'<div class="cpChallengeKpi165"><small>'+label+'</small><b>'+value+'</b><span>'+detail+'</span></div>';
+   let html='<section class="cpChallenge165">'+
+     '<div class="cpChallengeTop165"><small>PARCIAL DA CAMPANHA · '+esc(sourceCaption165())+'</small><h3>'+headline+'</h3>'+
+     '<p>Matrícula '+esc(p.mat)+' · Porte '+esc(g)+(p.store?' · Loja '+esc(p.store):'')+'</p></div>'+
+     '<div class="cpChallengeKpis165">'+
+     moneyBox("Sua posição",rankText,prizeText)+
+     moneyBox("Aprovado válido",money(approved),"Excluindo BOPIS")+
+     moneyBox("Ticket médio",ticket>0?money(ticket):"Sem referência",String(p.orders||0)+" pedido(s) válido(s)")+'</div>';
+   if(p.bopis>0)html+='<div class="cpBopisAlert165">🔴 BOPIS '+money(p.bopis)+' — valor <b>não contabilizado no ranking</b>, pois o produto já estava no estoque da loja.</div>';
+   if(pos&&pos<=15){
+     html+='<div class="cpChallengeAction165"><span>🛡️ PARA DEFENDER A SUA POSIÇÃO</span>'+
+       '<b>'+(margin!=null?"Vantagem atual de "+money(margin):"Você está na 15ª posição, no limite do corte atual.")+'</b>'+
+       '<p>Referência de continuidade: '+money(estimatedSustain)+' em vendas válidas até 31/10'+
+       (expectedOrders!=null?" (aprox. "+expectedOrders+" pedidos pelo seu ticket).":"")+
+       '. É uma projeção baseada no seu ritmo de 01/10 até '+readable165(campaignInfo165.asof)+', não um valor que garanta sua posição.</p></div>';
+   }
+   if(pos===1)html+='<div class="cpChallengeAction165 alt"><span>🚀 PRÓXIMO DESAFIO</span><b>Continue na liderança!</b><p>Você já ocupa a 1ª posição. Acompanhe a evolução dos concorrentes até 31/10.</p></div>';
+   else html+='<div class="cpChallengeAction165 alt"><span>🚀 '+(pos&&pos<=15?"PARA SUBIR AO "+(pos-1)+"º LUGAR":"PARA ENTRAR ENTRE OS 15")+'</span>'+
+     '<b>'+money(diff)+' em vendas aprovadas válidas</b>'+
+     '<p>'+(required!=null?'Estimativa: <strong>'+required+' pedido(s)</strong> pelo seu ticket médio.'+
+       (remaining>0?' Ritmo equivalente a '+(required/remaining).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+' pedido(s) por dia.':'')
+       :'Ainda não há ticket médio válido para estimar a quantidade de pedidos.')+
+       (pos&&pos<=15?'<br>Prêmio da posição desejada: <strong>'+esc(prize(pos-1))+'</strong>.':'')+'</p></div>';
+   html+='<p class="cpChallengeFoot165">Faltam '+remaining+' dia(s) até 31/10. Ranking e prêmios são provisórios; o desempenho dos demais colaboradores altera o corte.</p></section>';
+   return html;
+ }
+ window.calculateCampaign158=async function(){
+   const field=document.getElementById("cpMat158"),output=document.getElementById("cpAnswer158");
+   if(!field||!output)return;
+   const m=String(field.value||"").replace(/[^0-9]/g,"");
+   if(!/^[0-9]{6,9}$/.test(m)){output.textContent="Digite uma matrícula válida.";return;}
+   output.innerHTML='<div class="cpLoading165">Consultando sua posição e calculando seu desafio…</div>';
+   const p=await findPerson165(m);
+   if(!p){output.innerHTML='<div class="cpLoading165">Matrícula não localizada na parcial disponível. Solicite ao administrador o relatório nacional completo até a data mais recente; nenhuma venda será presumida.</div>';return;}
+   current=p.group;
+   output.innerHTML=challenge165(p);
+ };
+ window.campaignMyResultCard165=function(){
+   if(!isVisible165())return "";
+   return '<section id="cpMyResult165" class="cpMyShell165"><strong>🏆 eStore no Volume Máximo · Sua posição</strong><p>Seu resultado na campanha está sendo consultado…</p></section>';
+ };
+ window.refreshCampaignResult165=async function(){
+   if(!isVisible165())return;
+   const host=document.getElementById("cpMyResult165");if(!host)return;
+   await window.loadCampaignSnapshot165();
+   const m=mat();
+   if(!/^[0-9]{6,9}$/.test(m)){host.innerHTML='<b>🏆 Campanha eStore no Volume Máximo</b><p>Entre com sua matrícula para visualizar sua posição.</p>';return;}
+   const p=await findPerson165(m);
+   if(!host.isConnected)return;
+   if(p)host.innerHTML=challenge165(p)+'<button type="button" class="cpSeeRanking165" onclick="openCampaignPartial158()">Ver ranking nacional completo →</button>';
+   else host.innerHTML='<b>🏆 eStore no Volume Máximo</b><p>Seu resultado ainda não está na base nacional publicada. A próxima importação poderá atualizar sua posição.</p><button type="button" class="cpSeeRanking165" onclick="openCampaignPartial158()">Conferir parcial →</button>';
  };
  window.openCampaignPartial158=function(){
    current=defaultGroup();
@@ -195,6 +243,13 @@ const regionalSnapshot163 = new Map();
     '.campaignModalV86:has(.cpPopupCTA158){overflow:auto!important}.campaignModalV86:has(.cpPopupCTA158) .campaignBannerV86 img{max-height:54vh!important}'+
     '@media(max-width:670px){.cpHeroCall158,.cpHead158{display:block}.cpHeroCall158 button,.cpHead158 button{width:100%;margin-top:9px}.cpGrid158{grid-template-columns:1fr}.cpKpis158{gap:5px}.cpKpis158 div{padding:9px 6px}.cpKpis158 small{font-size:9px}.cpRow158{padding:9px 6px}.cpValue158 b{font-size:12px}}'+
     '@media(prefers-reduced-motion:reduce){.cpTab158,.cpHeroCall158,.cpPopupCTA158{animation:none!important}}';
+   st.textContent+=
+    '.cpChallenge165{border:2px solid #DE7C00;border-radius:20px;overflow:hidden;background:#fff;box-shadow:0 12px 28px #173f3520;margin:14px 0;color:#173F35}'+
+    '.cpChallengeTop165{padding:19px;background:linear-gradient(120deg,#173F35,#356a55);color:white}.cpChallengeTop165 small{color:#f5cf76;font-size:11px;font-weight:900;letter-spacing:.02em}.cpChallengeTop165 h3{color:white;margin:8px 0;font-size:clamp(18px,4.5vw,25px);line-height:1.25}.cpChallengeTop165 p{color:#fff;font-size:12px;margin:0}'+
+    '.cpChallengeKpis165{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;padding:14px}.cpChallengeKpi165{background:#f4f1e8;border-radius:14px;padding:13px 10px;display:grid;gap:6px}.cpChallengeKpi165 small{font-size:10px;color:#566c61;font-weight:750}.cpChallengeKpi165 b{font-size:clamp(13px,3vw,20px);color:#173F35}.cpChallengeKpi165 span{font-size:10px;color:#466964}'+
+    '.cpChallengeAction165{padding:15px 18px;margin:5px 14px 12px;background:#EFF5EF;border-left:5px solid #466964;border-radius:10px}.cpChallengeAction165.alt{background:#FFF1DA;border-color:#DE7C00}.cpChallengeAction165 span{display:block;color:#466964;font-size:11px;font-weight:900;margin-bottom:6px}.cpChallengeAction165 b{font-size:18px;line-height:1.3}.cpChallengeAction165 p{font-size:12px;line-height:1.5;margin:7px 0 0}'+
+    '.cpBopisAlert165{margin:0 14px 13px;background:#FDEBEC;color:#8B2634;border-radius:10px;padding:11px 13px;font-size:12px;line-height:1.5}.cpChallengeFoot165{font-size:11px;color:#5b6d61;padding:0 18px 16px;line-height:1.6}.cpMyShell165{margin:12px 0}.cpSeeRanking165{border:0;border-radius:12px;background:#DE7C00;color:white;padding:12px 15px;width:100%;font-weight:850}.cpLoading165{background:#f5f2ea;padding:16px;border-radius:12px;font-size:13px}'+
+    '@media(max-width:520px){.cpChallengeKpis165{grid-template-columns:1fr}.cpChallengeKpi165{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}.cpChallengeKpi165 span{flex-basis:100%}.cpChallengeAction165{margin:5px 9px 9px}.cpChallengeTop165{padding:16px}}';
    document.head.appendChild(st);
  }
  function popup(){
