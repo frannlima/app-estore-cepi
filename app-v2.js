@@ -1,3 +1,52 @@
+/* Riachuelo | assinatura institucional única dos cards compartilháveis.
+ * Não altera gráficos, dados, rankings ou o conteúdo original do card.
+ * Utiliza o traçado vetorial original do logotipo Riachuelo.
+ * Tipografia Larsseit se instalada; fallback de sistema até a entrega dos arquivos licenciados. */
+(function(w){
+ "use strict";
+ const WORDMARK="M982,4L981,5L981,108L982,109L982,115L986,124L991,131L998,137L1007,142L1017,145L1075,145L1076,144L1076,125L1075,124L1021,124L1013,120L1007,113L1005,106L1005,5L1004,4ZM850,4L849,5L849,144L850,145L942,145L943,144L943,125L942,124L874,124L872,122L872,88L874,86L936,86L937,85L937,66L936,65L874,65L872,63L872,27L874,25L942,25L943,24L943,5L942,4ZM695,4L694,5L694,106L698,119L703,128L716,140L724,144L738,148L766,148L778,145L790,139L802,127L807,118L810,107L810,101L811,100L811,5L810,4L787,4L787,101L783,112L778,118L766,125L758,127L746,127L730,121L723,114L718,105L718,5L717,4ZM539,4L539,144L540,145L562,145L563,144L563,88L565,86L629,86L632,90L631,91L631,144L632,145L654,145L655,144L655,5L654,4L632,4L631,5L631,63L629,65L565,65L563,63L563,5L562,4ZM281,4L250,69L240,93L235,101L232,110L217,141L217,144L218,145L240,145L242,143L250,124L256,114L318,114L321,117L330,139L334,145L357,145L358,143L354,136L354,134L349,125L344,112L340,106L336,95L329,83L329,80L325,73L325,71L317,56L313,45L304,28L301,19L293,4ZM286,46L289,47L304,82L308,88L309,91L307,93L267,93L265,91ZM159,4L158,5L158,144L159,145L181,145L182,144L182,5L181,4ZM0,4L0,144L1,145L22,145L23,144L23,91L25,89L52,89L57,90L68,100L107,160L119,173L133,183L148,190L156,192L184,193L204,187L212,183L222,175L205,160L203,160L191,167L181,170L157,169L139,160L125,146L85,84L86,81L96,77L103,72L108,67L115,54L116,37L114,30L109,21L101,13L91,7L81,4ZM23,27L25,25L76,25L81,27L90,36L93,45L92,52L89,58L83,64L73,68L25,68L23,66ZM1146,1L1132,5L1125,9L1123,9L1110,18L1099,30L1090,45L1085,61L1085,66L1084,67L1085,87L1088,98L1094,111L1100,120L1116,135L1128,142L1148,148L1172,148L1187,144L1204,135L1222,117L1231,101L1234,92L1235,82L1236,81L1236,67L1231,47L1225,36L1215,23L1203,13L1190,6L1174,1L1164,1L1163,0ZM1163,22L1177,25L1190,32L1204,47L1210,61L1211,82L1206,98L1199,108L1192,115L1183,121L1176,124L1167,126L1153,126L1144,124L1132,118L1118,104L1113,96L1109,84L1109,65L1112,55L1118,44L1130,32L1146,24ZM434,1L420,5L413,9L411,9L397,19L387,30L379,43L373,63L373,85L378,103L382,111L389,121L404,135L416,142L436,148L461,148L476,144L488,138L499,130L505,124L505,122L488,108L477,117L468,122L455,126L437,125L428,122L421,118L408,106L399,89L397,81L397,68L401,54L406,45L413,37L425,28L432,25L447,22L461,24L473,29L489,41L505,26L505,24L487,10L467,2L453,1L452,0Z";
+ function decorateCanvas(source){
+   if(!source||!source.width||!source.height) return source;
+   if(source.dataset&&source.dataset.riaCard2025==="1") return source;
+   const width=source.width,height=source.height;
+   const top=Math.max(5,Math.round(width*.006));
+   const bottom=Math.max(68,Math.round(width*.09));
+   const out=document.createElement("canvas");
+   out.width=width;out.height=height+top+bottom;
+   const x=out.getContext("2d");
+   if(!x)return source;
+   x.fillStyle="#0C2E2D";x.fillRect(0,0,width,top);
+   x.drawImage(source,0,top,width,height);
+   x.fillStyle="#D7D0BB";x.fillRect(0,height+top,width,bottom);
+   x.fillStyle="#0C2E2D";x.fillRect(0,height+top, width, Math.max(1,Math.round(width*.0016)));
+   const logoW=Math.min(width*.35,Math.max(165,width*.28));
+   const logoH=logoW*194/1237;
+   const left=Math.max(18,Math.round(width*.036)), y=height+top+(bottom-logoH)/2;
+   x.save();
+   try{
+     x.translate(left,y);
+     x.scale(logoW/1237,logoW/1237);
+     x.fillStyle="#0C2E2D";
+     x.fill(new Path2D(WORDMARK));
+   }catch(e){
+     x.restore();
+     x.save();
+     x.fillStyle="#0C2E2D";x.font="700 "+Math.round(bottom*.31)+"px Larsseit, Arial, sans-serif";
+     x.fillText("RIACHUELO",left,height+top+bottom*.65);
+   }
+   x.restore();
+   if(width>=600){
+     const f=Math.max(14,Math.min(24,Math.round(width*.017)));
+     x.fillStyle="#466964";x.font="500 "+f+"px Larsseit, Arial, sans-serif";
+     x.textAlign="right";x.textBaseline="middle";
+     x.fillText("INCRIVELMENTE BRASIL",width-left,height+top+bottom/2);
+   }
+   if(out.dataset)out.dataset.riaCard2025="1";
+   return out;
+ }
+ w.RiachueloBrandCards={decorateCanvas,version:"2025.1"};
+})(window);
+
 /* V34 bootstrap: reutiliza o runtime principal já carregado pelo index */
 var ESTORE_API=window.API||'https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-api';
 
@@ -399,7 +448,7 @@ function previewHcV4(){const d=$('#hcDateV4')?.value,h=Number($('#hcCountV4')?.v
 async function saveHcV4(){const d=$('#hcDateV4')?.value,h=Math.trunc(Number($('#hcCountV4')?.value||0)),out=$('#hcOutV4');if(!d||h<1){out.innerHTML='<p class=bad>Informe a data e o HC disponível.</p>';return}try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'hc_set',matricula:String(U.u.id),st:String(U.u.st),date:d,hc:h})});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Não foi possível salvar.');APP_DELTA.hcSchedule=APP_DELTA.hcSchedule||{};APP_DELTA.hcSchedule[d]=APP_DELTA.hcSchedule[d]||{};APP_DELTA.hcSchedule[d][String(U.u.st)]={hc:h};out.innerHTML='<div class=notice>Distribuição por HC salva.</div>';setTimeout(()=>go('metasv4'),700)}catch(e){out.innerHTML='<p class=bad>'+escV3(e.message||e)+'</p>'}}
 
 function shareLinesV4(type){const x=person(),sp=storeP();if(type==='result')return ['Meu Resultado • '+pLabel[PER],'Captada: '+money(x.c),'Aprovada: '+money(x.a),'Pedidos: '+num(x.o),'Comissão: '+money(x.com)];if(type==='store')return ['Filial '+storeFullV3()+' • '+pLabel[PER],'Meta: '+money(sp.ef||sp.ee),'Realizado: '+money(sp.c),'Atingimento: '+pct(sp.att),'Share: '+pct(sp.share),'Pedidos: '+num(sp.o)];if(type==='meta'){const d=metaDistributionV4(PER),t=d.configured?d.individual:null;return ['Metas • '+pLabel[PER],'Meta filial: '+money(sp.ef||sp.ee),'Realizado: '+money(x.c),t!=null?'Meta individual: '+money(t):'Meta individual: aguardando distribuição por HC',t!=null?'Pedidos meta: '+num(Math.ceil(t/400)):'']}if(type==='pool'){const p=U.pool||{};return ['Pool eStore','Venda aprovada: '+money(p.approved||0),'Pool 3%: '+money(p.pool||0),'Elegíveis: '+num(p.eligible?.length||0),'Rateio estimado: '+money(p.sim||0)]}if(type==='team'){const a=U.team?.[PER]||[];return ['Meu Time • '+pLabel[PER],'Colaboradores: '+num(a.length),'Ativos: '+num(a.filter(v=>(v.c||0)>0).length),'Venda captada: '+money(a.reduce((sum,v)=>sum+Number(v.c||0),0))]}return ['Ranking eStore • '+pLabel[PER],'Filial '+U.u.st,'Minha posição CE+PI: '+(x.rr?num(x.rr)+'º':'—'),'Venda captada: '+money(x.c)]}
-function shareV4(type,title){const lines=shareLinesV4(type).filter(Boolean),text=title+'\n'+lines.join('\n');shareCanvas(canvasCard(title,lines),text)}
+function shareV4(type,title){const lines=shareLinesV4(type).filter(Boolean),text=title+'\n'+lines.join('\n');shareCanvas(window.RiachueloBrandCards.decorateCanvas(canvasCard(title,lines)),text)}
 function shareResultV4(){shareV4('result','Meu Resultado eStore')} function shareStoreV4(){shareV4('store','Dashboard eStore')} function shareMetaV4(){shareV4('meta','Metas eStore')} function sharePoolV4(){shareV4('pool','Pool eStore')} function shareTeamV4(){shareV4('team','Meu Time eStore')} function shareRankingV4(){shareV4('ranking','Ranking eStore')}
 function shareBarV4(type){const fn='share'+type[0].toUpperCase()+type.slice(1)+'V4()';return `<div class=shareBarV4><button onclick="${fn}">Compartilhar no WhatsApp</button></div>`}
 
@@ -530,7 +579,7 @@ async function highlightsCanvasV5(type,title){
   const lines=shareLinesV4(type).filter(Boolean);x.fillStyle='#173F35';x.font='bold 30px Arial';x.fillText('Resumo',65,y+30);x.font='26px Arial';let yy=y+78;for(const l of lines.slice(0,5)){x.fillText(l,65,yy);yy+=42}
   x.fillStyle='#173F35';x.font='bold 24px Arial';x.fillText('Fran Lima',65,1440);return c;
 }
-async function shareHighlightsV5(type,title){const c=await highlightsCanvasV5(type,title),lines=shareLinesV4(type).filter(Boolean),text=title+'\n'+lines.join('\n');shareCanvas(c,text)}
+async function shareHighlightsV5(type,title){const c=await highlightsCanvasV5(type,title),lines=shareLinesV4(type).filter(Boolean),text=title+'\n'+lines.join('\n');shareCanvas(window.RiachueloBrandCards.decorateCanvas(c),text)}
 shareResultV4=function(){return shareHighlightsV5('result','Destaques eStore | '+pLabel[PER])};
 shareStoreV4=function(){return shareHighlightsV5('store','Destaques Filial | '+pLabel[PER])};
 shareMetaV4=function(){return shareHighlightsV5('meta','Metas eStore | '+pLabel[PER])};
@@ -665,7 +714,7 @@ async function shareHourlyV5(){
  let y=795;x.font='17px Arial';stores.forEach((a,i)=>{const s=hourStatusV6(a),dev=Number(a.captured||0)-Number(a.metaValue||0);x.fillStyle=s.cls==='notfed'?'#FFF1E3':s.cls==='zero'?'#FDECEC':i%2?'#FFFFFF':'#F0F2EE';x.fillRect(45,y-25,990,50);x.fillStyle='#173F35';x.fillText(a.st,58,y);x.fillText(money(a.captured),118,y);x.fillText(num(a.orders)+'/'+num(a.orderTarget),300,y);x.fillText(pct(a.att),390,y);x.fillStyle=Number(a.share||0)===0?'#B42318':'#173F35';x.fillText(a.storeSales?pct(a.share):'0,00%',505,y);x.fillStyle=dev>=0?'#287A55':'#B42318';x.fillText(money(dev),620,y);x.fillStyle=s.cls==='course'?'#287A55':s.cls==='attention'?'#DE7C00':'#D92D20';x.font='700 15px Arial';x.fillText('● '+s.label,785,y);x.font='17px Arial';y+=54});
  const nf=stores.filter(a=>!a.updated_at).map(a=>a.st);x.fillStyle='#FFF1E3';x.fillRect(45,1830,990,55);x.fillStyle='#76232F';x.font='700 18px Arial';x.fillText('⚠ Ainda não alimentaram: '+(nf.length?nf.join(' • '):'Nenhuma'),62,1864);x.fillStyle='#173F35';x.font='16px Arial';x.fillText('Moda que inspira o Brasil',55,1910);x.textAlign='right';x.fillText('Fran Lima',1025,1910);
  const caption=hourlyCaptionV6(j);
- c.toBlob(async blob=>{if(!blob)return;const file=new File([blob],'parcial-estore-hora-a-hora.png',{type:'image/png'});try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text:caption,title:'Parcial eStore'});return}}catch(e){if(e?.name==='AbortError')return}try{await navigator.clipboard.writeText(caption)}catch(e){};shareCanvas(c,caption)},'image/png');
+ window.RiachueloBrandCards.decorateCanvas(c).toBlob(async blob=>{if(!blob)return;const file=new File([blob],'parcial-estore-hora-a-hora.png',{type:'image/png'});try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],text:caption,title:'Parcial eStore'});return}}catch(e){if(e?.name==='AbortError')return}try{await navigator.clipboard.writeText(caption)}catch(e){};shareCanvas(window.RiachueloBrandCards.decorateCanvas(c),caption)},'image/png');
 }
 function deltaMarkText(cur,prev,kind){
  if(prev==null||!Number.isFinite(Number(prev)))return '— sem hora anterior';
@@ -901,7 +950,7 @@ shareHourlyV5=async function(){
  if(pending.length){x.fillStyle='#76232F';x.font='bold 25px Arial';x.fillText('Pendentes: '+pending.map(r=>r.st).join(' • '),55,1745)}
  x.fillStyle='#173F35';x.font='bold 21px Arial';x.fillText('Share: eStore captado ÷ meta geral de vendas da filial',55,1800);x.fillText('Fran Lima',55,1845);
  const txt='🎯 *eStore CE+PI | HORA A HORA*\\n💵 *Realizado:* '+money(regional.captured)+'\\n📈 *Atingimento:* '+(regional.meta?pct(regional.captured/regional.meta):'—')+'\\n🛍️ *Pedidos:* '+num(regional.orders)+' / '+num(regional.orderTarget)+'\\n📊 *Share:* '+(regional.sales?pct(regional.captured/regional.sales):'—')+'\\n🏬 *Atualizadas:* '+active.length+'/'+stores.length+(pending.length?'\\n⚠️ *Pendentes:* '+pending.map(r=>r.st).join(', '):'');
- shareCanvas(c,txt);
+ shareCanvas(window.RiachueloBrandCards.decorateCanvas(c),txt);
 }
 
 const _loginV15=login;
@@ -973,7 +1022,7 @@ shareHourlyV5=async function(){
  let y=485;for(let i=0;i<stores.length;i++){const r=stores[i];x.fillStyle=shareClassV15(r);x.beginPath();x.roundRect(42,y-29,995,58,10);x.fill();x.fillStyle='#173F35';x.font='bold 21px Arial';x.fillText((i+1)+'º',55,y);x.fillText(r.st,120,y);if(!r.updated_at&&closing){x.fillStyle='#76232F';x.font='bold 17px Arial';x.fillText('Nenhuma informação de venda ao longo do dia',250,y)}else{x.fillText(money(r.captured),250,y);x.fillText(pct(r.att),500,y);x.fillText(num(r.orders)+'/'+num(r.orderTarget),650,y);x.fillText(r.storeSales?pct(r.share):'—',845,y);if(r.updated_at&&Number(r.captured)===0){x.fillStyle='#76232F';x.font='bold 13px Arial';x.fillText('R$ 0,00 informado',250,y+18)}}y+=64}
  x.fillStyle='#173F35';x.font='bold 22px Arial';x.fillText('Pedidos: '+num(regional.orders)+' / '+num(regional.orderTarget),55,1740);x.font='20px Arial';x.fillText('Share = venda eStore captada ÷ meta geral de vendas da filial',55,1790);x.fillText('Atualizado em '+new Date().toLocaleString('pt-BR')+' • Fran Lima',55,1840);
  const text=(closing?'🏁 *eStore CE+PI | FECHAMENTO*':'🎯 *eStore CE+PI | HORA A HORA*')+'\\n📅 '+new Date(j.result_date+'T12:00').toLocaleDateString('pt-BR')+'\\n💵 *Realizado:* '+money(regional.captured)+'\\n🎯 *Meta:* '+money(regional.meta)+'\\n📈 *Atingimento:* '+(regional.meta?pct(regional.captured/regional.meta):'—')+'\\n🛍️ *Pedidos:* '+num(regional.orders)+' / '+num(regional.orderTarget)+'\\n📊 *Share:* '+(regional.sales?pct(regional.captured/regional.sales):'—')+'\\n🏬 *Cobertura:* '+active.length+'/'+stores.length+(missing.length?' • '+missing.length+' sem informação':'')+(closing&&missing.length?'\\n⚠️ *Sem informação ao longo do dia:* '+missing.map(r=>r.st).join(', '):'');
- shareCanvas(c,text);
+ shareCanvas(window.RiachueloBrandCards.decorateCanvas(c),text);
 }
 
 function hourlyClosingStatusV17(){
@@ -1202,7 +1251,7 @@ async function shareTeamCardV26(){
  for(const r of stores.slice(0,19)){x.fillStyle=r.zero/(r.active+r.zero||1)>.7?'#FFF0F0':'#fff';x.beginPath();x.roundRect(45,y,990,48,8);x.fill();x.fillStyle=green;x.font='700 18px Arial, sans-serif';x.fillText(r.st,60,y+31);x.font='18px Arial, sans-serif';x.fillText(String(r.active+r.zero),185,y+31);x.fillText(String(r.active),330,y+31);x.fillStyle=r.zero?red:green;x.fillText(String(r.zero),520,y+31);x.fillStyle=green;x.fillText(money(r.c),690,y+31);y+=53;if(y>1390)break}
  x.fillStyle=green;x.font='18px Arial, sans-serif';x.fillText('Moda que inspira o Brasil',55,1460);x.textAlign='right';x.fillText('App. eStore CE+PI',1020,1460);
  const text='📊 *MEU TIME eStore | '+(TEAM_STORE_V19==='regional'?'REGIONAL CE+PI':'FILIAL '+TEAM_STORE_V19)+'*\\n'+pLabel[PER]+'\\n👥 Colaboradores: '+s.people.length+'\\n✅ Com venda: '+s.yes.length+'\\n🔴 Zerados: '+s.zero.length+'\\n📉 Dispersão: '+pct(s.disp)+'\\n💰 Venda captada: '+money(s.captured)+'\\n🛍️ Pedidos: '+s.orders;
- shareCanvas(c,text);
+ shareCanvas(window.RiachueloBrandCards.decorateCanvas(c),text);
 }
 
 
@@ -2037,7 +2086,7 @@ adminV3=function(){
       await waitImgs76(host);
       const h2c=await loadH2C76();
       const canvas=await h2c(host.querySelector('.campaign76card'),{backgroundColor:'#f5f1e8',scale:1.35,useCORS:true,allowTaint:false,logging:false});
-      const blob=await new Promise(function(resolve){canvas.toBlob(resolve,'image/png',0.98);});
+      const blob=await new Promise(function(resolve){window.RiachueloBrandCards.decorateCanvas(canvas).toBlob(resolve,'image/png',0.98);});
       if(!blob) throw new Error('Falha ao gerar o card.');
       const file=new File([blob],'campanha-estore-volume-maximo-riachuelo.png',{type:'image/png'});
       if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
@@ -2479,7 +2528,7 @@ showCampaignPopupV37=function(){
         '🟢 *5 menores dispersões*\n'+listText108(best)+'\n\n'+
         '🔴 *5 maiores dispersões*\n'+listText108(worst)+'\n\n'+
         '💡 Menor dispersão representa maior participação do time com venda no eStore.';
-      shareCanvas(c,summary);
+      shareCanvas(window.RiachueloBrandCards.decorateCanvas(c),summary);
     }catch(e){
       console.error('[V108] compartilhar Meu Time',e);
       alert('Não foi possível gerar o painel Meu Time agora.');
