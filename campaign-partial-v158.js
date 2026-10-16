@@ -12,6 +12,9 @@
  const groups=['P+PP','M','G+GG+EXX'];
  const ranks={};
  groups.forEach(function(k){ranks[k]=raw[k].split('|').map(function(s,i){const p=s.split(',');return {pos:i+1,mat:p[0],store:p[1],approved:+p[2],bopis:+p[3],ticket:+p[4]};});});
+const regionalSnapshot163 = new Map();
+ const regionalRaw163="1605496,2,7399,0,1;1940953,2,11197,0,1;1958275,2,53396,13599,4;2129752,0,14938,0,2;2365510,1,35693,0,2;2383101,1,8999,0,1;2396254,2,8099,28436,1;2438526,2,14038,0,2;2503247,0,11339,0,1;2739623,1,15999,11999,1;2739658,2,14399,0,1;2981319,2,76595,0,2;2998041,2,11998,0,1;3115445,1,46248,0,2;3116573,1,3599,0,1;3121089,1,16109,0,1;3122670,1,26998,0,2;3539555,2,11699,0,1;3633039,2,2699,26998,1;3661628,2,47192,0,3;3978219,1,7999,0,1;3978232,1,16199,0,1;3978689,0,39995,0,2;3995006,1,8999,0,1;3995369,1,16199,0,1;3996043,2,14399,0,1;4022411,2,11898,0,2;4024343,2,47998,0,1;4024839,2,23399,25198,1;4027213,0,27177,0,2;4028106,2,4679,54599,1;4028550,0,15299,0,1;4029444,2,25554,0,2;4039449,0,12599,0,1;4042043,2,9598,0,2;4055249,2,0,14399,0;4057052,1,30597,0,2;4058246,2,61596,0,4;4072556,1,25999,0,1;4074900,1,9576,0,1;4078853,2,70491,0,3;4082802,1,45807,0,2;4084535,0,14999,0,1;4084907,2,15999,0,1;4086800,0,33299,0,1;4088249,0,32476,0,4;4089941,1,12329,0,1;4092200,2,8599,0,1;4092977,2,27098,0,2;4093172,2,24837,0,3;4095459,2,8750,0,1;4095649,2,15999,0,1;4095765,2,7999,0,1;4095861,2,92554,0,6;4097172,1,1439,0,1;4098020,2,10999,0,1;4099552,2,0,12289,0;4102031,0,42035,0,3;4102034,1,25797,0,3;4102719,2,44598,0,1;4103295,2,106471,0,2;4104681,0,8999,0,1;4105334,1,9449,0,1;4106241,2,38696,25198,2;4106242,1,36998,0,2;4106781,2,17999,0,1;4106785,0,15299,0,1;4107565,0,13999,0,1;4108064,2,7199,0,1;4110028,0,42936,0,4;4111143,0,0,10799,0;4111385,2,20798,0,1;4111724,2,26997,0,1;4112324,1,94432,0,6;4112993,2,0,12239,0;4117626,2,16199,0,1;4117758,0,82011,19798,5;4118200,2,101332,0,4;4118739,1,14399,0,1;4121063,0,9651,0,1;4121570,1,14399,0,1;4122269,0,18419,0,2;4124391,0,12599,0,1;4124625,2,20330,0,2;4124627,2,5399,0,1;4125114,1,53896,21598,3;4125219,2,8999,0,1;4125940,2,6299,0,1;4126711,1,17792,0,2;4126793,0,49936,0,4;4127308,1,17999,0,1;4127497,0,37889,0,4;4127502,0,16199,0,1;4127517,0,9718,0,2;4127653,0,13548,0,2;4127979,2,37836,0,3;4129559,2,28798,0,1;4129639,1,22398,0,2;4129669,0,12599,0,1;4129686,1,14399,0,1;4129690,1,16739,0,1;4129704,2,50397,0,3;4130680,0,30598,0,2;4130780,1,0,12239,0;4131341,0,3999,0,1;4131839,1,10661,0,1;4132277,1,5399,0,1;4132934,0,48414,12599,5;4134662,2,17997,14399,1;4135506,1,3599,0,1;4135574,2,18498,23398,2;4136600,1,22497,0,2;4138966,2,38313,7199,3;4139129,0,22796,0,1;4139565,2,17998,0,1;4140291,1,21286,0,2;4141915,0,131114,0,7;4142234,0,7199,0,1;4142784,0,89812,0,7;4143272,0,17399,0,1;4144413,2,15299,6299,1;4144415,2,15299,0,1;4144600,1,27536,36896,1;4144611,0,13139,0,1;4145084,2,0,25198,0;4145094,0,76259,12599,6;4145248,2,12599,0,1;4145473,2,0,3599,0;4145653,2,97198,0,1;4145744,0,7599,0,1;4146164,0,29035,0,4;4147181,0,50209,0,5;4147772,2,304868,13499,3;4148249,0,13229,0,1;4148264,0,4499,0,1;4148504,0,4719,0,1;4149149,0,12599,0,1;4149160,0,8099,0,1;4149620,1,13098,35998,2;4150144,1,11339,0,1;4150725,0,7305,0,1;4150781,2,18432,0,1;4151041,0,31907,8999,3;4151062,2,24599,0,1;4151248,2,12599,0,1;4151293,2,13076,0,2;4151449,2,11699,0,1;4151468,0,18994,0,1;4151612,1,29355,0,3;4151676,2,17999,0,1;4151892,1,17999,0,1;4152004,1,11199,0,1;4152226,1,36177,0,1;4152664,2,33397,0,2;4152917,0,14759,0,1;4152924,0,27538,0,2;4153199,2,27895,0,2;4153522,2,8599,0,1;4153618,2,17654,0,2;4153874,1,0,15999,0;4153911,1,107927,0,11;4154241,1,17539,0,2;4154264,2,6839,0,1;4155199,2,10797,0,1;4155330,0,10799,0,1;4155600,2,8999,0,1;4156309,0,13216,0,1;4156445,2,65872,0,4;713210,1,34377,0,2;726400,0,65494,0,4;903078,2,75655,0,4";
+ regionalRaw163.split(';').forEach(function(line){const p=line.split(',');const group=groups[Number(p[1])];if(!group)return;const rec={mat:p[0],group:group,approved:Number(p[2])/100,bopis:Number(p[3])/100,orders:Number(p[4])};if(!regionalSnapshot163.has(rec.mat))regionalSnapshot163.set(rec.mat,rec);});
  let current='P+PP';
  const money=n=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(n)||0);
  const prize=p=>p<4?'Samsung A07 4G 128GB':p<6?'JBL Tune 720BT':p===6?'JBL Wave Beam 2':p===7?'JBL Wave Buds 2':p<10?'JBL Go 4':'JBL T520 BT';
@@ -19,43 +22,63 @@
  const days=()=>{const d=new Date();return Math.max(0,Math.ceil((Date.UTC(2026,9,31)-Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()))/86400000));};
  const mat=()=>{try{return String(U.u.id||'');}catch(_){return '';}};
  const esc=s=>String(s||'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
- function defaultGroup(){let m=mat();for(let k of groups)if(ranks[k].some(r=>r.mat===m))return k;return 'P+PP';}
+ function lookup163(m){for(const g of groups){const p=ranks[g].find(r=>r.mat===m);if(p)return {...p,group:g,orders:p.ticket>0?Math.max(1,Math.round(p.approved/p.ticket)):0};}return regionalSnapshot163.get(m)||null;}
+ function defaultGroup(){const r=lookup163(mat());return r?r.group:'P+PP';}
  function row(r){
    return '<div class="cpRow158"><div class="cpNumber158">'+r.pos+'º</div><div class="cpPerson158"><b>Matrícula '+esc(r.mat)+'</b><small>Loja '+esc(r.store)+(r.store==='108'?' · CE+PI':'')+'</small>'+
       (r.bopis?'<span class="cpBopis158" title="Valor BOPIS excluído do resultado">BOPIS: '+money(r.bopis)+'</span>':'')+'</div>'+
       '<div class="cpValue158"><b>'+money(r.approved)+'</b><small>'+esc(prize(r.pos))+'</small></div></div>';
  }
  function partial(){
-   return '<div class="cpHero158"><small>CAMPANHA NACIONAL · 01 A 31/10/2026</small><h2>🔊 eStore no <em>Volume Máximo</em></h2><p>Uma parcial para aumentar o som das vendas. 15 premiáveis por porte · 45 posições nacionais.</p><span>BASE ATÉ 14/10/2026</span></div>'+
+   return '<div class="cpHero158"><small>CAMPANHA NACIONAL · 01 A 31/10/2026</small><h2>🔊 eStore no <em>Volume Máximo</em></h2><p>Uma parcial para aumentar o som das vendas. 15 premiáveis por porte · 45 posições nacionais.</p><span>PERÍODO DA PARCIAL: 01/10 A 14/10/2026</span></div>'+
    '<div class="cpPorte158">'+groups.map(k=>'<button class="'+(k===current?'selected':'')+'" onclick="campaignPorte158(\''+k+'\')">'+esc(k)+'</button>').join('')+'</div>'+
    '<div class="cpKpis158"><div><small>Corte atual • Top 15</small><b>'+money(limit(current))+'</b></div><div><small>Premiados provisórios</small><b>15</b></div><div><small>Dias restantes</small><b>'+days()+'</b></div></div>'+
-   '<div class="cpHead158"><div><h3>🏆 TOP 15 · '+esc(current)+'</h3><p>Ranking nacional por venda aprovada sem BOPIS</p></div><button onclick="shareCampaignCard158(\''+current+'\')">↗ Compartilhar card horizontal</button></div>'+
+   '<div class="cpHead158"><div><h3>🏆 TOP 15 · '+esc(current)+'</h3><p>Ranking nacional por venda aprovada sem BOPIS</p></div><button onclick="shareCampaignCard158(\''+current+'\')">↗ Compartilhar Top 15 deste porte</button></div>'+
    '<div class="cpGrid158">'+ranks[current].map(row).join('')+'</div>'+
    '<p class="cpNote158"><b>BOPIS (em vermelho):</b> valor não contabilizado, pois se trata de venda de produtos que já estavam no estoque da loja. Os prêmios indicados são provisórios e as posições podem mudar até 31/10.</p>'+
-   '<div class="cpSimulator158"><h3>🎯 Qual seu desafio para entrar no Top 15?</h3><p>Digite sua matrícula. Se estiver fora do Top 15, informe a venda aprovada válida e o ticket médio para fazer a simulação.</p>'+
-   '<label>Matrícula <input id="cpMat158" inputmode="numeric" value="'+esc(mat())+'"></label>'+
-   '<label>Venda aprovada sem BOPIS (R$) <input id="cpApproved158" inputmode="decimal" placeholder="Opcional para quem já está no Top 15"></label>'+
-   '<label>Ticket médio válido (R$) <input id="cpTicket158" inputmode="decimal" placeholder="Opcional para quem já está no Top 15"></label>'+
-   '<button onclick="calculateCampaign158()">Simular pedidos necessários</button><div id="cpAnswer158" role="status"></div></div>'+
+   '<div class="cpSimulator158"><h3>🎯 Descubra seu desafio para subir no ranking</h3><p>Informe apenas sua matrícula. A parcial busca automaticamente suas vendas aprovadas, exclui BOPIS e calcula seu ticket médio válido.</p>'+
+   '<label>Matrícula <input id="cpMat158" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="9" autocomplete="off" value="'+esc(mat())+'" placeholder="Digite sua matrícula"></label>'+
+   '<button onclick="calculateCampaign158()">Consultar meu desafio</button><div id="cpAnswer158" role="status" aria-live="polite"></div></div>'+
    '<p class="cpMeta158">Parcial até 14/10/2026. Os nomes não constam no relatório recebido; por isso a identificação é por matrícula. Elegibilidade por cargo sujeita à validação final do regulamento.</p>';
  }
  function amount(s){s=String(s||'').trim().replace(/[R$\s]/g,'');return s?Number(s.includes(',')?s.replace(/\./g,'').replace(',','.'):s):NaN;}
  window.campaignPorte158=function(k){if(!ranks[k])return;current=k;let el=document.getElementById('cpPartial158');if(el)el.innerHTML=partial();};
  window.calculateCampaign158=function(){
-   const out=document.getElementById('cpAnswer158');if(!out)return;
-   const m=String(document.getElementById('cpMat158').value||'').trim();
-   const r=ranks[current].find(x=>x.mat===m);
-   const a=amount(document.getElementById('cpApproved158').value);
-   const t=amount(document.getElementById('cpTicket158').value);
-   const approved=Number.isFinite(a)?a:(r?r.approved:NaN);
-   const ticket=Number.isFinite(t)?t:(r?r.ticket:NaN);
-   if(!(approved>=0&&ticket>0)){out.textContent='Para calcular, informe sua venda válida e ticket médio (sem BOPIS).';return;}
-   const diff=Math.max(0,Math.ceil((limit(current)-approved+.01)*100)/100);
-   const orders=Math.ceil(diff/ticket), remaining=days();
-   out.innerHTML=diff===0?'<b>Você já alcançou o corte atual.</b> Continue vendendo: a classificação pode mudar.':
-   '<b>Faltam '+money(diff)+' para superar o atual 15º.</b><br>Estimativa: <b>'+orders+' pedido(s)</b> com ticket médio de '+money(ticket)+
-   '<br>Ritmo estimado: <b>'+(remaining?(orders/remaining).toFixed(2).replace('.',',')+' pedido(s) por dia':'campanha encerrada')+'</b> até 31/10.'+
-   '<br><small>Simulação com corte atual; não garante premiação.</small>';
+   const field=document.getElementById('cpMat158');
+   const out=document.getElementById('cpAnswer158');
+   if(!field||!out)return;
+   const m=String(field.value||'').replace(/[^0-9]/g,'').trim();
+   if(!/^\\d{6,9}$/.test(m)){out.textContent='Informe uma matrícula válida para consultar a parcial.';return;}
+   const rec=lookup163(m);
+   if(!rec){out.innerHTML='<b>Matrícula não localizada na parcial disponível.</b><br>O arquivo recebido contém o Top 45 nacional e a base completa da CE+PI até 14/10. É necessário atualizar o relatório nacional para consultar esta matrícula; não vamos estimar valores sem dados.';return;}
+   if(rec.group!==current){current=rec.group;const area=document.getElementById('cpPartial158');if(area)area.innerHTML=partial();}
+   const updated=document.getElementById('cpMat158'),answer=document.getElementById('cpAnswer158');
+   if(updated)updated.value=m;
+   if(!answer)return;
+   const matched=ranks[rec.group].find(x=>x.mat===m);
+   const currentPosition=matched?matched.pos:null;
+   const target=currentPosition>1?ranks[rec.group][currentPosition-2]:ranks[rec.group][14];
+   const approved=Math.round(rec.approved*100);
+   const threshold=Math.round(target.approved*100);
+   const diff=currentPosition===1?0:Math.max(0,(threshold+1-approved)/100);
+   const ticket=rec.orders>0?Math.round(approved/rec.orders)/100:0;
+   const orders=ticket>0?Math.ceil((diff-0.000001)/ticket):null;
+   const remaining=days();
+   let html='<div class="cpResult163"><b>Matrícula '+esc(m)+' · Porte '+esc(rec.group)+'</b>'+
+     '<p>Venda aprovada válida: <strong>'+money(rec.approved)+'</strong> · Pedidos válidos: '+(rec.orders||0)+
+     '<br>Ticket médio individual: '+(ticket>0?money(ticket):'sem pedidos válidos')+
+     '<br>'+ (rec.bopis>0?'<span class="cpBopis158">BOPIS excluído: '+money(rec.bopis)+'</span><br>':'')+
+     '<small>O BOPIS não integra o valor total utilizado no ranking.</small></p>';
+   if(currentPosition===1)html+='<b>🥇 1º lugar parcial!</b> Mantenha o ritmo: a classificação é provisória até 31/10.';
+   else{
+     const action=currentPosition?'ultrapassar o '+(currentPosition-1)+'º colocado':'entrar no Top 15';
+     html+='<p>'+(currentPosition?'<b>Posição atual: '+currentPosition+'º • Prêmio provisório: '+esc(prize(currentPosition))+'</b><br>':'<b>Fora do Top 15 na parcial.</b><br>')+
+       'Para '+action+': <strong>'+money(diff)+'</strong> adicionais em vendas aprovadas válidas.'+
+       (orders!==null?'<br>Estimativa pelo seu ticket: <strong>'+orders+' pedido(s)</strong>.': '<br><b>Quantidade de pedidos:</b> indisponível, pois não há ticket médio individual válido.')+
+       '<br>Até 31/10: <strong>'+remaining+' dia(s)</strong> restantes.'+
+       (orders!==null&&remaining>0?'<br>Ritmo estimado: <strong>'+(orders/remaining).toLocaleString('pt-BR',{maximumFractionDigits:2,minimumFractionDigits:2})+' pedido(s)/dia</strong>.':'')+'</p>';
+   }
+   answer.innerHTML=html+'<small>Simulação com a base de 01 a 14/10/2026. O corte e a posição podem mudar até o encerramento da campanha.</small></div>';
  };
  window.openCampaignPartial158=function(){
    current=defaultGroup();
