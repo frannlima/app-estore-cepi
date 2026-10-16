@@ -250,39 +250,89 @@ const regionalSnapshot163 = new Map();
    return can;
  }
  async function canvasAll165(){
-   const cvs=document.createElement("canvas");cvs.width=2700;cvs.height=1960;
-   const c=cvs.getContext("2d");c.fillStyle="#173F35";c.fillRect(0,0,2700,1960);
-   c.fillStyle="#DE7C00";c.fillRect(0,0,540,12);
-   const logo=new Image();logo.src="./assets/riachuelo-logo-horizontal-oficial-white-v133.svg";
-   try{await logo.decode();c.drawImage(logo,63,53,340,54)}catch(_){c.fillStyle="#fff";c.font="800 40px Arial";c.fillText("RIACHUELO",60,91)}
-   c.fillStyle="#F7C875";c.textAlign="right";c.font="800 25px Arial";c.fillText("PARCIAL NACIONAL · 01 A 31/10/2026",2640,78);
-   c.font="700 21px Arial";c.fillText("PERÍODO DE CORTE: "+sourceCaption165(),2640,113);
-   c.textAlign="left";c.fillStyle="#fff";c.font="900 65px Arial";c.fillText("eStore no",62,190);
-   c.fillStyle="#F4C673";c.fillText("Volume Máximo",378,190);
-   c.fillStyle="#FFFFFF";c.font="600 27px Arial";c.fillText("45 posições provisórias · 15 por porte · vendas aprovadas sem BOPIS",65,232);
-   const cols=groups.map((g,i)=>({g,x:40+i*886,w:866}));
-   cols.forEach(function(col){
-     const {g,x,w}=col;
-     rr(c,x,278,w,100,17,"#F4E6C8");
-     c.fillStyle="#173F35";c.font="900 34px Arial";c.fillText("TOP 15 · PORTE "+g,x+25,324);
-     c.font="700 21px Arial";c.fillText("CORTE: "+money(limit(g)),x+25,356);
-     (ranks[g]||[]).forEach(function(r,i){
-       const yy=395+i*92;
-       rr(c,x,yy,w,83,13,(i%2===0?"#FCFAF4":"#F2F3ED"));
-       rr(c,x+12,yy+11,60,60,11,r.pos===1?"#EFBF56":r.pos===2?"#CBD6D1":r.pos===3?"#E7C7B2":"#E4EAE4");
-       c.textAlign="center";c.fillStyle="#173F35";c.font="900 25px Arial";c.fillText(r.pos+"º",x+41,yy+48);c.textAlign="left";
-       c.font="800 18px Arial";c.fillText("MATRÍCULA "+r.mat,x+84,yy+25);
-       c.font="650 16px Arial";c.fillStyle="#466964";c.fillText("FILIAL "+r.store,x+84,yy+46);
-       if(r.bopis>0){c.fillStyle="#AC2532";c.font="800 14px Arial";c.fillText("● BOPIS "+money(r.bopis),x+84,yy+68);}
-       c.fillStyle="#173F35";c.font="900 23px Arial";c.textAlign="right";c.fillText(money(r.approved),x+w-22,yy+32);
-       c.fillStyle="#466964";c.font="600 16px Arial";c.fillText(prize(r.pos),x+w-22,yy+57);c.textAlign="left";
-     });
-   });
-   rr(c,42,1815,2616,108,16,"#0B3028");
-   c.fillStyle="#FFD17D";c.font="900 25px Arial";c.fillText("BOPIS = NÃO CONTABILIZADO NO RANKING",68,1858);
-   c.fillStyle="#fff";c.font="600 19px Arial";c.fillText("Produtos já disponíveis no estoque da loja. Resultados e prêmios são parciais, sujeitos a alterações.",68,1892);
-   c.textAlign="right";c.font="700 19px Arial";c.fillText("REGIONAL CE+PI · MODA QUE INSPIRA O BRASIL",2630,1884);
-   return cvs;
+  // Formato 2:3 inspirado no card enviado, com regionais oficiais do relatório.
+  const canvas=document.createElement('canvas');canvas.width=2700;canvas.height=4050;
+  const c=canvas.getContext('2d');if(!c)throw new Error('Canvas indisponível.');
+  const W=2700,dark='#173F35',deep='#0D3229',gold='#DE7C00',cream='#FBF6EB',soft='#466964';
+  const label=(str,x,y,font,color,align='left')=>{c.font=font;c.fillStyle=color;c.textAlign=align;c.fillText(String(str),x,y);};
+  const panel=(x,y,w,h,color,r=24)=>rr(c,x,y,w,h,r,color);
+  c.fillStyle=dark;c.fillRect(0,0,W,4050);
+  c.fillStyle=gold;c.fillRect(0,0,725,16);
+  c.fillStyle=deep;c.beginPath();c.arc(2395,510,430,0,Math.PI*2);c.fill();
+  const logo=new Image();logo.src='./assets/riachuelo-logo-horizontal-oficial-white-v133.svg';
+  try{await logo.decode();c.drawImage(logo,1890,78,685,110);}
+  catch(e){throw new Error('Logo oficial Riachuelo indisponível: não foi possível gerar o card institucional.');}
+  label('Moda que inspira o Brasil',2562,232,'700 30px Arial','#FFFFFF','right');
+  label('CAMPANHA • 01 A 31 DE OUTUBRO',92,111,'800 34px Arial','#F6C986');
+  label('eStore no',88,324,'900 157px Arial','#FFFFFF');
+  label('Volume Máximo',88,495,'900 171px Arial','#F4BB68');
+  panel(91,545,315,90,'#EBB863',45);
+  label(campaignInfo165.asof==='2026-10-14'?'2ª PARCIAL':'PARCIAL ATUALIZADA',248,604,'900 32px Arial',dark,'center');
+  panel(422,545,569,90,'#FFF4DB',45);
+  label(sourceCaption165(),706,602,'850 32px Arial',dark,'center');
+  label('TOP 15 por porte de loja • Aprovado válido sem BOPIS',91,691,'700 34px Arial','#FFFFFF');
+  label('Classificação parcial: o volume pode mudar até 31/10.',91,740,'500 29px Arial','#DAD9D6');
+  for(let i=0;i<12;i++){const h=69+i*20;panel(1895+i*58,744-h,37,h,i>7?'#DF9F4A':'#466964',8);}
+  const panels=[['P+PP','PP + P'],['M','M'],['G+GG+EXX','G, GG e EXX']];
+  const topY=826,panelW=830,panelH=2505,gap=35,margin=70;
+  panels.forEach(([group,title],index)=>{
+    const x=margin+index*(panelW+gap),arr=ranks[group]||[];
+    panel(x,topY,panelW,panelH,cream,26);
+    panel(x+28,topY+33,68,65,dark,15);
+    c.lineWidth=5;c.strokeStyle='#F5C16D';c.beginPath();c.roundRect(x+46,topY+59,33,25,5);c.stroke();
+    c.beginPath();c.arc(x+62,topY+55,10,Math.PI,0);c.stroke();
+    label(title,x+111,topY+80,'900 46px Arial',dark);
+    panel(x+panelW-167,topY+40,130,54,'#E9B362',25);
+    label('TOP 15',x+panelW-102,topY+77,'900 25px Arial',dark,'center');
+    c.fillStyle='#D6D2C4';c.fillRect(x+26,topY+131,panelW-52,2);
+    label('POS',x+34,topY+184,'800 20px Arial',soft);
+    label('MATRÍCULA',x+112,topY+184,'800 20px Arial',soft);
+    label('LOJA',x+291,topY+184,'800 20px Arial',soft);
+    label('REGIONAL',x+369,topY+184,'800 20px Arial',soft);
+    label('APROVADO',x+panelW-23,topY+184,'800 20px Arial',soft,'right');
+    const row0=topY+207,rh=142;
+    for(let i=0;i<15;i++){
+      const p=arr[i],y=row0+i*rh;
+      if(!p){label('Posição aguardando dados',x+35,y+72,'600 25px Arial',soft);continue;}
+      if(i%2)panel(x+16,y,panelW-32,rh-2,'#F1EEE5',9);
+      c.fillStyle='#E2DACB';c.fillRect(x+25,y+rh-1,panelW-50,1);
+      panel(x+29,y+27,63,63,i===0?'#E9B362':i===1?'#F0D199':i===2?'#F4DEB4':'#F9F1E3',32);
+      label(p.pos+'º',x+60,y+67,'900 28px Arial',dark,'center');
+      label(p.mat,x+113,y+68,'750 28px Arial',dark);
+      label(p.store,x+291,y+68,'700 27px Arial',dark);
+      const region=String(p.regional||'Não informada'),regionX=x+359;
+      let fontSize=region.length>13?17:region.length>9?20:24;
+      c.font='750 '+fontSize+'px Arial';
+      while(c.measureText(region).width>167&&fontSize>15){fontSize--;c.font='750 '+fontSize+'px Arial';}
+      const width=Math.min(181,Math.max(62,c.measureText(region).width+18));
+      panel(regionX,y+38,width,43,soft,10);
+      label(region,regionX+width/2,y+67,'750 '+fontSize+'px Arial','#FFFFFF','center');
+      label(money(p.approved),x+panelW-23,y+65,'900 29px Arial',dark,'right');
+      if(Number(p.bopis)>0){
+        const tag='BOPIS '+money(p.bopis);c.font='850 23px Arial';
+        const tagWidth=Math.min(302,Math.ceil(c.measureText(tag).width+26)),px=x+panelW-tagWidth-19;
+        panel(px,y+84,tagWidth,43,'#FCE1E0',10);
+        label(tag,px+tagWidth/2,y+112,'850 23px Arial','#AA2631','center');
+      }
+    }
+    panel(x+26,topY+panelH-87,panelW-52,60,'#E6EAE2',12);
+    label('Corte Top 15: '+money(limit(group)),x+47,topY+panelH-47,'900 26px Arial',dark);
+  });
+  panel(70,3370,2560,177,deep,23);
+  label('BOPIS NÃO CONTABILIZADO NO RANKING',103,3430,'900 33px Arial','#EEC17E');
+  label('Produtos já disponíveis no estoque da loja. Valores BOPIS aparecem à parte, em vermelho.',103,3483,'500 26px Arial','#FFFFFF');
+  label('Ranking por valor aprovado válido • Parcial '+sourceCaption165()+' • Sujeito a mudanças até 31/10.',103,3521,'500 24px Arial','#DAD9D6');
+  label('NA RETA FINAL VALE PRÊMIO!  •  PREMIAÇÃO PROVISÓRIA',90,3641,'900 38px Arial','#F7C579');
+  const prizes=[['1º ao 3º','Samsung A07'],['4º e 5º','JBL Tune 720BT'],['6º','JBL Wave Beam 2'],['7º','JBL Wave Buds 2'],['8º e 9º','JBL Go 4'],['10º ao 15º','JBL T520 BT']];
+  prizes.forEach(([pos,prize],i)=>{
+    const x=90+i*422;panel(x,3684,404,148,deep,21);
+    c.lineWidth=2;c.strokeStyle='#B88750';c.beginPath();c.roundRect(x,3684,404,148,21);c.stroke();
+    label(pos,x+202,3741,'900 33px Arial','#F4C67C','center');
+    label(prize,x+202,3798,'800 25px Arial','#FFFFFF','center');
+  });
+  c.fillStyle=gold;c.fillRect(70,3909,2560,4);
+  label('RIACHUELO  •  Moda que inspira o Brasil',1350,3995,'800 33px Arial','#FFFFFF','center');
+  return canvas;
  }
  window.shareCampaignRegional165=async function(){
    try{
