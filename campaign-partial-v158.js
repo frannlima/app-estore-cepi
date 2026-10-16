@@ -134,7 +134,7 @@
  }
  function popup(){
    const modal=document.querySelector('#campaignPopupV37 .campaignModalV86,#campaignPopupV37 .campaignModalV82,#campaignPopupV37 .campaignModalV38');
-   if(!modal||modal.querySelector('.cpPopupCTA158'))return;
+   if(!modal||modal.querySelector('.cpPopupCTA158,.campaignPopupPartialV160'))return;
    const b=document.createElement('button');b.type='button';b.className='cpPopupCTA158';
    b.innerHTML='<b>🔊 Você está aumentando o volume ou deixando seu nome fora do Top 15?</b><span>🏆 Veja a parcial da campanha! Confira os 45 elegíveis e os prêmios provisórios por porte →</span>';
    b.addEventListener('click',window.openCampaignPartial158);const banner=modal.querySelector('.campaignBannerV86,.campaignBannerButtonV82,.campaignPopupArtV38');if(banner)modal.insertBefore(b,banner);else modal.appendChild(b);
