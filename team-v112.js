@@ -288,9 +288,9 @@
       x.drawImage(logo,58,42,lw,lh);
     }
     x.strokeStyle=LINE;x.lineWidth=2;x.beginPath();x.moveTo(458,35);x.lineTo(458,130);x.stroke();
-    x.textAlign='left';x.fillStyle=GREEN;x.font='700 37px Arial';x.fillText('MEU TIME',500,69);
-    x.font='700 18px Arial';x.fillText('REGIONAL CE+PI',500,101);
-    x.font='16px Arial';x.fillStyle=SAGE;x.fillText(periodLabel()+' • '+fmtDate(currentEnd(j)),500,128);
+    x.textAlign='left';x.fillStyle=GREEN;x.font='700 37px Larsseit, Arial';x.fillText('MEU TIME',500,69);
+    x.font='700 18px Larsseit, Arial';x.fillText('REGIONAL CE+PI',500,101);
+    x.font='16px Larsseit, Arial';x.fillStyle=SAGE;x.fillText(periodLabel()+' • '+fmtDate(currentEnd(j)),500,128);
 
     const t=d.total,cardW=262,gap=16,xs=[58,336,614,892],y1=165,h=105;
     const cards1=[
@@ -301,9 +301,9 @@
     ];
     cards1.forEach((a,i)=>{
       canvasRound(x,xs[i],y1,cardW,h,17,a[3]);
-      canvasText(x,a[0],xs[i]+cardW/2,y1+24,'700 12px Arial',SAGE,'center',cardW-24);
-      canvasText(x,a[1],xs[i]+cardW/2,y1+57,'700 23px Arial',a[4],'center',cardW-24);
-      canvasText(x,a[2],xs[i]+cardW/2,y1+86,'500 10px Arial','#68736F','center',cardW-24);
+      canvasText(x,a[0],xs[i]+cardW/2,y1+24,'700 12px Larsseit, Arial',SAGE,'center',cardW-24);
+      canvasText(x,a[1],xs[i]+cardW/2,y1+57,'700 23px Larsseit, Arial',a[4],'center',cardW-24);
+      canvasText(x,a[2],xs[i]+cardW/2,y1+86,'500 10px Larsseit, Arial','#68736F','center',cardW-24);
     });
     const y2=286,w2=344,x2=[58,428,798];
     [
@@ -312,18 +312,18 @@
       ['POTENCIAL TOTAL',money(t.potential),'Zerados × ticket da filial','#FFF7E8',ORANGE]
     ].forEach((a,i)=>{
       canvasRound(x,x2[i],y2,w2,104,17,a[3]);
-      canvasText(x,a[0],x2[i]+w2/2,y2+24,'700 12px Arial',SAGE,'center',w2-24);
-      canvasText(x,a[1],x2[i]+w2/2,y2+58,'700 24px Arial',a[4],'center',w2-24);
-      canvasText(x,a[2],x2[i]+w2/2,y2+86,'500 10px Arial','#68736F','center',w2-24);
+      canvasText(x,a[0],x2[i]+w2/2,y2+24,'700 12px Larsseit, Arial',SAGE,'center',w2-24);
+      canvasText(x,a[1],x2[i]+w2/2,y2+58,'700 24px Larsseit, Arial',a[4],'center',w2-24);
+      canvasText(x,a[2],x2[i]+w2/2,y2+86,'500 10px Larsseit, Arial','#68736F','center',w2-24);
     });
 
-    x.textAlign='left';x.fillStyle=GREEN;x.font='700 25px Arial';x.fillText('PAINEL POR FILIAL',58,442);
-    x.fillStyle=SAGE;x.font='14px Arial';x.fillText('Dispersão = zerados ÷ HC • '+compareLabel(),58,468);
+    x.textAlign='left';x.fillStyle=GREEN;x.font='700 25px Larsseit, Arial';x.fillText('PAINEL POR FILIAL',58,442);
+    x.fillStyle=SAGE;x.font='14px Larsseit, Arial';x.fillText('Dispersão = zerados ÷ HC • '+compareLabel(),58,468);
 
     const cols=[62,120,205,286,365,455,555,685,850,1045],
           heads=['LOJA','HC','COM VENDA','%','ZERADOS','DISP. ATUAL','DISP. ANT.','EVOLUÇÃO','TICKET MÉDIO','POTENCIAL'],
           widths=[60,50,100,60,78,92,92,160,125,145];
-    heads.forEach((h,i)=>canvasText(x,h,cols[i],tableY,'700 10px Arial','#53625D','center',widths[i]));
+    heads.forEach((h,i)=>canvasText(x,h,cols[i],tableY,'700 10px Larsseit, Arial','#53625D','center',widths[i]));
 
     let y=firstRow;
     stores.forEach(r=>{
@@ -339,13 +339,13 @@
 
     const best=listTop(stores,true),worst=listTop(stores,false);
     const sy=y+18;
-    x.textAlign='left';x.fillStyle=GREEN;x.font='700 17px Arial';x.fillText('LEITURA EXECUTIVA',58,sy);
-    x.font='13px Arial';x.fillStyle=SAGE;x.fillText('Dispersão regional: '+(t.prevDisp==null?'—':pctBRTeam(t.prevDisp))+' → '+pctBRTeam(t.disp)+' • '+evoText(t.evolution)+' • '+compareLabel(),58,sy+28);
-    x.font='700 12px Arial';x.fillStyle='#157349';x.fillText('5 menores: '+best.map(r=>r.st+' '+pctBRTeam(r.disp)).join(' • '),58,sy+56);
+    x.textAlign='left';x.fillStyle=GREEN;x.font='700 17px Larsseit, Arial';x.fillText('LEITURA EXECUTIVA',58,sy);
+    x.font='13px Larsseit, Arial';x.fillStyle=SAGE;x.fillText('Dispersão regional: '+(t.prevDisp==null?'—':pctBRTeam(t.prevDisp))+' → '+pctBRTeam(t.disp)+' • '+evoText(t.evolution)+' • '+compareLabel(),58,sy+28);
+    x.font='700 12px Larsseit, Arial';x.fillStyle='#157349';x.fillText('5 menores: '+best.map(r=>r.st+' '+pctBRTeam(r.disp)).join(' • '),58,sy+56);
     x.fillStyle=WINE;x.fillText('5 maiores: '+worst.map(r=>r.st+' '+pctBRTeam(r.disp)).join(' • '),58,sy+82);
 
     const fy=H-47;x.strokeStyle='#BFC8C3';x.beginPath();x.moveTo(58,fy-18);x.lineTo(1142,fy-18);x.stroke();
-    x.fillStyle=GREEN;x.font='700 11px Arial';x.textAlign='left';x.fillText('MODA QUE INSPIRA O BRASIL',58,fy);
+    x.fillStyle=GREEN;x.font='700 11px Larsseit, Arial';x.textAlign='left';x.fillText('MODA QUE INSPIRA O BRASIL',58,fy);
     x.textAlign='right';x.fillText('App. eStore CE+PI',1142,fy);
     return cv;
   };
