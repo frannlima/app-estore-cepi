@@ -247,6 +247,56 @@ const regionalSnapshot163 = new Map();
    c.textAlign='right';c.font='600 18px Arial';c.fillText('CORTE DA PARCIAL: '+sourceCaption165(),1850,989);
    return can;
  }
+ async function canvasAll165(){
+   const cvs=document.createElement("canvas");cvs.width=2700;cvs.height=1960;
+   const c=cvs.getContext("2d");c.fillStyle="#173F35";c.fillRect(0,0,2700,1960);
+   c.fillStyle="#DE7C00";c.fillRect(0,0,540,12);
+   const logo=new Image();logo.src="./assets/riachuelo-logo-horizontal-oficial-white-v133.svg";
+   try{await logo.decode();c.drawImage(logo,63,53,340,54)}catch(_){c.fillStyle="#fff";c.font="800 40px Arial";c.fillText("RIACHUELO",60,91)}
+   c.fillStyle="#F7C875";c.textAlign="right";c.font="800 25px Arial";c.fillText("PARCIAL NACIONAL · 01 A 31/10/2026",2640,78);
+   c.font="700 21px Arial";c.fillText("PERÍODO DE CORTE: "+sourceCaption165(),2640,113);
+   c.textAlign="left";c.fillStyle="#fff";c.font="900 65px Arial";c.fillText("eStore no",62,190);
+   c.fillStyle="#F4C673";c.fillText("Volume Máximo",378,190);
+   c.fillStyle="#FFFFFF";c.font="600 27px Arial";c.fillText("45 posições provisórias · 15 por porte · vendas aprovadas sem BOPIS",65,232);
+   const cols=groups.map((g,i)=>({g,x:40+i*886,w:866}));
+   cols.forEach(function(col){
+     const {g,x,w}=col;
+     rr(c,x,278,w,100,17,"#F4E6C8");
+     c.fillStyle="#173F35";c.font="900 34px Arial";c.fillText("TOP 15 · PORTE "+g,x+25,324);
+     c.font="700 21px Arial";c.fillText("CORTE: "+money(limit(g)),x+25,356);
+     (ranks[g]||[]).forEach(function(r,i){
+       const yy=395+i*92;
+       rr(c,x,yy,w,83,13,(i%2===0?"#FCFAF4":"#F2F3ED"));
+       rr(c,x+12,yy+11,60,60,11,r.pos===1?"#EFBF56":r.pos===2?"#CBD6D1":r.pos===3?"#E7C7B2":"#E4EAE4");
+       c.textAlign="center";c.fillStyle="#173F35";c.font="900 25px Arial";c.fillText(r.pos+"º",x+41,yy+48);c.textAlign="left";
+       c.font="800 18px Arial";c.fillText("MATRÍCULA "+r.mat,x+84,yy+25);
+       c.font="650 16px Arial";c.fillStyle="#466964";c.fillText("FILIAL "+r.store,x+84,yy+46);
+       if(r.bopis>0){c.fillStyle="#AC2532";c.font="800 14px Arial";c.fillText("● BOPIS "+money(r.bopis),x+84,yy+68);}
+       c.fillStyle="#173F35";c.font="900 23px Arial";c.textAlign="right";c.fillText(money(r.approved),x+w-22,yy+32);
+       c.fillStyle="#466964";c.font="600 16px Arial";c.fillText(prize(r.pos),x+w-22,yy+57);c.textAlign="left";
+     });
+   });
+   rr(c,42,1815,2616,108,16,"#0B3028");
+   c.fillStyle="#FFD17D";c.font="900 25px Arial";c.fillText("BOPIS = NÃO CONTABILIZADO NO RANKING",68,1858);
+   c.fillStyle="#fff";c.font="600 19px Arial";c.fillText("Produtos já disponíveis no estoque da loja. Resultados e prêmios são parciais, sujeitos a alterações.",68,1892);
+   c.textAlign="right";c.font="700 19px Arial";c.fillText("REGIONAL CE+PI · MODA QUE INSPIRA O BRASIL",2630,1884);
+   return cvs;
+ }
+ window.shareCampaignRegional165=async function(){
+   try{
+     await window.loadCampaignSnapshot165();
+     const canvas=await canvasAll165();
+     const blob=await new Promise(done=>canvas.toBlob(done,"image/png"));
+     if(!blob)throw new Error("Falha ao gerar o card.");
+     const name="campanha-estore-top45-parcial-"+campaignInfo165.asof+".png";
+     const file=new File([blob],name,{type:"image/png"});
+     if(navigator.canShare&&navigator.canShare({files:[file]})){
+       try{await navigator.share({files:[file],title:"eStore no Volume Máximo · Parcial",text:"Top 45 nacional · 15 por porte · "+sourceCaption165()+". BOPIS excluído do ranking."});return;}
+       catch(e){if(e?.name==="AbortError")return;}
+     }
+     const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
+   }catch(e){alert("Não foi possível compartilhar: "+String(e.message||e));}
+ };
  window.shareCampaignCard158=async function(k){
    try{
      k=ranks[k]?k:current;
