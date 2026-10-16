@@ -139,8 +139,11 @@
    b.innerHTML='<b>🔊 Você está aumentando o volume ou deixando seu nome fora do Top 15?</b><span>🏆 Veja a parcial da campanha! Confira os 45 elegíveis e os prêmios provisórios por porte →</span>';
    b.addEventListener('click',window.openCampaignPartial158);const banner=modal.querySelector('.campaignBannerV86,.campaignBannerButtonV82,.campaignPopupArtV38');if(banner)modal.insertBefore(b,banner);else modal.appendChild(b);
  }
+ let installed158=false;
  function inject(){
-   if(typeof ccTabsV38!=='function'||typeof campaignsV3!=='function')return;
+   if(installed158)return true;
+   if(typeof ccTabsV38!=='function'||typeof campaignsV3!=='function')return false;
+   installed158=true;
    const tabs=ccTabsV38;ccTabsV38=function(){
      const base=tabs();
      const action='<button type="button" class="cpTab158 '+(CC_TAB_V38==='partial158'?'on':'')+'" onclick="openCampaignPartial158()">🏆 <span>Parcial Top 15</span></button>';
@@ -157,8 +160,24 @@
      if(CC_TAB_V38==='partial158')return '<div class="ccPageV38 cpPage158"><div class="pageTitleV3"><span>Campanhas · Parcial</span></div>'+ccTabsV38()+'<div id="cpPartial158">'+partial()+'</div></div>';
      return previous();
    };
+   return true;
  }
- style();inject();popup();
- const observer=new MutationObserver(function(){popup();});
+ window.renderCampaignPartialStandalone158 = function(){
+   current='P+PP';
+   return partial();
+ };
+ function ensureReady158(){
+   inject();
+   popup();
+ }
+ style();ensureReady158();
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ensureReady158,{once:true});
+ // Aguarda a interface legada concluir scripts com defer e carregamento assíncrono.
+ let attempts158=0;
+ const retry158=setInterval(function(){
+   if(inject()||++attempts158>=50)clearInterval(retry158);
+   popup();
+ },250);
+ const observer=new MutationObserver(function(){popup();if(!installed158)inject();});
  observer.observe(document.documentElement,{childList:true,subtree:true});
 })();
