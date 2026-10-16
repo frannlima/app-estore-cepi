@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v159';
-const BUILD='v159';
+const CACHE='estore-cepi-shell-v161';
+const BUILD='v161';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
@@ -11,6 +11,7 @@ const TEAM_AREA_REGIONAL_SCRIPT='./team-area-regional-v117.js?build=v117';
 const BOPIS_ANALYTICS_SCRIPT='./bopis-analytics-v117.js?build=v155';
 const VOICE_SCRIPT='./voice-v123.js?build=v133';
 const MEU_ACOMPANHAMENTO_BRIDGE='./bridge-meu-acompanhamento-v1.js?build=v152';
+const CAMPAIGN_PARTIAL_SCRIPT='./campaign-partial-v158.js?build=v161';
 const SHELL=['./cards-visible-preview-v1.css','./brand-sharecards-2025.js','./brand-riachuelo-2025.css','./app-v2.css','./campaign-partial-v158.js','./presentation-v103.js','./hourly-meta-v104.js','./team-v112.js','./team-store-v113.js','./commission-eligibility-v114.js','./commission-bopis-v146.js','./team-collapse-v116.js','./team-area-regional-v117.js','./bopis-analytics-v117.js','./voice-v123.js','./bridge-meu-acompanhamento-v1.js','./performance-v130.js','./performance-v130.css','./celebrations-v134.js','./celebrations-v134.css','./assets/campaign-popup-v86.svg','./assets/campaign-hero-v84.svg','./assets/riachuelo-logo-exact-v75.svg','./assets/riachuelo-logo-horizontal-oficial-v133.svg','./assets/riachuelo-logo-horizontal-oficial-white-v133.svg','./assets/campaign-share-v76.svg','./assets/campaign-share-v75.jpg','./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon-v136.svg','./desktop-v136.css','./icon.svg','./riachuelo-horizontal-oficial.png'];
 
 function injectAppV104(html){
@@ -27,8 +28,8 @@ function injectAppV104(html){
     .replace(/\n?<script[^>]+src=["']\.\/bopis-analytics-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
     .replace(/\n?<script[^>]+src=["']\.\/voice-v\d+\.js[^"']*["'][^>]*><\/script>\n?/gi,'\n')
     .replace(/src=["']\.\/app-v2\.js(?:\?[^"']*)?["']/gi,'src="./app-v2.js?build='+BUILD+'"');
-  const tags='\n<script src="'+PRESENTATION_SCRIPT+'"></script>\n<script src="'+HOURLY_META_SCRIPT+'"></script>\n<script src="'+TEAM_SCRIPT+'"></script>\n<script src="'+TEAM_STORE_SCRIPT+'"></script>\n<script src="'+COMMISSION_ELIGIBILITY_SCRIPT+'"></script>\n<script src="'+COMMISSION_BOPIS_SCRIPT+'"></script>\n<script src="'+TEAM_COLLAPSE_SCRIPT+'"></script>\n<script src="'+TEAM_AREA_REGIONAL_SCRIPT+'"></script>\n<script src="'+BOPIS_ANALYTICS_SCRIPT+'"></script>\n<script src="'+VOICE_SCRIPT+'"></script>\n<script src="'+MEU_ACOMPANHAMENTO_BRIDGE+'"></script>\n';
-  html=html.replace('</head>','<link rel="stylesheet" href="./brand-riachuelo-2025.css?build=v157"><link rel="stylesheet" href="./cards-visible-preview-v1.css?build=v157"></head>');
+  const tags='\n<script src="'+CAMPAIGN_PARTIAL_SCRIPT+'"></script>\n<script src="'+PRESENTATION_SCRIPT+'"></script>\n<script src="'+HOURLY_META_SCRIPT+'"></script>\n<script src="'+TEAM_SCRIPT+'"></script>\n<script src="'+TEAM_STORE_SCRIPT+'"></script>\n<script src="'+COMMISSION_ELIGIBILITY_SCRIPT+'"></script>\n<script src="'+COMMISSION_BOPIS_SCRIPT+'"></script>\n<script src="'+TEAM_COLLAPSE_SCRIPT+'"></script>\n<script src="'+TEAM_AREA_REGIONAL_SCRIPT+'"></script>\n<script src="'+BOPIS_ANALYTICS_SCRIPT+'"></script>\n<script src="'+VOICE_SCRIPT+'"></script>\n<script src="'+MEU_ACOMPANHAMENTO_BRIDGE+'"></script>\n';
+  html=html.replace('</head>','<link rel="stylesheet" href="./brand-riachuelo-2025.css?build=v161"><link rel="stylesheet" href="./cards-visible-preview-v1.css?build=v161"></head>');
   return html.replace(/<\/body>\s*<\/html>\s*$/i, tags+'</body></html>');
 }
 async function htmlResponseWithInjection(res){
@@ -75,20 +76,18 @@ self.addEventListener('fetch',event=>{
       })
       .catch(()=>null);
 
-    // Atualiza silenciosamente em segundo plano, sem navegar/recarregar a página.
-    event.waitUntil(networkPromise.then(()=>{}));
-
+    // A navegação prioriza a versão atual; o cache só entra quando offline.
     event.respondWith(
-      cachePromise.then(async cache=>{
-        const cached=await cache.match('./index.html');
-        if(cached) return htmlResponseWithInjection(cached.clone());
+      (async()=>{
         const res=await networkPromise;
-        if(res) return htmlResponseWithInjection(res.clone());
+        if(res&&res.ok)return htmlResponseWithInjection(res.clone());
+        const cache=await cachePromise,cached=await cache.match('./index.html');
+        if(cached)return htmlResponseWithInjection(cached.clone());
         return new Response('App temporariamente indisponível offline.',{
           status:503,
           headers:{'content-type':'text/plain; charset=utf-8'}
         });
-      })
+      })()
     );
     return;
   }
@@ -109,11 +108,17 @@ self.addEventListener('fetch',event=>{
 
   event.waitUntil(networkPromise.then(()=>{}));
   event.respondWith(
-    cachePromise.then(async cache=>{
+    (async()=>{
+      const critical=/\\.(?:js|css)$/i.test(url.pathname);
+      if(critical){
+        // JS/CSS: garantir atualização após deploy e manter fallback offline.
+        const live=await networkPromise;
+        if(live&&live.ok)return live;
+      }
+      const cache=await cachePromise;
       const cached=await cache.match(req,{ignoreSearch:true});
-      if(cached) return cached;
-      const res=await networkPromise;
-      return res||Response.error();
-    })
+      if(cached)return cached;
+      return (await networkPromise)||Response.error();
+    })()
   );
 });
