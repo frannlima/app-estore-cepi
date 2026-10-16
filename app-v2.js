@@ -1880,7 +1880,11 @@ function ccTabsV38(){
 function campaignOverviewV38(){
   const x=currentCampaignV38();
   if(!x)return '<div class="ccEmptyV38"><b>Nenhuma campanha ativa agora.</b><span>As campanhas aparecem automaticamente conforme a vigência definida no ADM.</span></div>';
-  return '<div class="ccHeroV38"><img src="'+campaignArtV38(x)+'" alt="'+escV3(x.title||'Campanha eStore')+'"><button onclick="setCcTabV38(\'prizes\')">Ver campanha <span>→</span></button></div>'+
+  return '<section class="campaignNativeCalloutV162" style="background:#173F35;border:2px solid #DE7C00;border-radius:18px;margin:12px 0 16px;padding:18px;color:white;animation:campaignPartialGlowV160 2.4s ease-in-out infinite">'+
+    '<strong style="display:block;color:#FFE09B;font-size:17px;margin-bottom:6px">🏆 PARCIAL DO TOP 15 EM DESTAQUE</strong>'+
+    '<p style="font-size:13px;line-height:1.5;margin:0 0 11px;color:white">🔊 Você está aumentando o volume ou deixando seu nome fora dos premiáveis? Descubra sua posição entre os 45 elegíveis.</p>'+
+    '<button style="background:#DE7C00;color:white;padding:12px 18px;font-weight:900;border:0;border-radius:12px;width:100%" onclick="if(window.openCampaignPartial158)window.openCampaignPartial158();else location.href=\'./parcial.html\'">CONFERIR PARCIAL →</button></section>'+ 
+    '<div class="ccHeroV38"><img src="'+campaignArtV38(x)+'" alt="'+escV3(x.title||'Campanha eStore')+'"><button onclick="setCcTabV38(\'prizes\')">Ver campanha <span>→</span></button></div>'+
     '<div class="ccTitleV38">Campanha em destaque</div>'+
     '<div class="ccCampaignCardV38"><img src="'+campaignArtV38(x)+'" alt=""><div><b>'+escV3(x.title||'Campanha eStore')+'</b><span>'+campaignPeriodV38(x)+'</span></div></div>'+
     '<div class="ccInfoGridV38">'+
@@ -2322,7 +2326,7 @@ showCampaignPopupV37=function(){
   el.innerHTML=
     '<div class="campaignModalV86" role="dialog" aria-modal="true" aria-label="Campanha eStore outubro">'+
       '<button class="campaignCloseV86" onclick="event.stopPropagation();closeCampaignPopupV37(false)" aria-label="Fechar">×</button>'+
-      '<button type="button" class="campaignPopupPartialV160" onclick="event.stopPropagation();if(window.openCampaignPartial158)window.openCampaignPartial158();else{closeCampaignPopupV37(false);CC_TAB_V38=\'partial158\';go(\'campaigns\')}" aria-label="Ver parcial do ranking nacional Top 15">'+
+      '<button type="button" class="campaignPopupPartialV160" onclick="event.stopPropagation();if(window.openCampaignPartial158)window.openCampaignPartial158();else{location.href=\'./parcial.html\'}" aria-label="Ver parcial do ranking nacional Top 15">'+
         '<strong>🏆 A PARCIAL DO TOP 15 JÁ SAIU!</strong><span>🔊 Você está aumentando o volume ou deixando seu nome fora dos premiáveis? <b>Confira sua posição →</b></span>'+ 
       '</button>'+ 
       '<button class="campaignBannerV86" onclick="closeCampaignPopupV37(true)" aria-label="Conhecer a mecânica da campanha">'+
@@ -2766,4 +2770,4 @@ showCampaignPopupV37=function(){
 
 
 /* V158: Parcial Top 15 por porte - inicialização independente */
-(function(){if(window.__CAMPAIGN_PARTIAL_158_LOADER__)return;window.__CAMPAIGN_PARTIAL_158_LOADER__=true;var s=document.createElement('script');s.src='./campaign-partial-v158.js?build=v159';s.async=false;s.onerror=function(){console.warn('Parcial eStore indisponível: falha ao carregar módulo')};(document.head||document.documentElement).appendChild(s);})();
+(function(){if(window.__CAMPAIGN_PARTIAL_158_LOADER__)return;window.__CAMPAIGN_PARTIAL_158_LOADER__=true;var s=document.createElement('script');s.src='./campaign-partial-v158.js?build=v162';s.async=false;s.onerror=function(){console.warn('Parcial eStore indisponível: falha ao carregar módulo')};(document.head||document.documentElement).appendChild(s);})();
