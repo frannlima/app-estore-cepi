@@ -10,6 +10,47 @@
   'G+GG+EXX':'4149633,100,5013.97,274.97,263.89|4103076,475,4177.25,0,596.75|4153107,155,4173.93,0,208.70|4098621,132,3820.42,0,764.08|4126650,148,3812.67,0,190.63|4129830,440,3570.26,0,396.70|4126767,132,3309.86,0,551.64|4147772,108,3048.68,134.99,1016.23|4111450,366,3030.59,0,3030.59|4123193,100,2978.36,0,156.76|4138261,112,2940.47,609.34,226.19|4145996,366,2880.89,0,221.61|4048856,373,2819.58,0,1409.79|4129807,463,2377.52,0,1188.76|4144104,070,2367.81,0,215.26'
  };
  const groups=['P+PP','M','G+GG+EXX'];
+ const API165="https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-campaign-2026";
+ let serverSnapshot165=null, fetchedAt165=0, loading165=null, status165="prévia inicial";
+ let campaignInfo165={asof:"2026-10-14",started_at:"2026-10-01",visible_until:"2026-11-10"};
+ function readable165(d){if(!d)return "14/10/2026";const m=String(d).match(/^(\d{4})-(\d{2})-(\d{2})/);return m?m[3]+"/"+m[2]+"/"+m[1]:String(d);}
+ function sourceCaption165(){return "01/10/2026 a "+readable165(campaignInfo165.asof);}
+ function isVisible165(){return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})<="2026-11-10";}
+ async function request165(action,fields){
+   const response=await fetch(API165,{method:"POST",cache:"no-store",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.assign({action:action},fields||{}))});
+   const json=await response.json();if(!response.ok||!json.ok)throw new Error(json.error||"Consulta da campanha indisponível.");return json;
+ }
+ function persistSnapshot165(payload){
+   if(!payload.available||!payload.top)return;
+   serverSnapshot165=payload;status165="atualizado";
+   campaignInfo165={asof:payload.asof,started_at:payload.started_at||"2026-10-01",visible_until:payload.visible_until||"2026-11-10"};
+   groups.forEach(function(g){
+     const rows=payload.top[g];if(!Array.isArray(rows)||!rows.length)return;
+     ranks[g]=rows.map((x,i)=>({
+       pos:i+1,mat:String(x.matricula),store:String(x.store||"").padStart(3,"0"),approved:Number(x.approved_cents||0)/100,
+       bopis:Number(x.bopis_cents||0)/100,orders:Number(x.orders||0),ticket:Number(x.orders)>0?Number(x.approved_cents||0)/100/Number(x.orders):0
+     }));
+   });
+ }
+ window.loadCampaignSnapshot165=async function(force){
+   if(!isVisible165())return;
+   if(!force&&Date.now()-fetchedAt165<45000)return;
+   if(loading165)return loading165;
+   loading165=(async()=>{
+     try{
+       const p=await request165("snapshot");
+       fetchedAt165=Date.now();
+       if(p.available)persistSnapshot165(p);
+       else status165="base parcial até 14/10";
+       const area=document.getElementById("cpPartial158");
+       if(area)area.innerHTML=partial();
+       const hint=document.getElementById("campaignSource165");
+       if(hint)hint.textContent=p.available?"Dados acumulados até "+readable165(p.asof):"Base parcial inicial · até 14/10";
+     }catch(e){status165="dados iniciais; falha de sincronização";console.warn("[Campanha]",e);}
+     finally{loading165=null;}
+   })();return loading165;
+ };
+
  const ranks={};
  groups.forEach(function(k){ranks[k]=raw[k].split('|').map(function(s,i){const p=s.split(',');return {pos:i+1,mat:p[0],store:p[1],approved:+p[2],bopis:+p[3],ticket:+p[4]};});});
 const regionalSnapshot163 = new Map();
@@ -18,7 +59,7 @@ const regionalSnapshot163 = new Map();
  let current='P+PP';
  const money=n=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(n)||0);
  const prize=p=>p<4?'Samsung A07 4G 128GB':p<6?'JBL Tune 720BT':p===6?'JBL Wave Beam 2':p===7?'JBL Wave Buds 2':p<10?'JBL Go 4':'JBL T520 BT';
- const limit=k=>ranks[k][14].approved;
+ const limit=k=>ranks[k]?.[14]?.approved||0;
  const days=()=>{const d=new Date();return Math.max(0,Math.ceil((Date.UTC(2026,9,31)-Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()))/86400000));};
  const mat=()=>{try{return String(U.u.id||'');}catch(_){return '';}};
  const esc=s=>String(s||'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -196,14 +237,10 @@ const regionalSnapshot163 = new Map();
    inject();
    popup();
  }
- style();ensureReady158();
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ensureReady158,{once:true});
- // Aguarda a interface legada concluir scripts com defer e carregamento assíncrono.
- let attempts158=0;
- const retry158=setInterval(function(){
-   if(inject()||++attempts158>=50)clearInterval(retry158);
-   popup();
- },250);
- const observer=new MutationObserver(function(){popup();if(!installed158)inject();});
+ // As abas e a navegação agora são tratadas pelo app principal, sem duplicar botões.
+ style();popup();
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){popup();window.loadCampaignSnapshot165();},{once:true});
+ else window.loadCampaignSnapshot165();
+ const observer=new MutationObserver(function(){popup();});
  observer.observe(document.documentElement,{childList:true,subtree:true});
 })();
