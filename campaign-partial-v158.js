@@ -152,7 +152,9 @@
    if(typeof campaignOverviewV38==='function'){
      const overview=campaignOverviewV38;
      campaignOverviewV38=function(){
-       return '<section class="cpHeroCall158"><div><b>🏆 PARCIAL DA CAMPANHA • DESTAQUE</b><p>🔊 Você está aumentando o volume ou deixando seu nome fora dos 15 premiáveis? Confira quem está no Top 15 de cada porte!</p></div><button onclick="openCampaignPartial158()">Ver parcial →</button></section>'+overview();
+       const body=overview();
+     if(body.includes('campaignNativeCalloutV162'))return body;
+     return '<section class="cpHeroCall158"><div><b>🏆 PARCIAL DA CAMPANHA • DESTAQUE</b><p>🔊 Você está aumentando o volume ou deixando seu nome fora dos 15 premiáveis? Confira quem está no Top 15 de cada porte!</p></div><button onclick="openCampaignPartial158()">Ver parcial →</button></section>'+body;
      };
    }
    const previous=campaignsV3;
