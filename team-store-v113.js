@@ -157,11 +157,11 @@
       const ratio=logo.width/logo.height,lw=370,lh=Math.min(70,lw/ratio);
       ctx.drawImage(logo,(W-lw)/2,37,lw,lh);
     }
-    txt(ctx,'Moda que inspira o Brasil',W/2,132,'500 17px Arial',P.white,'center');
+    txt(ctx,'Moda que inspira o Brasil',W/2,132,'500 17px Larsseit, Arial',P.white,'center');
 
-    txt(ctx,'MEU TIME',W/2,225,'700 43px Arial',P.green,'center');
-    txt(ctx,'FILIAL '+U.u.st,W/2,273,'700 25px Arial',P.green,'center');
-    txt(ctx,periodName()+' • '+fmtDate(current?.endDate),W/2,312,'500 18px Arial',P.sage,'center');
+    txt(ctx,'MEU TIME',W/2,225,'700 43px Larsseit, Arial',P.green,'center');
+    txt(ctx,'FILIAL '+U.u.st,W/2,273,'700 25px Larsseit, Arial',P.green,'center');
+    txt(ctx,periodName()+' • '+fmtDate(current?.endDate),W/2,312,'500 18px Larsseit, Arial',P.sage,'center');
 
     // KPIs
     const gap=14,cw=(W-96-gap*3)/4,x0=48,y0=352;
@@ -174,23 +174,23 @@
     // Dispersão da filial
     const sy=486;
     rr(ctx,48,sy,W-96,235,18,'#EFEADF','#E2DDD3');
-    txt(ctx,'DISPERSÃO DA FILIAL',82,sy+41,'700 25px Arial',P.green);
+    txt(ctx,'DISPERSÃO DA FILIAL',82,sy+41,'700 25px Larsseit, Arial',P.green);
     rr(ctx,68,sy+72,W-136,135,14,P.white);
-    txt(ctx,'Atual',115,sy+101,'500 13px Arial',P.sage);
-    txt(ctx,fmtPct(m.disp),115,sy+145,'700 39px Arial',P.orange);
+    txt(ctx,'Atual',115,sy+101,'500 13px Larsseit, Arial',P.sage);
+    txt(ctx,fmtPct(m.disp),115,sy+145,'700 39px Larsseit, Arial',P.orange);
     ctx.strokeStyle=P.gray;ctx.beginPath();ctx.moveTo(355,sy+90);ctx.lineTo(355,sy+188);ctx.stroke();
-    txt(ctx,'Período anterior',405,sy+101,'500 13px Arial',P.sage);
-    txt(ctx,pm?fmtPct(pm.disp):'—',405,sy+145,'700 31px Arial',P.green);
+    txt(ctx,'Período anterior',405,sy+101,'500 13px Larsseit, Arial',P.sage);
+    txt(ctx,pm?fmtPct(pm.disp):'—',405,sy+145,'700 31px Larsseit, Arial',P.green);
     ctx.strokeStyle=P.gray;ctx.beginPath();ctx.moveTo(658,sy+90);ctx.lineTo(658,sy+188);ctx.stroke();
     rr(ctx,690,sy+87,270,105,13,e.rel!=null&&e.rel<0?'#E6F0EA':'#FFF2DF');
-    txt(ctx,'Evolução',720,sy+110,'500 13px Arial',P.sage);
-    txt(ctx,evoPct(e),720,sy+145,'700 31px Arial',evoColor(e));
-    txt(ctx,e.pp==null?'':evoPp(e)+' • '+evoWord(e),720,sy+174,'500 10px Arial',P.sage,'left',220);
+    txt(ctx,'Evolução',720,sy+110,'500 13px Larsseit, Arial',P.sage);
+    txt(ctx,evoPct(e),720,sy+145,'700 31px Larsseit, Arial',evoColor(e));
+    txt(ctx,e.pp==null?'':evoPp(e)+' • '+evoWord(e),720,sy+174,'500 10px Larsseit, Arial',P.sage,'left',220);
 
     // Áreas
     const ay=758;
-    txt(ctx,'DISPERSÃO POR ÁREAS',74,ay,'700 28px Arial',P.green);
-    txt(ctx,'Percentual de colaboradores sem venda por área da filial.',74,ay+32,'500 14px Arial',P.sage);
+    txt(ctx,'DISPERSÃO POR ÁREAS',74,ay,'700 28px Larsseit, Arial',P.green);
+    txt(ctx,'Percentual de colaboradores sem venda por área da filial.',74,ay+32,'500 14px Larsseit, Arial',P.sage);
     areaCard(ctx,48,ay+62,478,345,'Operações',a['Operações'],pa?.['Operações']);
     areaCard(ctx,554,ay+62,478,345,'Caixa / Atendimento',a['Caixa / Atendimento'],pa?.['Caixa / Atendimento']);
 
@@ -199,12 +199,12 @@
     const legends=[[P.orange,'Zerados'],[P.green,'Com venda'],[P.beige,'Período anterior'],[P.sage,'Redução da dispersão']];
     legends.forEach((z,i)=>{
       const bx=80+i*235;ctx.beginPath();ctx.arc(bx,ly+40,10,0,Math.PI*2);ctx.fillStyle=z[0];ctx.fill();
-      txt(ctx,z[1],bx+18,ly+40,'500 11px Arial',P.sage,'left',180);
+      txt(ctx,z[1],bx+18,ly+40,'500 11px Larsseit, Arial',P.sage,'left',180);
     });
 
     ctx.strokeStyle='#BFC8C3';ctx.beginPath();ctx.moveTo(48,1435);ctx.lineTo(1032,1435);ctx.stroke();
-    txt(ctx,'MODA QUE INSPIRA O BRASIL',48,1465,'700 11px Arial',P.green);
-    txt(ctx,'App. eStore CE+PI',1032,1465,'700 11px Arial',P.green,'right');
+    txt(ctx,'MODA QUE INSPIRA O BRASIL',48,1465,'700 11px Larsseit, Arial',P.green);
+    txt(ctx,'App. eStore CE+PI',1032,1465,'700 11px Larsseit, Arial',P.green,'right');
     return cv;
   }
 
