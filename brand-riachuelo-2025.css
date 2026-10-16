@@ -1,0 +1,71 @@
+/* Riachuelo 2025 · identidade institucional eStore CE+PI
+   Brandbook 2025 (Verde Riachuelo e Bege Duna) + Pantone operacional.
+   Layout base, regras e indicadores comerciais preservados.
+   Larsseit só renderiza de forma exata quando houver licença/arquivo de fonte. */
+:root{
+  --ria-brand-green:#0C2E2D;
+  --ria-brand-dune:#D7D0BB;
+  --ria-pantone-567:#173F35;
+  --ria-pantone-3305:#466964;
+  --ria-pantone-gray:#DAD9D6;
+  --ria-pantone-7527:#D6D2C4;
+  --ria-pantone-orange:#DE7C00;
+  --ria-pantone-orange-u:#D37C32;
+  --ria-pantone-wine:#76232F;
+  --ria-pantone-rose:#AE535C;
+  --ria-pantone-red:#E03C31;
+  --ria-pantone-pink:#E68699;
+  --ria-font:"Larsseit","Larsseit Regular","Arial",sans-serif;
+  --g:var(--ria-brand-green);
+  --g2:var(--ria-pantone-3305);
+  --sand:var(--ria-brand-dune);
+  --gray:var(--ria-pantone-gray);
+  --o:var(--ria-pantone-orange);
+  --o2:var(--ria-pantone-orange-u);
+  --bg:#F7F6F2;
+}
+html,body,#shell{font-family:var(--ria-font)!important;}
+body,#shell{background-color:var(--bg);color:var(--ria-brand-green);}
+button,input,textarea,select{font-family:var(--ria-font)!important;}
+:is(h1,h2,h3,h4,.pageTitleV3,.homeBrandV33 b,.menuTileV33 b,.dynamicPanelV34 b){
+  font-family:var(--ria-font)!important;
+  letter-spacing:-.025em;
+}
+#shell .pageTitleV3,#shell .homeBrandV33 b{color:var(--ria-brand-green);}
+#shell .homeBannerV3,#shell .commissionHeroV3{
+  background:linear-gradient(135deg,var(--ria-brand-green),var(--ria-pantone-3305))!important;
+  color:#fff;
+}
+#shell .premiumHomeV33,#shell .premiumHomeV34{background-color:#F7F6F2;}
+#shell .homeTopV33{color:var(--ria-brand-green);}
+#shell .homeTopV33 :is(h1,h2,h3),#shell .homeBrandV33 span{font-family:var(--ria-font)!important;}
+#shell .menuTileV33{
+  border:1px solid rgba(12,46,45,.1)!important;
+  box-shadow:0 6px 20px rgba(12,46,45,.065)!important;
+}
+#shell .dynamicPanelV34{
+  border-color:rgba(215,208,187,.46)!important;
+  box-shadow:0 12px 35px rgba(12,46,45,.18);
+}
+#shell .metricCardV3,#shell .recognitionV3{
+  border-color:#E3DED3!important;
+  box-shadow:0 5px 18px rgba(12,46,45,.055);
+}
+#shell .storeSelectorV3{background:#F0EEE7;}
+#shell .bottom{
+  border-top:1px solid #DAD9D6!important;
+  box-shadow:0 -4px 20px rgba(12,46,45,.07)!important;
+}
+#shell :is(.teamDashHeadV26,.teamTableV26 th){background-color:var(--ria-brand-green)!important;color:#fff;}
+#shell .brandPhotoCardV3,#shell .campaignHeroV34{overflow:hidden;}
+:where(button,a,[role="button"]):focus-visible{
+  outline:3px solid var(--ria-pantone-orange)!important;outline-offset:2px;
+}
+:where(input,textarea,select):focus-visible{
+  outline:2px solid var(--ria-pantone-3305)!important;outline-offset:1px;
+}
+/* Não substituir cores de desempenho, status, comissão, mundo, DCO ou campanha. */
+@media(max-width:680px){
+  #shell .menuTileV33{box-shadow:0 3px 12px rgba(12,46,45,.055)!important;}
+  #shell .dynamicPanelV34{box-shadow:0 6px 24px rgba(12,46,45,.15);}
+}
