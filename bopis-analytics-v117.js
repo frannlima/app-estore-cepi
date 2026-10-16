@@ -238,14 +238,14 @@
   }
   window.previewBopisCardV117=async function(){
     try{
-      const c=await bopisCanvas117(),m=document.createElement('div');m.className='previewModal';
+      const c=window.RiachueloBrandCards.decorateCanvas(await bopisCanvas117()),m=document.createElement('div');m.className='previewModal';
       m.innerHTML='<div class=box><img src="'+c.toDataURL('image/png')+'" alt="Dashboard BOPIS"><div class=toolbar><button class=btn onclick="shareBopisCardV117()">Compartilhar</button><button class="btn ghost" onclick="this.closest(\'.previewModal\').remove()">Fechar</button></div></div>';
       m.onclick=e=>{if(e.target===m)m.remove()};document.body.appendChild(m);
     }catch(e){alert('Não foi possível gerar o dashboard BOPIS.')}
   };
   window.shareBopisCardV117=async function(){
     try{
-      const c=await bopisCanvas117(),b=await new Promise(r=>c.toBlob(r,'image/png',.98)),caption=bopisCaption117();
+      const c=window.RiachueloBrandCards.decorateCanvas(await bopisCanvas117()),b=await new Promise(r=>c.toBlob(r,'image/png',.98)),caption=bopisCaption117();
       if(!b)throw new Error('Falha ao gerar imagem');
       const f=new File([b],'BOPIS_Regional_CEPI_'+BOPIS_PERIOD_V117+'.png',{type:'image/png'});
       if(navigator.share){try{if(!navigator.canShare||navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'BOPIS • Regional CE+PI',text:caption});return}}catch(e){if(e?.name==='AbortError')return}}
