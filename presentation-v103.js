@@ -305,8 +305,8 @@
     const logo=await loadLogo();
     if(logo){const ratio=logo.width/logo.height,lw=370,lh=lw/ratio;ctx.drawImage(logo,58,55,lw,lh);}
     ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(485,37);ctx.lineTo(485,110);ctx.stroke();
-    txt(ctx,'Painel Regional eStore • CE+PI',530,60,650,'700 34px Arial','#FFFFFF');
-    txt(ctx,descriptor(d),530,99,690,'500 20px Arial','#F2E6C7');
+    txt(ctx,'Painel Regional eStore • CE+PI',530,60,650,'700 34px Larsseit, Arial','#FFFFFF');
+    txt(ctx,descriptor(d),530,99,690,'500 20px Larsseit, Arial','#F2E6C7');
     ctx.beginPath();ctx.moveTo(1190,14);ctx.bezierCurveTo(1280,20,1290,115,1380,136);ctx.lineTo(1510,136);ctx.bezierCurveTo(1430,88,1470,37,1540,14);ctx.closePath();ctx.fillStyle=C.sage;ctx.fill();
     ctx.beginPath();ctx.moveTo(1430,14);ctx.bezierCurveTo(1500,5,1560,10,1582,14);ctx.lineTo(1582,136);ctx.lineTo(1515,136);ctx.bezierCurveTo(1465,95,1485,40,1540,14);ctx.closePath();ctx.fillStyle=C.orange;ctx.fill();
 
@@ -329,12 +329,12 @@
 
     const podY=648,podH=228;rr(ctx,18,podY,W-36,podH,16,C.white,'#E5E1D8',1);
     ctx.fillStyle=C.green;rr(ctx,18,podY,W-36,42,16,C.green,C.green,0);ctx.fillRect(18,podY+21,W-36,21);
-    txt(ctx,'🏆',48,podY+21,28,'700 20px Arial','#FFFFFF','center');txt(ctx,'Pódio Regional',76,podY+21,250,'700 19px Arial','#FFFFFF');
+    txt(ctx,'🏆',48,podY+21,28,'700 20px Larsseit, Arial','#FFFFFF','center');txt(ctx,'Pódio Regional',76,podY+21,250,'700 19px Larsseit, Arial','#FFFFFF');
     ctx.strokeStyle='#D7D1C8';ctx.beginPath();ctx.moveTo(W/2,podY+56);ctx.lineTo(W/2,podY+podH-12);ctx.stroke();
     drawPodiumGroup(ctx,46,podY+48,W/2-78,podH-58,'Colaboradores',d.collabCaptured,'collab');
     drawPodiumGroup(ctx,W/2+30,podY+48,W/2-78,podH-58,'Supervisores',d.supervisorRanking,'sup');
 
-    txt(ctx,'MODA QUE INSPIRA O BRASIL',30,889,300,'600 14px Arial',C.green);
+    txt(ctx,'MODA QUE INSPIRA O BRASIL',30,889,300,'600 14px Larsseit, Arial',C.green);
     ctx.strokeStyle=C.sage;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(300,889);ctx.lineTo(1550,889);ctx.stroke();
     return canvas;
   }
