@@ -1873,8 +1873,10 @@ async function loadContentV3(){
   }catch(e){console.warn('Conteúdo dinâmico:',e)}
 }
 
+function campaignWithinWindow165(){const now=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Fortaleza',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());return now<='2026-11-10';}
 function ccTabsV38(){
   const items=[['campaigns','📣','Campanhas'],['coupons','🎟','Cupons'],['prizes','🎁','Premiação'],['sell','▥','Como vender']];
+  if(campaignWithinWindow165())items.splice(1,0,['partial158','🏆','Parcial Top 15']);
   return '<div class="ccTabsV38">'+items.map(i=>'<button class="'+(CC_TAB_V38===i[0]?'on':'')+'" onclick="setCcTabV38(\''+i[0]+'\')"><b>'+i[1]+'</b><span>'+i[2]+'</span></button>').join('')+'</div>';
 }
 function campaignOverviewV38(){
@@ -1883,7 +1885,7 @@ function campaignOverviewV38(){
   return '<section class="campaignNativeCalloutV162" style="background:#173F35;border:2px solid #DE7C00;border-radius:18px;margin:12px 0 16px;padding:18px;color:white;animation:campaignPartialGlowV160 2.4s ease-in-out infinite">'+
     '<strong style="display:block;color:#FFE09B;font-size:17px;margin-bottom:6px">🏆 PARCIAL DO TOP 15 EM DESTAQUE</strong>'+
     '<p style="font-size:13px;line-height:1.5;margin:0 0 11px;color:white">🔊 Você está aumentando o volume ou deixando seu nome fora dos premiáveis? Descubra sua posição entre os 45 elegíveis.</p>'+
-    '<button style="background:#DE7C00;color:white;padding:12px 18px;font-weight:900;border:0;border-radius:12px;width:100%" onclick="if(window.openCampaignPartial158)window.openCampaignPartial158();else location.href=\'./parcial.html\'">CONFERIR PARCIAL →</button></section>'+ 
+    '<button style="background:#DE7C00;color:white;padding:12px 18px;font-weight:900;border:0;border-radius:12px;width:100%" onclick="if(window.openCampaignPartial158)window.openCampaignPartial158();else{CC_TAB_V38=\'partial158\';go(\'campaigns\')}">CONFERIR PARCIAL →</button></section>'+ 
     '<div class="ccHeroV38"><img src="'+campaignArtV38(x)+'" alt="'+escV3(x.title||'Campanha eStore')+'"><button onclick="setCcTabV38(\'prizes\')">Ver campanha <span>→</span></button></div>'+
     '<div class="ccTitleV38">Campanha em destaque</div>'+
     '<div class="ccCampaignCardV38"><img src="'+campaignArtV38(x)+'" alt=""><div><b>'+escV3(x.title||'Campanha eStore')+'</b><span>'+campaignPeriodV38(x)+'</span></div></div>'+
@@ -1937,7 +1939,8 @@ function sellMoreV38(){
   '<div class="ccSellBannerV38"><div><b>Venda que não se perde, vira oportunidade.</b><span>Use o eStore como extensão da sua loja.</span></div><div>📲</div></div>';
 }
 campaignsV3=function(){
-  const body=CC_TAB_V38==='coupons'?couponsV38():CC_TAB_V38==='prizes'?prizesV38():CC_TAB_V38==='sell'?sellMoreV38():campaignOverviewV38();
+  if(!campaignWithinWindow165()&&CC_TAB_V38==='partial158')CC_TAB_V38='campaigns';
+  const body=CC_TAB_V38==='partial158' ? (window.renderCampaignPartialStandalone158?window.renderCampaignPartialStandalone158():'<div class="card"><b>Carregando a parcial da campanha…</b><p>Se a rede estiver lenta, aguarde alguns segundos e acesse novamente o menu.</p></div>') :CC_TAB_V38==='coupons'?couponsV38():CC_TAB_V38==='prizes'?prizesV38():CC_TAB_V38==='sell'?sellMoreV38():campaignOverviewV38();
   return '<div class="ccPageV38"><div class="pageTitleV3"><span>Cupons e Campanhas</span></div>'+ccTabsV38()+body+'</div>';
 };
 
@@ -2326,7 +2329,7 @@ showCampaignPopupV37=function(){
   el.innerHTML=
     '<div class="campaignModalV86" role="dialog" aria-modal="true" aria-label="Campanha eStore outubro">'+
       '<button class="campaignCloseV86" onclick="event.stopPropagation();closeCampaignPopupV37(false)" aria-label="Fechar">×</button>'+
-      '<button type="button" class="campaignPopupPartialV160" onclick="event.stopPropagation();if(window.openCampaignPartial158)window.openCampaignPartial158();else{location.href=\'./parcial.html\'}" aria-label="Ver parcial do ranking nacional Top 15">'+
+      '<button type="button" class="campaignPopupPartialV160" onclick="event.stopPropagation();if(window.openCampaignPartial158)window.openCampaignPartial158();else{CC_TAB_V38=\'partial158\';go(\'campaigns\')}" aria-label="Ver parcial do ranking nacional Top 15">'+
         '<strong>🏆 A PARCIAL DO TOP 15 JÁ SAIU!</strong><span>🔊 Você está aumentando o volume ou deixando seu nome fora dos premiáveis? <b>Confira sua posição →</b></span>'+ 
       '</button>'+ 
       '<button class="campaignBannerV86" onclick="closeCampaignPopupV37(true)" aria-label="Conhecer a mecânica da campanha">'+
@@ -2769,5 +2772,35 @@ showCampaignPopupV37=function(){
 })();
 
 
+/* V165 | Menu Campanhas nativo, card Meu Resultado e período até 10/11/2026 */
+(function(){
+ const baseResultV165=result;
+ result=function(){
+   const base=baseResultV165();
+   if(!campaignWithinWindow165())return base;
+   const section=window.campaignMyResultCard165 ? window.campaignMyResultCard165() :
+    '<section class="card" style="border:2px solid #DE7C00;background:#F8F3E7;margin:13px 0"><h3>🏆 Sua posição na campanha eStore no Volume Máximo</h3><p>Carregando seu desafio e sua premiação provisória…</p></section>';
+   return section+base;
+ };
+ const previousGoV165=go;
+ go=function(view){
+   const out=previousGoV165(view);
+   if(campaignWithinWindow165()){
+     if(view==='campaigns'&&CC_TAB_V38==='partial158'){
+       setTimeout(function(){
+         if(window.loadCampaignSnapshot165)window.loadCampaignSnapshot165();
+         else if(window.renderCampaignPartialStandalone158){
+           const target=document.querySelector('.ccPageV38');if(target)go('campaigns');
+         }
+       },80);
+     }
+     if(view==='result'){
+       setTimeout(function(){if(window.refreshCampaignResult165)window.refreshCampaignResult165();},100);
+     }
+   }
+   return out;
+ };
+})();
+
 /* V158: Parcial Top 15 por porte - inicialização independente */
-(function(){if(window.__CAMPAIGN_PARTIAL_158_LOADER__)return;window.__CAMPAIGN_PARTIAL_158_LOADER__=true;var s=document.createElement('script');s.src='./campaign-partial-v158.js?build=v164';s.async=false;s.onerror=function(){console.warn('Parcial eStore indisponível: falha ao carregar módulo')};(document.head||document.documentElement).appendChild(s);})();
+(function(){if(window.__CAMPAIGN_PARTIAL_158_LOADER__)return;window.__CAMPAIGN_PARTIAL_158_LOADER__=true;var s=document.createElement('script');s.src='./campaign-partial-v158.js?build=v165';s.async=false;s.onerror=function(){console.warn('Parcial eStore indisponível: falha ao carregar módulo')};(document.head||document.documentElement).appendChild(s);})();
