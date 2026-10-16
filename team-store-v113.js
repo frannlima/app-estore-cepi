@@ -217,7 +217,7 @@
     if(TEAM_SCOPE==='regional')return await baseShareTeamCardV113();
     try{
       const raw=teamCardData();if(!raw||raw.regional)return;
-      const prev=await previousTeamData(raw.j),caption=storeCaption(raw.j,prev),c=await storeCanvas();
+      const prev=await previousTeamData(raw.j),caption=storeCaption(raw.j,prev),c=window.RiachueloBrandCards.decorateCanvas(await storeCanvas());
       if(!c)return alert('Aguarde o carregamento dos dados do Meu Time.');
       const b=await new Promise(r=>c.toBlob(r,'image/png',.98));if(!b)throw new Error('Falha ao gerar imagem');
       const f=new File([b],'Meu_Time_Dispersao_Filial_'+U.u.st+'_'+PER+'.png',{type:'image/png'});
