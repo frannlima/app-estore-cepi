@@ -84,6 +84,7 @@
    const previous=go;
    const wrap=function(view){
      const output=previous(view);
+     if(visible())setTimeout(drawerEntry,50);
      if(visible()&&view==='campaigns'&&state.active){
        if(!moduleReady())setTimeout(function(){if(state.active&&moduleReady())go('campaigns');},600);
        else if(typeof window.loadCampaignSnapshot165==='function')window.loadCampaignSnapshot165();
@@ -95,6 +96,18 @@
    try{window.go=wrap;}catch(e){}
    return true;
  }
+ function drawerEntry(){
+   if(!visible())return;
+   const drawer=document.querySelector('.drawerNav');
+   if(!drawer||drawer.querySelector('.cpDrawerEntry168'))return;
+   const existing=Array.from(drawer.querySelectorAll('button')).find(b=>/go\(['"]campaigns['"]\)/.test(b.getAttribute('onclick')||''));
+   if(!existing)return;
+   const button=document.createElement('button');
+   button.type='button';button.className='cpDrawerEntry168';
+   button.innerHTML='<span class="drawerIco">🏆</span>Parcial Top 15 <small>· Outubro</small>';
+   button.addEventListener('click',window.campaignPartialOpen168);
+   existing.insertAdjacentElement('afterend',button);
+ }
  function addStyle(){
    if(document.getElementById('cp-native-v168-css'))return;
    const e=document.createElement('style');e.id='cp-native-v168-css';
@@ -105,6 +118,7 @@
      '.cpNativeLive168{font-weight:950;font-size:10px;color:#FFD990;letter-spacing:.1em}.cpNativeFeature168 h3{font-size:20px;color:#FFDC91;margin:8px 0}.cpNativeFeature168 p{color:#fff;font-size:13px;line-height:1.55;margin:0 0 14px}.cpNativeFeature168 button{width:100%;border:0;border-radius:14px;background:#DE7C00;color:#fff;padding:14px;font-weight:950;cursor:pointer}'+
      '.cpNativePage168{max-width:1200px;margin:0 auto}.cpNativeToolbar168{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 0 20px;color:#173F35;font-size:12px;font-weight:900}.cpNativeToolbar168 button{border:1px solid #466964;background:white;padding:11px 17px;border-radius:13px;color:#173F35;font-weight:800}'+
      '.cpMyShell168{border:2px solid #DE7C00;border-radius:18px;background:#F8F3E8;padding:16px;margin:13px 0}.cpMyShell168 b{color:#173F35}.cpMyShell168 p{font-size:12px;color:#466964}'+
+     '.cpDrawerEntry168{background:#FFF1D3!important;border:1px solid #DE7C00!important;color:#173F35!important;font-weight:900!important}.cpDrawerEntry168 small{color:#9C5B4A;font-size:10px}'+
      '@media(max-width:560px){.cpNativeToolbar168{flex-wrap:wrap}.cpNativeTab168{padding:10px 6px!important}.campaignPage75 .tabs75:has(.cpNativeTab168){flex-wrap:wrap!important}}'+
      '@media(prefers-reduced-motion:reduce){.cpNativeTab168,.cpNativeFeature168{animation:none!important}}';
    document.head.appendChild(e);
@@ -114,6 +128,7 @@
    setupCampaign();
    setupResult();
    setupGo();
+   drawerEntry();
  }
  init();
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
