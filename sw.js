@@ -109,7 +109,7 @@ self.addEventListener('fetch',event=>{
   event.waitUntil(networkPromise.then(()=>{}));
   event.respondWith(
     (async()=>{
-      const critical=/\\.(?:js|css)$/i.test(url.pathname);
+      const critical=url.pathname.endsWith('.js')||url.pathname.endsWith('.css');
       if(critical){
         // JS/CSS: garantir atualização após deploy e manter fallback offline.
         const live=await networkPromise;
