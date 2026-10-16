@@ -15,7 +15,7 @@
  let campaignInfo165={asof:"2026-10-14",started_at:"2026-10-01",visible_until:"2026-11-10"};
  function readable165(d){if(!d)return "14/10/2026";const m=String(d).match(/^(\d{4})-(\d{2})-(\d{2})/);return m?m[3]+"/"+m[2]+"/"+m[1]:String(d);}
  function sourceCaption165(){return "01/10/2026 a "+readable165(campaignInfo165.asof);}
- function isVisible165(){return new Date().toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'})<="2026-11-10";}
+ function isVisible165(){const p=new Intl.DateTimeFormat('en-US',{timeZone:'America/Fortaleza',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const v=k=>p.find(x=>x.type===k)?.value||'';return [v('year'),v('month'),v('day')].join('-')<='2026-11-10';}
  async function request165(action,fields){
    const response=await fetch(API165,{method:"POST",cache:"no-store",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.assign({action:action},fields||{}))});
    const json=await response.json();if(!response.ok||!json.ok)throw new Error(json.error||"Consulta da campanha indisponível.");return json;
@@ -153,7 +153,7 @@ const regionalSnapshot163 = new Map();
    const passedDays=Math.max(1,Math.min(31,Math.ceil((Date.parse(campaignInfo165.asof+"T12:00:00Z")-Date.parse("2026-10-01T12:00:00Z"))/86400000)+1));
    const estimatedSustain=Math.ceil(approved/passedDays*Math.max(0,remaining)*100)/100;
    const expectedOrders=ticket>0?Math.ceil(estimatedSustain/ticket):null;
-   const rankText=pos&&pos<=15?pos+"º lugar nacional":"Fora do Top 15";
+   const rankText=pos&&pos<=15?pos+"º lugar nacional":pos&&pos>15&&serverSnapshot165?.source_scope==="nacional_completo"?pos+"º nacional (fora Top 15)":"Fora do Top 15";
    let prizeText=pos&&pos<=15?prize(pos):"Ainda sem premiação projetada";
    let headline=pos&&pos<=15?"🏆 Você está entre os elegíveis. Vai defender sua posição ou disputar um prêmio maior?":"🎯 O Top 15 está ao seu alcance. Quantos pedidos faltam para mudar esse jogo?";
    const moneyBox=(label,value,detail)=>'<div class="cpChallengeKpi165"><small>'+label+'</small><b>'+value+'</b><span>'+detail+'</span></div>';
@@ -190,8 +190,9 @@ const regionalSnapshot163 = new Map();
    output.innerHTML='<div class="cpLoading165">Consultando sua posição e calculando seu desafio…</div>';
    const p=await findPerson165(m);
    if(!p){output.innerHTML='<div class="cpLoading165">Matrícula não localizada na parcial disponível. Solicite ao administrador o relatório nacional completo até a data mais recente; nenhuma venda será presumida.</div>';return;}
-   current=p.group;
-   output.innerHTML=challenge165(p);
+   if(p.group!==current){current=p.group;const area=document.getElementById('cpPartial158');if(area){area.innerHTML=partial();const next=document.getElementById('cpMat158');if(next)next.value=m;}}
+   const target=document.getElementById('cpAnswer158')||output;
+   target.innerHTML=challenge165(p);
  };
  window.campaignMyResultCard165=function(){
    if(!isVisible165())return "";
