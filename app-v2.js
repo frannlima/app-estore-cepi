@@ -2757,3 +2757,7 @@ showCampaignPopupV37=function(){
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
+
+
+/* V158: Parcial Top 15 por porte - inicialização independente */
+(function(){if(window.__CAMPAIGN_PARTIAL_158_LOADER__)return;window.__CAMPAIGN_PARTIAL_158_LOADER__=true;var s=document.createElement('script');s.src='./campaign-partial-v158.js?build=v158';s.async=false;s.onerror=function(){console.warn('Parcial eStore indisponível: falha ao carregar módulo')};(document.head||document.documentElement).appendChild(s);})();
