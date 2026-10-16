@@ -1,0 +1,89 @@
+/* Riachuelo | teste visual V1: cards já existentes nas telas eStore CE+PI.
+   Não recria cards nem altera suas fórmulas, eventos, rankings ou campos. */
+:root{
+ --ria-card-green:#0C2E2D;
+ --ria-card-sage:#466964;
+ --ria-card-orange:#DE7C00;
+ --ria-card-dune:#D7D0BB;
+ --ria-card-cream:#F7F6F2;
+}
+#shell .metricCardV3,
+#shell .hourKpiV6,
+#shell .teamKpisV26 > *,
+#shell .performanceKpiV130,
+#shell .performancePanelV130,
+#shell .recognitionV3{
+ border:1px solid #D7D0BB!important;
+ border-top:4px solid #466964!important;
+ border-radius:17px!important;
+ background-color:#FFFEFC!important;
+ box-shadow:0 8px 25px rgba(12,46,45,.09)!important;
+}
+#shell .metricCardV3.mOrangeV3,
+#shell .hourKpiV6.primary,
+#shell .performanceKpiV130:first-child{
+ border-top-color:#DE7C00!important;
+}
+#shell .recognitionV3{
+ border-top-color:#DE7C00!important;
+}
+#shell .hourlyExecutiveV6,
+#shell .teamDashV26,
+#shell .teamExecV26,
+#shell .performanceExecutiveV130,
+#shell .poolExecutiveV5{
+ border:1px solid rgba(12,46,45,.18)!important;
+ border-radius:22px!important;
+ box-shadow:0 14px 38px rgba(12,46,45,.11)!important;
+ overflow:hidden;
+}
+#shell .hourlyExecutiveV6 .hourBlockTitleV6,
+#shell .teamDashV26 .teamDashHeadV26{
+ background:linear-gradient(105deg,#0C2E2D,#28574D)!important;
+ color:#FFF!important;
+ border-bottom:4px solid #DE7C00!important;
+}
+#shell .hourlyExecutiveV6 .hourBlockTitleV6{
+ padding:12px 15px!important;
+ border-radius:11px!important;
+}
+#shell .teamDashV26 .teamDashHeadV26,
+#shell .teamTableV26 th{
+ color:#FFF!important;
+}
+#shell .teamDashV26 .teamDashHeadV26{
+ padding:14px 16px!important;
+}
+#shell .hourTopGridV6 > *,
+#shell .hourTableV6,
+#shell .teamSplitV26 > *,
+#shell .poolExecGridV5 > *{
+ border-color:rgba(12,46,45,.14)!important;
+}
+#shell .pageTitleV3,
+#shell .hourBlockTitleV6{
+ font-family:var(--ria-font,Arial,sans-serif)!important;
+ letter-spacing:-.025em!important;
+}
+#shell .hourShareBtnV5,
+#shell .shareBarV4 button{
+ background:#DE7C00!important;
+ color:#FFFFFF!important;
+ border-color:#DE7C00!important;
+ border-radius:12px!important;
+ box-shadow:0 5px 15px rgba(222,124,0,.18)!important;
+}
+#shell .performanceHeroV130{
+ border-bottom:4px solid #DE7C00!important;
+}
+#shell .performanceExecutivePreviewV130{
+ border:1px solid #D7D0BB!important;
+ box-shadow:0 8px 24px rgba(12,46,45,.075)!important;
+}
+@media(max-width:700px){
+ #shell .metricCardV3,
+ #shell .hourKpiV6,
+ #shell .recognitionV3{border-radius:14px!important;}
+ #shell .teamDashV26,
+ #shell .hourlyExecutiveV6{border-radius:17px!important;}
+}
