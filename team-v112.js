@@ -352,7 +352,7 @@
 
   previewTeamCard=async function(){
     try{
-      const c=await teamCardCanvas();
+      const c=window.RiachueloBrandCards.decorateCanvas(await teamCardCanvas());
       if(!c)return alert('Aguarde o carregamento dos dados do Meu Time.');
       const m=document.createElement('div');m.className='previewModal';
       m.innerHTML='<div class=box><img src="'+c.toDataURL('image/png')+'" alt="Dashboard Meu Time"><div class=toolbar><button class=btn onclick="shareTeamCard()">Compartilhar</button><button class="btn ghost" onclick="this.closest(\'.previewModal\').remove()">Fechar</button></div></div>';
