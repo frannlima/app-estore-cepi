@@ -247,6 +247,7 @@ const regionalSnapshot163 = new Map();
    c.fillStyle='#FFCD75';c.font='800 28px Arial';c.fillText('CORTE TOP 15: '+money(limit(k)),60,989);
    c.fillStyle='white';c.font='600 18px Arial';c.fillText('BOPIS: valor NÃO contabilizado no ranking, pois o produto já estava no estoque da loja.',60,1023);
    c.textAlign='right';c.font='600 18px Arial';c.fillText('CORTE DA PARCIAL: '+sourceCaption165(),1850,989);
+   c.font='700 18px Arial';c.fillText('Moda que inspira o Brasil',1850,1025);
    return can;
  }
  async function canvasAll165(){
