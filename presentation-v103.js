@@ -342,7 +342,7 @@
   async function ensurePanel(){
     const d=LAST||await loadData();LAST=d;
     status('Montando card horizontal...');
-    LAST_CANVAS=await renderPanel(d);
+    LAST_CANVAS=window.RiachueloBrandCards.decorateCanvas(await renderPanel(d));
     const img=$id('presPreviewImgV102'),box=$id('presPreviewV102');
     if(img)img.src=LAST_CANVAS.toDataURL('image/png');if(box)box.style.display='block';
     status('Card pronto.','success');return LAST_CANVAS;
