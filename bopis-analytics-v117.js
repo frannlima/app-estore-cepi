@@ -201,7 +201,7 @@
     stores.slice(0,19).forEach(r=>{
       rr117(x,55,y-20,1090,36,7,(+r.orders||0)>0?'#FFF5E5':'#F2F0EB');
       const vals=[r.st,fmtInt117(r.orders),fmtInt117(r.collaborators),fmtInt117(r.frequency)+' d',fmtInt117(r.recurringCollaborators),fmtMoney117(r.captured),fmtMoney117(r.approved),(+r.orders||0)>0?'Ocorrência':'—'];
-      vals.forEach((v,i)=>tx117(x,v,cols[i],y,(i===0||i===1?'700 ':'500 ')+(i===5||i===6?'10':'11')+'px Arial',i===7&&(+r.orders||0)>0?WINE:GREEN,'center',i===5||i===6?160:110));
+      vals.forEach((v,i)=>tx117(x,v,cols[i],y,(i===0||i===1?'700 ':'500 ')+(i===5||i===6?'10':'11')+'px Larsseit, Arial',i===7&&(+r.orders||0)>0?WINE:GREEN,'center',i===5||i===6?160:110));
       y+=42;
     });
 
