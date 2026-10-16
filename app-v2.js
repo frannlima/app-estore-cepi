@@ -1877,7 +1877,7 @@ function campaignWithinWindow165(){const now=new Intl.DateTimeFormat('en-CA',{ti
 function ccTabsV38(){
   const items=[['campaigns','📣','Campanhas'],['coupons','🎟','Cupons'],['prizes','🎁','Premiação'],['sell','▥','Como vender']];
   if(campaignWithinWindow165())items.splice(1,0,['partial158','🏆','Parcial Top 15']);
-  return '<div class="ccTabsV38">'+items.map(i=>'<button class="'+(CC_TAB_V38===i[0]?'on':'')+'" onclick="setCcTabV38(\''+i[0]+'\')"><b>'+i[1]+'</b><span>'+i[2]+'</span></button>').join('')+'</div>';
+  return '<div class="ccTabsV38">'+items.map(i=>'<button class="'+(CC_TAB_V38===i[0]?'on ':'')+(i[0]==='partial158'?'cpTab158 cpTabNative165':'')+'" onclick="setCcTabV38(\''+i[0]+'\')"><b>'+i[1]+'</b><span>'+i[2]+'</span></button>').join('')+'</div>';
 }
 function campaignOverviewV38(){
   const x=currentCampaignV38();
@@ -1941,7 +1941,7 @@ function sellMoreV38(){
 campaignsV3=function(){
   if(!campaignWithinWindow165()&&CC_TAB_V38==='partial158')CC_TAB_V38='campaigns';
   const body=CC_TAB_V38==='partial158' ? (window.renderCampaignPartialStandalone158?window.renderCampaignPartialStandalone158():'<div class="card"><b>Carregando a parcial da campanha…</b><p>Se a rede estiver lenta, aguarde alguns segundos e acesse novamente o menu.</p></div>') :CC_TAB_V38==='coupons'?couponsV38():CC_TAB_V38==='prizes'?prizesV38():CC_TAB_V38==='sell'?sellMoreV38():campaignOverviewV38();
-  return '<div class="ccPageV38"><div class="pageTitleV3"><span>Cupons e Campanhas</span></div>'+ccTabsV38()+body+'</div>';
+  return '<div class="ccPageV38"><div class="pageTitleV3"><span>Cupons e Campanhas</span></div>'+ccTabsV38()+(CC_TAB_V38==='partial158'?'<div id="cpPartial158" class="cpPage158">'+body+'</div>':body)+'</div>';
 };
 
 async function shareCcV38(type){
