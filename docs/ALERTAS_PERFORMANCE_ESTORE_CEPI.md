@@ -73,3 +73,24 @@ A base `collaborators` ainda não apresenta todos os gerentes da regional; somen
 - Filiais 089, 090 e 109 não estão no escopo de monitoramento.
 - O sistema envia aos indivíduos por **mensagem direta**, não ao grupo do WhatsApp.
 - Observação: a aprovação do modelo e a atribuição de categoria/preço dependem da Meta.
+
+## Proposta inicial: janelas de envio por cargo (17/10/2026)
+
+**Status: proposta para implementação futura — não implantada como regra de envio. O WhatsApp regional deve permanecer desativado.**
+
+| Cargo | Janela de referência para WhatsApp | Condição obrigatória |
+| --- | --- | --- |
+| Gerente de loja | 12h00–18h00 (America/Fortaleza) | Somente durante a jornada individual confirmada |
+| Supervisor | 14h00–21h00 (America/Fortaleza) | Somente durante a jornada individual confirmada |
+
+Diretrizes de implementação antes de ativar o canal regional:
+
+1. O horário de envio deverá pertencer **à interseção da janela de referência do cargo com a jornada efetivamente escalada do destinatário**. A escala individual prevalece, inclusive quando começar depois ou terminar antes da janela do cargo.
+2. **Bloquear** qualquer WhatsApp destinado a pessoa em folga, férias, afastamento ou sem escala individual válida para a data/hora. Não presumir jornada pela abertura da loja nem pelo cargo.
+3. Após a segunda parcial irregular, gerar ocorrência normalmente no radar interno; encaminhar WhatsApp **somente** quando o destinatário estiver dentro da janela permitida e da jornada individual. Não encaminhar cobrança atrasada no próximo turno/dia por ocorrência encerrada.
+4. Respeitar filiais sem operação prevista/meta eStore zerada, feriados e horários de funcionamento. Excluir 089, 090 e 109.
+5. O disparo deve ser individualizado e direcionado à liderança correta, com telefone, matrícula, cargo e filial validados, opt-in e template Meta aprovados; aplicar idempotência e histórico auditável.
+6. Revisar com RH/Jurídico/Políticas internas o tratamento de jornada, plantões e exceções; qualquer margem de segurança antes da saída requer aprovação específica. Não configurar exceções de sobreaviso implicitamente.
+7. Manter `estore_alert_config.whatsapp_enabled=false` até a conclusão do teste no número autorizado e a implementação/validação do filtro de jornada no backend, sem ativação regional automática.
+
+A programação existente do monitoramento interno (12h05–21h05) **não deve ser confundida com autorização para envio por WhatsApp**. Esta proposta define apenas elegibilidade futura por cargo e escala, não altera o Cron existente nem habilita mensagens externas.
