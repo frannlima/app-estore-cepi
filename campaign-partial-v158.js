@@ -11,7 +11,7 @@
  };
  const groups=['P+PP','M','G+GG+EXX'];
  const API165="https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-campaign-2026";
- let serverSnapshot165=null, fetchedAt165=0, loading165=null, status165="prévia inicial";
+ let serverSnapshot165=null, fetchedAt165=0, loading165=null, status165="prévia inicial", campaignSnapshotRejected165=false;
  let campaignInfo165={asof:"2026-10-14",started_at:"2026-10-01",visible_until:"2026-11-10"};
  function readable165(d){if(!d)return "14/10/2026";const m=String(d).match(/^(\d{4})-(\d{2})-(\d{2})/);return m?m[3]+"/"+m[2]+"/"+m[1]:String(d);}
  function sourceCaption165(){return "01/10/2026 a "+readable165(campaignInfo165.asof);}
@@ -22,6 +22,15 @@
  }
  function persistSnapshot165(payload){
    if(!payload.available||!payload.top)return;
+   // O ranking nacional deve ser cumulativo. Rejeitar visualmente uma parcial diária.
+   const referenceTop1={ "P+PP":335480, "M":1042521, "G+GG+EXX":501397 };
+   if(String(payload.asof||"")>="2026-10-14"&&groups.some(g=>
+       Number(payload.top[g]?.[0]?.approved_cents||0)<referenceTop1[g]*0.5)){
+     campaignSnapshotRejected165=true;
+     status165="carga incompleta detectada; referência anterior preservada";
+     return;
+   }
+   campaignSnapshotRejected165=false;
    serverSnapshot165=payload;status165="atualizado";
    campaignInfo165={asof:payload.asof,started_at:payload.started_at||"2026-10-01",visible_until:payload.visible_until||"2026-11-10"};
    groups.forEach(function(g){
@@ -45,7 +54,9 @@
        const area=document.getElementById("cpPartial158");
        if(area)area.innerHTML=partial();
        const hint=document.getElementById("campaignSource165");
-       if(hint)hint.textContent=p.available?"Dados acumulados até "+readable165(p.asof):"Base parcial inicial · até 14/10";
+       if(hint)hint.textContent=campaignSnapshotRejected165?
+          "Referência de 14/10 • dados posteriores aguardando acumulado válido":
+          p.available?"Dados acumulados até "+readable165(p.asof):"Base parcial inicial · até 14/10";
      }catch(e){status165="dados iniciais; falha de sincronização";console.warn("[Campanha]",e);}
      finally{loading165=null;}
    })();return loading165;
@@ -86,6 +97,7 @@ const regionalSnapshot163 = new Map();
    return '<div class="cpHero158"><small>CAMPANHA NACIONAL · 01 A 31/10/2026</small><h2>🔊 eStore no <em>Volume Máximo</em></h2>'+
      '<p>Seu resultado pode virar prêmio. Confira quem está nos 15 maiores volumes aprovados por porte — sem vendas BOPIS.</p>'+
      '<span>PERÍODO CONSIDERADO: '+esc(sourceCaption165())+'</span></div>'+
+      (campaignSnapshotRejected165?'<div class="cpNote158" role="alert" style="padding:14px;border:1px solid #d37c32;border-radius:12px;background:#fff6e9;margin:12px 0"><b>Atenção: última carga não acumulada.</b> Os valores enviados para 15/10 ficaram abaixo dos já apurados em 14/10. Por segurança, este ranking mostra a referência de 14/10, até que seja importado o relatório acumulado desde 01/10.</div>':'')+
      '<div class="cpPorte158">'+groups.map(g=>'<button class="'+(g===current?'selected':'')+'" onclick="campaignPorte158(\''+g+'\')" aria-pressed="'+(g===current)+'">'+esc(g)+'</button>').join('')+'</div>'+
      '<div class="cpKpis158"><div><small>Valor do 15º colocado</small><b>'+money(limit(current))+'</b></div><div><small>Premiados por porte</small><b>15</b></div><div><small>Encerramento das vendas</small><b>31/10</b></div></div>'+
      '<div class="cpHead158"><div><h3>🏆 Top 15 · '+esc(current)+'</h3><p>Ranking nacional • aprovado válido, sem BOPIS</p></div>'+
@@ -151,7 +163,7 @@ const regionalSnapshot163 = new Map();
    const missing=["tipoentrega","cargo","loja","numpedido"].filter(k=>col[k]<0);
    if(missing.length)throw new Error("Colunas ausentes: "+missing.join(", ")+". Confirme o modelo do relatório nacional.");
    const data=grid.slice(head+1),records=new Map(),ids=new Map();
-   let accepted=0,skipped=0,bopisOrders=0,asof="2026-10-01";
+   let accepted=0,skipped=0,bopisOrders=0,asof="2026-10-01",minDate="2026-10-31";
    progress("Consolidando "+data.length.toLocaleString("pt-BR")+" linhas do relatório…");
    for(let i=0;i<data.length;i++){
      const cells=data[i]||[],get=k=>cells[col[k]];
@@ -171,12 +183,18 @@ const regionalSnapshot163 = new Map();
      const set=ids.get(key),first=!set.has(oid);if(first)set.add(oid);
      if(norm165(get("tipoentrega"))==="bopis"){item.bopis_cents+=amt;bopisOrders++;}
      else{item.approved_cents+=amt;if(first)item.orders++;}
-     accepted++;if(date>asof)asof=date;
+     accepted++;if(date>asof)asof=date;if(date<minDate)minDate=date;
    }
    if(accepted<30)throw new Error("O relatório contém menos de 30 vendas válidas. Nenhuma alteração realizada.");
    const rows=[...records.values()].filter(x=>x.approved_cents>0||x.bopis_cents>0);
    if(rows.length>50000)throw new Error("Quantidade de colaboradores acima do limite permitido.");
-   return {rows,stats:{asof,rows:data.length,accepted,skipped,bopis_orders:bopisOrders}};
+   const totalApproved=rows.reduce((sum,x)=>sum+x.approved_cents,0);
+   if(minDate>"2026-10-03"||totalApproved<10000000)throw new Error(
+     "Arquivo não reconhecido como acumulado nacional. "+
+     "Exporte as vendas aprovadas desde 01/10 até "+readable165(asof)+
+     ", e não somente as vendas do último dia. Nenhum dado foi substituído."
+   );
+   return {rows,stats:{asof,min_date:minDate,rows:data.length,accepted,skipped,bopis_orders:bopisOrders}};
  }
  window.importCampaignExcel165=async function(){
    const box=document.getElementById("cpImportStatus165"),file=document.getElementById("cpAdminFile165")?.files?.[0],
