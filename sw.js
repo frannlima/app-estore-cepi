@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v170';
-const BUILD='v170';
+const CACHE='estore-cepi-shell-v171';
+const BUILD='v171';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
@@ -11,7 +11,7 @@ const TEAM_AREA_REGIONAL_SCRIPT='./team-area-regional-v117.js?build=v117';
 const BOPIS_ANALYTICS_SCRIPT='./bopis-analytics-v117.js?build=v155';
 const VOICE_SCRIPT='./voice-v123.js?build=v133';
 const MEU_ACOMPANHAMENTO_BRIDGE='./bridge-meu-acompanhamento-v1.js?build=v152';
-const CAMPAIGN_PARTIAL_SCRIPT='./campaign-partial-v158.js?build=v170';
+const CAMPAIGN_PARTIAL_SCRIPT='./campaign-partial-v158.js?build=v171';
 const CAMPAIGN_NATIVE_SCRIPT='./campaign-integration-v168.js?build=v168';
 const SHELL=['./cards-visible-preview-v1.css','./brand-sharecards-2025.js','./brand-riachuelo-2025.css','./app-v2.css','./campaign-partial-v158.js','./campaign-integration-v168.js','./parcial.html','./presentation-v103.js','./hourly-meta-v104.js','./team-v112.js','./team-store-v113.js','./commission-eligibility-v114.js','./commission-bopis-v146.js','./team-collapse-v116.js','./team-area-regional-v117.js','./bopis-analytics-v117.js','./voice-v123.js','./bridge-meu-acompanhamento-v1.js','./performance-v130.js','./performance-v130.css','./celebrations-v134.js','./celebrations-v134.css','./assets/campaign-popup-v86.svg','./assets/campaign-hero-v84.svg','./assets/riachuelo-logo-exact-v75.svg','./assets/riachuelo-logo-horizontal-oficial-v133.svg','./assets/riachuelo-logo-horizontal-oficial-white-v133.svg','./assets/campaign-share-v76.svg','./assets/campaign-share-v75.jpg','./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon-v136.svg','./desktop-v136.css','./icon.svg','./riachuelo-horizontal-oficial.png'];
 
