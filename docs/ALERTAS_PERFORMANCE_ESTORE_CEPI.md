@@ -153,3 +153,14 @@ Botões:
 4. Estado `Em jornada` deve expirar automaticamente na saída informada ou ao final do dia, o que ocorrer primeiro. Alterações de escala e jornadas podem ser atualizadas pelo próprio destinatário durante o expediente.
 5. Nunca enviar mensagens atrasadas no dia seguinte ou durante férias. A primeira mensagem de disponibilidade não pode ser usada como justificativa para cobrança fora da jornada.
 6. As regras acima **não têm implementação de produção ainda**; exigir testes automatizados com casos de folga, férias com data, retorno, ausência de resposta, entrega fora da janela, fins de semana e lojas de rua, antes de habilitar envios regionais.
+
+
+## Regra confirmada: gerentes excluídos dos alertas por WhatsApp (17/10/2026)
+
+A partir desta definição, **somente colaboradores cadastrados com `profile_type='supervisor'`, matrícula correspondente à filial e situação `Atividade Normal` podem ser destinatários dos alertas automáticos eStore CE+PI pelo WhatsApp**. O filtro foi implementado diretamente no banco Supabase em `estore_queue_whatsapp_incident` e `estore_claim_whatsapp_alerts`, protegendo tanto a criação quanto a saída da fila. Mensagens pendentes para não supervisores são canceladas.
+
+- **Gerentes ficam excluídos de todos os disparos automáticos de alerta de performance pelo WhatsApp**, mantendo seus cadastros como referência administrativa e sua visão gerencial no aplicativo.
+- O teste manual previamente autorizado do supervisor Fran Lima (108) é tratado separadamente, sem abertura para outros números.
+- Permanece `estore_alert_config.whatsapp_enabled=false`. O canal regional não foi ativado.
+- Folga, férias e verificação de jornada por resposta ao WhatsApp continuam **previstos, ainda não implementados**; não habilitar disparos regionais antes desses controles e da confirmação de entrega no piloto.
+- Teste transacional com rollback confirmou **1 supervisor elegível e 0 gerentes** na fila simulada, sem qualquer envio externo.
