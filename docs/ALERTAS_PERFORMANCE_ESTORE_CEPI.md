@@ -94,3 +94,14 @@ Diretrizes de implementação antes de ativar o canal regional:
 7. Manter `estore_alert_config.whatsapp_enabled=false` até a conclusão do teste no número autorizado e a implementação/validação do filtro de jornada no backend, sem ativação regional automática.
 
 A programação existente do monitoramento interno (12h05–21h05) **não deve ser confundida com autorização para envio por WhatsApp**. Esta proposta define apenas elegibilidade futura por cargo e escala, não altera o Cron existente nem habilita mensagens externas.
+
+
+## Regra confirmada: gerentes excluídos dos alertas por WhatsApp (17/10/2026)
+
+A partir desta definição, **somente colaboradores cadastrados com `profile_type='supervisor'`, matrícula correspondente à filial e situação `Atividade Normal` podem ser destinatários dos alertas automáticos eStore CE+PI pelo WhatsApp**. O filtro foi implementado diretamente no banco Supabase em `estore_queue_whatsapp_incident` e `estore_claim_whatsapp_alerts`, protegendo tanto a criação quanto a saída da fila. Mensagens pendentes para não supervisores são canceladas.
+
+- **Gerentes ficam excluídos de todos os disparos automáticos de alerta de performance pelo WhatsApp**, mantendo seus cadastros como referência administrativa e sua visão gerencial no aplicativo.
+- O teste manual previamente autorizado do supervisor Fran Lima (108) é tratado separadamente, sem abertura para outros números.
+- Permanece `estore_alert_config.whatsapp_enabled=false`. O canal regional não foi ativado.
+- Folga, férias e verificação de jornada por resposta ao WhatsApp continuam **previstos, ainda não implementados**; não habilitar disparos regionais antes desses controles e da confirmação de entrega no piloto.
+- Teste transacional com rollback confirmou **1 supervisor elegível e 0 gerentes** na fila simulada, sem qualquer envio externo.
