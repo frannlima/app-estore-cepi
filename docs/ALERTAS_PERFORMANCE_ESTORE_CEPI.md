@@ -124,3 +124,32 @@ Não incluir tokens em conversas, código, PRs ou URLs. Não habilitar `whatsapp
 - Modelo oficial de teste e assinatura do app na WABA: https://www.postman.com/meta/whatsapp-business-platform/documentation/wlk6lh4/whatsapp-cloud-api
 - Autenticação de Edge Functions: https://supabase.com/docs/guides/functions/auth-headers
 - Verificação de callback e assinatura HMAC da Meta: https://whatsapp.github.io/WhatsApp-Nodejs-SDK/api-reference/webhooks/start/ (referência de protocolo; o SDK arquivado não é dependência desta implementação).
+
+
+## Especificação pendente: confirmação de folga, férias e jornada via WhatsApp (17/10/2026)
+
+**Status: especificação da próxima fase; ainda não implementada nos webhooks ou no disparador. Manter `estore_alert_config.whatsapp_enabled=false` e o PR em rascunho enquanto o teste individual de entrega não for confirmado.**
+
+### Jornada e elegibilidade
+- Gerentes: de segunda a sábado, **limite de alertas 12h00–16h30**; a jornada informada termina às 17h00, respeitar afastamentos e folgas.
+- Supervisores: janela de referência **14h00–21h00**, limitada pelo funcionamento da loja e pela jornada individual efetiva. Não pressupor que qualquer supervisor esteja trabalhando das 14h às 21h.
+- Como não há acesso ao registro oficial de escalas, permitir que o próprio supervisor responda pelo WhatsApp; a confirmação de disponibilidade deve ser voluntária e baseada em consentimento.
+- Não gerar mensagens operacionais até o supervisor confirmar que está **em jornada** e informar sua hora de saída naquele dia. Sem confirmação, a ocorrência fica no painel interno; não distribuir a outro número que não esteja elegível.
+- O primeiro contato é, no máximo, um pedido **neutro e facultativo** de confirmação de disponibilidade, sem cobrança ou números de resultado; observar o risco de contato em folga, evitar insistência e alinhar previamente com RH/compliance. Nenhum trabalho ou resposta deve ser exigido fora da jornada.
+
+### Fluxo WhatsApp sugerido
+Usar template aprovado pela Meta com quick replies e processamento de inbound webhook assinado (não confundir com o webhook de status de entrega já existente). Mensagem inicial sugerida:
+> Olá! Este canal pode enviar avisos operacionais eStore durante sua jornada. Caso esteja trabalhando e queira recebê-los hoje, confirme sua disponibilidade. Se estiver em folga ou férias, informe abaixo. Não é necessário responder fora do expediente.
+
+Botões:
+- **Em jornada** (payload `ESTORE_WORKING`): solicitar saída `HH:MM`, armazenar a confirmação para o dia e limitar o envio ao menor horário entre fim informado, término da janela do cargo e horário operacional da filial; opcionalmente aplicar margem de 30 minutos.
+- **Folga hoje** (payload `ESTORE_DAY_OFF`): silenciar os alertas individuais para o restante do dia local, sem reagendamento retroativo; no dia seguinte, não pressupor jornada automaticamente.
+- **Estou de férias** (payload `ESTORE_VACATION`): bloquear imediatamente e perguntar **data de retorno DD/MM/AAAA**; enquanto estiver aguardando a data, manter o bloqueio. Validar formato e data futura e registrar `suspended_until`. Na data de retorno, liberar apenas a possibilidade de nova confirmação de jornada; não reenviar automaticamente alertas antigos.
+
+### Regras técnicas e proteção
+1. Relacionar resposta ao cadastro previamente validado por `wa_id`/telefone E.164, matrícula e filial; **nunca** usar mensagem de terceiros para alterar disponibilidade de outro destinatário.
+2. Idempotência por `wamid` de entrada, verificação da assinatura HMAC do webhook da Meta e auditoria de alteração de estado, mantendo mínimo de dados necessários.
+3. Quando `folga`, `ferias`, `aguardando_data_retorno`, `sem_confirmacao` ou `jornada_encerrada`: **bloquear no backend a criação e, novamente, o envio**; remover/cancelar itens pendentes para não enviar após mudança de status.
+4. Estado `Em jornada` deve expirar automaticamente na saída informada ou ao final do dia, o que ocorrer primeiro. Alterações de escala e jornadas podem ser atualizadas pelo próprio destinatário durante o expediente.
+5. Nunca enviar mensagens atrasadas no dia seguinte ou durante férias. A primeira mensagem de disponibilidade não pode ser usada como justificativa para cobrança fora da jornada.
+6. As regras acima **não têm implementação de produção ainda**; exigir testes automatizados com casos de folga, férias com data, retorno, ausência de resposta, entrega fora da janela, fins de semana e lojas de rua, antes de habilitar envios regionais.
