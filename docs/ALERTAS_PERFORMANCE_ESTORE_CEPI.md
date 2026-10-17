@@ -19,6 +19,7 @@ Projeto: `fndkjgveeojlywkdrtxe`.
 - Atualização considerada atrasada quando o último registro válido ultrapassa 70 minutos.
 - Incidentes únicos por episódio; alertas desativados na regularização.
 - Destinatários no aplicativo: perfis `supervisor`/`gerente` identificados por matrícula; supervisores com situação 'Atividade Normal' e exceção validada da gerente Rebeca (108).
+- Se não houver nenhum destinatário elegível para uma loja (atualmente filial 113), a ocorrência é direcionada somente ao administrador regional para evitar perda do alerta.
 - Canal inicial: `notification_messages` com `target_type='matricula'`. A caixa de notificações já existente no app consome essa tabela via `estore-api`.
 - Não envia mensagens de WhatsApp, SMS ou push em segundo plano nesta fase.
 
@@ -31,7 +32,7 @@ Projeto: `fndkjgveeojlywkdrtxe`.
 - Tabelas protegidas por RLS, sem acesso direto de clientes anon/authenticated.
 
 ## Testes / Operação
-- Teste reversível com verificações 12h05 e 13h05 simulou 41 notificações direcionadas; transação revertida, sem envios reais.
+- Teste reversível com verificações 12h05 e 13h05 simulou 18 ocorrências e 42 notificações direcionadas (incluindo uma escalada ao administrador para a 113); repetição do mesmo horário não gerou duplicidade. Transação revertida, sem envios reais.
 - Dry-run: `select public.estore_run_alert_monitor(now(),true);`
 - Verificar job: `select jobid,active,schedule from cron.job where jobname='estore_cepi_two_partials_monitor_v1';`
 - Verificar pendências: `select * from public.estore_alert_incidents order by opened_at desc limit 30;`
