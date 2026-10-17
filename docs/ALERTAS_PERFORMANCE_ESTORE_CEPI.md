@@ -52,7 +52,7 @@ A base `collaborators` ainda não apresenta todos os gerentes da regional; somen
 3. A rotina `estore_cepi_whatsapp_dispatch_v1` dispara às **12h10–21h10, Fortaleza** (UTC: `10 15-23,0 * * *`), ou seja, cinco minutos após as verificações horárias.
 4. A rotina chama `estore_schedule_whatsapp_dispatch()` que só faz requisição se a chave de serviço estiver no Supabase Vault sob o nome `estore_cepi_dispatch_service_key`.
 5. A Edge Function `estore-whatsapp-alerts` (com JWT obrigatório e verificação adicional da chave de serviço) consulta a fila, obtém os destinatários elegíveis e envia um template pela **Meta Cloud API v26.0**.
-6. O resultado é auditado em `estore_alert_wa_outbox` com status `sent`, `failed` ou `sending`. Não há reenvio automático após resultado incerto, para prevenir duplicidades.
+6. O resultado é auditado em `estore_alert_wa_outbox` com status `sent`, `failed` ou `sending`. Nesse dispatcher legado, `sent` significa aceitação HTTP pela Meta, sem confirmar entrega ao aparelho. Não há reenvio automático após resultado incerto, para prevenir duplicidades.
 
 ### Pré-requisitos para habilitação
 - Ter permissão legítima da organização para uso da identidade e do número corporativo no envio de alertas operacionais.
@@ -73,3 +73,54 @@ A base `collaborators` ainda não apresenta todos os gerentes da regional; somen
 - Filiais 089, 090 e 109 não estão no escopo de monitoramento.
 - O sistema envia aos indivíduos por **mensagem direta**, não ao grupo do WhatsApp.
 - Observação: a aprovação do modelo e a atribuição de categoria/preço dependem da Meta.
+
+## Piloto individual com confirmação de entrega — 17/10/2026
+
+### Diagnóstico confirmado
+
+- `estore_alert_config.whatsapp_enabled=false`; fila regional vazia.
+- A chave `estore_cepi_dispatch_service_key` ainda não está no Vault. Portanto, o agendamento regional não chama o provedor.
+- O sender original não recebia callbacks de entrega. Aceitação de uma chamada no painel Meta não comprova recebimento no WhatsApp.
+- O erro exato do teste anterior, feito diretamente no painel Meta, depende da consulta ao payload `statuses[].errors[]` daquele evento. Ele não foi criado no Supabase e não possui registro de teste para correlação automática.
+
+### Estrutura implantada
+
+- `estore-whatsapp-test`: JWT obrigatório mais validação da chave de serviço no handler. Aceita apenas `action` e `request_id`; não aceita destinatários fornecidos pelo cliente.
+- `estore-whatsapp-webhook`: autenticação por HMAC SHA-256 (`X-Hub-Signature-256`), conferida sobre o corpo original com `WA_META_APP_SECRET`. O GET da verificação usa `WA_WEBHOOK_VERIFY_TOKEN`.
+- `estore_whatsapp_test_config`: um contato autorizado, telefone esperado e chave de habilitação do teste manual. A configuração e o telefone permanecem exclusivamente no banco protegido.
+- `estore_whatsapp_tests`: tentativa, identificação retornada pela Meta, estado de entrega e erros.
+- `estore_whatsapp_test_events`: histórico idempotente dos status associados à tentativa autorizada. Mensagens recebidas, conteúdo de conversas e contatos de terceiros não são armazenados.
+- Tabelas com RLS e privilégios revogados para `anon` e `authenticated`; RPCs com `SECURITY INVOKER`, exclusivas do backend.
+- O modo de teste exige que o canal regional permaneça desligado. Não consome a fila de incidentes, não importa a lista de contatos em revisão e não modifica os cron jobs.
+- No máximo uma nova tentativa por minuto. Repetir o mesmo UUID retorna a tentativa existente, sem reenviar. Resultado de rede incerto exige reconciliação manual.
+
+### Configuração que depende do painel Meta
+
+1. Entrar na conta que possui o app **eStore CE+PI Alertas**. Conta Meta gerenciada é uma modalidade distinta do login pelo Facebook.
+2. Conferir o número remetente de teste, seu **Phone Number ID** e a conta WABA vinculada. O ID do telefone não é o número visível do remetente.
+3. Conferir e validar somente o destinatário autorizado do piloto na lista de destinatários de teste da Meta. Não adicionar os contatos em revisão.
+4. Cadastrar exclusivamente em **Supabase > Edge Functions > Secrets**:
+   - `WA_META_ACCESS_TOKEN`: token válido do mesmo app/WABA, com permissão de envio.
+   - `WA_META_PHONE_NUMBER_ID`: ID numérico do remetente.
+   - `WA_META_APP_SECRET`: App Secret usado para autenticar os callbacks.
+   - `WA_WEBHOOK_VERIFY_TOKEN`: valor aleatório com pelo menos 24 caracteres, igual ao usado na verificação do callback.
+   - Opcional: `WA_META_GRAPH_VERSION`; o padrão mantém `v26.0` do dispatcher existente.
+5. Callback: `https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-whatsapp-webhook`. Configurar assinatura do campo `messages` e conferir a assinatura do app na WABA (`subscribed_apps`).
+6. Consultar `estore-whatsapp-test` com `{"action":"diagnostics"}` por um backend autorizado. Só enviar quando `ready=true`.
+7. Fazer uma única chamada `{"action":"send_test","request_id":"<UUID novo>"}`. A mensagem é o modelo oficial de teste `hello_world`, idioma `en_US`, sem dados operacionais.
+8. Consultar `{"action":"result","request_id":"<mesmo UUID>"}`. `accepted` significa somente aceitação; `delivered` confirma entrega e `read` confirma leitura quando disponível. `failed` inclui o código e os detalhes recebidos da Meta.
+
+Não incluir tokens em conversas, código, PRs ou URLs. Não habilitar `whatsapp_enabled` durante este piloto. O endpoint de callback retorna 503 enquanto os segredos necessários estiverem ausentes, em vez de aceitar eventos sem autenticação.
+
+### Validação realizada
+
+- `node --test supabase/tests/whatsapp-test.test.mjs`: 15 testes, incluindo bloqueio de outro destinatário, falta de consentimento, autenticação, erros Meta, idempotência e resultados incertos.
+- `supabase/tests/whatsapp-test.sql`: validação no banco dentro de transação revertida; cobre limites, destinatário/remetente incorretos, status fora de ordem e deduplicação. Não chama a Meta.
+- Endpoint de teste sem autenticação: 401. Callback sem configuração: 503. Nenhuma mensagem real foi enviada na implantação.
+- Advisor informa RLS sem políticas nas tabelas privadas; isso corresponde à negação de acesso de clientes por padrão. Não adicionar políticas públicas para remover esse aviso. Referência: https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy.
+
+### Referências técnicas
+
+- Modelo oficial de teste e assinatura do app na WABA: https://www.postman.com/meta/whatsapp-business-platform/documentation/wlk6lh4/whatsapp-cloud-api
+- Autenticação de Edge Functions: https://supabase.com/docs/guides/functions/auth-headers
+- Verificação de callback e assinatura HMAC da Meta: https://whatsapp.github.io/WhatsApp-Nodejs-SDK/api-reference/webhooks/start/ (referência de protocolo; o SDK arquivado não é dependência desta implementação).

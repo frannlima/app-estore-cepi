@@ -1,0 +1,8 @@
+project_id = "app-estore-cepi"
+
+[functions.estore-whatsapp-test]
+verify_jwt = true
+
+# Meta authenticates requests with the app's HMAC signature, not a Supabase JWT.
+[functions.estore-whatsapp-webhook]
+verify_jwt = false
