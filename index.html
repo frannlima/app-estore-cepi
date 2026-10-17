@@ -1930,7 +1930,35 @@ async function weeklyReloadV70(){await adminWeeklyComparisonV70($('#weeklyCurren
 async function weeklyUploadV70(){let start=$('#weeklyStartV70')?.value,file=$('#weeklyFileV70')?.files?.[0],status=$('#weeklyUploadStatusV70');if(!start||!file)return alert('Informe a semana e selecione o Gerencial Semanal.');let fd=new FormData();fd.append('action','weekly_history_import');fd.append('matricula',U.u.id);fd.append('password',adminPwd());fd.append('week_start',start);fd.append('weekly_report',file,file.name);if(status)status.innerHTML='<div class=notice>Validando e incorporando o fechamento...</div>';try{let j=await apiForm(fd);if(status)status.innerHTML='<div class="notice success"><b>'+esc(j.message)+'</b><br>'+num(j.stores)+' filiais incorporadas'+((j.missing||[]).length?' • sem linha: '+j.missing.join(', '):'')+'</div>';await adminWeeklyComparisonV70(j.week_start,'')}catch(e){if(status)status.innerHTML='<div class="notice danger">'+esc(e.message||e)+'</div>'}}
 
 async function adminResults(){let y=new Date(Date.now()-86400000).toLocaleDateString('en-CA',{timeZone:'America/Fortaleza'});$('#adminWork').innerHTML='<div class=card><div class=title>Input • Resultado eStore</div><div class=muted>Importe os dois relatórios do mesmo dia. <b>A data deve ser a data do resultado contido nos relatórios — normalmente o dia anterior ao input.</b></div><div class="notice success"><b>Regra de origem dos dados</b><br>🏬 <b>Relatório Gerencial / Lojas:</b> alimenta exclusivamente o resultado das filiais: Captado, Aprovado, Pedidos, Share e demais indicadores da loja.<br><br>👤 <b>Relatório por Colaborador:</b> alimenta exclusivamente o resultado individual dos colaboradores, rankings e participação do time.<br><br>Os resultados da filial <b>não serão calculados pela soma dos colaboradores</b>.</div><label>Data do resultado</label><input id=impDate type=date class=field value="'+y+'"><div class="notice"><b>Exemplo:</b> se em 22/09 você está importando o fechamento de 21/09, selecione <b>21/09</b>.</div><label>Relatório por colaborador</label><input id=impColl type=file accept=".xlsx,.xls" class=field><label>Relatório gestão / lojas</label><input id=impMgmt type=file accept=".xlsx,.xls" class=field><button class=btn onclick="sendResults()">Processar e atualizar resultados</button><div id=impStatus></div></div>'}
-async function sendResults(){let d=$('#impDate').value,a=$('#impColl').files[0],b=$('#impMgmt').files[0];if(!d||!a||!b)return alert('Informe a data e selecione os dois relatórios.');let fd=new FormData();fd.append('action','daily_update');fd.append('matricula',U.u.id);fd.append('password',adminPwd());fd.append('date',d);fd.append('collaborators',a);fd.append('management',b);$('#impStatus').innerHTML='<div class=notice>Processando relatórios...</div>';try{let j=await apiForm(fd);$('#impStatus').innerHTML='<div class="notice success">'+esc(j.message)+'<br>'+j.collaborators+' colaboradores • '+j.management+' registros de lojas</div>';await reloadDashboard()}catch(e){$('#impStatus').innerHTML='<div class="notice danger">'+esc(e.message)+'</div>'}}
+async function sendResults(){
+  const d=$('#impDate')?.value,a=$('#impColl')?.files?.[0],b=$('#impMgmt')?.files?.[0];
+  if(!d||!a||!b)return alert('Informe a data e selecione os dois relatórios.');
+  const fd=new FormData();
+  fd.append('action','daily_update');
+  fd.append('matricula',U.u.id);
+  fd.append('password',adminPwd());
+  fd.append('date',d);
+  fd.append('collaborators',a);
+  fd.append('management',b);
+  const status=$('#impStatus'),btn=document.querySelector('[onclick="sendResults()"]');
+  const buttonLabel=btn?.textContent||'Processar e atualizar resultados';
+  if(btn){btn.disabled=true;btn.textContent='Processando...';}
+  status.innerHTML='<div class=notice>Processando relatórios...</div>';
+  try{
+    const j=await apiForm(fd);
+    status.innerHTML='<div class="notice success"><b>Importação concluída.</b><br>'+esc(j.message||'Relatórios processados.')+'<br>'+num(j.collaborators)+' colaboradores • '+num(j.management)+' registros de lojas</div>';
+    try{
+      await reloadDashboard();
+    }catch(refreshError){
+      console.warn('Importação gravada, atualização visual pendente:',refreshError);
+      status.innerHTML+='<div class="notice">Os relatórios foram processados, mas a tela não conseguiu atualizar os indicadores. Atualize a página para consultar os resultados. Confira os dados antes de reenviar os arquivos.</div>';
+    }
+  }catch(e){
+    status.innerHTML='<div class="notice danger">'+esc(e.message||'Não foi possível processar os relatórios.')+'</div>';
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=buttonLabel;}
+  }
+}
 function adminTargets(){$('#adminWork').innerHTML='<div class=card><div class=title>Input • Metas de Venda</div><div class=muted>A meta eStore será calculada a 1% da Meta Fin e incorporada ao histórico/visão anual.</div><input id=metaFile type=file accept=".xlsx,.xls" class=field><button class=btn onclick="sendTargets()">Processar metas</button><div id=metaStatus></div></div>'}
 async function sendTargets(){let a=$('#metaFile').files[0];if(!a)return alert('Selecione o arquivo de metas.');let fd=new FormData();fd.append('action','meta_update');fd.append('matricula',U.u.id);fd.append('password',adminPwd());fd.append('meta',a);$('#metaStatus').innerHTML='<div class=notice>Processando metas...</div>';try{let j=await apiForm(fd);$('#metaStatus').innerHTML='<div class="notice success">'+esc(j.message)+'<br>'+j.rows+' linhas • '+j.stores+' filiais • '+esc(j.minDate)+' a '+esc(j.maxDate)+'</div>';await reloadDashboard()}catch(e){$('#metaStatus').innerHTML='<div class="notice danger">'+esc(e.message)+'</div>'}}
 async function adminDatabase(){try{let j=await api({action:'collaborators_admin_get',matricula:U.u.id});window.ADMDB=j;let h=j.history||[],g=(j.grants||[]).filter(x=>typeof x==='object');$('#adminWork').innerHTML='<div class=card><div class=title>Banco de Dados • Colaboradores</div><div class=muted>Atualize a base sem apagar o histórico. Novos registros são incorporados e matrículas existentes são atualizadas.</div><div class=tabs><button class=on onclick="admDbTab(\'import\')">Importar lista</button><button onclick="admDbTab(\'manual\')">Novo colaborador</button><button onclick="admDbTab(\'access\')">Perfis e menus</button>'+(isMasterAdmin()?'<button onclick="admDbTab(\'admins\')">Acesso ADM</button>':'')+'<button onclick="admDbTab(\'history\')">Histórico</button></div><div class=grid><div class=kpi>Base cadastrada<b>'+num((j.collaborators||[]).length)+'</b></div><div class=kpi>Importações salvas<b>'+num(h.length)+'</b></div></div><div id=admDbPane></div></div>';admDbTab('import')}catch(e){$('#adminWork').innerHTML='<div class="notice danger">'+esc(e.message)+'</div>'}}
@@ -1948,7 +1976,17 @@ function admEditUser(id){let x=(window.ADMDB?.collaborators||[]).find(z=>String(
 async function saveCollaborator(){let x={matricula:$('#cMat').value.trim(),nome:$('#cNome').value.trim(),store_code:$('#cStore').value.trim(),cargo:$('#cCargo').value.trim(),profile_type:$('#cProfile').value,situacao:$('#cStatus').value,menu_permissions:[...document.querySelectorAll('.menuPerm:checked')].map(e=>e.value)};try{$('#cSave').innerHTML='<div class=notice>Salvando...</div>';await api({action:'collaborator_admin_save',matricula:U.u.id,password:adminPwd(),collaborator:x});$('#cSave').innerHTML='<div class="notice success">Cadastro salvo e incorporado à base.</div>';await adminDatabase()}catch(e){$('#cSave').innerHTML='<div class="notice danger">'+esc(e.message)+'</div>'}}
 async function grantAdmin(){let m=$('#grantMat').value.trim(),e=$('#grantExp').value;if(!m||!e)return alert('Informe matrícula e validade.');try{await api({action:'admin_grant_set',matricula:U.u.id,password:adminPwd(),target_matricula:m,expires_at:new Date(e).toISOString()});await adminDatabase();admDbTab('admins')}catch(x){alert(x.message)}}
 async function revokeAdmin(m){if(!confirm('Revogar o acesso administrativo desta matrícula?'))return;try{await api({action:'admin_grant_revoke',matricula:U.u.id,password:adminPwd(),target_matricula:m});await adminDatabase();admDbTab('admins')}catch(x){alert(x.message)}}
-async function reloadDashboard(){let j=await api({action:'dashboard',matricula:U.u.id});if(j.user)U={...U,...j.user};if(j.common)COMMON=j.common;render()}
+async function reloadDashboard(){
+  const j=await api({action:'dashboard',matricula:U.u.id});
+  if(j.user)U={...U,...j.user};
+  if(j.common)COMMON=j.common;
+  if(j.updatedAt)APP_UPDATED_AT=j.updatedAt;
+  RESULT_PERIOD_CACHE={};
+  STORE_PERIOD_CACHE={};
+  updateDrawerInfo();
+  // Preserva a confirmação da importação na Administração.
+  if(CUR!=='admin'&&typeof go==='function')go(CUR||'home');
+}
 function adminPwd(){if(!isMasterAdmin())return '';if(!ADMIN_PWD)ADMIN_PWD=prompt('Senha administrativa:')||'';return ADMIN_PWD}
 async function loadContentAdmin(){let j=await api({action:'content_admin_get',matricula:U.u.id});window.ADMCONTENT=j;return j}
 function contentForm(kind,x={}){return '<input id=ctTitle class=field placeholder="Título" value="'+esc(x.title||'')+'"><textarea id=ctText class=field rows=5 placeholder="Texto / mecânica / regras">'+esc(x.text||'')+'</textarea><label class=muted>Imagem / card da campanha</label><select id=ctImage class=field><option value="">Sem imagem</option>'+((window.ADMCONTENT?.media||[]).map(m=>'<option value="'+esc(m.url)+'" '+(m.url===x.image_url?'selected':'')+'>'+esc(m.name||'Imagem')+'</option>').join(''))+'</select><div class=muted>Escolha uma imagem já salva ou anexe um novo card agora.</div><input id=ctUpload type=file accept="image/*" class=field><div id=ctUploadStatus></div><input id=ctLink class=field placeholder="Link de destino" value="'+esc(x.link_url||'')+'"><input id=ctLinkLabel class=field placeholder="Texto do botão (ex.: Saiba mais)" value="'+esc(x.link_label||'Saiba mais')+'"><div class=grid><div><label class=muted>Início da exibição</label><input id=ctStart type=datetime-local class=field value="'+esc((x.start_at||'').slice(0,16))+'"></div><div><label class=muted>Fim da exibição</label><input id=ctEnd type=datetime-local class=field value="'+esc((x.end_at||'').slice(0,16))+'"></div></div><label><input id=ctActive type=checkbox '+(x.active!==false?'checked':'')+'> Publicação ativa</label><br><br><button class=btn onclick="saveContentItem(\''+kind+'\',\''+esc(x.id||'')+'\')">Salvar publicação</button>'}
