@@ -11,6 +11,7 @@ Projeto: `fndkjgveeojlywkdrtxe`.
 - Cron: `estore_cepi_two_partials_monitor_v1`, `5 15-23,0 * * *` (UTC), correspondente a **12h05 até 21h05 em Fortaleza**.
 - Primeiro disparo potencial: **13h05**, caso 12h05 e 13h05 confirmem pendência.
 - Lojas de rua (084, 113 e 146): última avaliação às **17h05**.
+- Lojas com **meta eStore explicitamente zerada** no cadastro diário são ignoradas no dia, inclusive domingos sem operação prevista.
 - Lojas monitoradas: 073, 084, 108, 113, 138, 142, 146, 175, 177, 222, 238, 258, 262, 314, 318, 344, 350 e 552.
 - Excluídas: 089, 090, 109.
 - Fonte de dados: `public.hourly_estore` com exclusão de lançamentos apagados.
