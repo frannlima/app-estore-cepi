@@ -101,6 +101,83 @@ const regionalSnapshot163 = new Map();
      adminImport165()+
      '<p class="cpMeta158"><span id="campaignSource165">Parcial '+esc(sourceCaption165())+'</span> • Ranking por matrícula (o relatório não contém nomes). A confirmação dos elegíveis depende do regulamento da campanha. Disponível no app até 10/11/2026.</p>';
  }
+ // Leitura local do Excel: a Edge Function recebe apenas os dados consolidados.
+ async function excelReader165(){
+   if(window.XLSX?.read&&window.XLSX?.utils?.sheet_to_json)return window.XLSX;
+   for(const url of ["https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js","https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"]){
+     try{
+       await new Promise((resolve,reject)=>{const el=document.createElement("script");el.src=url;el.async=true;el.onload=resolve;el.onerror=()=>reject(new Error("Leitor Excel indisponível"));document.head.appendChild(el);});
+       if(window.XLSX?.read)return window.XLSX;
+     }catch(e){console.warn("[Campanha] Biblioteca Excel indisponível",e);}
+   }
+   throw new Error("Não foi possível carregar o leitor Excel. Verifique sua conexão.");
+ }
+ const norm165=v=>String(v??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"");
+ function moneyCents165(v){
+   if(typeof v==="number")return Number.isFinite(v)?Math.round(v*100):0;
+   const s=String(v??"").replace(/[R$\s]/g,"");if(!s)return 0;
+   const n=Number(s.includes(",")?s.replace(/\./g,"").replace(",","."):s);
+   return Number.isFinite(n)?Math.round(n*100):0;
+ }
+ function isoCell165(v){
+   if(v instanceof Date&&!Number.isNaN(v.getTime()))return v.toISOString().slice(0,10);
+   if(typeof v==="number"&&v>40000&&v<60000)return new Date(Date.UTC(1899,11,30)+Math.floor(v)*86400000).toISOString().slice(0,10);
+   const s=String(v??"").trim();
+   let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return m[1]+"-"+m[2]+"-"+m[3];
+   m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);return m?m[3]+"-"+m[2]+"-"+m[1]:"";
+ }
+ function porteCell165(v){
+   const s=String(v??"").toUpperCase().replace(/\s+/g,"");
+   if(["P","PP","P+PP"].includes(s))return "P+PP";
+   if(s==="M")return "M";
+   return ["G","GG","EXX","G+GG+EXX"].includes(s)?"G+GG+EXX":"";
+ }
+ function compactWorkbook165(workbook,progress){
+   const ws=workbook.Sheets[workbook.SheetNames[0]];
+   if(!ws)throw new Error("Planilha vazia.");
+   const grid=window.XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:null,blankrows:false});
+   const aliases={matricula:["matricula","matriculacolaborador"],porte:["porte","porteloja"],
+     datacriacaopedido:["datacriacaopedido","datadopedido","datacriacao"],
+     aprovado:["aprovado","valoraprovado","vendaaprovada"],tipoentrega:["tipoentrega","tipodeentrega"],
+     cargo:["cargo","funcao"],loja:["loja","filial"],regional:["regional"],
+     numpedido:["numpedido","numeropedido","numerodopedido","pedido"]};
+   let head=-1,col={};
+   for(let i=0;i<Math.min(25,grid.length);i++){
+     const cells=(grid[i]||[]).map(norm165),p={};
+     for(const [key,names] of Object.entries(aliases))p[key]=cells.findIndex(x=>names.includes(x));
+     if(["matricula","porte","datacriacaopedido","aprovado","regional"].every(k=>p[k]>=0)){head=i;col=p;break;}
+   }
+   if(head<0)throw new Error("Colunas Matrícula, Porte, Data Criação Pedido, Aprovado e Regional não encontradas. Utilize o modelo oficial.");
+   const missing=["tipoentrega","cargo","loja","numpedido"].filter(k=>col[k]<0);
+   if(missing.length)throw new Error("Colunas ausentes: "+missing.join(", ")+". Confirme o modelo do relatório nacional.");
+   const data=grid.slice(head+1),records=new Map(),ids=new Map();
+   let accepted=0,skipped=0,bopisOrders=0,asof="2026-10-01";
+   progress("Consolidando "+data.length.toLocaleString("pt-BR")+" linhas do relatório…");
+   for(let i=0;i<data.length;i++){
+     const cells=data[i]||[],get=k=>cells[col[k]];
+     const m=String(get("matricula")??"").replace(/\D/g,""),g=porteCell165(get("porte")),date=isoCell165(get("datacriacaopedido"));
+     const amt=moneyCents165(get("aprovado")),cargo=String(get("cargo")??"").toUpperCase();
+     if(!m||!g||!date||date<"2026-10-01"||date>"2026-10-31"||amt<=0||
+        /APRENDIZ|INTERMITENTE|SUPERVISOR|GERENTE|REGIONAL/.test(cargo)){skipped++;continue;}
+     const regional=String(get("regional")??"").trim(),loja=String(get("loja")??"");
+     if(!regional)throw new Error("Regional ausente para matrícula "+m+" na linha "+(head+i+2)+".");
+     const st=(loja.match(/L(\d{2,4})/i)||[])[1]||loja.replace(/\D/g,"").slice(0,3);
+     if(!st)throw new Error("Filial ausente para matrícula "+m+" na linha "+(head+i+2)+".");
+     const key=g+":"+m;let item=records.get(key);
+     if(!item){item={matricula:m,store:st.padStart(3,"0"),regional,group:g,approved_cents:0,bopis_cents:0,orders:0};records.set(key,item);ids.set(key,new Set());}
+     if(item.regional!==regional)throw new Error("Regional divergente para matrícula "+m+": "+item.regional+" / "+regional+".");
+     item.store=st.padStart(3,"0");
+     const oid=String(get("numpedido")??"").trim()||m+"-"+date+"-"+accepted;
+     const set=ids.get(key),first=!set.has(oid);if(first)set.add(oid);
+     if(norm165(get("tipoentrega"))==="bopis"){item.bopis_cents+=amt;bopisOrders++;}
+     else{item.approved_cents+=amt;if(first)item.orders++;}
+     accepted++;if(date>asof)asof=date;
+   }
+   if(accepted<30)throw new Error("O relatório contém menos de 30 vendas válidas. Nenhuma alteração realizada.");
+   const rows=[...records.values()].filter(x=>x.approved_cents>0||x.bopis_cents>0);
+   if(rows.length>50000)throw new Error("Quantidade de colaboradores acima do limite permitido.");
+   return {rows,stats:{asof,rows:data.length,accepted,skipped,bopis_orders:bopisOrders}};
+ }
  window.importCampaignExcel165=async function(){
    const box=document.getElementById("cpImportStatus165"),file=document.getElementById("cpAdminFile165")?.files?.[0],
      pass=document.getElementById("cpAdminPassword165"),password=String(pass?.value||"");
@@ -108,19 +185,34 @@ const regionalSnapshot163 = new Map();
    if(!isAdmin165()){box.textContent="Acesso restrito ao administrador.";return;}
    if(!file||!/\.(xlsx|xls)$/i.test(file.name)){box.textContent="Selecione o relatório Excel acumulado.";return;}
    if(!password){box.textContent="Informe a senha administrativa.";return;}
-   const form=new FormData();form.append("action","import");form.append("matricula",mat());form.append("password",password);form.append("file",file);
-   box.textContent="Validando e consolidando a base nacional…";
+   if(file.size>12*1024*1024){box.textContent="O relatório deve ter no máximo 12 MB.";return;}
+   const button=box.parentElement?.querySelector('button[onclick="importCampaignExcel165()"]');
+   if(button){button.disabled=true;button.textContent="Processando relatório…";}
    try{
-     const response=await fetch(API165,{method:"POST",body:form,cache:"no-store"});
-     const result=await response.json();
-     if(!response.ok||!result.ok)throw new Error(result.error||"Falha na importação.");
+     box.textContent="Lendo o arquivo Excel no seu dispositivo…";
+     const Excel=await excelReader165(),workbook=Excel.read(await file.arrayBuffer(),{type:"array",cellDates:false});
+     const compact=compactWorkbook165(workbook,message=>{box.textContent=message;});
+     box.textContent="Enviando "+compact.rows.length.toLocaleString("pt-BR")+" matrículas consolidadas…";
+     const response=await fetch(API165,{method:"POST",cache:"no-store",headers:{"Content-Type":"application/json"},
+       body:JSON.stringify({action:"import_compact",matricula:mat(),password,filename:file.name,rows:compact.rows,stats:compact.stats})});
+     const result=await response.json().catch(()=>({}));
+     if(!response.ok||!result.ok)throw new Error(result.error||(
+       response.status===546?"Limite de processamento do servidor excedido.":"Erro no servidor (HTTP "+response.status+")."));
      if(pass)pass.value="";
      fetchedAt165=0;
      await window.loadCampaignSnapshot165(true);
-     const msg="Parcial atualizada até "+readable165(result.asof)+". "+result.entries+" matrículas consolidadas. Os valores da carga anterior foram substituídos.";
+     const msg="Parcial atualizada até "+readable165(result.asof)+". "+result.entries+
+       " matrículas consolidadas. A parcial anterior foi substituída, sem duplicar pedidos.";
      const host=document.getElementById("cpImportStatus165");if(host)host.textContent=msg;
      alert(msg);
-   }catch(e){box.textContent="Não foi possível importar: "+String(e.message||e);}
+   }catch(e){
+     console.error("[Campanha] Falha na importação",e);
+     const status=document.getElementById("cpImportStatus165");
+     if(status)status.textContent="Não foi possível importar: "+String(e.message||e)+". A parcial anterior foi preservada.";
+   }finally{
+     const btn=document.querySelector('button[onclick="importCampaignExcel165()"]');
+     if(btn){btn.disabled=false;btn.textContent="Importar e atualizar parcial";}
+   }
  };
  function amount(s){s=String(s||'').trim().replace(/[R$\s]/g,'');return s?Number(s.includes(',')?s.replace(/\./g,'').replace(',','.'):s):NaN;}
  window.campaignPorte158=function(k){if(!ranks[k])return;current=k;let el=document.getElementById('cpPartial158');if(el)el.innerHTML=partial();};
