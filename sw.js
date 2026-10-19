@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v173';
-const BUILD='v173';
+const CACHE='estore-cepi-shell-v174';
+const BUILD='v174';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
@@ -13,7 +13,7 @@ const VOICE_SCRIPT='./voice-v123.js?build=v133';
 const MEU_ACOMPANHAMENTO_BRIDGE='./bridge-meu-acompanhamento-v1.js?build=v152';
 const CAMPAIGN_PARTIAL_SCRIPT='./campaign-partial-v158.js?build=v173';
 const CAMPAIGN_NATIVE_SCRIPT='./campaign-integration-v168.js?build=v168';
-const SHELL=['./cards-visible-preview-v1.css','./brand-sharecards-2025.js','./brand-riachuelo-2025.css','./app-v2.css','./campaign-partial-v158.js','./campaign-integration-v168.js','./parcial.html','./presentation-v103.js','./hourly-meta-v104.js','./team-v112.js','./team-store-v113.js','./commission-eligibility-v114.js','./commission-bopis-v146.js','./team-collapse-v116.js','./team-area-regional-v117.js','./bopis-analytics-v117.js','./voice-v123.js','./bridge-meu-acompanhamento-v1.js','./performance-v130.js','./performance-v130.css','./celebrations-v134.js','./celebrations-v134.css','./assets/campaign-popup-v86.svg','./assets/campaign-hero-v84.svg','./assets/riachuelo-logo-exact-v75.svg','./assets/riachuelo-logo-horizontal-oficial-v133.svg','./assets/riachuelo-logo-horizontal-oficial-white-v133.svg','./assets/campaign-share-v76.svg','./assets/campaign-share-v75.jpg','./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon-v136.svg','./desktop-v136.css','./icon.svg','./riachuelo-horizontal-oficial.png'];
+const SHELL=['./coupon-home-carousel-v174.js','./coupon-home-carousel-v174.css','./cards-visible-preview-v1.css','./brand-sharecards-2025.js','./brand-riachuelo-2025.css','./app-v2.css','./campaign-partial-v158.js','./campaign-integration-v168.js','./parcial.html','./presentation-v103.js','./hourly-meta-v104.js','./team-v112.js','./team-store-v113.js','./commission-eligibility-v114.js','./commission-bopis-v146.js','./team-collapse-v116.js','./team-area-regional-v117.js','./bopis-analytics-v117.js','./voice-v123.js','./bridge-meu-acompanhamento-v1.js','./performance-v130.js','./performance-v130.css','./celebrations-v134.js','./celebrations-v134.css','./assets/campaign-popup-v86.svg','./assets/campaign-hero-v84.svg','./assets/riachuelo-logo-exact-v75.svg','./assets/riachuelo-logo-horizontal-oficial-v133.svg','./assets/riachuelo-logo-horizontal-oficial-white-v133.svg','./assets/campaign-share-v76.svg','./assets/campaign-share-v75.jpg','./october-volume-maximo.svg','./esquadrao-cliente-card.jpg','./esquadrao-cliente.webp','./','./index.html','./manifest.webmanifest','./icon-v136.svg','./desktop-v136.css','./icon.svg','./riachuelo-horizontal-oficial.png'];
 
 function injectAppV104(html){
   if(!html) return html;
@@ -38,8 +38,8 @@ function injectAppV104(html){
     if(close2>=0)html=html.slice(0,start)+html.slice(close2+9);
   }
   const tags='\n<script src="'+PRESENTATION_SCRIPT+'"></script>\n<script src="'+HOURLY_META_SCRIPT+'"></script>\n<script src="'+TEAM_SCRIPT+'"></script>\n<script src="'+TEAM_STORE_SCRIPT+'"></script>\n<script src="'+COMMISSION_ELIGIBILITY_SCRIPT+'"></script>\n<script src="'+COMMISSION_BOPIS_SCRIPT+'"></script>\n<script src="'+TEAM_COLLAPSE_SCRIPT+'"></script>\n<script src="'+TEAM_AREA_REGIONAL_SCRIPT+'"></script>\n<script src="'+BOPIS_ANALYTICS_SCRIPT+'"></script>\n<script src="'+VOICE_SCRIPT+'"></script>\n<script src="'+MEU_ACOMPANHAMENTO_BRIDGE+'"></script>\n<script src="'+CAMPAIGN_PARTIAL_SCRIPT+'"></script>\n<script src="'+CAMPAIGN_NATIVE_SCRIPT+'"></script>\n';
-  html=html.replace('</head>','<link rel="stylesheet" href="./brand-riachuelo-2025.css?build=v168"><link rel="stylesheet" href="./cards-visible-preview-v1.css?build=v168"></head>');
-  return html.replace(/<\/body>\s*<\/html>\s*$/i, tags+'</body></html>');
+  html=html.replace('</head>','<link rel="stylesheet" href="./brand-riachuelo-2025.css?build=v168"><link rel="stylesheet" href="./cards-visible-preview-v1.css?build=v168"><link rel="stylesheet" href="./coupon-home-carousel-v174.css?build=v174"></head>');
+  return html.replace(/<\/body>\s*<\/html>\s*$/i, tags+'<script src="./coupon-home-carousel-v174.js?build=v174"></script>'+'</body></html>');
 }
 async function htmlResponseWithInjection(res){
   const text=await res.text();
