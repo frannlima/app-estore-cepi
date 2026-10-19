@@ -208,8 +208,34 @@ const regionalSnapshot163 = new Map();
    if(button){button.disabled=true;button.textContent="Processando relatório…";}
    try{
      box.textContent="Lendo o arquivo Excel no seu dispositivo…";
-     const Excel=await excelReader165(),workbook=Excel.read(await file.arrayBuffer(),{type:"array",cellDates:false});
-     const compact=compactWorkbook165(workbook,message=>{box.textContent=message;});
+     let compact;
+     try{
+       const Excel=await excelReader165();
+       const workbook=Excel.read(await file.arrayBuffer(),{type:"array",cellDates:false});
+       compact=compactWorkbook165(workbook,message=>{box.textContent=message;});
+     }catch(localError){
+       console.warn("[Campanha] Leitura local falhou. Tentando leitura segura no servidor.",localError);
+       box.textContent="Leitura local indisponível. Validando o relatório no servidor…";
+       const payload=new FormData();
+       payload.append("action","import");
+       payload.append("matricula",mat());
+       payload.append("password",password);
+       payload.append("file",file,file.name);
+       const fallbackResponse=await fetch(API165,{method:"POST",cache:"no-store",body:payload});
+       const fallbackResult=await fallbackResponse.json().catch(()=>({}));
+       if(!fallbackResponse.ok||!fallbackResult.ok)throw new Error(
+         "Leitura local: "+String(localError?.message||localError)+
+         ". Leitura alternativa: "+(fallbackResult.error||"HTTP "+fallbackResponse.status));
+       if(pass)pass.value="";
+       fetchedAt165=0;
+       await window.loadCampaignSnapshot165(true);
+       const msg="Parcial atualizada até "+readable165(fallbackResult.asof)+". "+
+         fallbackResult.entries+" matrículas consolidadas. Arquivo nacional processado no servidor.";
+       const host=document.getElementById("cpImportStatus165");
+       if(host)host.textContent=msg;
+       alert(msg);
+       return;
+     }
      box.textContent="Enviando "+compact.rows.length.toLocaleString("pt-BR")+" matrículas consolidadas…";
      const response=await fetch(API165,{method:"POST",cache:"no-store",headers:{"Content-Type":"application/json"},
        body:JSON.stringify({action:"import_compact",matricula:mat(),password,filename:file.name,rows:compact.rows,stats:compact.stats})});
