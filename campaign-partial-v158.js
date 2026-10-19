@@ -205,7 +205,7 @@ const regionalSnapshot163 = new Map();
    const missing=["tipoentrega","cargo","loja","numpedido"].filter(k=>col[k]<0);
    if(missing.length)throw new Error("Colunas ausentes: "+missing.join(", ")+". Confirme o modelo do relatório nacional.");
    const data=grid.slice(head+1),records=new Map(),ids=new Map();
-   let accepted=0,skipped=0,bopisOrders=0,asof="2026-10-01",minDate="2026-10-31";
+   let accepted=0,skipped=0,bopisOrders=0,regionalConflicts=0,asof="2026-10-01",minDate="2026-10-31";
    progress("Consolidando "+data.length.toLocaleString("pt-BR")+" linhas do relatório…");
    for(let i=0;i<data.length;i++){
      const cells=data[i]||[],get=k=>cells[col[k]];
@@ -219,7 +219,7 @@ const regionalSnapshot163 = new Map();
      if(!st)throw new Error("Filial ausente para matrícula "+m+" na linha "+(head+i+2)+".");
      const key=g+":"+m;let item=records.get(key);
      if(!item){item={matricula:m,store:st.padStart(3,"0"),regional,group:g,approved_cents:0,bopis_cents:0,orders:0};records.set(key,item);ids.set(key,new Set());}
-     if(item.regional!==regional)throw new Error("Regional divergente para matrícula "+m+": "+item.regional+" / "+regional+".");
+     if(item.regional!==regional){regionalConflicts++;skipped++;continue;}
      item.store=st.padStart(3,"0");
      const oid=String(get("numpedido")??"").trim()||m+"-"+date+"-"+accepted;
      const set=ids.get(key),first=!set.has(oid);if(first)set.add(oid);
@@ -236,7 +236,7 @@ const regionalSnapshot163 = new Map();
      "Exporte as vendas aprovadas desde 01/10 até "+readable165(asof)+
      ", e não somente as vendas do último dia. Nenhum dado foi substituído."
    );
-   return {rows,stats:{asof,min_date:minDate,rows:data.length,accepted,skipped,bopis_orders:bopisOrders}};
+   return {rows,stats:{asof,min_date:minDate,rows:data.length,accepted,skipped,bopis_orders:bopisOrders,regional_conflicts:regionalConflicts}};
  }
  window.importCampaignExcel165=async function(){
    const box=document.getElementById("cpImportStatus165"),file=document.getElementById("cpAdminFile165")?.files?.[0],
@@ -278,7 +278,7 @@ const regionalSnapshot163 = new Map();
        alert(msg);
        return;
      }
-     box.textContent="Enviando "+compact.rows.length.toLocaleString("pt-BR")+" matrículas consolidadas…";
+     box.textContent="Enviando "+compact.rows.length.toLocaleString("pt-BR")+" matrículas consolidadas…"+(compact.stats.regional_conflicts?" "+compact.stats.regional_conflicts+" pedido(s) com regional divergente foram isolados.":"");
      const response=await fetch(API165,{method:"POST",cache:"no-store",headers:{"Content-Type":"application/json"},
        body:JSON.stringify({action:"import_compact",matricula:mat(),password,filename:file.name,rows:compact.rows,stats:compact.stats})});
      const result=await response.json().catch(()=>({}));
@@ -288,7 +288,7 @@ const regionalSnapshot163 = new Map();
      fetchedAt165=0;
      await window.loadCampaignSnapshot165(true);
      const msg="Parcial atualizada até "+readable165(result.asof)+". "+result.entries+
-       " matrículas consolidadas. A parcial anterior foi substituída, sem duplicar pedidos.";
+       " matrículas consolidadas. A parcial anterior foi substituída, sem duplicar pedidos."+(compact.stats.regional_conflicts?" Atenção: "+compact.stats.regional_conflicts+" pedido(s) com regional divergente foram desconsiderados. Revise a origem desses pedidos.":"");
      const host=document.getElementById("cpImportStatus165");if(host)host.textContent=msg;
      alert(msg);
    }catch(e){
