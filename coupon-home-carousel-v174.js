@@ -46,7 +46,7 @@ function updateDots(hero){
  const panels=[...hero.querySelectorAll('.dynamicPanelV34')];
  const dots=hero.querySelector('.dynDotsV34');
  if(!dots||!photos.length||photos.length!==panels.length)return;
- dots.innerHTML=photos.map((_,i)=>'<button type="button" data-ecp-index="'+i+'" aria-label="Ir para destaque '+(i+1)+' de '+photos.length+'" title="Destaque '+(i+1)+'"></button>').join('');
+ dots.innerHTML=photos.map((_,i)=>'<button type="button" class="'+(i===0?'active':'')+'" data-ecp-index="'+i+'" aria-label="Ir para destaque '+(i+1)+' de '+photos.length+'" title="Destaque '+(i+1)+'"></button>').join('');
  let counter=hero.querySelector('.ecpCount174');
  if(!counter){counter=document.createElement('span');counter.className='ecpCount174';counter.setAttribute('aria-live','off');dots.insertAdjacentElement('beforebegin',counter);}
  hero.dataset.ecpCount=String(photos.length);
