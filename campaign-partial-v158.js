@@ -81,14 +81,16 @@ const regionalSnapshot163 = new Map();
 
  // Evolução registrada por corte nacional, no mesmo navegador. Nunca presume posição anterior.
  const MOVKEY170="estore_campaign_positions_v170";
+ const PREVKEY170="estore_campaign_previous_v170";
  let previous170=null;
+ try{previous170=JSON.parse(localStorage.getItem(PREVKEY170)||"null");}catch(_){previous170=null;}
  function stored170(){try{const v=JSON.parse(localStorage.getItem(MOVKEY170)||"null");return v&&v.asof&&v.groups?v:null;}catch(_){return null;}}
  function view170(){return {asof:String(campaignInfo165.asof||""),groups:Object.fromEntries(groups.map(g=>[g,(ranks[g]||[]).map(x=>({mat:String(x.mat),pos:Number(x.pos)}))]))};}
  function remember170(){
    if(!serverSnapshot165)return;
    const fresh=view170(),saved=stored170();
    if(saved&&saved.asof!==fresh.asof){
-     if(saved.asof<fresh.asof)previous170=saved;
+     if(saved.asof<fresh.asof){previous170=saved;try{localStorage.setItem(PREVKEY170,JSON.stringify(saved));}catch(_){}}
      else return; // nunca substitui dados mais novos por uma consulta antiga
    }else if(saved&&saved.asof===fresh.asof){
      // manter uma comparação já existente durante recargas do mesmo corte
