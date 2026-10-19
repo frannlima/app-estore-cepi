@@ -40,6 +40,7 @@
        bopis:Number(x.bopis_cents||0)/100,orders:Number(x.orders||0),ticket:Number(x.orders)>0?Number(x.approved_cents||0)/100/Number(x.orders):0
      }));
    });
+   remember170();
  }
  window.loadCampaignSnapshot165=async function(force){
    if(!isVisible165())return;
@@ -77,9 +78,47 @@ const regionalSnapshot163 = new Map();
  const esc=s=>String(s||'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
  function lookup163(m){for(const g of groups){const p=ranks[g].find(r=>r.mat===m);if(p)return {...p,group:g,orders:p.ticket>0?Math.max(1,Math.round(p.approved/p.ticket)):0};}return regionalSnapshot163.get(m)||null;}
  function defaultGroup(){const r=lookup163(mat());return r?r.group:'P+PP';}
+
+ // Evolução registrada por corte nacional, no mesmo navegador. Nunca presume posição anterior.
+ const MOVKEY170="estore_campaign_positions_v170";
+ let previous170=null;
+ function stored170(){try{const v=JSON.parse(localStorage.getItem(MOVKEY170)||"null");return v&&v.asof&&v.groups?v:null;}catch(_){return null;}}
+ function view170(){return {asof:String(campaignInfo165.asof||""),groups:Object.fromEntries(groups.map(g=>[g,(ranks[g]||[]).map(x=>({mat:String(x.mat),pos:Number(x.pos)}))]))};}
+ function remember170(){
+   if(!serverSnapshot165)return;
+   const fresh=view170(),saved=stored170();
+   if(saved&&saved.asof!==fresh.asof){
+     if(saved.asof<fresh.asof)previous170=saved;
+     else return; // nunca substitui dados mais novos por uma consulta antiga
+   }else if(saved&&saved.asof===fresh.asof){
+     // manter uma comparação já existente durante recargas do mesmo corte
+   }
+   try{localStorage.setItem(MOVKEY170,JSON.stringify(fresh));}catch(_){}
+ }
+ function movement170(r){
+   const prior=previous170?.groups?.[current]?.find(x=>String(x.mat)===String(r.mat));
+   if(!prior)return '<span class="cpMoveNone170" title="Sem histórico de classificação anterior">—</span>';
+   const diff=Number(prior.pos)-Number(r.pos);
+   if(diff>0)return '<span class="cpMoveUp170" title="Subiu '+diff+' posições">▲ <small>('+prior.pos+'º)</small> ⭐</span>';
+   if(diff<0)return '<span class="cpMoveDown170" title="Caiu '+Math.abs(diff)+' posições">▼ <small>('+prior.pos+'º)</small></span>';
+   return '<span class="cpMoveNone170" title="Manteve a posição">— <small>('+prior.pos+'º)</small></span>';
+ }
+ function danger170(r){
+   const rows=ranks[current]||[];
+   // Concorrentes até 10% do valor aprovado, exclusivamente dentro do Top 15 conhecido.
+   const trailing=rows.filter(x=>x.pos>r.pos&&x.approved<r.approved&&r.approved-x.approved<=r.approved*.10);
+   if(!trailing.length)return '';
+   const gap=Math.min(...trailing.map(x=>r.approved-x.approved));
+   return '<span class="cpRisk170" title="Entre os classificados visíveis, diferença até 10% das vendas aprovadas">⚠ '+trailing.length+' '+(trailing.length===1?'colaborador próximo':'colaboradores próximos')+' · diferença '+money(gap)+'</span>';
+ }
+ if(!document.getElementById("cpMovesCss170")){
+   const style=document.createElement("style");style.id="cpMovesCss170";
+   style.textContent=".cpMove170{display:inline-flex;align-items:center;min-width:52px;margin:0 8px;font-size:12px;font-weight:800;white-space:nowrap}.cpMoveUp170{color:#16834c}.cpMoveDown170{color:#d92e32}.cpMoveNone170{color:#62716c}.cpMove170 small{font-size:10px;font-weight:600}.cpRisk170{display:block;margin-top:5px;background:#fff0ef;border:1px solid #ffc9c7;border-radius:7px;color:#bb2527;font-weight:750;font-size:10px;padding:4px 6px;max-width:235px}.cpMovementLegend170{font-size:11px;color:#48635a;padding:6px 2px 12px}.cpRow158 .cpValue158{min-width:110px}@media(max-width:640px){.cpMove170{min-width:43px;margin:0 5px}.cpRisk170{font-size:9px}}";
+   document.head.appendChild(style);
+ }
  function row(r){
-   return '<div class="cpRow158"><div class="cpNumber158">'+r.pos+'º</div><div class="cpPerson158"><b>Matrícula '+esc(r.mat)+'</b><small>Loja '+esc(r.store)+(' · Regional '+esc(r.regional||'Não informada'))+'</small>'+
-      (r.bopis?'<span class="cpBopis158" title="Valor BOPIS excluído do resultado">BOPIS: '+money(r.bopis)+'</span>':'')+'</div>'+
+   return '<div class="cpRow158"><div class="cpNumber158">'+r.pos+'º</div><div class="cpMove170">'+movement170(r)+'</div><div class="cpPerson158"><b>Matrícula '+esc(r.mat)+'</b><small>Loja '+esc(r.store)+(' · Regional '+esc(r.regional||'Não informada'))+'</small>'+
+      (r.bopis?'<span class="cpBopis158" title="Valor BOPIS excluído do resultado">BOPIS: '+money(r.bopis)+'</span>':'')+danger170(r)+'</div>'+
       '<div class="cpValue158"><b>'+money(r.approved)+'</b><small>'+esc(prize(r.pos))+'</small></div></div>';
  }
  function isAdmin165(){try{return typeof U!=="undefined"&&(!!U.admin||!!U.u?.admin);}catch(_){return false;}}
@@ -102,6 +141,7 @@ const regionalSnapshot163 = new Map();
      '<div class="cpKpis158"><div><small>Valor do 15º colocado</small><b>'+money(limit(current))+'</b></div><div><small>Premiados por porte</small><b>15</b></div><div><small>Encerramento das vendas</small><b>31/10</b></div></div>'+
      '<div class="cpHead158"><div><h3>🏆 Top 15 · '+esc(current)+'</h3><p>Ranking nacional • aprovado válido, sem BOPIS</p></div>'+
        '<button type="button" onclick="shareCampaignCard158(\''+current+'\')">↗ Card Top 15 deste porte</button></div>'+
+     '<div class="cpMovementLegend170">▲ Subiu ⭐ destaque · ▼ Caiu · — Estável ou sem histórico · ⚠ risco estimado (até 10% de diferença; apenas Top 15). '+(previous170?'Comparação com '+esc(readable165(previous170.asof)):'Comparação disponível após nova parcial neste dispositivo.')+'</div>'+
      '<div class="cpGrid158">'+(ranks[current]||[]).map(row).join('')+'</div>'+
      '<div class="cpShareRegional165"><b>📣 Compartilhamento regional</b><p>Gere uma única imagem com as 45 posições nacionais, organizadas nos três portes, e mobilize o time CE+PI.</p>'+
      '<button type="button" onclick="shareCampaignRegional165()">↗ Compartilhar card consolidado • 45 elegíveis</button></div>'+
