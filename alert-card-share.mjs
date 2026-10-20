@@ -14,7 +14,12 @@ export async function createAlertImage(contact,row){
   if(rowWords)line(rowWords,x,cy,size,color,bold);return cy+leading;
  };
  rect(0,0,1080,1450,cream);rect(0,0,1080,290,red);rect(36,34,245,220,dark);
- line('App.',66,105,32,'#fff');line('eStore',66,158,53,'#fff',true);line('CE+PI',66,215,55,'#DE7C00',true);
+ // A marca utilizada é o ícone do PWA oficial do próprio aplicativo.
+ const logo=new Image();
+ logo.src=new URL('./icon-v136.svg',import.meta.url).href;
+ try{await logo.decode();g.drawImage(logo,37,23,242,242);}catch{
+  line('App.',66,105,32,'#fff');line('eStore',66,158,53,'#fff',true);line('CE+PI',66,215,55,'#DE7C00',true);
+ }
  line('🚨 ALERTA',318,112,76,'#fff',true);line('eSTORE CONNECT',325,173,47,'#fff',true);
  const kind=row.condition==='zero'?'ACELERAR CAPTAÇÃO':row.condition==='group_sale'?'VENDA NÃO LANÇADA':'LOJA SEM ATUALIZAÇÃO';
  line(kind,325,230,37,'#fff',true);
@@ -41,10 +46,11 @@ export async function createAlertImage(contact,row){
  return new File([blob],'alerta-estore-filial-'+row.st+'.png',{type:'image/png'});
 }
 export async function shareAlertImage(file,phone){
- if(navigator.canShare?.({files:[file]}) && navigator.share){
-  await navigator.share({files:[file],title:'Alerta eStore Connect'});return 'Compartilhamento aberto. Confirme o destinatário no WhatsApp.';
+ if(navigator.canShare?.({files:[file]}) && typeof navigator.share==='function'){
+  await navigator.share({files:[file],title:'Alerta eStore Connect'});
+  return 'Card PNG entregue ao compartilhamento do dispositivo. Selecione WhatsApp, confira o destinatário e confirme o envio.';
  }
  const objectURL=URL.createObjectURL(file),a=document.createElement('a');a.href=objectURL;a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(objectURL),60000);
- const popup=window.open('https://wa.me/'+phone,'_blank','noopener,noreferrer');
- return popup?'Imagem baixada. Anexe o PNG à conversa aberta no WhatsApp e confirme o envio.':'Imagem baixada. Abra o WhatsApp e anexe o PNG manualmente.';
+ // O WhatsApp Web não admite pré-anexar um arquivo via wa.me; nunca enviar texto no lugar do PNG.
+ return 'PNG baixado. No computador, anexe o arquivo à conversa WhatsApp do número autorizado '+phone+'. Não foi enviado automaticamente.';
 }
