@@ -29,8 +29,8 @@ export async function createAlertImage(contact,row){
  wrap(intro,55,418,950,39,dark,true,48);
  rect(50,486,980,166,'#FFE7E7');g.strokeStyle=red;g.lineWidth=4;g.strokeRect(50,486,980,166);
  line('⚠ ATENÇÃO — SEM ATUALIZAÇÃO',80,552,39,red,true);
- const since=row.updated_at?new Date(row.updated_at).toLocaleTimeString('pt-BR',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit'}):'14:00';
- line('Venda e parcial desde as '+since,80,612,37,red,true);
+ const since=row.first_check_time||null;
+ line(since?'Sem atualização desde o 1º print: '+since:'Primeiro print do dia ainda não registrado',80,612,35,red,true);
  rect(50,679,980,165,'#E9EBEA');
  line('META eSTORE DO DIA',80,733,32,dark,true);line(money(row.meta),80,806,52,dark,true);
  line('META DE PEDIDOS',630,733,32,dark,true);line(String(row.orders)+' pedidos',630,806,52,dark,true);
