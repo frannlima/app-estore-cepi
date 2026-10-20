@@ -37,20 +37,22 @@ export async function createAlertImage(contact,row){
  rect(50,874,980,192,'#fff');
  line('AÇÃO IMEDIATA',80,936,44,red,true);
  wrap('Mobilizar o time, analisar o speed de atendimento e intensificar a captação.',80,991,920,35,dark,false,45);
- line('REGISTRE A VENDA',55,1142,37,dark,true);
- wrap('Menu → Hora a Hora → Sua filial → Registrar',55,1200,965,32,dark,false,45);
- rect(40,1260,1000,145,red);
- line('A PRÓXIMA HORA PODE MUDAR O JOGO!',73,1320,38,'#fff',true);
- line('VAMOS GIRAR O PONTEIRO!',220,1370,38,'#fff',true);
+ line('REGISTRE A VENDA',55,1130,37,dark,true);
+ wrap('Menu → Hora a Hora → Sua filial → Registrar',55,1181,965,32,dark,false,45);
+ line('frannlima.github.io/app-estore-cepi/?menu=hourly',55,1241,29,'#1458A5',true);
+ rect(40,1280,1000,125,red);
+ line('A PRÓXIMA HORA PODE MUDAR O JOGO!',73,1330,38,'#fff',true);
+ line('VAMOS GIRAR O PONTEIRO!',220,1381,38,'#fff',true);
  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob)throw Error('Falha na geração do PNG.');
  return new File([blob],'alerta-estore-filial-'+row.st+'.png',{type:'image/png'});
 }
+export const HOURLY_LINK='https://frannlima.github.io/app-estore-cepi/?menu=hourly';
 export async function shareAlertImage(file,phone){
  if(navigator.canShare?.({files:[file]}) && typeof navigator.share==='function'){
-  await navigator.share({files:[file],title:'Alerta eStore Connect'});
-  return 'Card PNG entregue ao compartilhamento do dispositivo. Selecione WhatsApp, confira o destinatário e confirme o envio.';
+  await navigator.share({files:[file],title:'Alerta eStore Connect',text:'📲 Atualize sua venda e pedidos no Hora a Hora:\n'+HOURLY_LINK});
+  return 'Card PNG compartilhado. O link Hora a Hora foi incluído no texto do compartilhamento quando suportado pelo WhatsApp; confirme a legenda antes de enviar.';
  }
  const objectURL=URL.createObjectURL(file),a=document.createElement('a');a.href=objectURL;a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(objectURL),60000);
  // O WhatsApp Web não admite pré-anexar um arquivo via wa.me; nunca enviar texto no lugar do PNG.
- return 'PNG baixado. No computador, anexe o arquivo à conversa WhatsApp do número autorizado '+phone+'. Não foi enviado automaticamente.';
+ return 'PNG baixado. No WhatsApp, anexe a imagem e envie junto a mensagem: '+HOURLY_LINK+'. O link dentro do PNG não é clicável.';
 }
