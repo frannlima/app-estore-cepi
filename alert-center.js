@@ -4,7 +4,23 @@ let model=null,imageHash='',imageUrl='',pendingRows=[],password='';
 const PILOT_PHONE='5585981594141'; // Piloto manual autorizado: nenhum outro destinatário habilitado.
 const approvedRow=(row)=>Boolean(row?.partial_id)&&Number(row?.captured||0)===0&&['missing','zero','group_sale','stale'].includes(row?.condition);
 const reais=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-const alertText=(c,row)=>{const name=String(c.person?.nome||c.name_original||'Liderança').trim().split(/\s+/)[0];const issue=row.condition==='group_sale'?'VENDA NÃO LANÇADA':row.condition==='zero'?'ACELERAR CAPTAÇÃO':'LOJA SEM ATUALIZAÇÃO';const since=row.updated_at?new Date(row.updated_at).toLocaleTimeString('pt-BR',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit'}):'14:00';return '🚨 *ALERTA eSTORE CONNECT | '+issue+'*\n\nOlá, *'+name+'!*\nFilial *'+row.st+'*: '+(row.condition==='zero'?'parcial zerada':'venda pendente de atualização')+' nesta verificação.\n\n🎯 *Meta eStore:* '+(Number(row.meta)>0?reais(row.meta):'A confirmar')+'\n🛍️ *Meta de pedidos:* '+(Number(row.orders)>0?row.orders+' pedidos':'A confirmar')+'\n🔴 *Ação imediata:* Mobilizar o time, analisar o speed de atendimento e intensificar a captação.\n\n📲 *Registre a venda:* Menu → Hora a Hora → Sua filial → Registrar\nhttps://frannlima.github.io/app-estore-cepi/?menu=hourly\n\n📌 *Obs.:* Loja sem atualização de venda e parcial desde '+since+'.\n\n🚀 *A próxima hora pode mudar o jogo. Vamos girar o ponteiro!*';};
+const alertText=(c,row)=>{
+ const name=String(c.person?.nome||c.name_original||'Liderança').trim().split(/\s+/)[0];
+ const issue=row.condition==='group_sale'?'VENDA NÃO LANÇADA':row.condition==='zero'?'ACELERAR CAPTAÇÃO':'LOJA SEM ATUALIZAÇÃO';
+ const since=row.updated_at?new Date(row.updated_at).toLocaleTimeString('pt-BR',{timeZone:'America/Sao_Paulo',hour:'2-digit',minute:'2-digit'}):'14:00';
+ return [
+ '🚨 *ALERTA eSTORE CONNECT | '+issue+'*',
+ 'Olá, *'+name+'!*',
+ 'Filial *'+row.st+'*: '+(row.condition==='zero'?'parcial zerada':'venda pendente de atualização')+' nesta verificação.',
+ '🎯 *Meta eStore:* '+(Number(row.meta)>0?reais(row.meta):'A confirmar'),
+ '🛍️ *Meta de pedidos:* '+(Number(row.orders)>0?row.orders+' pedidos':'A confirmar'),
+ '🔴 *Ação imediata:* Mobilizar o time, analisar o speed de atendimento e intensificar a captação.',
+ '📲 *Registre a venda:* Menu → Hora a Hora → Sua filial → Registrar',
+ 'https://frannlima.github.io/app-estore-cepi/?menu=hourly',
+ '📌 *Obs.:* Loja sem atualização de venda e parcial desde '+since+'.',
+ '🚀 *A próxima hora pode mudar o jogo. Vamos girar o ponteiro!*'
+ ].join('\n\n');
+};
 const pilotContact=c=>String(c?.store_code_original)==='108' && (String(c?.matricula_confirmed)==='2457695'||/^(fran lima|francimar lima)$/i.test(String(c?.name_original||'').trim()));
 const el=id=>document.getElementById(id);
 const html=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
