@@ -1,3 +1,25 @@
 .ac h2{margin:4px 0;font-size:26px}.acHeading,.acStore header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.acHeading p{margin:4px 0 16px}.acTabs,.acActions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.acGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:14px}.acStore{border:1px solid #DAD9D6;border-radius:18px;padding:18px;background:#fff}.acStore strong{font-size:22px}.acTag{font-size:12px;padding:6px 9px;border-radius:20px}.acTag.pending{background:#fff0db;color:#854000}.acTag.ok{background:#e7f4eb;color:#173F35}.acContact{border-top:1px solid #eee;padding:13px 0}.acContact small{display:block;margin-top:5px;overflow-wrap:anywhere}.acReviewRow{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:center}.ac button:disabled{opacity:.5;cursor:not-allowed}#acDialog{border:0;border-radius:20px;padding:24px;width:min(600px,94vw);max-height:88vh;color:#173F35}#acDialog::backdrop{background:#173f3590}#acDialog textarea{font-size:14px;line-height:1.5}#acStatus:empty{display:none}#acStatus{padding:12px;background:#f4f2ec;border-radius:12px}
 
 .acPoster{overflow:hidden;border:2px solid #b71c1c;border-radius:18px;background:#fff;color:#173f35;max-width:540px;margin:12px auto}.acPosterHead{display:flex;align-items:center;gap:18px;padding:18px;background:#a80e13;color:#fff;font-size:22px;font-weight:800}.acBrand{border-radius:12px;background:#173f35;padding:12px 18px;color:white;font-size:13px;line-height:1.1}.acBrand b{font-size:21px}.acPosterBody{padding:18px;line-height:1.45}.acPosterBody p{font-size:14px;overflow-wrap:anywhere}.acRedBox{padding:14px;background:#b71c1c;color:white;text-align:center;font-weight:800;border-radius:12px}.acStore .acActions button[data-ac-send]{background:#173f35;color:white}
+
+/* Painel de preparação do envio em lote; não representa disparo automático. */
+.acBatch{border:1px solid #dfaaa8;border-left:5px solid #b71c1c;background:#fffaf8;border-radius:16px;padding:16px;margin:16px 0 22px;color:#173F35}
+.acBatchTitle{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.acBatchTitle strong{font-size:19px;color:#9a1818}
+.acBatchTitle p{margin:6px 0;font-size:13px}
+.acBatchCount{font-size:14px;background:#fce7e5;color:#a31e1e;padding:7px 12px;border-radius:18px;white-space:nowrap}
+.acBatchStats{display:flex;gap:8px;flex-wrap:wrap;margin:13px 0}
+.acBatchStats span{background:#f4f2ec;border-radius:8px;padding:8px 10px;font-size:13px}
+.acBatchTargets{max-height:300px;overflow-y:auto;border-block:1px solid #e7d7d4;margin:12px 0;padding:5px 0}
+.acBatchRow{display:grid;grid-template-columns:minmax(135px,1fr) minmax(180px,2fr);gap:12px;align-items:center;padding:9px 4px;border-bottom:1px solid #eee8e6}
+.acBatchRow b,.acBatchRow small{display:block}
+.acBatchRow small{font-size:12px}
+.acPending{color:#9e4a2e;font-weight:600}
+.acConfirm{display:flex;align-items:flex-start;gap:9px;font-size:13px;padding-block:10px}
+.acConfirm input{flex:none;margin-top:4px}
+.acBatchActions{display:flex;gap:8px;flex-wrap:wrap}
+.acFootnote{display:block;font-size:12px;margin-top:12px;color:#5d6560}
+#acBatchDialog{border:0;border-radius:17px;padding:24px;width:min(520px,94vw);max-height:90vh;color:#173F35}
+#acBatchDialog::backdrop{background:#173f3590}
+#acBatchDialog button{margin:4px}
+@media(max-width:560px){.acBatch{padding:12px}.acBatchRow{grid-template-columns:1fr;gap:6px}.acBatchRow select{width:100%}.acBatchActions button{flex:1 1 100%}}
