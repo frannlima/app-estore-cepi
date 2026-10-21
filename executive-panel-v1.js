@@ -447,7 +447,7 @@ async function shareCard(){
   model.avatars=await Promise.all(ordered.map(x=>x?imageForCanvas(colPhoto(x)):Promise.resolve(null)));
   paintShare(ctx,model);
   const ria=await imageForCanvas(riaLogo);
-  if(ria)ctx.drawImage(ria,52,43,152,52); // Identidade RIA no topo.
+  if(ria)ctx.drawImage(ria,52,43,177,52); // Identidade RIA no topo.
   else{ctx.font="900 66px Arial";ctx.fillStyle="#FFFFFF";ctx.fillText("RIA",52,92)}
   const blob=await new Promise(r=>canvas.toBlob(r,"image/png",.98));
   if(!blob)throw Error("Falha ao gerar PNG");
