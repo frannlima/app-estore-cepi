@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v178-alert-batch';
-const BUILD='v178-alert-batch';
+const CACHE='estore-cepi-shell-v179-batch-select';
+const BUILD='v179-batch-select';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
