@@ -472,30 +472,30 @@ async function saveBenchmark(){
  }catch(err){alert("Não foi possível salvar: "+String(err.message||err))}
 }
 function caption(){
- const r=regionalData(),b=r.benchmark,z=opportunities(),ref=latestDate(),period=EX.period==="day"?"D-1":EX.period==="week"?"SEMANA":"MÊS";
- const begin=periodBounds(EX.period,ref).start_date,cap=r.rows.length?r.total.captured:b?.regional_captured??null;
- const orders=r.rows.length?r.total.orders:b?.regional_orders??null,company=b?.company_share??null,desvio=r.share!=null&&company!=null?r.share-n(company):null;
+ const r=regionalData(),b=r.benchmark,z=opportunities(),ref=latestDate();
+ const period=EX.period==="day"?"D-1":EX.period==="week"?"SEMANA":"MÊS";
+ const start=periodBounds(EX.period,ref).start_date;
+ const cap=r.rows.length?r.total.captured:b?.regional_captured??null;
+ const orders=r.rows.length?r.total.orders:b?.regional_orders??null;
+ const company=b?.company_share??null,desvio=r.share!=null&&company!=null?r.share-n(company):null;
+ const sign=desvio==null?"↕️":desvio<0?"🔻":desvio>0?"🔺":"➖";
+ const date=EX.period==="day"?dia(ref):dia(start)+" a "+dia(ref);
+ const labels=EX.period==="day"?"Lojas zeradas":"Lojas com zeragem";
  const lines=[
-  "📊 *PAINEL eSTORE | CE+PI • "+period+"*",
-  "📅 "+dia(begin)+(EX.period==="day"?"":" a "+dia(ref)),
+  "📊 *PAINEL EXECUTIVO eSTORE | CE+PI*",
+  "📅 *"+period+" • "+date+"*",
   "",
-  "💰 *Captação:* "+money2(cap),
-  "🛍️ *Pedidos:* "+count(orders),
-  "📈 *Share CE+PI:* "+percent(r.share),
-  "🏢 *Share empresa:* "+percent(company),
-  "↕️ *Desvio:* "+pp(desvio)
+  "💰 *Captação:* "+money2(cap)+" | *Pedidos:* "+count(orders),
+  "📈 *Share:* CE+PI "+percent(r.share)+" | Empresa "+percent(company),
+  sign+" *Desvio:* "+pp(desvio),
+  "",
+  "🏬 *"+labels+":* "+(z.daysCovered?z.zeros.length:"—"),
+  "💸 *Potencial de dispersão:* "+money2(z.potential),
+  "📉 *Impacto regional:* "+percent(z.ratio)
  ];
- lines.push("🏬 *"+(EX.period==="day"?"Lojas zeradas no dia":"Lojas com zeragem no período")+":* "+(z.daysCovered?z.zeros.length:"—"));
- lines.push("💰 *Potencial dispersão:* "+money2(z.potential));
- lines.push("📊 *Impacto na regional:* "+percent(z.ratio));
- if(EX.period==="day"){
-  if(z.zeros.length)lines.push("📍 *Filiais:* "+z.zeros.map(x=>"L"+x.st).join(" • "));
- }else if(z.zeros.length){
-  lines.push("📍 *Dias com zeragem | Impacto regional:*");
-  for(const x of z.zeros)lines.push("L"+x.st+" • "+x.days+" dia"+(x.days===1?"":"s")+" • "+percent(x.impact));
- }
- if(!z.complete||z.missingGoals)lines.push("⚠️ Apuração parcial: "+z.daysCovered+"/"+z.daysExpected+" dias. Valores não identificados não foram estimados.");
- lines.push("","Moda que inspira o Brasil");
+ if(!z.complete||z.missingGoals)lines.push("⚠️ *Apuração parcial:* "+z.daysCovered+"/"+z.daysExpected+" dias.");
+ lines.push("","🔎 *Explore os indicadores e a performance detalhada no app:",
+  "https://frannlima.github.io/app-estore-cepi/","","_Moda que inspira o Brasil_");
  return lines.join("\n");
 }
 
