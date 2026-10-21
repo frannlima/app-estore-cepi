@@ -573,23 +573,31 @@ function paintShare(ctx,data){
  fit(money2(data.potential),505,1002,26,195,true,G);
  print("Impacto:",724,1002,22,false,M);
  fit(percent(data.ratio),1007,1002,27,155,true,R,"right");
- fit("Impacto regional = potencial dos dias zerados ÷ captação regional do intervalo",73,1042,19,945,false,M);
- fit(isDaily?"LOJAS SEM CAPTAÇÃO DE VENDA NO DIA":"LOJAS COM ZERAGEM DE VENDAS NO PERÍODO",73,1080,24,946,true,G);
- for(let i=0;i<2;i++){
-  const x=73+i*487;
-  print(isDaily?"FILIAL  •  SITUAÇÃO":"FILIAL  •  DIAS ZERADOS  •  IMPACTO",x,1117,17,true,M);
- }
- if(zeroRows.length){
-  for(let i=0;i<zeroRows.length;i++){
-   const item=zeroRows[i],x=73+(i%2)*487,y=1152+Math.floor(i/2)*37;
-   print("L"+item.st,x,y,22,true,G);
-   if(isDaily)print("ZERADA",x+140,y,20,true,R);
-   else{
+ // D-1: manter apenas indicadores e a sequência das filiais, sem títulos intermediários.
+ // Semana e mês: preservar dias de zeragem e impacto regional por loja.
+ if(isDaily){
+  if(zeroRows.length){
+   const stores=zeroRows.map(item=>"L"+String(item.st||"").padStart(3,"0"));
+   const perLine=9;
+   for(let i=0;i<stores.length;i+=perLine){
+    fit(stores.slice(i,i+perLine).join("  •  "),73,1059+Math.floor(i/perLine)*33,23,931,true,G);
+   }
+  }else fit(data.hasDailyData?"Nenhuma filial com captação zerada":"Aguardando dados oficiais do dia",73,1059,21,929,false,M);
+ }else{
+  fit("LOJAS COM ZERAGEM DE VENDAS NO PERÍODO",73,1051,24,944,true,G);
+  for(let i=0;i<2;i++){
+   const x=73+i*487;
+   print("FILIAL  •  DIAS ZERADOS  •  IMPACTO",x,1087,17,true,M);
+  }
+  if(zeroRows.length){
+   for(let i=0;i<zeroRows.length;i++){
+    const item=zeroRows[i],x=73+(i%2)*487,y=1123+Math.floor(i/2)*37;
+    print("L"+String(item.st||"").padStart(3,"0"),x,y,22,true,G);
     print(item.days+"d",x+179,y,21,true,G);
     fit(percent(item.impact),x+461,y,21,195,true,R,"right");
    }
-  }
- }else fit(data.hasDailyData?"Nenhuma loja com zeragem no período":"Aguardando dados oficiais do intervalo",73,1152,22,938,false,M);
+  }else fit(data.hasDailyData?"Nenhuma filial com zeragem no período":"Aguardando dados oficiais do intervalo",73,1123,22,938,false,M);
+ }
  if(!data.coverageComplete)fit("Base parcial: "+data.daysCovered+"/"+data.daysExpected+" dias • números ausentes não estimados",73,data.detailBottom-22,18,934,false,R);
 
  print("TOP 3 VENDEDORES | CE+PI",52,bottom+37,28,true,G);
@@ -619,7 +627,7 @@ async function shareCard(){
  if(!EX.data)return notify("Aguarde o carregamento dos indicadores.");
  const d=regionalData(),b=d.benchmark,cap=d.rows.length?d.total.captured:b?.regional_captured??null;
  const orders=d.rows.length?d.total.orders:b?.regional_orders??null,opp=opportunities();
- const detailHeight=Math.max(255,250+Math.ceil(opp.zeros.length/2)*37);
+ const detailHeight=EX.period==="day"?Math.max(180,150+Math.ceil(opp.zeros.length/9)*33+(!opp.complete?30:0)):Math.max(240,215+Math.ceil(opp.zeros.length/2)*37);
  const detailBottom=927+detailHeight,cardHeight=detailBottom+70+302+118;
  const model={period:EX.period,dateLabel:EX.period==="day"?dia(latestDate()):dia(periodBounds(EX.period,latestDate()).start_date)+" a "+dia(latestDate()),
   captured:cap,orders,regionalShare:d.share,companyShare:b?.company_share??null,
