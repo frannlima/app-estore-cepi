@@ -2,21 +2,21 @@
 import {createAlertImage,shareAlertImage} from './alert-card-share.mjs';
 const selected=new Map();
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const eligibleRow=r=>!!r?.partial_id&&r.active===true&&Number(r.captured)===0&&Number(r.meta)>0&&Number(r.orders)>0&&['missing','zero','sale'].includes(r.group_status);
+const eligibleRow=r=>!!r?.partial_id&&r.active===true&&r.eligible===true&&Number(r.meta)>0&&Number(r.orders)>0&&['missing','zero','sale'].includes(r.group_status);
 const eligibleContact=(c,r)=>!!c?.person&&c.verification_status==='confirmado'&&c.store_code_original===r.st&&c.store_code_confirmed===r.st&&c.matricula_confirmed===c.person.matricula&&c.person.store_code===r.st&&c.person.eligible_supervisor===true&&/supervisor/i.test(c.person.cargo||'')&&!/gerente/i.test(c.person.cargo||'')&&c.person.situacao==='Atividade Normal'&&/^\+55[1-9]\d9\d{8}$/.test(c.phone_suggested_e164||'');
-const targets=model=>(model?.rows||[]).filter(eligibleRow).map(row=>({row,contacts:(model?.contacts||[]).filter(c=>eligibleContact(c,row))}));
+const targets=model=>(model?.rows||[]).filter(eligibleRow).sort((a,b)=>(a.group_status==='sale')-(b.group_status==='sale')||a.st.localeCompare(b.st)).map(row=>({row,contacts:(model?.contacts||[]).filter(c=>eligibleContact(c,row))}));
 export function batchMarkup(model){
  const rows=targets(model),enabled=rows.filter(t=>t.contacts.length).length;
  let blocks='';
  for(const t of rows){
   const options=t.contacts.map(c=>'<option value="'+c.id+'" '+(String(selected.get(t.row.st))===String(c.id)?'selected':'')+'>'+esc(c.person?.nome||c.name_original)+'</option>').join('');
   const choice=t.contacts.length?'<select class="field" aria-label="Supervisor da filial '+t.row.st+'" data-ac-batch-store="'+t.row.st+'"><option value="">Selecionar supervisor</option>'+options+'</select>':'<small class="acPending">Contato sem validação, fora de atividade ou sem vínculo confirmado.</small>';
-  const situation=t.row.group_status==='sale'?'Venda no print, ausente no app':t.row.group_status==='zero'?'Parcial zerada':'Parcial não informada';
+  const situation=t.row.closing?'Fechamento 21h: informar a venda captada no dia':t.row.group_status==='sale'?'Venda informada no print há 60 min ou mais':t.row.group_status==='zero'?'Parcial zerada: alerta prioritário':'Sem venda no print: alerta prioritário';
   blocks+='<div class="acBatchRow"><span><b>Filial '+esc(t.row.st)+'</b><small>'+situation+'</small></span>'+choice+'</div>';
  }
- return '<section class="acBatch"><div class="acBatchTitle"><div><strong>🚨 Alertas das lojas priorizadas</strong><p>Selecione um supervisor apto por filial para preparar os cards PNG.</p></div><b class="acBatchCount">'+rows.length+' lojas</b></div>'+
+ return '<section class="acBatch"><div class="acBatchTitle"><div><strong>🚨 Alertas das lojas priorizadas</strong><p>Sem venda no print: prioridade imediata. Com venda: alerta somente após 60 minutos sem nova atualização comprovada. Selecione um supervisor por filial.</p></div><b class="acBatchCount">'+rows.length+' lojas</b></div>'+
  '<div class="acBatchStats"><span>🔴 '+rows.length+' priorizadas</span><span>✅ '+enabled+' com contato apto</span><span>⚠️ '+(rows.length-enabled)+' aguardam validação</span></div>'+
- (blocks?'<div class="acBatchTargets">'+blocks+'</div>':'<p>Nenhuma loja priorizada na parcial validada. Lojas a conferir não entram no lote.</p>')+
+ (blocks?'<div class="acBatchTargets">'+blocks+'</div>':'<p>Nenhuma filial exige alerta agora. Lojas com venda informada há menos de 60 minutos permanecem fora do lote; classificações não conferidas não disparam.</p>')+
  '<label class="acConfirm"><input id="acBatchWorking" type="checkbox"> Confirmei que os supervisores selecionados estão trabalhando agora e podem receber os alertas.</label>'+
  '<div class="acBatchActions"><button id="acSelectAllBatch" class="btn ghost">Selecionar todas aptas</button><button id="acClearBatch" class="btn ghost">Limpar seleção</button><button id="acStartBatch" class="btn" disabled>Enviar em massa (assistido)</button><button id="acReviewBatch" class="btn ghost">Conferir contatos</button></div>'+
  '<small class="acFootnote">Um PNG personalizado por filial. O WhatsApp exige selecionar e confirmar cada destinatário; iniciar lote não comprova entrega.</small></section>';
