@@ -272,43 +272,141 @@ async function loadExecutiveV1(){
  finally{EX.loading=false}
 }
 function setPeriod(period){if(!["day","week","month"].includes(period))return;EX.period=period;const view=document.getElementById("view");if(view&&typeof go==="function"){go("executive")}else render()}
+/* V3: print como entrada principal; datas do D-1 vinculadas ao resultado importado. */
+function benchmarkPeriodChangedV3(){
+ const period=document.getElementById("exIn_period")?.value||"day";
+ const bounds=periodBounds(period,latestDate());
+ const start=document.getElementById("exIn_start_date"),end=document.getElementById("exIn_end_date");
+ if(start)start.value=bounds.start_date||"";
+ if(end)end.value=bounds.end_date||"";
+ const day=document.getElementById("exDayDateV3"),range=document.getElementById("exDateRangeV3");
+ if(day){day.hidden=period!=="day";day.textContent="📅 D-1 • "+dia(bounds.end_date)+" — data do resultado alimentado no app";}
+ if(range)range.hidden=period==="day";
+ const status=document.getElementById("exDateHintV3");
+ if(status)status.textContent=period==="day"?"A data é vinculada automaticamente ao último input selecionado no painel.":'Confira as datas exatas do intervalo exibido no print antes de anexá-lo.';
+}
+function benchmarkReviewV3(force){
+ const panel=document.getElementById("exBenchmarkReviewV3");
+ if(!panel)return;
+ panel.hidden=false;
+ if(force)panel.open=true;
+}
 function showAdmin(){
  if(!isMain())return notify("Importação restrita ao administrador principal.");
  const slot=document.getElementById("execAdminSlotV1");if(!slot)return;
  const b=periodBounds(EX.period,latestDate());
  const fields=[["company_captured","Captação empresa (R$)"],["company_approved","Aprovado empresa (R$)"],["company_orders","Pedidos empresa"],["company_share","Share empresa (%)"],["regional_captured","Captação CE+PI (R$)"],["regional_orders","Pedidos CE+PI"],["regional_share","Share CE+PI (%)"]];
  EX.draft={period:EX.period,start_date:b.start_date,end_date:b.end_date,company_captured:"",company_approved:"",company_orders:"",company_share:"",regional_captured:"",regional_orders:"",regional_share:""};
- slot.innerHTML='<section class="execAdminV1" id="execBenchmarkAdminV1"><h3>Benchmark oficial | Empresa</h3>'+
- '<p class="execHelpV1">Anexe o print do relatório por regional. A leitura é feita no dispositivo, e os campos precisam ser conferidos antes de salvar. O intervalo do print deve coincidir com as datas abaixo.</p>'+
- '<div class="execInputsV1"><div class="execFieldV1"><label>Período</label><select id="exIn_period"><option value="day">D-1</option><option value="week">Semana</option><option value="month">Mês</option></select></div>'+
- '<div class="execFieldV1"><label>De</label><input id="exIn_start_date" type="date"></div><div class="execFieldV1"><label>Até</label><input id="exIn_end_date" type="date"></div>'+
- fields.map(([key,label])=>'<div class="execFieldV1"><label>'+label+'</label><input id="exIn_'+key+'" inputmode="decimal" placeholder="—"></div>').join("")+'</div>'+
- '<div style="display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:14px"><label class="execActionV1 orange" style="background:#DE7C00"><input id="exPrintFileV1" accept="image/*" type="file" onchange="execReadPrintV1(event)" hidden>▤ Ler print</label><button class="execActionV1" onclick="execSaveBenchmarkV1()">✓ Conferir e salvar</button><button class="execActionV1" style="background:#e2e5df;color:#173F35" onclick="document.getElementById(\'execAdminSlotV1\').innerHTML=\'\'">Fechar</button></div>'+
- '<p class="execHelpV1" id="exOcrStatusV1">Obrigatório: captação e share empresa. Nenhum número é preenchido por estimativa.</p></section>';
- document.getElementById("exIn_period").value=EX.period;
- Object.entries(EX.draft).forEach(([k,v])=>{const x=document.getElementById("exIn_"+k);if(x)x.value=v});
+ if(EX.ocrImageUrl){URL.revokeObjectURL(EX.ocrImageUrl);EX.ocrImageUrl=null}
+ slot.innerHTML='<section class="execAdminV1 execImportSimplifiedV3" id="execBenchmarkAdminV1">'+
+ '<h3>Benchmark oficial | Empresa</h3>'+
+ '<p class="execHelpV1">Anexe o print oficial com o resultado das regionais e total da empresa. O aplicativo realiza a leitura e preenche os números reconhecidos para conferência, sem estimativas.</p>'+
+ '<div class="execImportPeriodV3"><div class="execFieldV1"><label for="exIn_period">Período</label><select id="exIn_period" onchange="execBenchmarkPeriodChangedV3()"><option value="day">D-1</option><option value="week">Semana</option><option value="month">Mês</option></select></div>'+
+ '<div class="execImportDatesV3"><div id="exDayDateV3" class="execDayBadgeV3"></div>'+
+ '<div id="exDateRangeV3" class="execDateRangeV3" hidden><div class="execFieldV1"><label for="exIn_start_date">De</label><input id="exIn_start_date" type="date"></div>'+
+ '<div class="execFieldV1"><label for="exIn_end_date">Até</label><input id="exIn_end_date" type="date"></div></div>'+
+ '<small id="exDateHintV3" class="execHelpV1"></small></div></div>'+
+ '<label class="execUploadMainV3" for="exPrintFileV1"><span class="execUploadIconV3">▣</span><span><strong>Anexar print oficial</strong><small>Selecione a imagem da tela ou um print salvo no celular · PNG, JPG ou WEBP, até 8 MB</small></span><input id="exPrintFileV1" accept="image/*" type="file" onchange="execReadPrintV1(event)" hidden></label>'+
+ '<div id="exOcrStatusV1" class="execReadStatusV3" role="status" aria-live="polite">Aguardando o print para fazer a leitura automática.</div>'+
+ '<details id="exOriginalPrintV3" class="execOriginalPrintV3" hidden><summary>Visualizar o print original</summary><img id="exOriginalImageV3" alt="Print original anexado para conferir o benchmark" loading="lazy"></details>'+
+ '<details id="exBenchmarkReviewV3" class="execReviewV3" hidden><summary>Indicadores extraídos · conferir ou corrigir <span id="exReviewCountV3"></span></summary>'+
+ '<p class="execHelpV1">Os dados reconhecidos são apresentados abaixo. Corrija somente os campos que estiverem diferentes do print. Campos não identificados ficam em branco.</p>'+
+ '<div class="execInputsV1">'+fields.map(([key,label])=>'<div class="execFieldV1"><label for="exIn_'+key+'">'+label+'</label><input id="exIn_'+key+'" inputmode="decimal" autocomplete="off" placeholder="Não identificado" aria-label="'+label+'"></div>').join("")+'</div></details>'+
+ '<div class="execImportActionsV3"><button type="button" class="execActionV1" onclick="execBenchmarkReviewV3(true)">Revisar campos</button>'+
+ '<button type="button" class="execActionV1 execConfirmV3" onclick="execSaveBenchmarkV1()">✓ Conferir e salvar</button>'+
+ '<button type="button" class="execActionV1" style="background:#e2e5df;color:#173F35" onclick="document.getElementById(\'execAdminSlotV1\').innerHTML=\'\'">Fechar</button></div>'+
+ '<p class="execHelpV1">Obrigatório: captação e share da empresa. Se algum número não for reconhecido com segurança, o campo permanece vazio para correção; nenhum dado é estimado.</p></section>';
+ const periodEl=document.getElementById("exIn_period");if(periodEl)periodEl.value=EX.period;
+ benchmarkPeriodChangedV3();
  slot.scrollIntoView({behavior:"smooth",block:"start"});
 }
 async function loadLib(url,global){if(w[global])return w[global];await new Promise((resolve,reject)=>{const script=document.createElement("script");script.src=url;script.onload=resolve;script.onerror=()=>reject(Error("Biblioteca indisponível."));document.head.appendChild(script)});return w[global]}
+/* V3: leitura conservadora da linha total da empresa e da linha CE+PI. */
 function ocrParse(text){
- const lines=String(text||"").split(/\n/).map(x=>x.replace(/\s+/g," ").trim()).filter(Boolean);
- const find=(re)=>lines.find(x=>re.test(x))||"";
- const extract=(line)=>{const cap=(line.match(/R\$\s*[\d.,]+/)||[])[0];const pct=(line.match(/\d+(?:[.,]\d+)?\s*%/g)||[]).at(-1);const od=(line.match(/\s(\d{1,6})\s+R\$\s*[0.,]+/)||[])[1];
- return {captured:cap?numeric(cap):null,share:pct?numeric(pct):null,orders:od?Number(od):null}};
- return {company:extract(find(/^Total\b|^TOTAL\b/i)),regional:extract(find(/^CE\s*\+?\s*PI\b|^CE\s*PI\b/i))};
+ const lines=String(text||"").split(/\r?\n/).map(x=>x.replace(/\s+/g," ").trim()).filter(Boolean);
+ const normalize=x=>String(x||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/[|•]/g," ").replace(/\s+/g," ").trim();
+ const regionName=x=>/^(?:REGIONAL\s*)?CE\s*(?:\+|&|\/|\-|E)?\s*PI(?:\b|$)|^(?:REGIONAL\s*)?CEPI\b|^CEARA\s*(?:E|\/)\s*PIAUI\b/.test(normalize(x));
+ const companyName=x=>/^(?:(?:TOTAL|T0TAL)(?:\s+(?:GERAL|EMPRESA|NACIONAL))?|(?:MEDIA|MEDIA\s+GERAL|MEDIA\s+EMPRESA|EMPRESA|CONSOLIDADO(?:\s+GERAL)?|BRASIL)(?:\s+TOTAL)?)(?:\s|$)/.test(normalize(x));
+ const isOtherRow=x=>/^(?:REGIONAL\s+)?(?:[A-Z]{2}\s*(?:\+|\/)\s*[A-Z]{2}|TOTAL|EMPRESA|BRASIL|CONSOLIDADO|MEDIA)\b/.test(normalize(x));
+ function collect(test){
+  const candidates=[];
+  for(let i=0;i<lines.length;i++){
+   if(!test(lines[i]))continue;
+   let value=lines[i];
+   // OCR ocasionalmente envia valores da tabela na linha seguinte à identificação.
+   for(let j=1;j<=2&&i+j<lines.length&&!isOtherRow(lines[i+j])&&value.length<170;j++){
+    if((value.match(/%/g)||[]).length>=1&&(value.match(/R\$/g)||[]).length>=1)break;
+    value+=' '+lines[i+j];
+   }
+   const row=extract(value);
+   candidates.push({row,quality:[row.captured,row.approved,row.orders,row.share].filter(x=>x!=null).length,content:value});
+  }
+  candidates.sort((a,b)=>b.quality-a.quality);
+  return candidates[0]?.row||{captured:null,approved:null,orders:null,share:null};
+ }
+ function extract(line){
+  // Usar apenas percentuais explícitos; não confundir share com EV vs AA.
+  const shares=(line.match(/\b\d{1,2}[.,]\d{1,3}\s*%/g)||[])
+    .map(x=>numeric(x)).filter(x=>x!=null&&x>=0&&x<=5);
+  const share=shares.length===1?shares[0]:null;
+  const withoutShares=line.replace(/(?:^|[^\d])\d{1,2}[.,]\d{1,3}\s*%/g," ");
+  // Valor financeiro com R$ ou casas decimais e separador de milhar.
+  const rawAmounts=withoutShares.match(/R\$\s*[-+]?\d[\d.,]*|(?:\d{1,3}(?:\.\d{3})+|\d+),\d{2}(?!\d)/gi)||[];
+  const amounts=rawAmounts.map(x=>numeric(x)).filter(x=>x!=null&&x>=0);
+  const captured=amounts.length?amounts[0]:null;
+  const approved=amounts.length>1?amounts[1]:null;
+  // Pedidos apenas com rótulo explícito na mesma linha; nunca adivinhar.
+  const ordersMatch=line.match(/(?:pedidos?|qtd\.?\s*ped(?:idos)?)\s*[:\-]?\s*(\d{1,6})(?!\d)/i);
+  const orders=ordersMatch?Number(ordersMatch[1]):null;
+  return {captured,approved,orders,share};
+ }
+ return {company:collect(companyName),regional:collect(regionName),lines:lines.length};
 }
 async function readPrint(ev){
  const file=ev?.target?.files?.[0],status=document.getElementById("exOcrStatusV1");
- if(!file)return;if(!file.type.startsWith("image/")||file.size>8e6){notify("Envie uma imagem de até 8 MB.");return}
- if(status)status.textContent="Lendo imagem no dispositivo. A primeira leitura pode levar alguns segundos...";
+ if(!file)return;
+ if(!file.type.startsWith("image/")||file.size>8e6){notify("Envie uma imagem de até 8 MB.");return}
+ const review=document.getElementById("exBenchmarkReviewV3");
+ if(review){review.hidden=true;review.open=false}
+ for(const key of ["company_captured","company_approved","company_orders","company_share","regional_captured","regional_orders","regional_share"]){
+  const element=document.getElementById("exIn_"+key);if(element)element.value="";
+ }
+ if(EX.ocrImageUrl)URL.revokeObjectURL(EX.ocrImageUrl);
+ EX.ocrImageUrl=URL.createObjectURL(file);
+ const preview=document.getElementById("exOriginalImageV3"),details=document.getElementById("exOriginalPrintV3");
+ if(preview)preview.src=EX.ocrImageUrl;
+ if(details)details.hidden=false;
+ if(status){status.className="execReadStatusV3";status.textContent="Lendo o print e procurando o total da empresa e a linha CE+PI…";}
  try{
   const t=await loadLib("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js","Tesseract");
-  const result=await t.recognize(file,"por+eng");const parsed=ocrParse(result?.data?.text);
-  const fields=[["company_captured",parsed.company.captured],["company_orders",parsed.company.orders],["company_share",parsed.company.share],["regional_captured",parsed.regional.captured],["regional_orders",parsed.regional.orders],["regional_share",parsed.regional.share]];
+  const result=await t.recognize(file,"por+eng");
+  EX.ocrText=result?.data?.text||"";
+  const parsed=ocrParse(EX.ocrText);
+  const fields=[["company_captured",parsed.company.captured],["company_approved",parsed.company.approved],
+    ["company_orders",parsed.company.orders],["company_share",parsed.company.share],
+    ["regional_captured",parsed.regional.captured],["regional_orders",parsed.regional.orders],
+    ["regional_share",parsed.regional.share]];
+  // Valores impossíveis permanecem sem publicação, aguardando conferência.
+  if(parsed.company.captured!=null&&parsed.regional.captured!=null&&parsed.company.captured<parsed.regional.captured)
+   fields.forEach(item=>{if(item[0]==="company_captured")item[1]=null});
   let found=0;
-  fields.forEach(([key,v])=>{const el=document.getElementById("exIn_"+key);if(el&&v!=null){el.value=String(v).replace(".",",");found++}});
-  if(status)status.textContent=found?"Leitura preliminar: "+found+" campos identificados. Confira TODOS com o print original antes de salvar.":"Não foi possível identificar as linhas. Digite os campos do relatório manualmente.";
- }catch(err){if(status)status.textContent="Leitura automática indisponível ("+String(err.message||err)+"). Informe os valores manualmente."}
+  fields.forEach(([key,value])=>{
+   const el=document.getElementById("exIn_"+key);
+   if(el&&value!=null){el.value=String(value).replace(".",",");found++}
+  });
+  if(review){review.hidden=false;review.open=true}
+  const count=document.getElementById("exReviewCountV3");if(count)count.textContent=found+" de 7";
+  const mandatory=fields.find(x=>x[0]==="company_captured")?.[1]!=null&&parsed.company.share!=null;
+  if(status){
+   status.className="execReadStatusV3 "+(mandatory?"success":"warning");
+   status.textContent=mandatory?
+    "Leitura concluída: "+found+" de 7 campos reconhecidos. Confira os valores com o print e salve. Os campos em branco são opcionais, exceto captação e share empresa.":
+    "Leitura parcial: "+found+" de 7 campos. Captação ou share da empresa não foram reconhecidos com segurança. Confira o print e corrija somente os campos pendentes antes de salvar.";
+  }
+ }catch(err){
+  if(review){review.hidden=false;review.open=true}
+  if(status){status.className="execReadStatusV3 warning";status.textContent="Não foi possível ler este print automaticamente ("+String(err.message||err)+"). Confira a imagem original e use os campos de correção."}
+ }
 }
 async function saveBenchmark(){
  if(!isMain())return notify("Importação não autorizada.");
@@ -516,6 +614,8 @@ w.executivePanelViewV1=executivePanelViewV1;
 w.loadExecutiveV1=loadExecutiveV1;
 w.execSetPeriodV1=setPeriod;
 w.execRefreshV1=loadExecutiveV1;
+w.execBenchmarkPeriodChangedV3=benchmarkPeriodChangedV3;
+w.execBenchmarkReviewV3=benchmarkReviewV3;
 w.execShowAdminV1=showAdmin;
 w.execSaveBenchmarkV1=saveBenchmark;
 w.execReadPrintV1=readPrint;
