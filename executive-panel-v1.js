@@ -6,7 +6,7 @@
 (function(w){
 "use strict";
 const API_EXEC="https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-executive";
-const STORES=["073","084","108","113","138","142","146","175","177","222","238","258","262","314","318","344","350","552"];
+const STORES=["073","084","108","109","113","138","142","146","175","177","222","238","258","262","314","318","344","350","552"];
 const EX={
  period:"day",data:null,loading:false,error:"",fca:null,ranking:null,highlight:null,date:null,
  draft:null,ocrText:"",active:false
