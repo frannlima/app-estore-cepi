@@ -25,7 +25,7 @@ const firstMonth=(d)=>d.slice(0,7)+"-01";
 const same=(a,b)=>String(a||"")===String(b||"");
 const logo="./assets/riachuelo-logo-horizontal-oficial-white-v133.svg";
 const riaLogo="./assets/ria-marca-executivo.svg";
-const verticalLogo="./assets/ria-vertical-anexo-v188.svg";
+const executiveHeaderLogo="./assets/ria-vertical-header-light-v195.svg";
 function notify(msg){let el=document.createElement("div");el.className="execToastV1";el.textContent=msg;document.body.append(el);setTimeout(()=>el.remove(),4700)}
 async function exApi(body){const r=await fetch(API_EXEC,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});const j=await r.json().catch(()=>({}));if(!r.ok||j.error)throw Error(j.error||"Falha de comunicação");return j}
 function storeName(st){try{return typeof storeDisplayName==="function"?storeDisplayName(st):""}catch(_){return""}}
@@ -530,10 +530,12 @@ function paintShare(ctx,data){
  const bottom=data.detailBottom, podiumY=bottom+70;
  ctx.fillStyle=S;ctx.fillRect(0,0,1080,data.height);
  ctx.fillStyle=G;ctx.fillRect(0,0,1080,206);
- box(45,13,143,180,"#F7F5EF",16); // marca vertical do anexo é desenhada sobre essa área no final
- fit("eStore | CE+PI",245,69,54,790,true,W);
- print("PAINEL EXECUTIVO DE RESULTADOS",247,118,25,true,"#D3E4DC");
- box(245,151,575,41,O,9);fit(period+" • "+data.dateLabel,268,171,27,530,true,W);
+ // Cabeçalho integrado: textos alinhados à esquerda e marca transparente à direita,
+ // sem caixa, moldura ou fundo adicional atrás do logo.
+ fit("eStore | CE+PI",58,70,54,755,true,W);
+ print("PAINEL EXECUTIVO DE RESULTADOS",60,120,25,true,"#D3E4DC");
+ box(58,151,706,42,O,9);
+ fit(period+" • "+data.dateLabel,78,172,27,665,true,W);
  ctx.fillStyle=O;ctx.fillRect(0,206,1080,6);
 
  const metrics=[["CAPTAÇÃO CE+PI",money2(data.captured)],["PEDIDOS",count(data.orders)],["SHARE REGIONAL",percent(data.regionalShare)]];
@@ -642,10 +644,24 @@ async function shareCard(){
   const ctx=canvas.getContext("2d",{alpha:false});if(!ctx)throw Error("Canvas indisponível");
   await document.fonts?.ready;
   model.avatars=await Promise.all(ordered.map(x=>x?imageForCanvas(colPhoto(x)):Promise.resolve(null)));
-  const ria=await imageForCanvas(verticalLogo);
+  const headerLogo=await imageForCanvas(executiveHeaderLogo);
   paintShare(ctx,model);
-  if(ria)ctx.drawImage(ria,59,22,118,158);
-  else{ctx.font="900 57px Arial";ctx.fillStyle="#173F35";ctx.fillText("RIA",58,102)}
+  // Marca original RIA / CHU / ELO em versão clara e transparente, no próprio
+  // fundo verde do cabeçalho. Região reservada: x=910..1032; y=22..182.
+  if(headerLogo){
+   const maxW=116,maxH=155;
+   const iw=headerLogo.naturalWidth||950,ih=headerLogo.naturalHeight||1268;
+   const scale=Math.min(maxW/iw,maxH/ih);
+   const wLogo=iw*scale,hLogo=ih*scale;
+   const xLogo=1080-54-(maxW+wLogo)/2, yLogo=27+(maxH-hLogo)/2;
+   ctx.drawImage(headerLogo,xLogo,yLogo,wLogo,hLogo);
+  }else{
+   // Carregamento do SVG indisponível: fallback tipográfico sem fundo.
+   ctx.font="800 30px Larsseit,Arial,sans-serif";
+   ctx.fillStyle="#F7F5EF";ctx.textAlign="center";ctx.textBaseline="middle";
+   ["RIA","CHU","ELO"].forEach((line,i)=>ctx.fillText(line,968,61+i*41));
+   ctx.textAlign="left";
+  }
   const blob=await new Promise(r=>canvas.toBlob(r,"image/png",.98));
   if(!blob)throw Error("Falha ao gerar PNG");
   const file=new File([blob],"Painel_eStore_CEPI_"+EX.period+"_"+latestDate()+".png",{type:"image/png"});
