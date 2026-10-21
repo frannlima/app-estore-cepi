@@ -20,6 +20,7 @@ const percent=(v)=>v==null?"—":(n(v)*100).toLocaleString("pt-BR",{minimumFract
 const pp=(v)=>v==null?"—":(v>0?"+":"")+(n(v)*100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+" p.p.";
 const dia=(v)=>v?String(v).split("-").reverse().join("/"):"—";
 const isoWeek=(d)=>{let x=new Date(d+"T12:00:00Z"),z=x.getUTCDay()||7;x.setUTCDate(x.getUTCDate()-z+1);return x.toISOString().slice(0,10)};
+function weekNumber(d){const x=new Date(d+"T12:00:00Z"),t=new Date(Date.UTC(x.getUTCFullYear(),x.getUTCMonth(),x.getUTCDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const first=new Date(Date.UTC(t.getUTCFullYear(),0,1));return Math.ceil((((t-first)/86400000)+1)/7)}
 const firstMonth=(d)=>d.slice(0,7)+"-01";
 const same=(a,b)=>String(a||"")===String(b||"");
 const logo="./assets/riachuelo-logo-horizontal-oficial-white-v133.svg";
@@ -135,7 +136,7 @@ function drawChart(rows){
  for(let i=0;i<4;i++){let y=top+i*plot/3,unit=max*(3-i)/3;a+='<line x1="'+left+'" x2="'+(W-right)+'" y1="'+y+'" y2="'+y+'" stroke="#e5e8e4"/><text x="'+(left-6)+'" y="'+(y+5)+'" text-anchor="end" fill="#66746b" font-size="13">'+(unit>=1000?(unit/1000).toFixed(1)+"k":Math.round(unit))+'</text>'}
  rows.forEach((x,i)=>{const bx=left+i*bw+bw*.15,w=bw*.68,h=plot*x.captured/max,y=top+plot-h;
  a+='<rect x="'+bx+'" y="'+y+'" width="'+w+'" height="'+Math.max(0,h)+'" rx="5" fill="'+(i===rows.length-1?"#DE7C00":"#173F35")+'"/>'+
- '<text x="'+(bx+w/2)+'" y="'+(H-10)+'" text-anchor="middle" font-size="13" fill="#51635b">'+(EX.period==="month"?"Sem. "+String(Number(isoWeek(x.date).slice(8,10))):x.date.slice(8))+'</text>';
+ '<text x="'+(bx+w/2)+'" y="'+(H-10)+'" text-anchor="middle" font-size="13" fill="#51635b">'+(EX.period==="month"?"Sem. "+weekNumber(x.date):x.date.slice(8))+'</text>';
  if(i===rows.length-1)a+='<text x="'+(bx+w/2)+'" y="'+Math.max(14,y-7)+'" font-size="14" font-weight="bold" text-anchor="middle" fill="#b96200">'+count(x.captured)+'</text>';
  });
  return a+"</svg>";
