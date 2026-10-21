@@ -6,7 +6,7 @@
 (function(w){
 "use strict";
 const API_EXEC="https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-executive";
-const STORES=["073","084","108","109","113","138","142","146","175","177","222","238","258","262","314","318","344","350","552"];
+const STORES=["073","084","108","113","138","142","146","175","177","222","238","258","262","314","318","344","350","552"];
 const EX={
  period:"day",data:null,loading:false,error:"",fca:null,ranking:null,highlight:null,date:null,
  draft:null,ocrText:"",active:false
@@ -23,6 +23,7 @@ const isoWeek=(d)=>{let x=new Date(d+"T12:00:00Z"),z=x.getUTCDay()||7;x.setUTCDa
 const firstMonth=(d)=>d.slice(0,7)+"-01";
 const same=(a,b)=>String(a||"")===String(b||"");
 const logo="./assets/riachuelo-logo-horizontal-oficial-white-v133.svg";
+const riaLogo="./assets/ria-marca-executivo.svg";
 function notify(msg){let el=document.createElement("div");el.className="execToastV1";el.textContent=msg;document.body.append(el);setTimeout(()=>el.remove(),4700)}
 async function exApi(body){const r=await fetch(API_EXEC,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});const j=await r.json().catch(()=>({}));if(!r.ok||j.error)throw Error(j.error||"Falha de comunicação");return j}
 function storeName(st){try{return typeof storeDisplayName==="function"?storeDisplayName(st):""}catch(_){return""}}
@@ -33,7 +34,15 @@ function isGuest(){try{return typeof isDemo==="function"&&isDemo()}catch(_){retu
 function currentAsOf(){return String(w.COMMON?.asof||w.DB?.asof||"")}
 function latestDate(){return EX.date||EX.data?.daily?.at(-1)?.date||currentAsOf()}
 function periodBounds(period,date){return {period,start_date:period==="day"?date:period==="week"?isoWeek(date):firstMonth(date),end_date:date}}
-function matchBenchmark(){const b=periodBounds(EX.period,latestDate());return (EX.data?.benchmarks||[]).find(x=>x.period===b.period&&same(x.start_date,b.start_date)&&same(x.end_date,b.end_date))||null}
+function rawBenchmark(){const b=periodBounds(EX.period,latestDate());return (EX.data?.benchmarks||[]).find(x=>x.period===b.period&&same(x.start_date,b.start_date)&&same(x.end_date,b.end_date))||null}
+function validBenchmark(b,regionalCap){
+ if(!b)return false;
+ // Evitar que OCR incorreto publique 45,00% no lugar de 0,45% ou capture LY como captado.
+ const share=Number(b.company_share),cap=Number(b.company_captured);
+ return Number.isFinite(share)&&share>=0&&share<=.05&&Number.isFinite(cap)&&cap>=0
+   &&!(regionalCap>0&&cap+.01<regionalCap);
+}
+function matchBenchmark(){const b=rawBenchmark();const regional=EX.data?.daily?.filter(x=>x.date>=periodBounds(EX.period,latestDate()).start_date&&x.date<=latestDate()).reduce((s,x)=>s+x.stores.filter(y=>STORES.includes(y.st)).reduce((q,y)=>q+n(y.c),0),0)||0;return validBenchmark(b,regional)?b:null}
 function numeric(v){if(v==null||v==="")return null;const c=String(v).trim().replace(/R\$|%|\s/g,"");if(!c)return null;let s=c;if(c.includes(","))s=c.replace(/\./g,"").replace(",",".");else if((c.match(/\./g)||[]).length>1)s=c.replace(/\./g,"");const x=Number(s);return Number.isFinite(x)?x:null}
 function dailyRows(date){const d=(EX.data?.daily||[]).find(x=>x.date===date);return d?d.stores.filter(x=>STORES.includes(x.st)):[]}
 function baseRows(period){const rows=w.COMMON?.regional?.[period]||[];return rows.filter(x=>STORES.includes(String(x.st||"").padStart(3,"0"))).map(x=>({...x,st:String(x.st).padStart(3,"0")}))}
@@ -75,34 +84,67 @@ function opportunities(){
  const regTarget=base.reduce((s,x)=>s+n(x.ee),0);
  return {zeros:v,missing,potential,ratio:have&&regTarget>0?potential/regTarget:null};
 }
-function trendData(){const end=latestDate(),start=EX.period==="day"?null:periodBounds(EX.period,end).start_date;
- let a=(EX.data?.daily||[]).filter(x=>x.date<=end&&(!start||x.date>=start)).slice(-8);
- if(!a.length)a=(EX.data?.daily||[]).slice(-8);
- const bm=EX.data?.benchmarks||[];
- return a.map(x=>{
-  const b=bm.find(z=>z.period==="day"&&z.end_date===x.date);
-  return {date:x.date,captured:x.stores.reduce((s,y)=>s+n(y.c),0),companyShare:b?.company_share==null?null:n(b.company_share)};
- });
+function trendData(){
+ const end=latestDate(),start=periodBounds(EX.period,end).start_date;
+ const days=(EX.data?.daily||[]).filter(x=>x.date>=start&&x.date<=end);
+ const grouped=new Map();
+ for(const d of days){
+  const key=EX.period==="month"?isoWeek(d.date):d.date;
+  const item=grouped.get(key)||{date:d.date,until:d.date,captured:0,coverage:0};
+  item.captured+=d.stores.filter(x=>STORES.includes(x.st)).reduce((sum,x)=>sum+n(x.c),0);
+  item.until=d.date;item.coverage++;
+  grouped.set(key,item);
+ }
+ return [...grouped.values()].sort((a,b)=>a.date.localeCompare(b.date));
 }
-function top3HTML(title,rows,key,format){return '<div class="execMiniV1"><h4>'+e(title)+'</h4>'+(
- rows.length?rows.map((x,i)=>'<div class="execMiniRowV1"><span class="execMedalV1">'+(i+1)+'</span><b>'+e(x.st)+'</b><b>'+format(x[key])+'</b></div>').join(""):'<small>Sem dados confirmados.</small>'
- )+'</div>'}
+function firstTwoNames(name){
+ const parts=String(name||"").replace(/\s+/g," ").trim().split(" ").filter(Boolean);
+ return parts.slice(0,2).join(" ")||"Colaborador";
+}
+function displayColName(p){
+ try{return firstTwoNames(typeof preferredName==="function"?preferredName(p.id,p.name):p.name)}
+ catch(_){return firstTwoNames(p.name)}
+}
+function colPhoto(p){
+ const id=String(p?.id||"");
+ try{
+  if(typeof APP_PROFILE_PHOTOS!=="undefined"&&APP_PROFILE_PHOTOS[id])return APP_PROFILE_PHOTOS[id];
+  if(typeof CONTENT!=="undefined"&&CONTENT?.profilePhotos?.[id])return CONTENT.profilePhotos[id];
+  if(typeof U!=="undefined"&&String(U?.u?.id||"")===id&&typeof profilePhotoV3==="function")return profilePhotoV3()||"";
+ }catch(_){}
+ return "";
+}
+function podiumItem(p,pos){
+ if(!p)return '<div class="execPodiumPersonV2 empty">Sem resultado confirmado</div>';
+ const photo=colPhoto(p),name=displayColName(p),initials=name.split(" ").slice(0,2).map(x=>x[0]).join("");
+ const mark='<span class="execStoreMarkV2"><img src="'+riaLogo+'" alt="RIA"><b>'+e(p.st)+'</b></span>';
+ return '<div class="execPodiumPersonV2 place'+pos+'"><span class="execPlaceV2">'+pos+'º</span>'+
+ '<div class="execPhotoV2">'+(photo?'<img src="'+e(photo)+'" alt="Foto do colaborador" loading="lazy" referrerpolicy="no-referrer">':'<span>'+e(initials)+'</span>')+'</div>'+
+ '<b class="execNameV2">'+e(name)+'</b>'+mark+'<strong class="execAmountV2">'+money(p.c)+'</strong></div>';
+}
+function top3HTML(title,rows,key,format){
+ return '<div class="execMiniV1"><h4>'+e(title)+'</h4><div class="execMiniListV2">'+(
+ rows.length?rows.map((x,i)=>'<div class="execMiniRowV1"><span class="execMedalV1">'+(i+1)+'</span><b class="execStoreV2">'+e(x.st)+'</b><strong>'+format(x[key])+'</strong></div>').join(""):'<span class="execHelpV1">Aguardando dados</span>'
+ )+'</div></div>';
+}
 function drawChart(rows){
- if(!rows.length)return '<p class="execHelpV1">Sem histórico gerencial disponível para o período.</p>';
- const W=740,H=225,left=32,right=28,top=20,bottom=35;
- const max=Math.max(1,...rows.map(x=>x.captured));const maxY=max*1.25,plot=H-bottom-top,bw=(W-left-right)/rows.length;
- let a='<svg xmlns="http://www.w3.org/2000/svg" class="execChartV1" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Evolução da captação regional por dia; pontos laranja representam share oficial da empresa">';
- for(let i=0;i<4;i++){const y=top+plot*i/3,v=maxY*(3-i)/3;a+='<line x1="'+left+'" y1="'+y+'" x2="'+(W-right)+'" y2="'+y+'" stroke="#e1e3de"/><text x="'+(left-6)+'" y="'+(y+3)+'" font-size="10" fill="#6c746e" text-anchor="end">'+Math.round(v/1000)+'k</text>'}
- rows.forEach((x,i)=>{let x0=left+i*bw+bw*.20,w=bw*.58,h=plot*x.captured/maxY,y=top+plot-h,col=i===rows.length-1?"#DE7C00":"#173F35";
-  a+='<rect x="'+x0+'" y="'+y+'" width="'+w+'" height="'+Math.max(0,h)+'" rx="4" fill="'+col+'"/>';
-  a+='<text x="'+(x0+w/2)+'" y="'+(H-14)+'" text-anchor="middle" font-size="10" fill="#56615d">'+x.date.slice(8)+'/'+x.date.slice(5,7)+'</text>';
-  if(i===rows.length-1)a+='<text x="'+(x0+w/2)+'" y="'+Math.max(12,y-7)+'" text-anchor="middle" font-weight="bold" font-size="13" fill="#D77500">'+count(x.captured)+'</text>';
+ if(!rows.length)return '<p class="execHelpV1">Ainda não há histórico gerencial suficiente para o período.</p>';
+ const W=700,H=224,left=45,right=12,top=25,bottom=37,plot=H-top-bottom,max=Math.max(1,...rows.map(x=>x.captured))*1.18;
+ const bw=(W-left-right)/rows.length;
+ let a='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" class="execChartV1" role="img" aria-label="Captação regional oficial por '+(EX.period==="week"?"dia":"semana")+'">';
+ for(let i=0;i<4;i++){let y=top+i*plot/3,unit=max*(3-i)/3;a+='<line x1="'+left+'" x2="'+(W-right)+'" y1="'+y+'" y2="'+y+'" stroke="#e5e8e4"/><text x="'+(left-6)+'" y="'+(y+5)+'" text-anchor="end" fill="#66746b" font-size="13">'+(unit>=1000?(unit/1000).toFixed(1)+"k":Math.round(unit))+'</text>'}
+ rows.forEach((x,i)=>{const bx=left+i*bw+bw*.15,w=bw*.68,h=plot*x.captured/max,y=top+plot-h;
+ a+='<rect x="'+bx+'" y="'+y+'" width="'+w+'" height="'+Math.max(0,h)+'" rx="5" fill="'+(i===rows.length-1?"#DE7C00":"#173F35")+'"/>'+
+ '<text x="'+(bx+w/2)+'" y="'+(H-10)+'" text-anchor="middle" font-size="13" fill="#51635b">'+(EX.period==="month"?"Sem. "+String(Number(isoWeek(x.date).slice(8,10))):x.date.slice(8))+'</text>';
+ if(i===rows.length-1)a+='<text x="'+(bx+w/2)+'" y="'+Math.max(14,y-7)+'" font-size="14" font-weight="bold" text-anchor="middle" fill="#b96200">'+count(x.captured)+'</text>';
  });
- const sharePoints=rows.map((x,i)=>x.companyShare==null?null:{x:left+i*bw+bw*.49,y:top+plot-plot*Math.min(1,(x.companyShare*100)/2.0),p:x.companyShare}).filter(Boolean);
- if(sharePoints.length>=2)a+='<polyline fill="none" stroke="#DE7C00" stroke-width="2.5" stroke-linejoin="round" points="'+sharePoints.map(x=>x.x+','+x.y).join(" ")+'"/>';
- for(const x of sharePoints)a+='<circle cx="'+x.x+'" cy="'+x.y+'" r="4.5" fill="#DE7C00" stroke="#fff" stroke-width="1"/>';
- a+='<text x="'+(W-4)+'" y="12" font-size="10" fill="#DE7C00" text-anchor="end">Share empresa (escala até 2%)</text></svg>';
- return a;
+ return a+"</svg>";
+}
+function dailyStoreChart(rows){
+ const items=[...rows].filter(x=>n(x.c)>0).sort((a,b)=>n(b.c)-n(a.c)).slice(0,5);
+ if(!items.length)return '<div class="execHelpV1">Sem captação registrada no período diário.</div>';
+ const max=Math.max(1,...items.map(x=>n(x.c)));
+ return '<div class="execTopStoreChartV2">'+items.map((x,i)=>'<div class="execStoreBarV2"><span class="execStoreRankV2">'+(i+1)+'º</span><strong>RIA '+e(x.st)+'</strong><div class="execStoreBarTrackV2"><i style="width:'+Math.max(2,n(x.c)/max*100)+'%;background:'+(i===0?"#DE7C00":"#173F35")+'"></i></div><b>'+money(x.c)+'</b></div>').join("")+'</div>';
 }
 function executivePanelViewV1(){
  if(!isLeader())return '<div class="notice">Painel Executivo disponível para supervisores e gestores.</div>';
