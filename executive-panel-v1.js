@@ -174,10 +174,12 @@ function colPhoto(p){
 function podiumItem(p,pos){
  if(!p)return '<div class="execPodiumPersonV2 empty">Sem resultado confirmado</div>';
  const photo=colPhoto(p),name=displayColName(p),initials=name.split(" ").slice(0,2).map(x=>x[0]).join("");
- const mark='<span class="execStoreMarkV2"><img src="'+verticalLogo+'" alt="RIA"><b>'+e(p.st)+'</b></span>';
- return '<div class="execPodiumPersonV2 place'+pos+'"><span class="execPlaceV2">'+pos+'º</span>'+
+ const medal=pos===1?'🏅':pos===2?'🥈':'🥉';
+ const place='<span class="execPlaceV2 execPlaceWithMedalV3" aria-label="'+pos+'º lugar"><span class="execRankMedalV3" aria-hidden="true">'+medal+'</span><strong>'+pos+'º</strong></span>';
+ const store='<span class="execStoreTextV3">L '+e(String(p.st||'').padStart(3,'0'))+'</span>';
+ return '<div class="execPodiumPersonV2 place'+pos+'">'+place+
  '<div class="execPhotoV2">'+(photo?'<img src="'+e(photo)+'" alt="Foto do colaborador" loading="lazy" referrerpolicy="no-referrer">':'<span>'+e(initials)+'</span>')+'</div>'+
- '<b class="execNameV2">'+e(name)+'</b>'+mark+'<strong class="execAmountV2">'+money(p.c)+'</strong></div>';
+ '<b class="execNameV2">'+e(name)+'</b>'+store+'<strong class="execAmountV2">'+money(p.c)+'</strong></div>';
 }
 function top3HTML(title,rows,key,format){
  return '<div class="execMiniV1"><h4>'+e(title)+'</h4><div class="execMiniListV2">'+(
@@ -595,8 +597,10 @@ function paintShare(ctx,data){
  for(let i=0;i<3;i++){
   const x=46+335*i,person=order[i];
   box(x,podiumY,321,302,i===1?"#FBE1AB":"#EFF0EC",19);
-  box(x+134,podiumY+16,52,39,i===1?O:"#466964",17);
-  print(no[i]+"º",x+160,podiumY+36,24,true,W,"center");
+  // Medalha e colocação com contraste, iguais ao pódio da tela.
+  box(x+98,podiumY+13,125,45,i===1?"#DE7C00":"#466964",17);
+  print(no[i]===1?"🏅":no[i]===2?"🥈":"🥉",x+125,podiumY+36,30,false,W,"center");
+  print(no[i]+"º",x+190,podiumY+36,28,true,W,"center");
   if(!person)continue;
   const avatar=data.avatars?.[i];
   ctx.save();ctx.beginPath();ctx.arc(x+160,podiumY+112,48,0,Math.PI*2);ctx.clip();
@@ -604,8 +608,7 @@ function paintShare(ctx,data){
   else{ctx.fillStyle="#D4E3D9";ctx.fillRect(x+112,podiumY+64,96,96);print(displayColName(person).slice(0,1),x+160,podiumY+113,37,true,G,"center")}
   ctx.restore();
   fit(displayColName(person),x+160,podiumY+192,29,292,true,G,"center");
-  if(data.verticalMark){ctx.drawImage(data.verticalMark,x+121,podiumY+221,20,27);fit(String(person.st),x+157,podiumY+235,25,162,true,"#466964","left")}
-  else fit("RIA "+person.st,x+160,podiumY+236,25,281,true,"#466964","center");
+  fit("L "+String(person.st||"").padStart(3,"0"),x+160,podiumY+236,29,285,true,G,"center");
   fit(money2(person.c),x+160,podiumY+280,35,293,true,G,"center");
  }
  ctx.fillStyle=G;ctx.fillRect(0,data.height-90,1080,90);
@@ -632,7 +635,6 @@ async function shareCard(){
   await document.fonts?.ready;
   model.avatars=await Promise.all(ordered.map(x=>x?imageForCanvas(colPhoto(x)):Promise.resolve(null)));
   const ria=await imageForCanvas(verticalLogo);
-  model.verticalMark=ria;
   paintShare(ctx,model);
   if(ria)ctx.drawImage(ria,59,22,118,158);
   else{ctx.font="900 57px Arial";ctx.fillStyle="#173F35";ctx.fillText("RIA",58,102)}
