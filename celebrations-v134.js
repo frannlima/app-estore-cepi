@@ -142,24 +142,10 @@
     }catch(_){}
   }
 
-  function ensureBackButton(){
-    let btn=document.getElementById("backMeuAcompanhamentoV2");
-    if(btn) return btn;
-    btn=document.createElement("button");
-    btn.id="backMeuAcompanhamentoV2";
-    btn.type="button";
-    btn.setAttribute("aria-label","Voltar para Meu Acompanhamento");
-    btn.innerHTML='<span aria-hidden="true">←</span><b>Meu Acompanhamento</b>';
-    btn.style.cssText=[
-      "position:fixed","left:max(10px,env(safe-area-inset-left))","top:max(10px,env(safe-area-inset-top))",
-      "z-index:2147483000","display:flex","align-items:center","gap:7px","min-height:38px",
-      "padding:7px 11px","border:1px solid rgba(255,255,255,.42)","border-radius:999px",
-      "background:#173F35","color:#fff","font:700 11px Arial,sans-serif",
-      "box-shadow:0 8px 22px rgba(23,63,53,.22)","cursor:pointer"
-    ].join(";");
-    btn.onclick=function(){location.href=MAIN_URL};
-    document.body.appendChild(btn);
-    return btn;
+  // O retorno continua possível pela navegação entre apps, mas sem botão
+  // flutuante fixo cobrindo a identidade e os menus do eStore.
+  function removeLegacyBackButton(){
+    document.getElementById("backMeuAcompanhamentoV2")?.remove();
   }
 
   function userReady(){
@@ -196,7 +182,7 @@
   }
 
   async function launch(){
-    ensureBackButton();
+    removeLegacyBackButton();
 
     if(source!=="meu-acompanhamento" || !target) return;
 
