@@ -137,7 +137,7 @@ function colPhoto(p){
 function podiumItem(p,pos){
  if(!p)return '<div class="execPodiumPersonV2 empty">Sem resultado confirmado</div>';
  const photo=colPhoto(p),name=displayColName(p),initials=name.split(" ").slice(0,2).map(x=>x[0]).join("");
- const mark='<span class="execStoreMarkV2"><img src="'+riaLogo+'" alt="RIA"><b>'+e(p.st)+'</b></span>';
+ const mark='<span class="execStoreMarkV2"><img src="'+verticalLogo+'" alt="RIA"><b>'+e(p.st)+'</b></span>';
  return '<div class="execPodiumPersonV2 place'+pos+'"><span class="execPlaceV2">'+pos+'º</span>'+
  '<div class="execPhotoV2">'+(photo?'<img src="'+e(photo)+'" alt="Foto do colaborador" loading="lazy" referrerpolicy="no-referrer">':'<span>'+e(initials)+'</span>')+'</div>'+
  '<b class="execNameV2">'+e(name)+'</b>'+mark+'<strong class="execAmountV2">'+money(p.c)+'</strong></div>';
@@ -469,7 +469,8 @@ function paintShare(ctx,data){
   else{ctx.fillStyle="#D4E3D9";ctx.fillRect(x+112,podiumY+64,96,96);print(displayColName(person).slice(0,1),x+160,podiumY+113,37,true,G,"center")}
   ctx.restore();
   fit(displayColName(person),x+160,podiumY+192,29,292,true,G,"center");
-  fit("RIA "+person.st,x+160,podiumY+236,25,281,true,"#466964","center");
+  if(data.verticalMark){ctx.drawImage(data.verticalMark,x+121,podiumY+221,20,27);fit(String(person.st),x+157,podiumY+235,25,162,true,"#466964","left")}
+  else fit("RIA "+person.st,x+160,podiumY+236,25,281,true,"#466964","center");
   fit(money2(person.c),x+160,podiumY+280,35,293,true,G,"center");
  }
  ctx.fillStyle=G;ctx.fillRect(0,data.height-90,1080,90);
@@ -495,8 +496,9 @@ async function shareCard(){
   const ctx=canvas.getContext("2d",{alpha:false});if(!ctx)throw Error("Canvas indisponível");
   await document.fonts?.ready;
   model.avatars=await Promise.all(ordered.map(x=>x?imageForCanvas(colPhoto(x)):Promise.resolve(null)));
-  paintShare(ctx,model);
   const ria=await imageForCanvas(verticalLogo);
+  model.verticalMark=ria;
+  paintShare(ctx,model);
   if(ria)ctx.drawImage(ria,59,22,118,158);
   else{ctx.font="900 57px Arial";ctx.fillStyle="#173F35";ctx.fillText("RIA",58,102)}
   const blob=await new Promise(r=>canvas.toBlob(r,"image/png",.98));
