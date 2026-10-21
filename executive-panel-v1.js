@@ -72,19 +72,56 @@ function regionalData(){
 function activeStores(){const day=dailyRows(latestDate());const r=regionalData();return EX.period==="day"?(day.length?day:r.rows):r.rows}
 function topRows(type){return [...activeStores()].sort((a,b)=>n(b[type])-n(a[type])||a.st.localeCompare(b.st)).filter(x=>type==="share"?x.share!=null:n(x[type])>0).slice(0,3)}
 function topCollaborators(){return (EX.ranking?.regional||[]).filter(x=>n(x.c)>0).sort((a,b)=>n(b.c)-n(a.c)).slice(0,3)}
+/* Indicadores de dispersão apurados exclusivamente com inputs oficiais e metas da data. */
 function opportunities(){
- const day=EX.data?.daily?.find(x=>x.date===latestDate());
- if(EX.period!=="day"||!day)return {zeros:[],missing:[],potential:null,ratio:null};
- const present=new Set(day.stores.map(x=>x.st));
- const missing=STORES.filter(x=>!present.has(x));
- const zeros=day.stores.filter(x=>STORES.includes(x.st)&&n(x.c)===0&&n(x.o)===0);
- // Meta é extraída de Gestão/Lojas para a data. Não substituímos meta ausente por valores inventados.
- const base=same(currentAsOf(),latestDate())?baseRows("day"):[];
- const v=zeros.map(x=>({st:x.st,target:base.find(y=>y.st===x.st)?.ee??null}));
- const have=v.every(x=>x.target!=null);
- const potential=have?v.reduce((s,x)=>s+n(x.target),0):null;
- const regTarget=base.reduce((s,x)=>s+n(x.ee),0);
- return {zeros:v,missing,potential,ratio:have&&regTarget>0?potential/regTarget:null};
+ const bounds=periodBounds(EX.period,latestDate());
+ const start=bounds.start_date,end=bounds.end_date;
+ const daily=new Map((EX.data?.daily||[]).filter(x=>x.date>=start&&x.date<=end).map(x=>[x.date,x]));
+ const byStore=new Map(),incompleteDays=[],daysMissing=[],allDates=[];
+ let regionCaptured=0,daysCovered=0,zeroDays=0,missingGoals=0;
+ if(!start||!end)return {zeros:[],missing:[],potential:null,ratio:null,regionalCaptured:null,daysCovered:0,daysExpected:0,zeroDays:0,complete:false};
+ const cursor=new Date(start+"T12:00:00Z"),last=new Date(end+"T12:00:00Z");
+ for(let count=0;cursor<=last&&count<35;count++,cursor.setUTCDate(cursor.getUTCDate()+1)){
+  const date=cursor.toISOString().slice(0,10);allDates.push(date);
+  const entry=daily.get(date);
+  if(!entry){daysMissing.push(date);continue}
+  const stores=new Map((entry.stores||[]).filter(x=>STORES.includes(String(x.st||"").padStart(3,"0")))
+   .map(x=>[String(x.st).padStart(3,"0"),x]));
+  if(stores.size!==STORES.length)incompleteDays.push(date);
+  daysCovered++;
+  for(const [st,item] of stores){
+   const captured=Number(item.c),orders=Number(item.o);
+   if(!Number.isFinite(captured)||!Number.isFinite(orders)||captured<0||orders<0){
+    if(!incompleteDays.includes(date))incompleteDays.push(date);
+    continue;
+   }
+   regionCaptured+=captured;
+   if(captured!==0||orders!==0)continue;
+   let zero=byStore.get(st);
+   if(!zero){zero={st,days:0,potential:0,goalsComplete:true,dates:[]};byStore.set(st,zero)}
+   zero.days++;
+   zero.dates.push(date);
+   zeroDays++;
+   // "target" vem exclusivamente da meta eStore da filial na data, nunca de aproximações.
+   const goal=item.target;
+   if(goal==null||!Number.isFinite(Number(goal))||Number(goal)<0){
+    zero.goalsComplete=false;missingGoals++;
+   }else zero.potential+=Number(goal);
+  }
+ }
+ const complete=daysMissing.length===0&&incompleteDays.length===0&&daysCovered===allDates.length&&daysCovered>0;
+ const official=matchBenchmark()?.regional_captured;
+ const regionalCaptured=official!=null&&Number.isFinite(Number(official))&&Number(official)>0
+  ?Number(official):(complete&&regionCaptured>0?regionCaptured:null);
+ const zeros=[...byStore.values()].map(x=>{
+  const potential=x.goalsComplete?x.potential:null;
+  return {...x,potential,impact:potential!=null&&regionalCaptured>0?potential/regionalCaptured:null};
+ }).sort((a,b)=>b.days-a.days||(b.potential??0)-(a.potential??0)||a.st.localeCompare(b.st));
+ const potential=missingGoals===0&&daysCovered>0?zeros.reduce((sum,x)=>sum+x.potential,0):null;
+ const ratio=potential!=null&&regionalCaptured>0?potential/regionalCaptured:null;
+ const missing=EX.period==="day"?STORES.filter(st=>!daily.get(end)?.stores?.some(x=>String(x.st||"").padStart(3,"0")===st)):[];
+ return {zeros,missing,potential,ratio,regionalCaptured,daysCovered,daysExpected:allDates.length,
+  zeroDays,complete,missingGoals,daysMissing,incompleteDays};
 }
 function shareMovements(){
  const ref=latestDate(),p=EX.period,valid=x=>x&&STORES.includes(String(x.st||"").padStart(3,"0"))&&x.share_delta!=null&&Number.isFinite(Number(x.share_delta));
@@ -184,20 +221,7 @@ function render(){
  const maxCompare=Math.max(.00001,share||0,company||0);
  const bar=(v)=>v==null?"0%":Math.min(100,v/maxCompare*100)+"%";
  const trend=d.delta,opp=opportunities(),recs=topCollaborators(),ordered=[recs[1],recs[0],recs[2]];
- const stamps=(EX.data?.daily||[]).filter(x=>x.date>=bounds.start_date&&x.date<=ref);
- const f=EX.fca;
- const fcaRows=EX.period==="week"?(f?.currentPartial?.end===ref?f.currentPartial.retractions||[]:f?.prioritized||[]):[];
- let attention=[];
- if(EX.period==="day"){
-  attention=[
-   ...opp.zeros.map(x=>({st:x.st,tag:"ZERADA",amount:x.target,kind:"zero"})),
-   ...opp.missing.map(st=>({st,tag:"SEM INPUT",amount:null,kind:"pending"}))
-  ].slice(0,8);
- }else if(EX.period==="week"){
-  attention=fcaRows.slice(0,5).map(x=>({st:x.st,tag:pp(x.share_delta),kind:n(x.share_delta)<0?"down":"up",amount:null}));
- }else{
-  attention=[...d.rows].filter(x=>x.share!=null).sort((a,b)=>n(a.share)-n(b.share)).slice(0,5).map(x=>({st:x.st,tag:percent(x.share),kind:"share",amount:null}));
- }
+
  const benchmarkMessage=bad?'<div class="execErrorV1">⚠ Benchmark inconsistente para '+e(dateText)+'. O share da empresa foi ocultado até a conferência da captação e do percentual no print oficial.</div>':
  !bench?'<p class="execNoticeV2">Benchmark nacional pendente neste intervalo. Importe o print oficial para habilitar a comparação em p.p.</p>':"";
  const regionLine='<div class="execCompareLineV2"><span>CE+PI</span><b>'+percent(share)+'</b><div class="execMeterV1"><i style="width:'+bar(share)+'"></i></div></div>';
@@ -212,12 +236,21 @@ function render(){
  (daily?'<span class="execTinyV2">5 maiores filiais</span>':'<span class="execTinyV2">Fonte: Gestão/Lojas</span>')+'</div>'+
  (daily?dailyStoreChart(d.rows):drawChart(trendData()))+
  (daily?'<button type="button" class="execSecondaryV2" onclick="execToggleStoresV2()">Ver todas as lojas ▾</button><div id="execAllStoresV2" class="execAllStoresV2" hidden>'+[...d.rows].sort((a,b)=>n(b.c)-n(a.c)).map(x=>'<div><b>L'+e(x.st)+'</b><span>'+money(x.c)+'</span></div>').join("")+'</div>':"")+'</section>';
- const zeroCard=daily?'<div class="execZeroV1"><h4>LOJAS ZERADAS</h4><strong class="execNumBigV2">'+opp.zeros.length+'</strong><small>Com captação igual a zero</small><div class="execZeroStatsV2"><span>Potencial de recuperação</span><b>'+money(opp.potential)+'</b><span>% da meta regional</span><b>'+percent(opp.ratio)+'</b><span>Sem atualização</span><b>'+opp.missing.length+'</b></div></div>':
- '<div class="execZeroV1"><h4>SHARE REGIONAL</h4><strong class="execNumBigV2">'+percent(share)+'</strong><small>'+(EX.period==="week"?"Evolução frente à semana anterior":"Acumulado do mês")+'</small><div class="execShareDeltaV2 '+(trend!=null&&trend<0?"negative":"positive")+'">'+(trend==null?"Sem comparativo FCA":pp(trend))+'</div></div>';
- const attentionTitle=daily?"SITUAÇÃO DAS LOJAS":EX.period==="week"?"MAIORES RETRAÇÕES | FCA":"MENOR SHARE | MÊS";
- const rightCard='<div class="execPriorityV1"><h4>'+attentionTitle+'</h4>'+
- (attention.length?'<div class="execStoreAttentionV2">'+attention.map(x=>'<div class="execAttRowV2"><span><b>L'+e(x.st)+'</b></span><strong class="'+(x.kind==="down"||x.kind==="zero"?"execDangerV1":"")+'">'+e(x.tag)+'</strong></div>').join("")+'</div>':'<div class="execHelpV1">Sem lojas para este critério.</div>')+
- '<small class="execTinyV2">'+(daily?"Sem informação não é loja zerada.":EX.period==="week"?"Comparativo do FCA semanal.":"Lojas ordenadas pelo share do mês.")+'</small></div>';
+ const zeroCard='<div class="execZeroV1 execZeroPeriodV3"><h4>'+(daily?'LOJAS ZERADAS NO DIA':'LOJAS COM ZERAGEM NO PERÍODO')+'</h4>'+
+ '<strong class="execNumBigV2">'+(opp.daysCovered?opp.zeros.length:'—')+'</strong>'+
+ '<small>'+(daily?'Com captação igual a zero':opp.zeroDays+' dia(s) de zeragem de vendas nas filiais')+'</small>'+
+ '<div class="execZeroStatsV2"><span>Potencial dispersão (R$)</span><b>'+money2(opp.potential)+'</b>'+
+ '<span>Impacto na regional (%)</span><b>'+percent(opp.ratio)+'</b></div>'+
+ (!opp.complete||opp.missingGoals?'<p class="execTinyV2 execZeroWarningV3">Apuração '+opp.daysCovered+'/'+opp.daysExpected+' dias'+(opp.missingGoals?' • meta de '+opp.missingGoals+' zeragem(ns) indisponível':'')+'. Valores indisponíveis não foram estimados.</p>':'')+
+ '</div>';
+ const rightCard='<div class="execPriorityV1 execZeroStoresV3"><h4>'+(daily?'LOJAS SEM CAPTAÇÃO DE VENDA NO DIA':'LOJAS COM ZERAGEM DE VENDAS NO PERÍODO')+'</h4>'+
+ (daily?'<div class="execZeroHeadV3"><span>Filial</span><span>Situação</span></div>':
+ '<div class="execZeroHeadV3"><span>Filial</span><span>Dias zerados</span><span>Impacto regional</span></div>')+
+ (opp.zeros.length?'<div class="execZeroListV3">'+opp.zeros.map(x=>'<div class="execZeroRowV3"><b>L'+e(x.st)+'</b>'+
+ (daily?'<strong class="execDangerV1">ZERADA</strong>':'<b>'+x.days+' dia'+(x.days===1?'':'s')+'</b><strong class="execDangerV1">'+percent(x.impact)+'</strong>')+
+ '</div>').join("")+'</div>':
+ '<div class="execHelpV1">'+(opp.daysCovered?'Nenhuma filial com zeragem registrada no período.':'Aguardando registros oficiais do período.')+'</div>')+
+ '<small class="execTinyV2">Impacto regional = potencial dos dias zerados ÷ captação CE+PI no intervalo. Filiais sem registro não são classificadas como zeradas.</small></div>';
  const moves=shareMovements();
  const lines=(list,cls)=>list.length?list.map(x=>'<div class="execMoveRowV188"><strong>L'+e(x.st)+'</strong><b class="'+cls+'">'+pp(x.delta)+'</b></div>').join(""):'<div class="execHelpV1">Nenhuma filial neste critério.</div>';
  const movementPanel=daily?"":'<section class="execSectionV1"><div class="execSectionHeadV2"><h3>EVOLUÇÃO DO SHARE | '+(EX.period==="week"?"SEMANA":"MÊS")+'</h3><span class="execTinyV2">'+e(moves.source)+'</span></div>'+
@@ -450,7 +483,16 @@ function caption(){
   "🏢 *Share empresa:* "+percent(company),
   "↕️ *Desvio:* "+pp(desvio)
  ];
- if(EX.period==="day")lines.push("🎯 *Lojas zeradas:* "+z.zeros.length+" • potencial "+money2(z.potential));
+ lines.push("🏬 *"+(EX.period==="day"?"Lojas zeradas no dia":"Lojas com zeragem no período")+":* "+(z.daysCovered?z.zeros.length:"—"));
+ lines.push("💰 *Potencial dispersão:* "+money2(z.potential));
+ lines.push("📊 *Impacto na regional:* "+percent(z.ratio));
+ if(EX.period==="day"){
+  if(z.zeros.length)lines.push("📍 *Filiais:* "+z.zeros.map(x=>"L"+x.st).join(" • "));
+ }else if(z.zeros.length){
+  lines.push("📍 *Dias com zeragem | Impacto regional:*");
+  for(const x of z.zeros)lines.push("L"+x.st+" • "+x.days+" dia"+(x.days===1?"":"s")+" • "+percent(x.impact));
+ }
+ if(!z.complete||z.missingGoals)lines.push("⚠️ Apuração parcial: "+z.daysCovered+"/"+z.daysExpected+" dias. Valores não identificados não foram estimados.");
  lines.push("","Moda que inspira o Brasil");
  return lines.join("\n");
 }
@@ -521,41 +563,32 @@ function paintShare(ctx,data){
  });
 
  box(46,927,988,data.detailHeight,W,18,L);
- if(data.period==="day"){
-  print("LOJAS ZERADAS | D-1",71,959,28,true,G);
-  print("Zeradas:",73,1001,23,false,M);
-  print(String(data.zeros),200,1001,31,true,R);
-  print("Potencial:",312,1001,23,false,M);
-  fit(money2(data.potential),455,1001,29,235,true,G);
-  print("Impacto:",724,1001,23,false,M);
-  fit(percent(data.ratio),840,1001,29,155,true,R);
-  print("% da meta regional não contribuída",71,1041,21,false,M);
-  print("RELAÇÃO DAS FILIAIS",71,1081,21,true,G);
-  const parts=data.zeroStores.map(x=>"L"+x);
-  if(parts.length){
-   const maxPer=9;
-   for(let i=0;i<parts.length;i+=maxPer)fit(parts.slice(i,i+maxPer).join("  •  "),71,1114+(i/maxPer)*28,22,929,false,G);
-  }else print("Nenhuma loja zerada com input confirmado",71,1114,20,false,M);
-  if(data.pending>0)fit(data.pending+" filial(is) sem input, não classificadas como zeradas",71,data.detailBottom-20,19,921,false,R);
- }else{
-  const mv=data.movements||{available:false,up:[],down:[],reason:"Comparativo indisponível"};
-  print("EVOLUÇÃO DO SHARE | "+(data.period==="week"?"SEMANA":"MÊS"),72,959,28,true,G);
-  print(mv.source||"Comparação oficial",73,994,20,false,M);
-  if(!mv.available){
-    fit(mv.reason||"Aguardando dados oficiais comparáveis",73,1050,25,918,false,M);
-  }else{
-    print("▲ EVOLUÍRAM",73,1042,24,true,"#14835C");
-    print("▼ RETRAÍRAM",562,1042,24,true,R);
-    const countRows=Math.max(mv.up.length,mv.down.length,1);
-    for(let k=0;k<countRows;k++){
-      const y=1080+k*29,u=mv.up[k],d=mv.down[k];
-      if(u){print("L"+u.st,77,y,22,true,G);fit(pp(u.delta),485,y,22,305,true,"#14835C","right")}
-      if(d){print("L"+d.st,566,y,22,true,G);fit(pp(d.delta),1015,y,22,290,true,R,"right")}
-    }
-    if(!mv.up.length)print("Nenhuma evolução registrada",75,1080,20,false,M);
-    if(!mv.down.length)print("Nenhuma retração registrada",565,1080,20,false,M);
-  }
+ const isDaily=data.period==="day",zeroRows=data.zeroRows||[];
+ fit(isDaily?"LOJAS ZERADAS NO DIA":"LOJAS COM ZERAGEM NO PERÍODO",71,959,29,943,true,G);
+ print(isDaily?"Lojas:":"Filiais:",73,1002,22,false,M);
+ print(String(data.zeroCount??"—"),170,1002,29,true,R);
+ print("Potencial dispersão:",283,1002,22,false,M);
+ fit(money2(data.potential),505,1002,26,195,true,G);
+ print("Impacto:",724,1002,22,false,M);
+ fit(percent(data.ratio),1007,1002,27,155,true,R,"right");
+ fit("Impacto regional = potencial dos dias zerados ÷ captação regional do intervalo",73,1042,19,945,false,M);
+ fit(isDaily?"LOJAS SEM CAPTAÇÃO DE VENDA NO DIA":"LOJAS COM ZERAGEM DE VENDAS NO PERÍODO",73,1080,24,946,true,G);
+ for(let i=0;i<2;i++){
+  const x=73+i*487;
+  print(isDaily?"FILIAL  •  SITUAÇÃO":"FILIAL  •  DIAS ZERADOS  •  IMPACTO",x,1117,17,true,M);
  }
+ if(zeroRows.length){
+  for(let i=0;i<zeroRows.length;i++){
+   const item=zeroRows[i],x=73+(i%2)*487,y=1152+Math.floor(i/2)*37;
+   print("L"+item.st,x,y,22,true,G);
+   if(isDaily)print("ZERADA",x+140,y,20,true,R);
+   else{
+    print(item.days+"d",x+179,y,21,true,G);
+    fit(percent(item.impact),x+461,y,21,195,true,R,"right");
+   }
+  }
+ }else fit(data.hasDailyData?"Nenhuma loja com zeragem no período":"Aguardando dados oficiais do intervalo",73,1152,22,938,false,M);
+ if(!data.coverageComplete)fit("Base parcial: "+data.daysCovered+"/"+data.daysExpected+" dias • números ausentes não estimados",73,data.detailBottom-22,18,934,false,R);
 
  print("TOP 3 VENDEDORES | CE+PI",52,bottom+37,28,true,G);
  const order=[data.collabs[1],data.collabs[0],data.collabs[2]],no=[2,1,3];
@@ -583,15 +616,15 @@ async function shareCard(){
  if(!EX.data)return notify("Aguarde o carregamento dos indicadores.");
  const d=regionalData(),b=d.benchmark,cap=d.rows.length?d.total.captured:b?.regional_captured??null;
  const orders=d.rows.length?d.total.orders:b?.regional_orders??null,opp=opportunities();
- const movements=shareMovements();
- const detailHeight=EX.period==="day"?246:(movements.available?Math.max(235,140+Math.max(movements.up.length,movements.down.length,1)*29):225);
+ const detailHeight=Math.max(255,250+Math.ceil(opp.zeros.length/2)*37);
  const detailBottom=927+detailHeight,cardHeight=detailBottom+70+302+118;
  const model={period:EX.period,dateLabel:EX.period==="day"?dia(latestDate()):dia(periodBounds(EX.period,latestDate()).start_date)+" a "+dia(latestDate()),
   captured:cap,orders,regionalShare:d.share,companyShare:b?.company_share??null,
   gap:d.share!=null&&b?.company_share!=null?d.share-n(b.company_share):null,
   topCap:topRows("c"),topOrders:topRows("o"),topShare:topRows("share"),
-  zeros:opp.zeros.length,zeroStores:opp.zeros.map(x=>x.st),ratio:opp.ratio,pending:opp.missing.length,potential:opp.potential,
-  movements,detailHeight,detailBottom,height:cardHeight,collabs:topCollaborators()};
+  zeroCount:opp.daysCovered?opp.zeros.length:null,zeroRows:opp.zeros,ratio:opp.ratio,potential:opp.potential,
+  hasDailyData:opp.daysCovered>0,coverageComplete:opp.complete,daysCovered:opp.daysCovered,daysExpected:opp.daysExpected,
+  detailHeight,detailBottom,height:cardHeight,collabs:topCollaborators()};
  const ordered=[model.collabs[1],model.collabs[0],model.collabs[2]];
  try{
   const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=model.height;
