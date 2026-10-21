@@ -153,61 +153,77 @@ function executivePanelViewV1(){
 }
 function render(){
  const root=document.getElementById("execVisualV1");if(!root)return;
- if(EX.loading&&!EX.data){root.innerHTML='<div class="execSectionV1">Consultando o histórico de resultados...</div>';return}
- const data=regionalData(),b=data.benchmark,co=b?.company_share==null?null:n(b.company_share);
- const rg=data.share,gap=rg==null||co==null?null:rg-co,cap=data.rows.length?data.total.captured:(b?.regional_captured??null),orders=data.rows.length?data.total.orders:(b?.regional_orders??null),target=data.total.target||null;
- const att=cap!=null&&target>0?cap/target:null;
- const date=latestDate(),dateRange=periodBounds(EX.period,date),title=EX.period==="day"?"D-1":EX.period==="week"?"ACUMULADO SEMANAL":"ACUMULADO MENSAL";
- const dateLabel=EX.period==="day"?dia(date):dia(dateRange.start_date)+" a "+dia(date);
- const absMax=Math.max(.00001,rg||0,co||0);
- const regionMeter=rg==null?0:Math.min(100,100*rg/absMax);
- const nationalMeter=co==null?0:Math.min(100,100*co/absMax);
- const zeros=opportunities(),trend=trendData(),regRows=data.rows;
- const podium=topCollaborators();
- const ordered=[podium[1],podium[0],podium[2]];
- const greenDelta=data.delta,regShares=data.share;
- const fca=EX.fca;
- const trendRows=EX.period==="week"&&(fca?.currentPartial?.end===date)?[...(fca.currentPartial.retractions||[])].slice(0,5):EX.period==="week"?[...(fca?.prioritized||[])].slice(0,5):[];
- let shareHtml=top3HTML("TOP 3 | SHARE",topRows("share"),"share",percent);
- let salesHtml=top3HTML("TOP 3 | CAPTAÇÃO",topRows("c"),"c",money);
- let ordersHtml=top3HTML("TOP 3 | PEDIDOS",topRows("o"),"o",count);
- let missing=!b?'<p class="execErrorV1">Benchmark empresa não informado para '+dateLabel+'. A comparação em p.p. ficará indisponível até o import oficial.</p>':"";
- let caption=EX.period==="week"&&greenDelta!=null?"▲▼ SHARE SEMANAL: "+pp(greenDelta)+" vs período anterior (FCA)":
- EX.period==="month"?"Evolução mensal em p.p.: requer período comparativo oficial.":"Captação regional do D-1 a partir do gerencial.";
- const stale=EX.period!=="day"&&!same(date,currentAsOf());
- const detail=stale?'<p class="execErrorV1">Data histórica: o consolidado da regional por loja não está disponível para essa seleção. Consulte o FCA ou o relatório gerencial correspondente.</p>':"";
- const zeroBlock=EX.period==="day"?'<div class="execZeroV1"><h4>LOJAS ZERADAS | D-1</h4><div class="big">'+(zeros.missing.length?'—':zeros.zeros.length)+'</div><small>'+(zeros.missing.length?zeros.missing.length+' lojas sem atualização no gerencial':"lojas com captação zero")+'</small><strong>'+money(zeros.potential)+'</strong><small>Potencial da meta dessas lojas</small><br><b>'+percent(zeros.ratio)+'</b><small> da meta regional</small></div>':
- '<div class="execZeroV1"><h4>EVOLUÇÃO SHARE | FCA</h4><div class="big" style="font-size:23px">'+(greenDelta==null?"—":pp(greenDelta))+'</div><small>'+caption+'</small><br><strong style="font-size:15px">Fonte: FCA semanal</strong></div>';
- const right=EX.period==="day"?(
-   zeros.missing.length?'<p class="execHelpV1">Sem input: '+zeros.missing.join(", ")+'</p>':
-   zeros.zeros.length?'<table class="execTableV1"><tr><th>LOJA</th><th>STATUS</th><th>META (R$)</th></tr>'+zeros.zeros.slice(0,5).map(x=>'<tr><td>'+e(x.st)+'</td><td class="execDangerV1">ZERADA</td><td>'+money(x.target)+'</td></tr>').join("")+'</table>':
-   '<p class="execHelpV1">Todas as lojas com captação informada.</p>'
- ):trendRows.length?'<table class="execTableV1"><tr><th>LOJA</th><th>ANTERIOR</th><th>ATUAL</th><th>Δ SHARE</th></tr>'+trendRows.map(x=>'<tr><td>'+e(x.st)+'</td><td>'+percent(x.previous_share)+'</td><td>'+percent(x.share)+'</td><td class="'+(n(x.share_delta)<0?"execDangerV1":"execSuccessV1")+'">'+pp(x.share_delta)+'</td></tr>').join("")+'</table>':
- '<p class="execHelpV1">Nenhuma retração semanal disponível no FCA.</p>';
- const html='<div class="execReportV1" id="execShareCardV1">'+
-  '<header class="execHeaderV1"><div class="execHeadTopV1"><img src="'+logo+'" alt="Riachuelo"><span>Moda que inspira o Brasil</span></div>'+
-  '<div class="execTitleV1">eStore | CE+PI</div><div class="execSubV1">PAINEL EXECUTIVO DE RESULTADOS</div><div class="execDateBandV1">▣ '+title+' | '+dateLabel+'</div></header>'+
-  '<div class="execBodyV1"><section class="execSectionV1"><div class="execSectionTitleV1">VISÃO GERAL | CE+PI × EMPRESA</div>'+
-  '<div class="execKpisV1"><div class="execKpiV1"><label>CAPTAÇÃO CE+PI</label><strong>'+money(cap)+'</strong><small>Fonte Gestão/Lojas</small></div>'+
-  '<div class="execKpiV1"><label>PEDIDOS</label><strong>'+count(orders)+'</strong><small>CE+PI</small></div>'+
-  '<div class="execKpiV1"><label>SHARE REGIONAL</label><strong>'+percent(rg)+'</strong><small class="execTrendV1 '+(greenDelta<0?"down":"up")+'">'+(greenDelta==null?"vs Empresa":pp(greenDelta)+" vs FCA")+'</small></div>'+
-  '<div class="execKpiV1"><label>ATING. META</label><strong>'+percent(att)+'</strong><small>Meta financeira eStore</small></div></div>'+
-  '<div class="execCompareV1"><div><div class="execBarLabelV1"><span>CE+PI</span><b>'+percent(rg)+'</b><div class="execMeterV1"><i style="width:'+regionMeter+'%"></i></div></div>'+
-  '<div class="execBarLabelV1"><span>Empresa</span><b>'+percent(co)+'</b><div class="execMeterV1 national"><i style="width:'+nationalMeter+'%"></i></div></div></div>'+
-  '<div class="execDiffV1"><b style="'+(gap!=null&&gap>=0?"color:#148152":"")+'">'+pp(gap)+'</b><small>Desvio vs empresa</small></div></div></section>'+
-  '<section class="execSectionV1"><div class="execSectionTitleV1">EVOLUÇÃO DA CAPTAÇÃO (R$)</div>'+
-  '<div class="execChartLegendV1"><span><i class="execDotV1"></i>CE+PI • Captado</span><span><i class="execDotV1 orange"></i>Share empresa*</span></div>'+drawChart(trend)+
-  '<small class="execHelpV1">* Linha do benchmark disponível somente nos dias importados; eixo da direita: share %.</small></section>'+
-  '<div class="execTriGridV1">'+salesHtml+ordersHtml+shareHtml+'</div>'+
-  '<div class="execPairV1" style="margin-top:12px">'+zeroBlock+'<section class="execPriorityV1"><h4>'+(EX.period==="day"?"LOJAS PRIORIZADAS | ZERAGEM":"MAIORES RETRAÇÕES | FCA")+'</h4>'+right+'</section></div>'+
-  '<section class="execSectionV1"><div class="execSectionTitleV1">TOP 3 COLABORADORES | VENDA CAPTADA</div><div class="execPodiumV1">'+
-  ordered.map((x,i)=>x?'<div class="'+(i===1?"winner":"")+'"><span class="execMedalV1">'+(i===1?"1":i===0?"2":"3")+'º</span><div class="execAvatarV1">'+e(String(x.name||"?").slice(0,1))+'</div><b>'+e(x.name)+'</b><small>Loja '+e(x.st)+'</small><strong>'+money(x.c)+'</strong></div>':'<div><div class="execAvatarV1">—</div><small>Sem dados</small></div>').join("")+'</div></section>'+
-  '<div class="execBottomV1"><div class="execFocusV1"><b>🎯 FOCO DO DIA</b><div>'+(EX.period==="day"?"Mobilizar as lojas sem captação e recuperar o potencial disponível.":EX.period==="week"?"Reverter as maiores retrações de share identificadas no FCA.":"Reforçar produtividade e participação das lojas na entrega mensal.")+'</div></div>'+
-  '<div class="execValuesV1">Talento é conquista<br>Ninguém faz nada sozinho<br>Vontade de crescer<br>Simples é incrível</div></div>'+
-  '<p class="execSourceV1">'+(b?"Benchmark oficial da empresa • "+dia(b.updated_at.slice(0,10)):"Aguardando benchmark oficial")+' | Gerencial eStore CE+PI</p></div>'+
-  '<footer class="execFootV1"><img src="'+logo+'" alt="Riachuelo"><span>Moda que inspira o Brasil</span></footer></div>';
- root.innerHTML=missing+detail+html+'<p class="execHelpV1" style="text-align:center;margin:12px">Os rankings refletem o último período gerencial disponível. Períodos sem base oficial não são estimados.</p>';
+ if(!EX.data){root.innerHTML='<div class="execSectionV1">Consultando as fontes oficiais...</div>';return}
+ const d=regionalData(),bench=d.benchmark,raw=rawBenchmark(),bad=raw&&!bench;
+ const share=d.share,company=bench?.company_share==null?null:n(bench.company_share);
+ const gap=share==null||company==null?null:share-company,cap=d.rows.length?d.total.captured:(bench?.regional_captured??null);
+ const orders=d.rows.length?d.total.orders:(bench?.regional_orders??null),target=d.total.target||null;
+ const reach=cap!=null&&target>0?cap/target:null;
+ const ref=latestDate(),bounds=periodBounds(EX.period,ref),periodName=EX.period==="day"?"D-1":EX.period==="week"?"SEMANA":"MÊS";
+ const dateText=EX.period==="day"?dia(ref):dia(bounds.start_date)+" – "+dia(ref);
+ const maxCompare=Math.max(.00001,share||0,company||0);
+ const bar=(v)=>v==null?"0%":Math.min(100,v/maxCompare*100)+"%";
+ const trend=d.delta,opp=opportunities(),recs=topCollaborators(),ordered=[recs[1],recs[0],recs[2]];
+ const stamps=(EX.data?.daily||[]).filter(x=>x.date>=bounds.start_date&&x.date<=ref);
+ const f=EX.fca;
+ const fcaRows=EX.period==="week"?(f?.currentPartial?.end===ref?f.currentPartial.retractions||[]:f?.prioritized||[]):[];
+ let attention=[];
+ if(EX.period==="day"){
+  attention=[
+   ...opp.zeros.map(x=>({st:x.st,tag:"ZERADA",amount:x.target,kind:"zero"})),
+   ...opp.missing.map(st=>({st,tag:"SEM INPUT",amount:null,kind:"pending"}))
+  ].slice(0,8);
+ }else if(EX.period==="week"){
+  attention=fcaRows.slice(0,5).map(x=>({st:x.st,tag:pp(x.share_delta),kind:n(x.share_delta)<0?"down":"up",amount:null}));
+ }else{
+  attention=[...d.rows].filter(x=>x.share!=null).sort((a,b)=>n(a.share)-n(b.share)).slice(0,5).map(x=>({st:x.st,tag:percent(x.share),kind:"share",amount:null}));
+ }
+ const benchmarkMessage=bad?'<div class="execErrorV1">⚠ Benchmark inconsistente para '+e(dateText)+'. O share da empresa foi ocultado até a conferência da captação e do percentual no print oficial.</div>':
+ !bench?'<p class="execNoticeV2">Benchmark nacional pendente neste intervalo. Importe o print oficial para habilitar a comparação em p.p.</p>':"";
+ const regionLine='<div class="execCompareLineV2"><span>CE+PI</span><b>'+percent(share)+'</b><div class="execMeterV1"><i style="width:'+bar(share)+'"></i></div></div>';
+ const companyLine='<div class="execCompareLineV2"><span>Empresa</span><b>'+percent(company)+'</b><div class="execMeterV1 national"><i style="width:'+bar(company)+'"></i></div></div>';
+ const mini=[
+  top3HTML("TOP 3 | CAPTAÇÃO",topRows("c"),"c",money),
+  top3HTML("TOP 3 | PEDIDOS",topRows("o"),"o",count),
+  top3HTML("TOP 3 | SHARE",topRows("share"),"share",percent)
+ ].join("");
+ const daily=EX.period==="day";
+ const chart='<section class="execSectionV1"><div class="execSectionHeadV2"><h3>'+ (daily?"MAIORES CAPTAÇÕES | D-1":EX.period==="week"?"EVOLUÇÃO DIÁRIA DA CAPTAÇÃO":"EVOLUÇÃO SEMANAL DA CAPTAÇÃO")+'</h3>'+
+ (daily?'<span class="execTinyV2">5 maiores filiais</span>':'<span class="execTinyV2">Fonte: Gestão/Lojas</span>')+'</div>'+
+ (daily?dailyStoreChart(d.rows):drawChart(trendData()))+
+ (daily?'<button type="button" class="execSecondaryV2" onclick="execToggleStoresV2()">Ver todas as lojas ▾</button><div id="execAllStoresV2" class="execAllStoresV2" hidden>'+[...d.rows].sort((a,b)=>n(b.c)-n(a.c)).map(x=>'<div><b>RIA '+e(x.st)+'</b><span>'+money(x.c)+'</span></div>').join("")+'</div>':"")+'</section>';
+ const zeroCard=daily?'<div class="execZeroV1"><h4>LOJAS ZERADAS</h4><strong class="execNumBigV2">'+opp.zeros.length+'</strong><small>Com captação igual a zero</small><div class="execZeroStatsV2"><span>Potencial de recuperação</span><b>'+money(opp.potential)+'</b><span>% da meta regional</span><b>'+percent(opp.ratio)+'</b><span>Sem atualização</span><b>'+opp.missing.length+'</b></div></div>':
+ '<div class="execZeroV1"><h4>SHARE REGIONAL</h4><strong class="execNumBigV2">'+percent(share)+'</strong><small>'+(EX.period==="week"?"Evolução frente à semana anterior":"Acumulado do mês")+'</small><div class="execShareDeltaV2 '+(trend!=null&&trend<0?"negative":"positive")+'">'+(trend==null?"Sem comparativo FCA":pp(trend))+'</div></div>';
+ const attentionTitle=daily?"SITUAÇÃO DAS LOJAS":EX.period==="week"?"MAIORES RETRAÇÕES | FCA":"MENOR SHARE | MÊS";
+ const rightCard='<div class="execPriorityV1"><h4>'+attentionTitle+'</h4>'+
+ (attention.length?'<div class="execStoreAttentionV2">'+attention.map(x=>'<div class="execAttRowV2"><span><b>RIA '+e(x.st)+'</b></span><strong class="'+(x.kind==="down"||x.kind==="zero"?"execDangerV1":"")+'">'+e(x.tag)+'</strong></div>').join("")+'</div>':'<div class="execHelpV1">Sem lojas para este critério.</div>')+
+ '<small class="execTinyV2">'+(daily?"Sem informação não é loja zerada.":EX.period==="week"?"Comparativo do FCA semanal.":"Lojas ordenadas pelo share do mês.")+'</small></div>';
+ const podium='<section class="execSectionV1"><div class="execSectionHeadV2"><h3>TOP 3 COLABORADORES | REGIONAL</h3><span class="execTinyV2">Venda captada • '+periodName+'</span></div>'+
+ '<div class="execPodiumV1">'+ordered.map((x,i)=>podiumItem(x,[2,1,3][i])).join("")+'</div></section>';
+ const warning=!same(ref,currentAsOf())&&EX.period!=="day"?'<p class="execNoticeV2">Referência histórica: os rankings por loja refletem o último acumulado gerencial disponível.</p>':"";
+ root.innerHTML=benchmarkMessage+warning+
+ '<div class="execReportV1" id="execShareCardV1"><header class="execHeaderV1">'+
+ '<div class="execHeadTopV1"><img src="'+logo+'" alt="Riachuelo"><span>Moda que inspira o Brasil</span></div>'+
+ '<h1 class="execTitleV1">eStore | CE+PI</h1><p class="execSubV1">PAINEL EXECUTIVO DE RESULTADOS</p>'+
+ '<div class="execDateBandV1">'+periodName+' • '+dateText+'</div></header>'+
+ '<div class="execBodyV1"><section class="execSectionV1"><div class="execSectionHeadV2"><h3>VISÃO GERAL | CE+PI × EMPRESA</h3></div>'+
+ '<div class="execKpisV1"><div class="execKpiV1"><label>CAPTAÇÃO CE+PI</label><strong>'+money(cap)+'</strong><small>Gerencial</small></div>'+
+ '<div class="execKpiV1"><label>PEDIDOS</label><strong>'+count(orders)+'</strong><small>CE+PI</small></div>'+
+ '<div class="execKpiV1"><label>SHARE REGIONAL</label><strong>'+percent(share)+'</strong><small>Oficial / gerencial</small></div>'+
+ '<div class="execKpiV1"><label>ATING. META</label><strong>'+percent(reach)+'</strong><small>Meta eStore</small></div></div>'+
+ '<div class="execCompareV1"><div class="execCompareRowsV2">'+regionLine+companyLine+'</div><div class="execDiffV1"><b class="'+(gap!=null&&gap>=0?"execSuccessV1":"")+'">'+pp(gap)+'</b><small>Desvio vs empresa</small></div></div></section>'+
+ chart+
+ '<section class="execSectionV1"><div class="execSectionHeadV2"><h3>DESTAQUES POR FILIAL</h3></div><div class="execTriGridV1">'+mini+'</div></section>'+
+ '<section class="execPairV1">'+zeroCard+rightCard+'</section>'+
+ podium+
+ '<p class="execSourceV1">Fonte: Gerencial eStore / FCA'+(bench?" • Benchmark empresa importado":" • Empresa pendente")+' • '+dateText+'</p>'+
+ '</div><footer class="execFootV1"><img src="'+logo+'" alt="Riachuelo"><span>Moda que inspira o Brasil</span></footer></div>';
 }
+function toggleStores(){
+ const el=document.getElementById("execAllStoresV2");if(!el)return;
+ el.hidden=!el.hidden;
+}
+
 async function loadExecutiveV1(){
  if(EX.loading)return;
  const root=document.getElementById("execVisualV1");if(!root)return;
@@ -334,4 +350,5 @@ w.execSaveBenchmarkV1=saveBenchmark;
 w.execReadPrintV1=readPrint;
 w.execShareV1=shareCard;
 w.execShareCaptionV1=caption;
+w.execToggleStoresV2=toggleStores;
 })(window);
