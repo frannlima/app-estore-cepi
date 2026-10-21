@@ -538,18 +538,62 @@ function paintShare(ctx,data){
  fit(period+" • "+data.dateLabel,78,172,27,665,true,W);
  ctx.fillStyle=O;ctx.fillRect(0,206,1080,6);
 
+ // V197: alinhamento central e dimensionamento por área útil para compartilhar no celular.
+ // As cinco caixas preservam os mesmos indicadores oficiais, sem mudar os cálculos.
+ const centered=(value,centerX,y,desired,maxWidth,color=G,bold=true)=>{
+   const label=String(value??"—");
+   let size=desired;
+   while(size>17){
+     ctx.font=(bold?"800 ":"500 ")+size+"px Larsseit,Arial,sans-serif";
+     if(ctx.measureText(label).width<=maxWidth)break;
+     size--;
+   }
+   print(label,centerX,y,size,bold,color,"center");
+ };
  const metrics=[["CAPTAÇÃO CE+PI",money2(data.captured)],["PEDIDOS",count(data.orders)],["SHARE REGIONAL",percent(data.regionalShare)]];
  metrics.forEach(([title,val],i)=>{
-  const x=46+i*335;box(x,239,321,137,W,16,L);
-  print(title,x+17,266,22,true,M);
-  fit(val,x+17,331,48,280,true,i===2?O:G);
+   const x=46+i*335,w=321,cx=x+w/2;
+   box(x,239,w,137,W,16,L);
+   centered(title,cx,274,22,w-25,M,true);
+   centered(val,cx,328,48,w-27,i===2?O:G,true);
  });
  box(46,397,988,156,W,16,L);
- print("SHARE EMPRESA",71,434,24,true,M);
- fit(percent(data.companyShare),71,496,51,275,true,G);
- ctx.fillStyle=L;ctx.fillRect(394,421,2,108);
- print("DESVIO CE+PI × EMPRESA",424,435,24,true,M);
- fit(pp(data.gap),424,496,57,560,true,data.gap!=null&&data.gap>=0?"#188257":R);
+ const shareCenter=(46+394)/2,desvioCenter=(396+1034)/2;
+ centered("SHARE EMPRESA",shareCenter,433,23,308,M,true);
+ centered(percent(data.companyShare),shareCenter,494,51,300,G,true);
+ ctx.fillStyle=L;ctx.fillRect(394,420,2,110);
+ centered("DESVIO CE+PI × EMPRESA",desvioCenter,433,24,602,M,true);
+ // Valor em p.p. acompanhado de triângulo sem depender de emojis/fontes do dispositivo.
+ const diffValue=pp(data.gap);
+ const diffColor=data.gap==null?M:data.gap<0?R:data.gap>0?"#188257":M;
+ let diffFont=56;
+ const diffWidth=564,triangleW=25,triangleGap=15;
+ while(diffFont>18){
+   ctx.font="800 "+diffFont+"px Larsseit,Arial,sans-serif";
+   if(ctx.measureText(diffValue).width+triangleW+triangleGap<=diffWidth)break;
+   diffFont--;
+ }
+ ctx.font="800 "+diffFont+"px Larsseit,Arial,sans-serif";
+ const textW=ctx.measureText(diffValue).width;
+ const groupStart=desvioCenter-(textW+triangleW+triangleGap)/2;
+ const triX=groupStart+triangleW/2,triY=492;
+ ctx.fillStyle=diffColor;
+ if(data.gap==null||data.gap===0){
+   ctx.fillRect(triX-12,triY-3,24,6);
+ }else{
+   ctx.beginPath();
+   if(data.gap>0){
+     ctx.moveTo(triX,triY-14);
+     ctx.lineTo(triX+13,triY+11);
+     ctx.lineTo(triX-13,triY+11);
+   }else{
+     ctx.moveTo(triX-13,triY-11);
+     ctx.lineTo(triX+13,triY-11);
+     ctx.lineTo(triX,triY+14);
+   }
+   ctx.closePath();ctx.fill();
+ }
+ print(diffValue,groupStart+triangleW+triangleGap,triY,diffFont,true,diffColor);
 
  print("DESTAQUES DA REGIONAL",52,595,29,true,G);
  const cats=[["CAPTAÇÃO",data.topCap,"c",money],["PEDIDOS",data.topOrders,"o",count],["SHARE",data.topShare,"share",percent]];
