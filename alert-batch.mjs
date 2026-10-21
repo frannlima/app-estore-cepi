@@ -18,7 +18,7 @@ export function batchMarkup(model){
  '<div class="acBatchStats"><span>🔴 '+rows.length+' priorizadas</span><span>✅ '+enabled+' com contato apto</span><span>⚠️ '+(rows.length-enabled)+' aguardam validação</span></div>'+
  (blocks?'<div class="acBatchTargets">'+blocks+'</div>':'<p>Nenhuma loja priorizada na parcial validada. Lojas a conferir não entram no lote.</p>')+
  '<label class="acConfirm"><input id="acBatchWorking" type="checkbox"> Confirmei que os supervisores selecionados estão trabalhando agora e podem receber os alertas.</label>'+
- '<div class="acBatchActions"><button id="acStartBatch" class="btn" disabled>Enviar em massa (assistido)</button><button id="acReviewBatch" class="btn ghost">Conferir contatos</button></div>'+
+ '<div class="acBatchActions"><button id="acSelectAllBatch" class="btn ghost">Selecionar todas aptas</button><button id="acClearBatch" class="btn ghost">Limpar seleção</button><button id="acStartBatch" class="btn" disabled>Enviar em massa (assistido)</button><button id="acReviewBatch" class="btn ghost">Conferir contatos</button></div>'+
  '<small class="acFootnote">Um PNG personalizado por filial. O WhatsApp exige selecionar e confirmar cada destinatário; iniciar lote não comprova entrega.</small></section>';
 }
 export function wireBatch(model,notify){
@@ -28,6 +28,14 @@ export function wireBatch(model,notify){
  const refresh=()=>{const n=queue().length;btn.disabled=!working.checked||n===0;btn.textContent='Enviar em massa (assistido) · '+n;};
  document.querySelectorAll('[data-ac-batch-store]').forEach(e=>e.addEventListener('change',()=>{if(e.value)selected.set(e.dataset.acBatchStore,e.value);else selected.delete(e.dataset.acBatchStore);refresh();}));
  working.addEventListener('change',refresh);
+ document.getElementById('acSelectAllBatch')?.addEventListener('click',()=>{
+  for(const x of available){if(x.contacts.length)selected.set(x.row.st,String(x.contacts[0].id));}
+  document.querySelectorAll('[data-ac-batch-store]').forEach(e=>{e.value=selected.get(e.dataset.acBatchStore)||'';});
+  refresh();
+ });
+ document.getElementById('acClearBatch')?.addEventListener('click',()=>{
+  selected.clear();document.querySelectorAll('[data-ac-batch-store]').forEach(e=>{e.value='';});refresh();
+ });
  document.getElementById('acReviewBatch')?.addEventListener('click',()=>document.getElementById('acContactsTab')?.click());
  refresh();
  btn.addEventListener('click',()=>{
