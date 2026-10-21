@@ -67,7 +67,7 @@ function runBatch(items,notify){
    action.disabled=true;
    try{
     const file=await createAlertImage(x.contact,x.row);
-    const result=await shareAlertImage(file,x.contact.phone_suggested_e164.replace(/\D/g,''));
+    const result=await shareAlertImage(file,x.contact.phone_suggested_e164.replace(/\D/g,''),Boolean(x.row.closing));
     shared++;
     dialog.querySelector('#acBatchMessage').textContent=result;
     action.disabled=false;action.textContent='Continuar para a próxima filial';
