@@ -325,22 +325,140 @@ function caption(){
  "\n*Foco:* "+(EX.period==="week"?"Reverter as maiores retrações identificadas no FCA.":"Garantir produtividade e vendas em todas as filiais.")+
  "\n\nModa que inspira o Brasil";
 }
-async function shareCard(){
- const el=document.getElementById("execShareCardV1");if(!el)return notify("Painel indisponível.");
- try{
-  const h=await loadLib("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js","html2canvas");
-  await document.fonts?.ready;
-  const img=el.querySelector("img");if(img&&!img.complete)await new Promise(r=>{img.onload=r;img.onerror=r;setTimeout(r,1800)});
-  const canvas=await h(el,{backgroundColor:"#F8F6F0",scale:Math.max(2,Math.min(3,1080/Math.max(320,el.offsetWidth))),useCORS:true,scrollY:-window.scrollY,logging:false});
-  const blob=await new Promise(r=>canvas.toBlob(r,"image/png",1));if(!blob)throw Error("Imagem não gerada");
-  const file=new File([blob],"eStore_CEPI_"+EX.period+"_"+latestDate()+".png",{type:"image/png"});
-  if(navigator.canShare?.({files:[file]})&&navigator.share){
-   try{await navigator.share({files:[file],title:"eStore CE+PI | Painel Executivo",text:caption()});return}catch(err){if(err.name==="AbortError")return}
-  }
-  const href=URL.createObjectURL(blob),a=document.createElement("a");a.href=href;a.download=file.name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(href),1800);
-  try{await navigator.clipboard.writeText(caption());notify("PNG salvo e resumo copiado para WhatsApp.")}catch(_){notify("PNG gerado. Compartilhe o arquivo no WhatsApp.")}
- }catch(err){alert("Não foi possível exportar o card: "+String(err.message||err))}
+
+async function imageForCanvas(src){
+ if(!src)return null;
+ return await new Promise(resolve=>{
+  const im=new Image();
+  if(!/^data:/i.test(src))im.crossOrigin="anonymous";
+  let finished=false;const done=(value)=>{if(finished)return;finished=true;resolve(value)};
+  im.onload=()=>done(im);im.onerror=()=>done(null);im.src=src;
+  setTimeout(()=>done(null),3500);
+ });
 }
+function paintShare(ctx,data){
+ const C={green:"#173F35",dark:"#10372f",sage:"#466964",sand:"#F7F5EF",orange:"#DE7C00",red:"#AB2630",grey:"#66746e",line:"#e7e9e3",white:"#FFFFFF"};
+ const W=1080,H=1580;
+ const box=(x,y,w,h,fill,r=18,stroke=null)=>{
+  ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke()}
+ };
+ const text=(str,x,y,size=27,bold=false,color=C.green,align="left",max=1e5)=>{
+  ctx.font=(bold?"800 ":"500 ")+size+"px Larsseit, Arial, sans-serif";
+  ctx.fillStyle=color;ctx.textAlign=align;ctx.textBaseline="middle";
+  ctx.fillText(String(str??"—"),x,y,max);
+  ctx.textAlign="left";
+ };
+ const fit=(str,x,y,size,maxWidth,bold=true,color=C.green,align="left")=>{
+  const t=String(str??"—");let s=size;
+  do{ctx.font=(bold?"800 ":"500 ")+s+"px Larsseit, Arial, sans-serif";if(ctx.measureText(t).width<=maxWidth)break;s-=1}while(s>19);
+  text(t,x,y,s,bold,color,align,maxWidth);
+ };
+ ctx.fillStyle=C.sand;ctx.fillRect(0,0,W,H);
+ ctx.fillStyle=C.green;ctx.fillRect(0,0,W,205);
+ // RIA é desenhado diretamente da marca oficial recortada, não como texto substituto.
+ const period=data.period==="day"?"D-1":data.period==="week"?"SEMANA":"MÊS";
+ text("eStore | CE+PI",252,63,54,true,C.white);
+ text("PAINEL EXECUTIVO DE RESULTADOS",255,111,23,true,"#DBE5E0");
+ box(50,142,570,46,C.orange,10);
+ fit(period+" • "+data.dateLabel,72,165,28,520,true,C.white);
+ ctx.fillStyle="#DE7C00";ctx.fillRect(40,205,1000,6);
+ // KPIs principais.
+ const metrics=[["CAPTAÇÃO REGIONAL",money2(data.captured)],["PEDIDOS",count(data.orders)],["SHARE CE+PI",percent(data.regionalShare)]];
+ metrics.forEach((m,i)=>{
+  const x=46+i*335;box(x,236,321,145,C.white,15,C.line);
+  text(m[0],x+19,268,21,true,C.grey);
+  fit(m[1],x+19,331,49,284,true,i===2?C.orange:C.green);
+ });
+ box(46,400,988,153,C.white,18,C.line);
+ text("SHARE EMPRESA",70,432,24,true,C.grey);
+ fit(percent(data.companyShare),70,483,51,245,true,C.green);
+ ctx.fillStyle=C.line;ctx.fillRect(385,425,2,102);
+ text("DESVIO CE+PI × EMPRESA",421,432,22,true,C.grey);
+ fit(pp(data.gap),421,490,58,570,true,data.gap!=null&&data.gap>=0?"#168055":C.red);
+ // Top 3 filiais com o mesmo conjunto de dados da tela.
+ text("DESTAQUES DA REGIONAL",52,591,28,true,C.green);
+ const cols=[["CAPTAÇÃO",data.topCap,"c",money],["PEDIDOS",data.topOrders,"o",count],["SHARE",data.topShare,"share",percent]];
+ cols.forEach((g,ind)=>{
+  const x=46+ind*335;box(x,622,321,286,C.white,17,C.line);
+  ctx.fillStyle=C.orange;ctx.fillRect(x+17,649,6,32);
+  text("TOP 3 "+g[0],x+34,665,24,true,C.green);
+  for(let i=0;i<3;i++){
+   const item=g[1][i],ry=716+i*58;
+   box(x+16,ry-21,38,38,i===0?C.orange:i===1?"#999e9b":"#C58A5B",19);
+   text(String(i+1),x+35,ry-1,20,true,C.white,"center");
+   if(item){
+    text("RIA "+String(item.st),x+64,ry,24,true,C.green);
+    fit(g[3](item[g[2]]),x+304,ry,24,128,true,C.green,"right");
+   }else text("—",x+65,ry,24,false,C.grey);
+  }
+ });
+ box(46,927,988,142,C.white,18,C.line);
+ text(data.period==="day"?"OPORTUNIDADE DE RECUPERAÇÃO":data.period==="week"?"EVOLUÇÃO DE SHARE | FCA":"PARTICIPAÇÃO NO MÊS",68,959,24,true,C.green);
+ if(data.period==="day"){
+  text("Zeradas:",72,1014,26,false,C.grey);text(String(data.zeros),209,1014,30,true,C.red);
+  text("Pendentes:",315,1014,26,false,C.grey);text(String(data.pending),479,1014,30,true,C.red);
+  text("Potencial:",603,1014,26,false,C.grey);fit(money(data.potential),750,1014,34,235,true,C.green);
+ }else if(data.period==="week"){
+  text("Variação vs semana anterior",70,1015,28,false,C.grey);
+  fit(pp(data.delta),990,1015,40,340,true,data.delta<0?C.red:C.green,"right");
+ }else{
+  text("Share regional acumulado",70,1015,28,false,C.grey);
+  fit(percent(data.regionalShare),990,1015,40,340,true,C.green,"right");
+ }
+ text("TOP 3 VENDEDORES • CE+PI",52,1125,28,true,C.green);
+ const podiumOrder=[data.collabs[1],data.collabs[0],data.collabs[2]];
+ const podiumNo=[2,1,3];
+ for(let i=0;i<3;i++){
+  const x=46+335*i,y=1160,w=321,h=302,person=podiumOrder[i];
+  box(x,y,w,h,i===1?"#FCE2A7":"#EEF0EC",20,null);
+  box(x+134,y+15,52,39,i===1?C.orange:C.sage,16);
+  text(podiumNo[i]+"º",x+160,y+34,24,true,C.white,"center");
+  if(!person)continue;
+  const avatar=data.avatars[i];
+  ctx.save();ctx.beginPath();ctx.arc(x+160,y+111,48,0,2*Math.PI);ctx.clip();
+  if(avatar)ctx.drawImage(avatar,x+112,y+63,96,96);
+  else{ctx.fillStyle="#D0E0D7";ctx.fillRect(x+112,y+63,96,96);text(displayColName(person).slice(0,1),x+160,y+112,39,true,C.green,"center")}
+  ctx.restore();
+  fit(displayColName(person),x+160,y+190,29,285,true,C.green,"center");
+  fit("RIA "+String(person.st),x+160,y+231,24,275,true,C.sage,"center");
+  fit(money2(person.c),x+160,y+275,34,280,true,C.green,"center");
+ }
+ ctx.fillStyle=C.green;ctx.fillRect(0,1490,W,90);
+ text("MODA QUE INSPIRA O BRASIL",58,1524,24,true,C.white);
+ text("Fonte: eStore CE+PI • "+period,58,1555,19,false,"#B7CEC4");
+}
+async function shareCard(){
+ if(!EX.data)return notify("Aguarde o carregamento dos indicadores.");
+ const d=regionalData(),b=d.benchmark,cap=d.rows.length?d.total.captured:b?.regional_captured??null;
+ const orders=d.rows.length?d.total.orders:b?.regional_orders??null,opp=opportunities();
+ const model={period:EX.period,dateLabel:EX.period==="day"?dia(latestDate()):dia(periodBounds(EX.period,latestDate()).start_date)+" a "+dia(latestDate()),
+  captured:cap,orders,regionalShare:d.share,companyShare:b?.company_share??null,
+  gap:d.share!=null&&b?.company_share!=null?d.share-n(b.company_share):null,
+  topCap:topRows("c"),topOrders:topRows("o"),topShare:topRows("share"),
+  zeros:opp.zeros.length,pending:opp.missing.length,potential:opp.potential,
+  delta:d.delta,collabs:topCollaborators()};
+ const ordered=[model.collabs[1],model.collabs[0],model.collabs[2]];
+ try{
+  const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1580;
+  const ctx=canvas.getContext("2d",{alpha:false});if(!ctx)throw Error("Canvas indisponível");
+  await document.fonts?.ready;
+  model.avatars=await Promise.all(ordered.map(x=>x?imageForCanvas(colPhoto(x)):Promise.resolve(null)));
+  paintShare(ctx,model);
+  const ria=await imageForCanvas(riaLogo);
+  if(ria)ctx.drawImage(ria,52,43,152,52); // Identidade RIA no topo.
+  else{ctx.font="900 66px Arial";ctx.fillStyle="#FFFFFF";ctx.fillText("RIA",52,92)}
+  const blob=await new Promise(r=>canvas.toBlob(r,"image/png",.98));
+  if(!blob)throw Error("Falha ao gerar PNG");
+  const file=new File([blob],"Painel_eStore_CEPI_"+EX.period+"_"+latestDate()+".png",{type:"image/png"});
+  if(navigator.canShare?.({files:[file]})&&navigator.share){
+   try{await navigator.share({title:"Painel Executivo eStore | CE+PI",files:[file],text:caption()});return}catch(err){if(err.name==="AbortError")return}
+  }
+  const link=URL.createObjectURL(blob),a=document.createElement("a");a.href=link;a.download=file.name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(link),4000);
+  try{await navigator.clipboard.writeText(caption());notify("Card compacto salvo e resumo copiado.")}catch(_){notify("Card compacto salvo para compartilhar.")}
+ }catch(err){alert("Não foi possível gerar o card: "+String(err.message||err))}
+}
+
 w.executivePanelViewV1=executivePanelViewV1;
 w.loadExecutiveV1=loadExecutiveV1;
 w.execSetPeriodV1=setPeriod;
