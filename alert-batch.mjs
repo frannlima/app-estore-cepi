@@ -16,6 +16,7 @@ export function batchMarkup(model){
  }
  return '<section class="acBatch"><div class="acBatchTitle"><div><strong>🚨 Alertas das lojas priorizadas</strong><p>Sem venda no print: prioridade imediata. Com venda: alerta somente após 60 minutos sem nova atualização comprovada. Selecione um supervisor por filial.</p></div><b class="acBatchCount">'+rows.length+' lojas</b></div>'+
  '<div class="acBatchStats"><span>🔴 '+rows.length+' priorizadas</span><span>✅ '+enabled+' com contato apto</span><span>⚠️ '+(rows.length-enabled)+' aguardam validação</span></div>'+
+ (model?.needs_reconfirm?'<p class="acBatchFreshNote"><b>Referência: '+esc(model.reference_time||'?')+'.</b> Existe um registro posterior ('+esc(model.latest_record_time||'?')+') sem classificação. Revise o registro mais recente ou confirme o uso da parcial classificada.</p><label class="acConfirm"><input type="checkbox" id="acBatchReferenceConfirm"> Autorizo usar a parcial classificada de '+esc(model.reference_time||'?')+' como referência deste lote.</label>':'<p class="acBatchFreshNote">Referência da parcial validada: <b>'+esc(model?.reference_time||'não informada')+'</b>.</p>')+
  (blocks?'<div class="acBatchTargets">'+blocks+'</div>':'<p>Nenhuma filial exige alerta agora. Lojas com venda informada há menos de 60 minutos permanecem fora do lote; classificações não conferidas não disparam.</p>')+
  '<label class="acConfirm"><input id="acBatchWorking" type="checkbox"> Confirmei que os supervisores selecionados estão trabalhando agora e podem receber os alertas.</label>'+
  '<div class="acBatchActions"><button id="acSelectAllBatch" class="btn ghost">Selecionar todas aptas</button><button id="acClearBatch" class="btn ghost">Limpar seleção</button><button id="acStartBatch" class="btn" disabled>Enviar em massa (assistido)</button><button id="acReviewBatch" class="btn ghost">Conferir contatos</button></div>'+
@@ -23,11 +24,11 @@ export function batchMarkup(model){
 }
 export function wireBatch(model,notify){
  const available=targets(model);
- const working=document.getElementById('acBatchWorking'),btn=document.getElementById('acStartBatch');
+ const working=document.getElementById('acBatchWorking'),btn=document.getElementById('acStartBatch'),reference=document.getElementById('acBatchReferenceConfirm');
  const queue=()=>available.flatMap(t=>{const c=t.contacts.find(c=>String(c.id)===String(selected.get(t.row.st)));return c?[{row:t.row,contact:c}]:[];});
- const refresh=()=>{const n=queue().length;btn.disabled=!working.checked||n===0;btn.textContent='Enviar em massa (assistido) · '+n;};
+ const refresh=()=>{const n=queue().length;btn.disabled=!working.checked||n===0||(reference&&!reference.checked);btn.textContent='Enviar em massa (assistido) · '+n;};
  document.querySelectorAll('[data-ac-batch-store]').forEach(e=>e.addEventListener('change',()=>{if(e.value)selected.set(e.dataset.acBatchStore,e.value);else selected.delete(e.dataset.acBatchStore);refresh();}));
- working.addEventListener('change',refresh);
+ working.addEventListener('change',refresh);reference?.addEventListener('change',refresh);
  document.getElementById('acSelectAllBatch')?.addEventListener('click',()=>{
   for(const x of available){if(x.contacts.length)selected.set(x.row.st,String(x.contacts[0].id));}
   document.querySelectorAll('[data-ac-batch-store]').forEach(e=>{e.value=selected.get(e.dataset.acBatchStore)||'';});
@@ -39,7 +40,7 @@ export function wireBatch(model,notify){
  document.getElementById('acReviewBatch')?.addEventListener('click',()=>document.getElementById('acContactsTab')?.click());
  refresh();
  btn.addEventListener('click',()=>{
-  if(!working.checked)return;
+  if(!working.checked||(reference&&!reference.checked))return;
   const items=queue().filter(v=>eligibleRow(v.row)&&eligibleContact(v.contact,v.row));
   if(!items.length){notify('Nenhum destinatário elegível selecionado. Confira os contatos.');return;}
   runBatch(items,notify);
