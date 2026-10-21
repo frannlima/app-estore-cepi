@@ -335,7 +335,7 @@ function ocrParse(text){
    let value=lines[i];
    // OCR ocasionalmente envia valores da tabela na linha seguinte à identificação.
    for(let j=1;j<=2&&i+j<lines.length&&!isOtherRow(lines[i+j])&&value.length<170;j++){
-    if((value.match(/%/g)||[]).length>=1&&(value.match(/R\$/g)||[]).length>=1)break;
+    if(/\d[\d.]*,\d{2}/.test(value)&&/\d[.,]\d{1,3}\s*%/.test(value))break;
     value+=' '+lines[i+j];
    }
    const row=extract(value);
@@ -356,8 +356,8 @@ function ocrParse(text){
   const captured=amounts.length?amounts[0]:null;
   const approved=amounts.length>1?amounts[1]:null;
   // Pedidos apenas com rótulo explícito na mesma linha; nunca adivinhar.
-  const ordersMatch=line.match(/(?:pedidos?|qtd\.?\s*ped(?:idos)?)\s*[:\-]?\s*(\d{1,6})(?!\d)/i);
-  const orders=ordersMatch?Number(ordersMatch[1]):null;
+  const ordersMatch=line.match(/(?:pedidos?|qtd\.?\s*ped(?:idos)?)\s*[:\-]?\s*(\d{1,3}(?:\.\d{3})+|\d{1,7})(?![\d.,])/i);
+  const orders=ordersMatch?Number(ordersMatch[1].replace(/\./g,"")):null;
   return {captured,approved,orders,share};
  }
  return {company:collect(companyName),regional:collect(regionName),lines:lines.length};
@@ -379,7 +379,11 @@ async function readPrint(ev){
  if(status){status.className="execReadStatusV3";status.textContent="Lendo o print e procurando o total da empresa e a linha CE+PI…";}
  try{
   const t=await loadLib("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js","Tesseract");
-  const result=await t.recognize(file,"por+eng");
+  let result;
+  try{result=await t.recognize(file,"por+eng")}catch(primary){
+   if(status)status.textContent="Tentando uma segunda leitura do print…";
+   result=await t.recognize(file,"eng");
+  }
   EX.ocrText=result?.data?.text||"";
   const parsed=ocrParse(EX.ocrText);
   const fields=[["company_captured",parsed.company.captured],["company_approved",parsed.company.approved],
