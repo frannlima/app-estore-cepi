@@ -186,3 +186,46 @@
  .execStoreMarkV2 img{width:15px;height:21px}
  .execStoreMarkV2 b{font-size:10px}
 }
+
+
+/* V3 - Importacao automatica do print no Painel Executivo */
+.execImportSimplifiedV3{padding:20px!important;border:1px solid #dce5df!important;background:#fff!important}
+.execImportSimplifiedV3 h3{font-size:21px;margin:0 0 8px;color:#173F35}
+.execImportSimplifiedV3>.execHelpV1{margin:8px 0 13px}
+.execImportPeriodV3{display:grid;grid-template-columns:minmax(125px,190px) minmax(0,1fr);gap:14px;margin:16px 0;align-items:start}
+.execImportDatesV3{display:grid;gap:8px;align-self:stretch}
+.execDateRangeV3{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.execDateRangeV3[hidden],.execDayBadgeV3[hidden],.execReviewV3[hidden],.execOriginalPrintV3[hidden]{display:none!important}
+.execDayBadgeV3{background:#eaf2ed;border:1px solid #bed6c8;color:#173F35;border-radius:13px;padding:13px;font-size:14px;font-weight:850;line-height:1.4}
+.execImportDatesV3 small{font-size:11px}
+.execUploadMainV3{background:#f3f7f4;border:2px dashed #467365;border-radius:16px;min-height:100px;display:flex;align-items:center;gap:13px;cursor:pointer;padding:15px;margin:14px 0;color:#173F35}
+.execUploadMainV3:active{background:#e5f1e9}
+.execUploadMainV3 strong{display:block;font-size:17px;margin-bottom:3px}
+.execUploadMainV3 small{display:block;color:#56766c;line-height:1.5;font-size:11px}
+.execUploadIconV3{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:#DE7C00;color:#fff;font-size:24px;flex:none}
+.execReadStatusV3{border-radius:13px;border:1px solid #c9d8cd;background:#f0f3f0;color:#466964;font-size:12px;line-height:1.5;font-weight:650;padding:12px 13px;min-height:42px}
+.execReadStatusV3.success{background:#e9f4ec;border-color:#9acdaf;color:#175c37}
+.execReadStatusV3.warning{background:#fff5e9;border-color:#ebc594;color:#7e4b14}
+.execOriginalPrintV3,.execReviewV3{border:1px solid #dce5dd;border-radius:14px;margin:12px 0;overflow:hidden;background:#faf9f5}
+.execOriginalPrintV3 summary,.execReviewV3 summary{padding:13px 15px;font-size:13px;font-weight:850;color:#173F35;cursor:pointer}
+.execReviewV3 summary span{font-size:11px;color:#466964;font-weight:750}
+.execOriginalPrintV3 img{width:100%;height:auto;max-height:490px;object-fit:contain;display:block;background:#dfe5df}
+.execReviewV3 .execInputsV1{padding:7px 14px 15px;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.execReviewV3>.execHelpV1{margin:0;padding:4px 14px}
+.execReviewV3 .execFieldV1 label{font-size:12px}
+.execReviewV3 input:not([type=date]){font-variant-numeric:tabular-nums;font-weight:750}
+.execReviewV3 input::placeholder{color:#8f9892;font-weight:400;font-size:12px}
+.execImportActionsV3{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:13px}
+.execImportActionsV3 .execActionV1{min-height:43px;white-space:normal}
+.execImportActionsV3 .execConfirmV3{background:#173F35;flex:1}
+@media(max-width:580px){
+ .execImportSimplifiedV3{padding:14px!important}
+ .execImportPeriodV3{grid-template-columns:1fr;gap:10px}
+ .execDateRangeV3{gap:8px}
+ .execUploadMainV3{padding:13px;gap:10px}
+ .execUploadMainV3 strong{font-size:15px}
+ .execReadStatusV3{font-size:12px}
+ .execReviewV3 .execInputsV1{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .execImportActionsV3 .execActionV1{font-size:12px;padding:10px 11px}
+ .execImportActionsV3 .execConfirmV3{flex:1 1 150px}
+}
