@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v180-alert-rules';
-const BUILD='v180-alert-rules';
+const CACHE='estore-cepi-shell-v181-classified-partial';
+const BUILD='v181-classified-partial';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
