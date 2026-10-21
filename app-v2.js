@@ -2804,3 +2804,134 @@ showCampaignPopupV37=function(){
 
 /* V158: Parcial Top 15 por porte - inicialização independente */
 (function(){if(window.__CAMPAIGN_PARTIAL_158_LOADER__)return;window.__CAMPAIGN_PARTIAL_158_LOADER__=true;var s=document.createElement('script');s.src='./campaign-partial-v158.js?build=v167';s.async=false;s.onerror=function(){console.warn('Parcial eStore indisponível: falha ao carregar módulo')};(document.head||document.documentElement).appendChild(s);})();
+
+
+/* V189: pop-up individual da 3ª parcial eStore Volume Máximo */
+(function(){
+  'use strict';
+  if(window.__estoreThirdPartialPopup189)return;
+  window.__estoreThirdPartialPopup189=true;
+  const END='2026-11-10';
+  const RECEIPTS_API='https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-campaign-popup-read';
+  const PAGE='./ranking-3a-parcial-2026.html?build=v189';
+  const PREFIX='estore_volumemaximo_3parcial_20261020_seen_';
+  const checked=new Set();
+  const checking=new Set();
+  let shownFor='',lastFocus=null,oldOverflow='';
+  const byId=id=>document.getElementById(id);
+  function currentMatricula(){
+    try { if(typeof U!=='undefined'&&U&&U.u&&U.u.id)return String(U.u.id).trim(); }catch(_){}
+    try { if(window.U&&window.U.u&&window.U.u.id)return String(window.U.u.id).trim(); }catch(_){}
+    return '';
+  }
+  function loggedIn(){
+    const login=byId('login'),app=byId('app');
+    return !!app&&!app.classList.contains('hide')&&(!login||login.classList.contains('hide'));
+  }
+  function localSeen(id){try{return localStorage.getItem(PREFIX+id)==='1'}catch(_){return false}}
+  function saveLocal(id){try{localStorage.setItem(PREFIX+id,'1')}catch(_){}}
+  function isExpired(){
+    try{
+      const f=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Fortaleza',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+      const get=t=>f.find(x=>x.type===t).value;
+      return get('year')+'-'+get('month')+'-'+get('day')>END;
+    }catch(_){return false}
+  }
+  function otherModalActive(){
+    const ids=['celebrationOverlayV134','campaignPopupV37','pop75','pop75Overlay','estoreThirdPartialModal189'];
+    return ids.some(id=>{
+      const e=byId(id);
+      return e&&e.getClientRects().length>0&&getComputedStyle(e).visibility!=='hidden';
+    });
+  }
+  function style(){
+    if(byId('estoreThirdPartialStyles189'))return;
+    const st=document.createElement('style');st.id='estoreThirdPartialStyles189';
+    st.textContent=
+      '#estoreThirdPartialModal189{position:fixed;inset:0;z-index:2147483250;background:rgba(5,22,18,.86);padding:max(9px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(9px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));display:flex;align-items:center;justify-content:center;box-sizing:border-box}'+
+      '#estoreThirdPartialModal189 *{box-sizing:border-box}'+
+      '#estoreThirdPartialModal189 .tpDialog189{width:min(980px,100%);height:min(97dvh,100%);background:#fff9ee;box-shadow:0 22px 80px #0007;border-radius:21px;display:flex;flex-direction:column;overflow:hidden;color:#173f35;font-family:Arial,system-ui,sans-serif}'+
+      '#estoreThirdPartialModal189 .tpHead189{background:#173f35;color:#fff;padding:15px 18px 14px;display:flex;gap:14px;align-items:center}'+
+      '#estoreThirdPartialModal189 .tpHeader189{flex:1;min-width:0}'+
+      '#estoreThirdPartialModal189 .tpHeader189 small{font-size:10px;letter-spacing:.12em;font-weight:850;color:#e8ad5a}'+
+      '#estoreThirdPartialModal189 .tpHeader189 h2{margin:6px 0 0;line-height:1.25;font-size:clamp(15px,2.5vw,20px);font-weight:850;color:#fff}'+
+      '#estoreThirdPartialModal189 .tpClose189{height:37px;width:37px;min-width:37px;border:1px solid #fff7;border-radius:50%;background:#ffffff1d;color:#fff;font-size:25px;cursor:pointer}'+
+      '#estoreThirdPartialModal189 .tpFrame189{border:0;display:block;width:100%;flex:1;min-height:0;background:#173f35}'+
+      '#estoreThirdPartialModal189 .tpFoot189{padding:11px 15px;background:#fff9ee;display:flex;justify-content:space-between;align-items:center;gap:12px}'+
+      '#estoreThirdPartialModal189 .tpFoot189 button{border:0;border-radius:12px;background:#DE7C00;color:#fff;padding:12px 18px;font-weight:900;font-size:13px;cursor:pointer}'+
+      '#estoreThirdPartialModal189 .tpFoot189 a{color:#173f35;font-weight:750;text-decoration:underline;font-size:12px}'+
+      '@media(max-width:560px){#estoreThirdPartialModal189 .tpDialog189{height:98dvh;border-radius:13px}#estoreThirdPartialModal189 .tpHead189{padding:12px}#estoreThirdPartialModal189 .tpHeader189 h2{font-size:15px}#estoreThirdPartialModal189 .tpFoot189{padding:9px;gap:5px}#estoreThirdPartialModal189 .tpFoot189 button{font-size:11px;padding:12px 10px}#estoreThirdPartialModal189 .tpFoot189 a{font-size:10px}}';
+    document.head.appendChild(st);
+  }
+  function ack(id){
+    saveLocal(id);
+    checked.add(id);
+    fetch(RECEIPTS_API,{method:'POST',mode:'cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({matricula:id}),keepalive:true,cache:'no-store'}).catch(e=>console.warn('[eStore pop-up] confirmação remota indisponível',e));
+  }
+  function dismiss(){
+    const e=byId('estoreThirdPartialModal189');
+    if(!e)return;
+    const id=shownFor;
+    e.remove();
+    document.body.style.overflow=oldOverflow;
+    shownFor='';
+    if(id)ack(id);
+    try{lastFocus?.focus?.()}catch(_){}
+  }
+  window.closeThirdPartialPopup189=dismiss;
+  function show(id){
+    if(byId('estoreThirdPartialModal189')||!loggedIn()||currentMatricula()!==id)return;
+    if(isExpired())return;
+    style();
+    shownFor=id;
+    lastFocus=document.activeElement;
+    oldOverflow=document.body.style.overflow;
+    document.body.style.overflow='hidden';
+    const overlay=document.createElement('section');
+    overlay.id='estoreThirdPartialModal189';
+    overlay.setAttribute('role','dialog');
+    overlay.setAttribute('aria-modal','true');
+    overlay.setAttribute('aria-label','3ª parcial da campanha eStore no Volume Máximo');
+    overlay.innerHTML=
+      '<div class="tpDialog189">'+
+      '<header class="tpHead189">'+
+      '<div class="tpHeader189"><small>🏆 CAMPANHA eSTORE NO VOLUME MÁXIMO</small><h2>Confira o ranking da 3ª parcial da campanha eStore no Volume Máximo.</h2></div>'+
+      '<button type="button" class="tpClose189" aria-label="Fechar ranking" title="Fechar">×</button>'+
+      '</header>'+
+      '<iframe class="tpFrame189" title="Card da 3ª parcial da campanha" src="'+PAGE+'" loading="eager"></iframe>'+
+      '<footer class="tpFoot189"><a href="'+PAGE+'" target="_blank" rel="noopener">Abrir card em tela cheia ↗</a><button type="button" class="tpConfirm189">CONFERI O RANKING ✓</button></footer>'+
+      '</div>';
+    document.body.appendChild(overlay);
+    overlay.querySelector('.tpClose189')?.addEventListener('click',dismiss);
+    overlay.querySelector('.tpConfirm189')?.addEventListener('click',dismiss);
+    overlay.addEventListener('click',ev=>{if(ev.target===overlay)dismiss()});
+    overlay.querySelector('.tpClose189')?.focus();
+  }
+  async function tryShow(){
+    if(isExpired()||!loggedIn())return;
+    const id=currentMatricula();
+    if(!/^\d{4,12}$/.test(id)||id==='0000000'||localSeen(id)||checked.has(id)||checking.has(id))return;
+    checking.add(id);
+    let seen=false;
+    try{
+      const controller=new AbortController();
+      const timeout=setTimeout(()=>controller.abort(),4500);
+      try{
+        const r=await fetch(RECEIPTS_API+'?matricula='+encodeURIComponent(id),{mode:'cors',cache:'no-store',signal:controller.signal});
+        const data=await r.json();
+        if(r.ok&&data.ok)seen=!!data.seen;
+      }finally{clearTimeout(timeout)}
+    }catch(e){console.warn('[eStore pop-up] consulta indisponível; usando armazenamento local',e)}
+    finally{checking.delete(id)}
+    if(seen){saveLocal(id);checked.add(id);return}
+    if(localSeen(id)){checked.add(id);return}
+    // Evita sobrepor a celebração de aniversário e outros avisos já abertos.
+    if(currentMatricula()===id&&!otherModalActive())show(id);
+  }
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&byId('estoreThirdPartialModal189'))dismiss()});
+  window.addEventListener('storage',e=>{if(e.key&&e.key.startsWith(PREFIX)&&e.newValue==='1'&&shownFor===e.key.slice(PREFIX.length))dismiss()});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(tryShow,1350),{once:true});
+  else setTimeout(tryShow,1350);
+  // Também atende restauração automática de login, troca de matrícula e fechamento de outros modais.
+  setInterval(tryShow,1700);
+})();
