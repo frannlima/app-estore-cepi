@@ -25,6 +25,7 @@ const firstMonth=(d)=>d.slice(0,7)+"-01";
 const same=(a,b)=>String(a||"")===String(b||"");
 const logo="./assets/riachuelo-logo-horizontal-oficial-white-v133.svg";
 const riaLogo="./assets/ria-marca-executivo.svg";
+const verticalLogo="./assets/ria-vertical-anexo-v188.svg";
 function notify(msg){let el=document.createElement("div");el.className="execToastV1";el.textContent=msg;document.body.append(el);setTimeout(()=>el.remove(),4700)}
 async function exApi(body){const r=await fetch(API_EXEC,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});const j=await r.json().catch(()=>({}));if(!r.ok||j.error)throw Error(j.error||"Falha de comunicação");return j}
 function storeName(st){try{return typeof storeDisplayName==="function"?storeDisplayName(st):""}catch(_){return""}}
@@ -85,6 +86,24 @@ function opportunities(){
  const regTarget=base.reduce((s,x)=>s+n(x.ee),0);
  return {zeros:v,missing,potential,ratio:have&&regTarget>0?potential/regTarget:null};
 }
+function shareMovements(){
+ const ref=latestDate(),p=EX.period,valid=x=>x&&STORES.includes(String(x.st||"").padStart(3,"0"))&&x.share_delta!=null&&Number.isFinite(Number(x.share_delta));
+ const normalize=(arr,kind)=>[...(arr||[])].filter(valid).map(x=>({st:String(x.st).padStart(3,"0"),delta:Number(x.share_delta)})).filter(x=>kind==="up"?x.delta>0:x.delta<0).sort((a,b)=>kind==="up"?b.delta-a.delta:a.delta-b.delta);
+ if(p==="week"){
+  const f=EX.fca||{},cur=f.showPartial&&f.currentPartial&&f.currentPartial.end===ref?f.currentPartial:null;
+  const closed=!cur&&f.closedWeekEnd===ref?f:null;
+  return {available:!!(cur||closed),up:normalize(cur?.growth||closed?.growth,"up"),down:normalize(cur?.retractions||closed?.prioritized,"down"),source:"FCA semanal",reason:cur||closed?"":"Comparativo FCA não disponível para o intervalo"};
+ }
+ if(p==="month"){
+  const ym=ref.slice(0,7),d=new Date(ym+"-01T12:00:00Z");d.setUTCMonth(d.getUTCMonth()-1);const before=d.toISOString().slice(0,7);
+  const all=EX.data?.official_months||[],curr=all.find(x=>x.month===ym),previous=all.find(x=>x.month===before);
+  if(!curr||!previous||!curr.stores||!previous.stores)return {available:false,up:[],down:[],source:"Share mensal oficial",reason:"Aguardando shares oficiais dos dois meses comparados"};
+  const list=STORES.filter(st=>curr.stores[st]!=null&&previous.stores[st]!=null&&Number.isFinite(Number(curr.stores[st]))&&Number.isFinite(Number(previous.stores[st]))).map(st=>({st,delta:Number(curr.stores[st])-Number(previous.stores[st])}));
+  if(!list.length)return {available:false,up:[],down:[],source:"Share mensal oficial",reason:"Sem histórico mensal comparável por filial"};
+  return {available:true,up:list.filter(x=>x.delta>0).sort((a,b)=>b.delta-a.delta),down:list.filter(x=>x.delta<0).sort((a,b)=>a.delta-b.delta),source:"Share mensal oficial",reason:""};
+ }
+ return {available:false,up:[],down:[],source:"",reason:""};
+}
 function trendData(){
  const end=latestDate(),start=periodBounds(EX.period,end).start_date;
  const days=(EX.data?.daily||[]).filter(x=>x.date>=start&&x.date<=end);
@@ -125,7 +144,7 @@ function podiumItem(p,pos){
 }
 function top3HTML(title,rows,key,format){
  return '<div class="execMiniV1"><h4>'+e(title)+'</h4><div class="execMiniListV2">'+(
- rows.length?rows.map((x,i)=>'<div class="execMiniRowV1"><span class="execMedalV1">'+(i+1)+'</span><b class="execStoreV2">'+e(x.st)+'</b><strong>'+format(x[key])+'</strong></div>').join(""):'<span class="execHelpV1">Aguardando dados</span>'
+ rows.length?rows.map((x,i)=>'<div class="execMiniRowV1"><span class="execMedalV1">'+(i+1)+'</span><b class="execStoreV2">L'+e(x.st)+'</b><strong>'+format(x[key])+'</strong></div>').join(""):'<span class="execHelpV1">Aguardando dados</span>'
  )+'</div></div>';
 }
 function drawChart(rows){
@@ -145,7 +164,7 @@ function dailyStoreChart(rows){
  const items=[...rows].filter(x=>n(x.c)>0).sort((a,b)=>n(b.c)-n(a.c)).slice(0,5);
  if(!items.length)return '<div class="execHelpV1">Sem captação registrada no período diário.</div>';
  const max=Math.max(1,...items.map(x=>n(x.c)));
- return '<div class="execTopStoreChartV2">'+items.map((x,i)=>'<div class="execStoreBarV2"><span class="execStoreRankV2">'+(i+1)+'º</span><strong>RIA '+e(x.st)+'</strong><div class="execStoreBarTrackV2"><i style="width:'+Math.max(2,n(x.c)/max*100)+'%;background:'+(i===0?"#DE7C00":"#173F35")+'"></i></div><b>'+money(x.c)+'</b></div>').join("")+'</div>';
+ return '<div class="execTopStoreChartV2">'+items.map((x,i)=>'<div class="execStoreBarV2"><span class="execStoreRankV2">'+(i+1)+'º</span><strong>L'+e(x.st)+'</strong><div class="execStoreBarTrackV2"><i style="width:'+Math.max(2,n(x.c)/max*100)+'%;background:'+(i===0?"#DE7C00":"#173F35")+'"></i></div><b>'+money(x.c)+'</b></div>').join("")+'</div>';
 }
 function executivePanelViewV1(){
  if(!isLeader())return '<div class="notice">Painel Executivo disponível para supervisores e gestores.</div>';
@@ -192,12 +211,12 @@ function render(){
  const chart='<section class="execSectionV1"><div class="execSectionHeadV2"><h3>'+ (daily?"MAIORES CAPTAÇÕES | D-1":EX.period==="week"?"EVOLUÇÃO DIÁRIA DA CAPTAÇÃO":"EVOLUÇÃO SEMANAL DA CAPTAÇÃO")+'</h3>'+
  (daily?'<span class="execTinyV2">5 maiores filiais</span>':'<span class="execTinyV2">Fonte: Gestão/Lojas</span>')+'</div>'+
  (daily?dailyStoreChart(d.rows):drawChart(trendData()))+
- (daily?'<button type="button" class="execSecondaryV2" onclick="execToggleStoresV2()">Ver todas as lojas ▾</button><div id="execAllStoresV2" class="execAllStoresV2" hidden>'+[...d.rows].sort((a,b)=>n(b.c)-n(a.c)).map(x=>'<div><b>RIA '+e(x.st)+'</b><span>'+money(x.c)+'</span></div>').join("")+'</div>':"")+'</section>';
+ (daily?'<button type="button" class="execSecondaryV2" onclick="execToggleStoresV2()">Ver todas as lojas ▾</button><div id="execAllStoresV2" class="execAllStoresV2" hidden>'+[...d.rows].sort((a,b)=>n(b.c)-n(a.c)).map(x=>'<div><b>L'+e(x.st)+'</b><span>'+money(x.c)+'</span></div>').join("")+'</div>':"")+'</section>';
  const zeroCard=daily?'<div class="execZeroV1"><h4>LOJAS ZERADAS</h4><strong class="execNumBigV2">'+opp.zeros.length+'</strong><small>Com captação igual a zero</small><div class="execZeroStatsV2"><span>Potencial de recuperação</span><b>'+money(opp.potential)+'</b><span>% da meta regional</span><b>'+percent(opp.ratio)+'</b><span>Sem atualização</span><b>'+opp.missing.length+'</b></div></div>':
  '<div class="execZeroV1"><h4>SHARE REGIONAL</h4><strong class="execNumBigV2">'+percent(share)+'</strong><small>'+(EX.period==="week"?"Evolução frente à semana anterior":"Acumulado do mês")+'</small><div class="execShareDeltaV2 '+(trend!=null&&trend<0?"negative":"positive")+'">'+(trend==null?"Sem comparativo FCA":pp(trend))+'</div></div>';
  const attentionTitle=daily?"SITUAÇÃO DAS LOJAS":EX.period==="week"?"MAIORES RETRAÇÕES | FCA":"MENOR SHARE | MÊS";
  const rightCard='<div class="execPriorityV1"><h4>'+attentionTitle+'</h4>'+
- (attention.length?'<div class="execStoreAttentionV2">'+attention.map(x=>'<div class="execAttRowV2"><span><b>RIA '+e(x.st)+'</b></span><strong class="'+(x.kind==="down"||x.kind==="zero"?"execDangerV1":"")+'">'+e(x.tag)+'</strong></div>').join("")+'</div>':'<div class="execHelpV1">Sem lojas para este critério.</div>')+
+ (attention.length?'<div class="execStoreAttentionV2">'+attention.map(x=>'<div class="execAttRowV2"><span><b>L'+e(x.st)+'</b></span><strong class="'+(x.kind==="down"||x.kind==="zero"?"execDangerV1":"")+'">'+e(x.tag)+'</strong></div>').join("")+'</div>':'<div class="execHelpV1">Sem lojas para este critério.</div>')+
  '<small class="execTinyV2">'+(daily?"Sem informação não é loja zerada.":EX.period==="week"?"Comparativo do FCA semanal.":"Lojas ordenadas pelo share do mês.")+'</small></div>';
  const podium='<section class="execSectionV1"><div class="execSectionHeadV2"><h3>TOP 3 COLABORADORES | REGIONAL</h3><span class="execTinyV2">Venda captada • '+periodName+'</span></div>'+
  '<div class="execPodiumV1">'+ordered.map((x,i)=>podiumItem(x,[2,1,3][i])).join("")+'</div></section>';
@@ -312,19 +331,22 @@ async function saveBenchmark(){
  }catch(err){alert("Não foi possível salvar: "+String(err.message||err))}
 }
 function caption(){
- const rg=regionalData(),b=rg.benchmark,zero=opportunities(),period=EX.period==="day"?"D-1":EX.period==="week"?"SEMANA":"MÊS";
- const d=latestDate();
- return "📊 *PAINEL eSTORE | CE+PI • "+period+"*\n"+
- "📅 "+dia(periodBounds(EX.period,d).start_date)+(EX.period!=="day"?" a "+dia(d):"")+"\n\n"+
- "💰 *Captação:* "+money2(rg.rows.length?rg.total.captured:b?.regional_captured??null)+"\n"+
- "🛍️ *Pedidos:* "+count(rg.rows.length?rg.total.orders:b?.regional_orders??null)+"\n"+
- "📈 *Share CE+PI:* "+percent(rg.share)+"\n"+
- "🏢 *Share empresa:* "+percent(b?.company_share)+"\n"+
- "↕️ *Desvio:* "+pp(rg.share!=null&&b?.company_share!=null?rg.share-n(b.company_share):null)+"\n"+
- (rg.delta==null?"":"🔺 *Evolução share vs FCA:* "+pp(rg.delta)+"\n")+
- (EX.period==="day"?"🎯 *Lojas zeradas:* "+zero.zeros.length+(zero.potential==null?"":" • potencial "+money2(zero.potential))+"\n":"")+
- "\n*Foco:* "+(EX.period==="week"?"Reverter as maiores retrações identificadas no FCA.":"Garantir produtividade e vendas em todas as filiais.")+
- "\n\nModa que inspira o Brasil";
+ const r=regionalData(),b=r.benchmark,z=opportunities(),ref=latestDate(),period=EX.period==="day"?"D-1":EX.period==="week"?"SEMANA":"MÊS";
+ const begin=periodBounds(EX.period,ref).start_date,cap=r.rows.length?r.total.captured:b?.regional_captured??null;
+ const orders=r.rows.length?r.total.orders:b?.regional_orders??null,company=b?.company_share??null,desvio=r.share!=null&&company!=null?r.share-n(company):null;
+ const lines=[
+  "📊 *PAINEL eSTORE | CE+PI • "+period+"*",
+  "📅 "+dia(begin)+(EX.period==="day"?"":" a "+dia(ref)),
+  "",
+  "💰 *Captação:* "+money2(cap),
+  "🛍️ *Pedidos:* "+count(orders),
+  "📈 *Share CE+PI:* "+percent(r.share),
+  "🏢 *Share empresa:* "+percent(company),
+  "↕️ *Desvio:* "+pp(desvio)
+ ];
+ if(EX.period==="day")lines.push("🎯 *Lojas zeradas:* "+z.zeros.length+" • potencial "+money2(z.potential));
+ lines.push("","Moda que inspira o Brasil");
+ return lines.join("\n");
 }
 
 async function imageForCanvas(src){
