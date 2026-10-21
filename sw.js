@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v195-right-logo';
-const BUILD='v195-right-logo';
+const CACHE='estore-cepi-shell-v196-link-legenda';
+const BUILD='v196-link-legenda';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
