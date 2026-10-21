@@ -253,3 +253,27 @@
  .execZeroStoresV3 .execZeroHeadV3{font-size:10px}
  .execZeroStoresV3 .execZeroRowV3{font-size:12px}
 }
+
+
+/* v193 | Pódio Executivo: medalhas, ordinal e filial sem logo */
+.execPodiumV1 .execPlaceWithMedalV3{display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;width:auto!important;height:auto!important;min-width:94px;min-height:43px;border-radius:999px!important;padding:5px 13px!important;box-shadow:0 3px 8px rgba(23,63,53,.15);background:#DE7C00;color:#fff;flex:none}
+.execPodiumV1 .execPlaceWithMedalV3 .execRankMedalV3{font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-size:25px;line-height:1.25;display:inline-block}
+.execPodiumV1 .execPlaceWithMedalV3 strong{color:#fff!important;font-size:20px!important;font-weight:950!important;white-space:nowrap;line-height:1.1}
+.execPodiumV1 .place2 .execPlaceWithMedalV3{background:#466964}
+.execPodiumV1 .place3 .execPlaceWithMedalV3{background:#466964}
+.execPodiumV1 .execStoreTextV3{display:block;margin:0;min-width:0;padding:3px 9px;border-radius:8px;font-size:16px;font-weight:900;color:#173F35;background:rgba(255,255,255,.70);letter-spacing:.03em;font-variant-numeric:tabular-nums}
+.execPodiumV1 .execPodiumPersonV2{gap:10px}
+.execPodiumV1 .execNameV2{overflow-wrap:anywhere}
+@media(max-width:650px){
+ .execPodiumV1 .execPlaceWithMedalV3{min-width:70px;min-height:32px;gap:3px!important;padding:3px 6px!important}
+ .execPodiumV1 .execPlaceWithMedalV3 .execRankMedalV3{font-size:19px}
+ .execPodiumV1 .execPlaceWithMedalV3 strong{font-size:15px!important}
+ .execPodiumV1 .execStoreTextV3{font-size:13px;padding:3px 7px}
+ .execPodiumV1 .execPodiumPersonV2{gap:7px}
+}
+@media(max-width:365px){
+ .execPodiumV1 .execPlaceWithMedalV3{min-width:62px;min-height:29px}
+ .execPodiumV1 .execPlaceWithMedalV3 .execRankMedalV3{font-size:16px}
+ .execPodiumV1 .execPlaceWithMedalV3 strong{font-size:14px!important}
+ .execPodiumV1 .execStoreTextV3{font-size:12px;padding:3px 5px}
+}
