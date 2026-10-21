@@ -176,3 +176,13 @@
 .execMoveRowV188{gap:6px;padding:6px 0;font-size:11px}
 .execMoveRowV188 strong,.execMoveRowV188 b{font-size:11px}
 }
+
+/* Marca institucional vertical RIA no pódio (único bloco com a identificação RIA + filial). */
+.execStoreMarkV2{background:rgba(255,255,255,.84);border:1px solid #E3E6DE;min-height:52px;min-width:52px;padding:5px 8px;gap:2px}
+.execStoreMarkV2 img{width:19px;height:28px;max-width:none;object-fit:contain}
+.execStoreMarkV2 b{color:#173F35;font-size:12px;line-height:1.1}
+@media(max-width:650px){
+ .execStoreMarkV2{min-height:45px;min-width:41px;padding:4px 6px}
+ .execStoreMarkV2 img{width:15px;height:21px}
+ .execStoreMarkV2 b{font-size:10px}
+}
