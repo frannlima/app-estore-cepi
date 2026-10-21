@@ -19,6 +19,8 @@ const dateBR=v=>/^\d{4}-\d\d-\d\d$/.test(v)?v.slice(8)+'/'+v.slice(5,7)+'/'+v.sl
 const localHour=stamp=>{try{return Number(new Intl.DateTimeFormat('en-GB',{timeZone:'America/Fortaleza',hour:'2-digit',hourCycle:'h23'}).format(new Date(stamp)))}catch(_){return 0}};
 const isMain=()=>typeof admV3==='function'&&admV3()&&user()?.id!=='0000000';
 let adminPassword='',supervisors=null,parsed=[],fileRef=null,rawText='',photoHash='',busy=false;
+let alertTemplateV198=null;
+import('./alert-center-core.mjs').then(m=>{alertTemplateV198=typeof m.message==='function'?m.message:null}).catch(()=>{});
 function reference(j){
  const t=clock(),selected=String(j?.result_date||t.date);
  return {date:selected,hour:selected===t.date?t.hour:21,minute:selected===t.date?t.minute:59};
@@ -126,6 +128,7 @@ async function directory(){
 }
 function alertMessage(row,person){
  const first=String(person.name||'Liderança').split(' ')[0],d=curr()?.result_date||clock().date;
+ if(alertTemplateV198)return alertTemplateV198({name:person.name,st:row.st,meta:row.metaValue,orders:row.orderTarget,condition:'missing',date:d,time:clock().time});
  return '🚨 *ALERTA eSTORE CONNECT | HORA A HORA*\n\nOlá, '+first+'! Precisamos atualizar a captação da *filial '+row.st+'*.\n\n🎯 *Meta eStore:* '+moneyBR(row.metaValue)+'\n🛍️ *Meta de pedidos:* '+Number(row.orderTarget||0)+'\n⏱️ *Situação:* '+status(row,curr()).label+'\n📅 *Parcial:* '+dateBR(d)+'\n\n📲 Já teve vendas? Atualize o Hora a Hora: '+APP_URL+'\n\nCaso exista alguma dificuldade, sinalize para alinharmos o apoio. Contamos com você!';
 }
 function showDirectory(){
