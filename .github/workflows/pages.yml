@@ -39,8 +39,10 @@ jobs:
           cp "$BASE/tesseract.js/dist/worker.min.js" vendor/ocr/worker.min.js
           cp "$BASE/tesseract.js-core/"tesseract-core*.wasm* vendor/ocr/core/
           cp "$BASE/@tesseract.js-data/eng/4.0.0_best_int/eng.traineddata.gz" vendor/ocr/lang/eng.traineddata.gz
-          cp "$BASE/tesseract.js/LICENSE" vendor/ocr/TESSERACT_LICENSE
-          cp "$BASE/tesseract.js-core/LICENSE" vendor/ocr/CORE_LICENSE
+          for pkg in tesseract.js tesseract.js-core; do
+            license="$(find "$BASE/$pkg" -maxdepth 1 -type f -iname 'LICENSE*' -print -quit)"
+            if [ -n "$license" ]; then cp "$license" "vendor/ocr/${pkg}-LICENSE"; fi
+          done
           test -s vendor/ocr/tesseract.min.js
           test -s vendor/ocr/worker.min.js
           test -s vendor/ocr/core/tesseract-core-simd-lstm.wasm
