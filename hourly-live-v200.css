@@ -117,3 +117,19 @@
 .hourQuickManualFieldsV205 select,.hourQuickManualFieldsV205 input{min-height:43px;width:100%;min-width:0;border:1px solid #A5C3AE;background:#fff;border-radius:9px;padding:9px 11px;font-size:15px;color:#173F35}
 .hourDirRowV198 [data-hour-card]{white-space:normal;line-height:1.3;min-height:40px;font-weight:800}
 @media(max-width:600px){.hourQuickManualFieldsV205{grid-template-columns:1fr 1fr}.hourDirRowV198 [data-hour-card]{padding:9px 7px}}
+
+
+/* Hora a Hora — importação prioritária por texto WhatsApp v208 */
+.hourPastePrimaryV208{border:1px solid #9ABFAA;border-radius:14px;background:#F1F8F2;padding:11px 12px;margin:0}
+.hourPastePrimaryV208 summary{font-size:15px!important;font-weight:900!important;color:#173F35!important;cursor:pointer;line-height:1.5;padding:3px 0 10px!important}
+.hourPastePrimaryV208 textarea{font-size:14px;line-height:1.5;border:1px solid #9EBBA9;background:#fff;border-radius:11px;padding:12px;width:100%;max-width:100%;min-height:186px;color:#183E34;resize:vertical}
+.hourPasteAnalyzeV208{display:block;width:100%;padding:13px 15px;margin-top:10px;border-radius:10px;background:#173F35;color:#fff;font-size:15px;font-weight:850;min-height:44px}
+.hourImageOptionalV208{border:1px solid #DCE7DD;background:#fff;border-radius:11px;padding:9px 12px}
+.hourImageOptionalV208 summary{font-size:12px;color:#4B6C5F;cursor:pointer;font-weight:750;line-height:1.5;padding:6px}
+.hourImageOptionalV208 .hourQuickDropV202{margin:9px 0 3px;min-height:92px}
+.hourImageOptionalV208 .hourQuickCameraV202{font-size:24px}
+.hourImportRulesV208{background:#F1F7F3;border-left:3px solid #466964;border-radius:6px;padding:9px 10px;font-size:12px;color:#355548;line-height:1.6}
+.hourSaleBreakdownV208{font-size:12px;color:#5C776C;line-height:1.4;overflow-wrap:anywhere;background:#F7F8F4;border-radius:7px;padding:6px 8px;margin-bottom:9px}
+.hourQuickReviewHeaderV202{align-items:start}
+.hourQuickReviewHeaderV202 small{font-size:12px;font-weight:750;color:#1B6D8F}
+@media(max-width:640px){.hourPastePrimaryV208{padding:10px}.hourPastePrimaryV208 textarea{min-height:200px}.hourPasteAnalyzeV208{position:relative;font-size:14px}.hourImportRulesV208{font-size:11px}}
