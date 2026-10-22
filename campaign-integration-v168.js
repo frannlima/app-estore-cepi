@@ -185,7 +185,10 @@
      fn.__goal215=true;wrappedShare=fn;window.shareCanvas=fn;
    }
    if(!logged())return;
-   const m=id();if(m!==lastId){lastId=m;routed=false;shown=false;close()}
+   const m=id();
+   // Admin pertence exclusivamente à matrícula proprietária; preserve menus de supervisão.
+   try{if(m!=="2457695"&&U?.admin)U.admin=false}catch(_){}
+   if(m!==lastId){lastId=m;routed=false;shown=false;close()}
    if(!routed){
      routed=true;
      const v=new URLSearchParams(location.search).get("view");
