@@ -439,7 +439,7 @@ function renderReview(modal){
  const total=cents(rows.flatMap(x=>x.amounts))/100;
  host.innerHTML='<div class="hourQuickReviewHeaderV202"><b>2. Confira o consolidado</b>'+
  '<small>'+rows.length+' lojas • '+moneyBR(total)+' em vendas identificadas</small></div>'+
- '<p class="hourImportRulesV208">Os valores após a meta foram somados por filial. O padrão é <b>total acumulado do dia</b>, para evitar duplicação de vendas já lançadas. Se a mensagem mostrar apenas novas vendas, altere o tipo na respectiva loja. Pedidos reais não são inferidos da meta.</p>'+
+ '<p class="hourImportRulesV208">Os valores após a meta foram somados por filial. O padrão é <b>total acumulado do dia</b>, para evitar duplicação de vendas já lançadas. Se a mensagem mostrar apenas novas vendas, altere o tipo na respectiva loja. Pedidos não são inferidos da meta; se não forem informados, serão registrados como 0.</p>'+
  (rows.length?rows.map(x=>{
   const amount=cents(x.amounts)/100;
   const details=x.amounts.map(moneyBR).join(' + ');
