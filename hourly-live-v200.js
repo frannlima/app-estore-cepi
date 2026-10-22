@@ -323,17 +323,40 @@ async function readOCR(modal){
 function renderReview(modal){
  const host=modal.querySelector('#hourImportRowsV198');
  const candidates=parsed.filter(x=>x.amounts.length>0);
- host.innerHTML='<h4>Conferência de vendas por filial</h4>'+
- '<p class="hourSmallV198">Valores reconhecidos não entram automaticamente. Confira cada filial. Indique se a quantia é venda incremental ou acumulado do dia. Pedidos são opcionais quando não constam da mensagem.</p>'+
+ const multi=candidates.filter(x=>x.amounts.length>1).length;
+ host.innerHTML='<div class="hourQuickReviewHeaderV202"><b>2. Confira as vendas</b><small>'+candidates.length+' loja(s) identificada(s)'+(multi?' • '+multi+' precisam de conferência do total':'')+'</small></div>'+
  (candidates.length?candidates.map(x=>{
-  const multi=x.amounts.length>1;
-  return '<div class="hourImportRowV198" data-hir="'+x.st+'"><label class="hourCheckV198"><input type="checkbox" data-hi-check> <strong>L'+x.st+'</strong></label>'+
-   '<small>Meta de pedidos: '+x.goal+'</small>'+
-   (multi?'<small class="hourMultiV198">Múltiplos valores encontrados: '+x.amounts.map(moneyBR).join(' / ')+'. Confirme o total manualmente.</small>':'')+
-   '<label>Venda (R$)<input class="field" data-hi-captured type="text" inputmode="decimal" value="'+(multi?'':x.amounts[0].toFixed(2).replace('.',','))+'" placeholder="0,00"></label>'+
-   '<label>Pedidos reais<input class="field" data-hi-orders type="number" min="0" max="10000" step="1" value="0"></label>'+
-   '<label>Tipo<select class="field" data-hi-mode><option value="incremental">Venda incremental</option><option value="cumulative">Total acumulado do dia</option></select></label></div>';
- }).join(''):'<p class="hourMultiV198">Nenhuma venda identificada com segurança. Os números após as setas são metas de pedidos, não vendas realizadas.</p>');
+  const multiple=x.amounts.length>1,amount=multiple?'':x.amounts[0].toFixed(2).replace('.',',');
+  const shortcuts=multiple?'<div class="hourQuickChoicesV202"><small>O print contém '+x.amounts.length+' valores. Escolha o valor ou confira a soma:</small>'+
+   x.amounts.map(v=>'<button type="button" class="hourQuickChoiceV202" data-pick="'+v.toFixed(2)+'">'+moneyBR(v)+'</button>').join('')+
+   '<button type="button" class="hourQuickChoiceV202" data-pick="'+x.amounts.reduce((a,b)=>a+b,0).toFixed(2)+'">Somar: '+moneyBR(x.amounts.reduce((a,b)=>a+b,0))+'</button></div>':'';
+  return '<div class="hourQuickSaleV202" data-hir="'+x.st+'">'+
+   '<div class="hourQuickSaleHeaderV202"><label><input type="checkbox" data-hi-check '+(multiple?'':'checked')+'><b>L'+x.st+'</b></label><small>Meta '+x.goal+' pedidos</small></div>'+
+   '<label class="hourQuickAmountV202">Venda captada (R$)<input class="field" data-hi-captured inputmode="decimal" value="'+amount+'" placeholder="Confira ou digite o total"></label>'+
+   shortcuts+'<details class="hourQuickSaleAdvancedV202"><summary>Editar pedidos e tipo de lançamento</summary>'+
+   '<div class="hourQuickEditFieldsV202"><label>Pedidos realizados<input class="field" data-hi-orders type="number" min="0" max="10000" value="0" step="1"></label>'+
+   '<label>Valor informado<select class="field" data-hi-mode><option value="incremental">Nova venda (incremento)</option><option value="cumulative">Total acumulado do dia</option></select></label></div></details>'+
+   '</div>';
+ }).join(''):'<p class="hourQuickNoSaleV202">Não foram identificados valores de venda. A meta de pedidos não é um lançamento de venda.</p>');
+ const confirmation=modal.querySelector('#hourQuickConfirmV202');
+ confirmation.hidden=!candidates.length;
+ host.querySelectorAll('[data-pick]').forEach(btn=>btn.onclick=()=>{
+   const row=btn.closest('[data-hir]');
+   row.querySelector('[data-hi-captured]').value=Number(btn.dataset.pick).toFixed(2).replace('.',',');
+   row.querySelector('[data-hi-check]').checked=true;
+   refreshReviewV202(modal);
+ });
+ host.querySelectorAll('[data-hi-check]').forEach(c=>c.onchange=()=>refreshReviewV202(modal));
+ host.querySelectorAll('[data-hi-captured]').forEach(input=>input.oninput=()=>{
+   if(moneyVal(input.value)>0)input.closest('[data-hir]').querySelector('[data-hi-check]').checked=true;
+   refreshReviewV202(modal);
+ });
+ refreshReviewV202(modal);
+}
+function refreshReviewV202(modal){
+ const count=[...modal.querySelectorAll('[data-hir]')].filter(el=>el.querySelector('[data-hi-check]')?.checked&&moneyVal(el.querySelector('[data-hi-captured]')?.value)>0).length;
+ const b=modal.querySelector('#hourImportCommitV198');
+ if(b){b.disabled=count===0;b.textContent=count?'Salvar '+count+' venda'+(count===1?'':'s')+' confirmada'+(count===1?'':'s'):'Selecione a venda para salvar';}
 }
 async function commit(modal){
  const result=modal.querySelector('#hourImportResultV198'),date=modal.querySelector('#hourImportDateV198').value,time=modal.querySelector('#hourImportTimeV198').value,password=modal.querySelector('#hourImportPwdV198').value;
