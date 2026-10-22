@@ -18,7 +18,7 @@ const clock=()=>{const a=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{tim
 const dateBR=v=>/^\d{4}-\d\d-\d\d$/.test(v)?v.slice(8)+'/'+v.slice(5,7)+'/'+v.slice(0,4):'—';
 const localHour=stamp=>{try{return Number(new Intl.DateTimeFormat('en-GB',{timeZone:'America/Fortaleza',hour:'2-digit',hourCycle:'h23'}).format(new Date(stamp)))}catch(_){return 0}};
 const isMain=()=>typeof admV3==='function'&&admV3()&&user()?.id!=='0000000';
-let adminPassword='',supervisors=null,parsed=[],fileRef=null,rawText='',photoHash='',busy=false;
+let adminPassword='',supervisors=null,groupStatuses={},parsed=[],fileRef=null,rawText='',photoHash='',busy=false;
 let alertTemplateV198=null;
 import('./alert-center-core.mjs').then(m=>{alertTemplateV198=typeof m.message==='function'?m.message:null}).catch(()=>{});
 function reference(j){
@@ -41,7 +41,7 @@ function status(r,j){
  return{code:'course',label:'Em curso',miss:0};
 }
 function noInput(j){
- return(j?.stores||[]).filter(r=>status(r,j).code==='missing').map(r=>String(r.st).padStart(3,'0'));
+ return(j?.stores||[]).filter(r=>status(r,j).code==='missing'&&groupStatuses[String(r.st).padStart(3,'0')]!=='sale').map(r=>String(r.st).padStart(3,'0'));
 }
 function statusCounts(j){
  const all=j?.stores||[];
@@ -92,7 +92,7 @@ function decorateScreen(){
  const old=root.querySelector('.hourAlertV6');if(old)old.remove();
  const nf=noInput(j),counts=statusCounts(j);
  if(radar)radar.innerHTML='<div class="hourRadarCountersV198"><span>🟢 Girando ponteiro <b>'+counts.spinning+'</b></span><span>🟠 Em curso <b>'+counts.course+'</b></span><span>🔴 Sem input <b>'+counts.missing+'</b></span></div>'+
- '<p><b>Filiais pendentes:</b> '+(nf.length?nf.map(x=>'L'+x).join(' • '):'Nenhuma')+'</p><small>Contagem por intervalo desde o último lançamento. Mensagens do grupo não são lidas automaticamente: importe o print para considerar as vendas informadas.</small>';
+ '<p><b>Filiais pendentes:</b> '+(nf.length?nf.map(x=>'L'+x).join(' • '):'Nenhuma')+'</p><small>Contagem por intervalo desde o último lançamento. Mensagens do grupo não são lidas automaticamente: importe o print para considerar as vendas. Após validar a Central, as lojas com venda confirmada no grupo ficam fora dos alertas.</small>';
  if(supervisors)showDirectory();
 }
 function shortName(s){return String(s||'').trim().split(/\s+/).slice(0,2).join(' ')}
@@ -120,10 +120,12 @@ function caption(j){
 async function directory(){
  if(!isMain())throw Error('Acesso restrito ao administrador.');
  if(!adminPassword){const s=window.prompt('Senha administrativa para consultar supervisores e contatos:');if(!s)return;adminPassword=s}
- const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:'dashboard',matricula:String(user()?.id||''),password:adminPassword})});
+ const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:'dashboard',matricula:String(user()?.id||''),password:adminPassword,date:curr()?.result_date||clock().date})});
  const j=await r.json();
  if(!r.ok||!j.ok){adminPassword='';throw Error(j.error||'Consulta indisponível')}
  supervisors=j.contacts||[];
+ groupStatuses=j.groupStatus||{};
+ try{decorateScreen()}catch(_){}
  return supervisors;
 }
 function alertMessage(row,person){
@@ -259,7 +261,7 @@ hourlyCaptionV6=caption;
 window.hourlyStatusV198=status;
 window.hourlyRadarV198=decorateScreen;
 const prevLogout=typeof logoutApp==='function'?logoutApp:null;
-if(prevLogout)logoutApp=function(...args){adminPassword='';supervisors=null;return prevLogout(...args)};
-window.addEventListener('pagehide',()=>{adminPassword='';supervisors=null});
+if(prevLogout)logoutApp=function(...args){adminPassword='';supervisors=null;groupStatuses={};return prevLogout(...args)};
+window.addEventListener('pagehide',()=>{adminPassword='';supervisors=null;groupStatuses={}});
 console.info('[eStore] Hora a Hora v198: importação revisada e alertas assistidos');
 })();
