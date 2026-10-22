@@ -51,7 +51,7 @@ async function createPoster(j){
   rrect(ctx,x,y,colW,kpiH,19,row===0?'#FFFFFF':'#EDF4EE','#E3E6E0');
   const palette=[['#315F50','#EBF3E8'],['#DAD9D6','#FDF6ED'],['#F3E0DB','#FCEFEA']][col];
   rrect(ctx,x+15,y+15,47,45,12,palette[1]);
-  put(ctx,icon,x+38,y+38,25,G,true,'center');
+  put(ctx,icon,x+38,y+38,25,GREEN,true,'center');
   fit(ctx,title,x+72,y+37,colW-90,18,MUTED,true);
   fit(ctx,val,x+15,y+95,colW-30,34,title==='DESVIO PARA META'?(delta<0?RED:'#167748'):BLUE,true);
  });
