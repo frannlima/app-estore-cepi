@@ -140,8 +140,8 @@
 /* V215: direcionamento diário de metas para supervisores e links de compartilhamento. */
 (function(){
  "use strict";
- const permitted=new Set(["home","result","metasv4","store","ranking","campaigns","poolv3","teamv3","reportsv3","profilev3","important","adminv3"]);
- const labels={home:"Início",result:"Meu Resultado",metasv4:"Metas",store:"Minha Filial",ranking:"Ranking",campaigns:"Campanhas",poolv3:"Pool",teamv3:"Meu Time",reportsv3:"Relatórios",profilev3:"Perfil",important:"Informações",adminv3:"Administrativo"};
+ const permitted=new Set(["home","result","metasv4","hourlyv5","store","ranking","campaigns","poolv3","teamv3","reportsv3","profilev3","important","supportv5","adminv3"]);
+ const labels={home:"Início",result:"Meu Resultado",metasv4:"Metas",store:"Minha Filial",ranking:"Ranking",campaigns:"Campanhas",poolv3:"Pool",teamv3:"Meu Time",reportsv3:"Relatórios",profilev3:"Perfil",important:"Informações",hourlyv5:"Hora a Hora",supportv5:"Suporte",adminv3:"Administrativo"};
  let current="home",lastId="",routed=false,shown=false,wrappedGo=null,wrappedShare=null;
  window.__estoreCurrentShareMenu215=()=>current;
  function date(){
@@ -172,7 +172,7 @@
  (document.head||document.documentElement).appendChild(css);
  function tick(){
    if(typeof window.go==="function"&&window.go!==wrappedGo&&!window.go.__goal215){
-     const orig=window.go,fn=function(view,...rest){if(permitted.has(view))current=view;return orig.call(this,view,...rest)};
+     const orig=window.go,fn=function(view,...rest){if(view==="adminv3"&&id()!=="2457695")return; if(permitted.has(view))current=view;return orig.call(this,view,...rest)};
      fn.__goal215=true;wrappedGo=fn;window.go=fn;
    }
    if(typeof window.shareCanvas==="function"&&window.shareCanvas!==wrappedShare&&!window.shareCanvas.__goal215){
@@ -226,4 +226,31 @@
  };
  enhanced.__estoreFooter215=true;
  try{navigator.share=enhanced}catch(_){}
+})();
+
+
+/* Segurança da experiência: promoções permanecem no menu Campanhas, sem modal na abertura. */
+(function(){
+ "use strict";
+ let lastSuppressed=null;
+ function suppress(){
+   // A tela principal já carregou; os métodos de publicidade não podem interrompê-la.
+   try{
+     if(typeof showCampaignPopupV37==="function"&&showCampaignPopupV37!==lastSuppressed){
+       lastSuppressed=function(){return};
+       showCampaignPopupV37=lastSuppressed;
+     }
+   }catch(_){}
+   try{
+     if(typeof window.showCampaignPopupV37==="function"&&window.showCampaignPopupV37!==lastSuppressed){
+       if(!lastSuppressed)lastSuppressed=function(){return};
+       window.showCampaignPopupV37=lastSuppressed;
+     }
+   }catch(_){}
+   document.getElementById("campaignPopupV37")?.remove();
+ }
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",suppress,{once:true});
+ else suppress();
+ const interval=setInterval(suppress,2500);
+ window.addEventListener("pagehide",()=>clearInterval(interval),{once:true});
 })();
