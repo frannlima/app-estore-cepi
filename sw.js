@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v210-hourly-caption';
-const BUILD='v210-hourly-caption';
+const CACHE='estore-cepi-shell-v211-hourly-caption-standard';
+const BUILD='v211-hourly-caption-standard';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
