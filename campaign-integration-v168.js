@@ -143,6 +143,7 @@
  const permitted=new Set(["home","result","metasv4","store","ranking","campaigns","poolv3","teamv3","reportsv3","profilev3","important","adminv3"]);
  const labels={home:"Início",result:"Meu Resultado",metasv4:"Metas",store:"Minha Filial",ranking:"Ranking",campaigns:"Campanhas",poolv3:"Pool",teamv3:"Meu Time",reportsv3:"Relatórios",profilev3:"Perfil",important:"Informações",adminv3:"Administrativo"};
  let current="home",lastId="",routed=false,shown=false,wrappedGo=null,wrappedShare=null;
+ window.__estoreCurrentShareMenu215=()=>current;
  function date(){
    const parts=new Intl.DateTimeFormat("en-US",{timeZone:"America/Fortaleza",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
    const p=k=>parts.find(x=>x.type===k)?.value||"";
@@ -199,4 +200,30 @@
  }
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",tick,{once:true});else tick();
  setInterval(tick,1400);
+})();
+
+/* V215 | Inclui menu e endereço no compartilhamento nativo de imagens e textos. */
+(function(){
+ "use strict";
+ if(typeof navigator.share!=="function"||navigator.share.__estoreFooter215)return;
+ const before=navigator.share;
+ const paths={home:"Início",result:"Meu Resultado",metasv4:"Metas",store:"Minha Filial",ranking:"Ranking",campaigns:"Campanhas",poolv3:"Pool",teamv3:"Meu Time",reportsv3:"Relatórios",profilev3:"Perfil",important:"Informações",hourlyv5:"Hora a Hora",adminv3:"Administrativo"};
+ function route(){
+   const v=new URLSearchParams(location.search).get("view");
+   let current=typeof window.__estoreCurrentShareMenu215==="function"?window.__estoreCurrentShareMenu215():"";
+   if((!current||current==="home")&&paths[v])current=v;
+   return paths[current]?current:"home";
+ }
+ function footer(text){
+   const base=String(text||"").trimEnd();
+   if(base.includes("frannlima.github.io/app-estore-cepi/"))return base;
+   const v=route();
+   return base+"\n\n📲 Acesse o App eStore CE+PI\n📍 Menu → "+paths[v]+"\n🔗 https://frannlima.github.io/app-estore-cepi/?view="+v;
+ }
+ const enhanced=function(payload){
+   if(!payload||typeof payload!=="object")return before.call(navigator,payload);
+   return before.call(navigator,{...payload,text:footer(payload.text||payload.title||"")});
+ };
+ enhanced.__estoreFooter215=true;
+ try{navigator.share=enhanced}catch(_){}
 })();
