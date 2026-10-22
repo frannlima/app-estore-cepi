@@ -133,3 +133,6 @@
 .hourQuickReviewHeaderV202{align-items:start}
 .hourQuickReviewHeaderV202 small{font-size:12px;font-weight:750;color:#1B6D8F}
 @media(max-width:640px){.hourPastePrimaryV208{padding:10px}.hourPastePrimaryV208 textarea{min-height:200px}.hourPasteAnalyzeV208{position:relative;font-size:14px}.hourImportRulesV208{font-size:11px}}
+
+/* Cadastro de supervisores: advertência de afastamento/férias no Hora a Hora */
+.hourDirRowV198 .hourLeaveV209{display:block;margin-top:5px;padding:6px 8px;border-radius:6px;background:#FFF3E1;color:#914E18;font-size:11px;line-height:1.35;font-weight:800;white-space:normal}
