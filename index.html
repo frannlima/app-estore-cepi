@@ -1987,7 +1987,119 @@ function storeDisplayName(st){let code=String(st||U?.u?.st||'').padStart(3,'0'),
 function profile(){let dn=displayName();if(isDemo())return '<div class=card><div class=profileHead>'+photo(U.u.id,dn,'photoBig')+'<div><div class=title>'+esc(dn)+'</div><div class=muted>Modo Demonstração • Filial '+esc(U.u.st)+'</div></div></div><div class=notice>Este perfil permite conhecer todas as áreas do App sem alterar dados, configurações ou registros.</div></div>';return '<div class=card><div class=profileHead>'+photo(U.u.id,dn,'photoBig')+'<div><div class=title>'+esc(dn)+'</div><div class=muted>Matrícula '+esc(U.u.id)+' • Filial '+esc(U.u.st)+'<br>'+esc(U.u.role)+'</div></div></div><div class=card style="box-shadow:none;background:#f7f6f2"><div class=title>Personalizar meu perfil</div><div class=muted>Escolha como seu nome aparecerá na tela inicial e adicione sua foto.</div><input id=prefName class=field maxlength=40 value="'+esc(dn)+'" placeholder="Nome de preferência"><input id=profilePhoto type=file accept="image/*" class=field><button class=btn onclick="saveMyProfile()">Salvar perfil</button><div id=profileSaveStatus></div></div><div class=notice>Moda que inspira o Brasil.<br><br>Vontade de crescer • Ninguém faz nada sozinho • O simples é incrível • Talento é conquista</div></div>'}
 async function saveMyProfile(){let name=$('#prefName').value.trim(),file=$('#profilePhoto').files[0],st=$('#profileSaveStatus');if(!name)return alert('Informe o nome de preferência.');st.innerHTML='<div class=notice>Salvando perfil...</div>';try{await api({action:'profile_preferences_set',matricula:U.u.id,preferred_name:name});CONTENT.preferredNames=CONTENT.preferredNames||{};CONTENT.preferredNames[String(U.u.id)]=name;if(file){let dataUrl=await resizeProfilePhoto(file);let j=await api({action:'profile_photo_set',matricula:U.u.id,dataUrl});CONTENT.profilePhotos[String(U.u.id)]=j.photo_url}st.innerHTML='<div class="notice success">Perfil atualizado com sucesso.</div>';setTimeout(()=>go('profile'),500)}catch(e){st.innerHTML='<div class="notice danger">'+esc(e.message)+'</div>'}}
 function resizeProfilePhoto(file){return new Promise((resolve,reject)=>{let r=new FileReader();r.onerror=reject;r.onload=()=>{let im=new Image();im.onerror=reject;im.onload=()=>{let size=Math.min(im.width,im.height),sx=(im.width-size)/2,sy=(im.height-size)/2,c=document.createElement('canvas');c.width=c.height=640;c.getContext('2d').drawImage(im,sx,sy,size,size,0,0,640,640);resolve(c.toDataURL('image/jpeg',.82))};im.src=r.result};r.readAsDataURL(file)})}
-function admin(){if(!isAdmin())return '<div class=notice>Acesso administrativo não autorizado.</div>';if(isDemo())return '<div class="card readOnlyAdmin"><div class=title>Central Administrativa • Demonstração</div><div class=muted>Você pode conhecer a estrutura administrativa, mas alterações ficam bloqueadas no modo visitante.</div><div class=adminGrid style="margin-top:14px"><button class=btn>Atualizar Resultados</button><button class=btn>Comparativo Semanal</button><button class=btn>Atualizar Metas</button><button class=btn>Ticket Médio Histórico</button><button class=btn>Banco de Dados</button><button class=btn>Informações Importantes</button><button class=btn>Cupons e Campanhas</button><button class=btn>eDay</button><button class=btn>Notificações</button><button class=btn>Mídias do App</button><button class=btn>Hora a Hora</button><button class=btn>Chat / Suporte</button><button class=btn>Ritual eStore</button><button class=btn>Apresentação eStore</button></div><div class=notice style="margin-top:14px">🔒 Somente leitura. Nenhum dado pode ser incluído, alterado ou excluído.</div></div>';return '<div class=card><div class=title>Central Administrativa</div><div class=muted>Atualização de dados, configurações e gestão do App.</div><div class=adminGrid style="margin-top:14px"><button class=btn onclick="adminResults()">Atualizar Resultados</button><button class=btn onclick="adminWeeklyComparisonV70()">Comparativo Semanal</button><button class=btn onclick="adminTargets()">Atualizar Metas</button><button class=btn onclick="adminHistoricalTicketsV97()">Ticket Médio Histórico</button><button class=btn onclick="adminDatabase()">Banco de Dados</button><button class=btn onclick="adminInfo()">Informações Importantes</button><button class=btn onclick="adminCampaign()">Cupons e Campanhas</button><button class=btn onclick="adminEday()">eDay</button><button class=btn onclick="adminNotify()">Notificações</button><button class=btn onclick="adminMedia()">Mídias do App</button><button class=btn onclick="go(&quot;hourly&quot;)">Hora a Hora</button><button class=btn onclick="go(&quot;support&quot;)">Chat / Suporte</button><button class=btn onclick="adminRitualV52()">Ritual eStore</button><button class=btn onclick="adminPresentationV99()">Apresentação eStore</button><button class=btn onclick="go(&quot;fca&quot;)">FCA e Performance</button></div></div><div id=adminWork></div><div class=card><div class=title>Auditoria recente</div><div id=audit class=muted>Carregando...</div></div>'}
+
+/* ADM V205 — navegação direta no núcleo do aplicativo.
+   Oculta a grade ao abrir o espaço de trabalho; volta somente após sucesso validado. */
+(function(){
+ "use strict";
+ const state={active:false,pending:null,observer:null,observed:null,timer:null};
+ const doneWords=/conclu[ií]d|sucesso|salv[ao]|publicad|atualizad|processad|incorporad|importad|enviad|cadastrad|exclu[ií]d|gravad|registrad/i;
+ const badWords=/erro|falha|n[aã]o foi poss[ií]vel|obrigat[oó]ri|inv[aá]lid|cancelad|negad|selecione|informe/i;
+ const writeAction=/(?:^daily_update$|^meta_update$|(?:_save|_upload|_update|_import|_delete|_publish|_grant|_revoke|_reset|_remove|_create)$|^weekly_history_import$)/i;
+ function el(id){return document.getElementById(id)}
+ function installCss(){
+   if(el('adminStyleV205'))return;
+   const sheet=document.createElement('style');sheet.id='adminStyleV205';
+   sheet.textContent="\n#view.adminWorkspaceModeV205 #adminHubV205,#view.adminWorkspaceModeV205 #adminAuditV205{display:none!important}\n#view:not(.adminWorkspaceModeV205) #adminWork,#view:not(.adminWorkspaceModeV205) #adminToolbarV205{display:none!important}\n#adminToolbarV205{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:3px 0 13px;padding:12px;background:#f0f5f1;border:1px solid #d6e0d8;border-radius:16px;scroll-margin-top:82px}\n#adminToolbarV205[hidden]{display:none!important}\n#adminToolbarV205 button{background:#173F35;color:#fff;border:0;border-radius:12px;font-weight:800;min-height:43px;padding:10px 13px;cursor:pointer}\n#adminToolbarV205 strong{color:#173F35;flex:1;font-size:15px}\n#adminToolbarV205 .adminLiveV205{font-weight:700;color:#18764b;font-size:12px}\n#adminHubV205 .adminToastV205{margin:12px 0;padding:12px;border-radius:12px;background:#edf7ee;color:#173F35;font-size:13px;font-weight:750}\n@media(max-width:600px){#adminToolbarV205 button{width:100%}#adminToolbarV205 strong{font-size:14px}}\n";
+   document.head.appendChild(sheet);
+ }
+ function clearTimer(){if(state.timer)clearTimeout(state.timer);state.timer=null}
+ function status(text){const e=el('adminLiveV205');if(e)e.textContent=text||''}
+ function focus(){
+   const bar=el('adminToolbarV205');
+   if(!bar)return;
+   requestAnimationFrame(()=>requestAnimationFrame(()=>{
+     if(!state.active||!bar.isConnected)return;
+     window.scrollTo({top:0,left:0,behavior:'instant'});
+     bar.scrollIntoView({behavior:'instant',block:'start'});
+   }));
+ }
+ function finish(){
+   if(!state.active||!state.pending)return;
+   state.pending=null;clearTimer();status('✓ Atualizado');
+   state.timer=setTimeout(()=>{state.timer=null;if(state.active)window.adminReturnV205(true)},1650);
+ }
+ function checkWork(){
+   if(!state.active||!state.pending)return;
+   const work=el('adminWork');if(!work)return;
+   const messages=[...work.querySelectorAll('.notice.success,.success.notice,[role=status].success')]
+     .map(x=>String(x.textContent||'').replace(/\s+/g,' ').trim())
+     .filter(x=>doneWords.test(x)&&!badWords.test(x));
+   if(messages.some(x=>!state.pending.previous.has(x)))finish();
+ }
+ function ensureObserver(){
+   const work=el('adminWork');if(!work||state.observed===work)return;
+   state.observer?.disconnect();state.observed=work;
+   state.observer=new MutationObserver(checkWork);
+   state.observer.observe(work,{subtree:true,childList:true,characterData:true});
+ }
+ function wrapApi(name){
+   const original=window[name];
+   if(typeof original!=='function'||original.__adminV205)return;
+   const wrapper=async function(){
+     const arg=arguments[0],action=String(name==='apiForm'?arg?.get?.('action')||'':arg?.action||'');
+     const res=await original.apply(this,arguments);
+     if(state.active&&state.pending&&writeAction.test(action))finish();
+     return res;
+   };
+   wrapper.__adminV205=true;window[name]=wrapper;
+ }
+ window.adminJumpV205=function(button){
+   if(typeof CUR!=='undefined'&&CUR!=='admin')return;
+   const title=(button?.textContent||'Área administrativa').trim();
+   if(!el('adminWork')||!el('adminHubV205'))return;
+   installCss();ensureObserver();
+   wrapApi('api');wrapApi('apiForm');
+   clearTimer();state.pending=null;state.active=true;
+   el('view')?.classList.add('adminWorkspaceModeV205');
+   const bar=el('adminToolbarV205');
+   if(bar)bar.hidden=false;
+   if(el('adminTitleV205'))el('adminTitleV205').textContent=title;
+   status('');
+   focus();
+ };
+ window.adminReturnV205=function(success){
+   clearTimer();state.pending=null;state.active=false;
+   el('view')?.classList.remove('adminWorkspaceModeV205');
+   const bar=el('adminToolbarV205');if(bar)bar.hidden=true;
+   if(success){
+     const hub=el('adminHubV205');
+     if(hub){
+       const existing=hub.querySelector('.adminToastV205');if(existing)existing.remove();
+       const n=document.createElement('div');n.className='adminToastV205';n.setAttribute('role','status');
+       n.textContent='✓ Alteração concluída. Selecione outro menu.';
+       hub.appendChild(n);
+       setTimeout(()=>n.remove(),3500);
+     }
+   }
+   requestAnimationFrame(()=>window.scrollTo({top:0,left:0,behavior:'instant'}));
+ };
+ document.addEventListener('click',event=>{
+   if(!state.active||typeof CUR!=='undefined'&&CUR!=='admin')return;
+   const button=event.target.closest?.('button');
+   if(!button||!el('adminWork')?.contains(button))return;
+   const handler=button.getAttribute('onclick')||'';
+   const fn=handler.match(/(?:window\.)?([A-Za-z_$][\w$]*)\s*\(/)?.[1]||'';
+   const label=String(button.textContent||'').trim();
+   if(!/^(sendResults|sendTargets|save|upload|publish|delete|reset|import|process|create|remove|confirm|admDbImport|admDbSave|weeklyUpload)/i.test(fn)
+      && !/^(salvar|publicar|processar|importar|incorporar|excluir|enviar|cadastrar|gravar|confirmar|restaurar)/i.test(label))return;
+   clearTimer();
+   const previous=new Set([...el('adminWork').querySelectorAll('.notice.success,.success.notice')].map(n=>String(n.textContent||'').replace(/\s+/g,' ').trim()));
+   state.pending={fn,previous};
+   status('Salvando...');
+ },true);
+ const alertOriginal=window.alert;
+ window.alert=function(message){
+   const text=String(message??'');
+   const succeeded=state.active&&state.pending&&doneWords.test(text)&&!badWords.test(text);
+   const failed=state.active&&state.pending&&badWords.test(text);
+   const result=alertOriginal.apply(this,arguments);
+   if(succeeded)finish();else if(failed){state.pending=null;status('');}
+   return result;
+ };
+})();
+
+function admin(){if(!isAdmin())return '<div class=notice>Acesso administrativo não autorizado.</div>';if(isDemo())return '<div class="card readOnlyAdmin"><div class=title>Central Administrativa • Demonstração</div><div class=muted>Você pode conhecer a estrutura administrativa, mas alterações ficam bloqueadas no modo visitante.</div><div class=adminGrid style="margin-top:14px"><button class=btn>Atualizar Resultados</button><button class=btn>Comparativo Semanal</button><button class=btn>Atualizar Metas</button><button class=btn>Ticket Médio Histórico</button><button class=btn>Banco de Dados</button><button class=btn>Informações Importantes</button><button class=btn>Cupons e Campanhas</button><button class=btn>eDay</button><button class=btn>Notificações</button><button class=btn>Mídias do App</button><button class=btn>Hora a Hora</button><button class=btn>Chat / Suporte</button><button class=btn>Ritual eStore</button><button class=btn>Apresentação eStore</button></div><div class=notice style="margin-top:14px">🔒 Somente leitura. Nenhum dado pode ser incluído, alterado ou excluído.</div></div>';return '<div id=adminHubV205 class=card><div class=title>Central Administrativa</div><div class=muted>Atualização de dados, configurações e gestão do App.</div><div class=adminGrid style="margin-top:14px"><button class=btn onclick="adminResults();adminJumpV205(this)">Atualizar Resultados</button><button class=btn onclick="adminWeeklyComparisonV70();adminJumpV205(this)">Comparativo Semanal</button><button class=btn onclick="adminTargets();adminJumpV205(this)">Atualizar Metas</button><button class=btn onclick="adminHistoricalTicketsV97();adminJumpV205(this)">Ticket Médio Histórico</button><button class=btn onclick="adminDatabase();adminJumpV205(this)">Banco de Dados</button><button class=btn onclick="adminInfo();adminJumpV205(this)">Informações Importantes</button><button class=btn onclick="adminCampaign();adminJumpV205(this)">Cupons e Campanhas</button><button class=btn onclick="adminEday();adminJumpV205(this)">eDay</button><button class=btn onclick="adminNotify();adminJumpV205(this)">Notificações</button><button class=btn onclick="adminMedia();adminJumpV205(this)">Mídias do App</button><button class=btn onclick="go(&quot;hourly&quot;)">Hora a Hora</button><button class=btn onclick="go(&quot;support&quot;)">Chat / Suporte</button><button class=btn onclick="adminRitualV52();adminJumpV205(this)">Ritual eStore</button><button class=btn onclick="adminPresentationV99();adminJumpV205(this)">Apresentação eStore</button><button class=btn onclick="go(&quot;fca&quot;)">FCA e Performance</button></div></div><div id=adminToolbarV205 hidden><button type=button onclick="adminReturnV205(false)">← Voltar aos menus</button><strong id=adminTitleV205></strong><span id=adminLiveV205 class=adminLiveV205></span></div><div id=adminWork></div><div id=adminAuditV205 class=card><div class=title>Auditoria recente</div><div id=audit class=muted>Carregando...</div></div>'}
 
 let WEEKLY_COMPARE_V70=null;
 function weeklyDateLabelV70(v){return v?fcaDateV61(v):'—'}
@@ -6309,4 +6421,4 @@ window.uploadHistoricalTicketsV97=async function(){
 <link rel="stylesheet" href="./alert-center.css?build=20261020"><script type="module" src="./alert-center.js?build=v201"></script>
 <script src="./executive-panel-v1.js?build=v188"></script>
 <!-- HORA-A-HORA-LIVE-V200: carregamento direto, independente do Service Worker -->
-<script src="./hourly-live-v200.js?build=v203"></script><script src="./admin-navigation-v203.js?build=v203"></script></body></html>
+<script src="./hourly-live-v200.js?build=v203"></script></body></html>
