@@ -63,3 +63,47 @@
 .hourV200Status.spinning{color:#216a48;background:#e2f5ea}.hourV200Status.course{color:#a26a19;background:#fff3d4}
 .hourImportCardV198,.hourAlertsCardV198{margin-top:15px}
 @media(max-width:640px){.hourV200Grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.hourV200Metric{padding:12px 9px}.hourV200Metric b{font-size:clamp(15px,4vw,21px)}.hourImportCardV198>.btn,.hourAlertsCardV198>.btn{width:100%}}
+
+
+/* Simplificação da importação — v202 */
+.hourQuickBoxV202{gap:14px;max-width:600px;padding:18px 16px 22px}
+.hourQuickBoxV202 .hourNewHeadV198 h3{font-size:20px;line-height:1.2}
+.hourQuickBoxV202 .hourNewHeadV198 small{font-size:12px}
+.hourQuickDropV202{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;min-height:125px;background:#EDF6EF;border:2px dashed #6BA28A;border-radius:15px;padding:18px 12px;text-align:center;color:#173F35;cursor:pointer}
+.hourQuickDropV202 strong{font-weight:900;font-size:16px}
+.hourQuickDropV202 small{font-size:12px;color:#416556}
+.hourQuickCameraV202{display:block;font-size:35px;line-height:1.1;margin-bottom:5px}
+.hourQuickDropV202 input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.hourQuickStateV202{border-radius:10px;background:#F5F5F1;padding:11px 12px;min-height:40px;font-size:12px;line-height:1.5;color:#245548;font-weight:650}
+.hourQuickReviewHeaderV202{display:flex;justify-content:space-between;gap:9px;align-items:baseline;border-bottom:1px solid #DDE8E0;margin-bottom:8px;padding-bottom:8px}
+.hourQuickReviewHeaderV202 b{font-size:16px;color:#173F35}
+.hourQuickReviewHeaderV202 small{font-size:11px;color:#50695E}
+.hourQuickSaleV202{background:#FFFFFF;border:1px solid #D9E7DD;border-radius:14px;padding:13px;margin:10px 0;box-shadow:0 2px 8px #173F350D}
+.hourQuickSaleHeaderV202{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:11px}
+.hourQuickSaleHeaderV202 label{display:flex;align-items:center;gap:10px;font-size:18px;color:#173F35}
+.hourQuickSaleHeaderV202 input{height:20px;width:20px;accent-color:#173F35}
+.hourQuickSaleHeaderV202 small{font-size:11px;color:#6E796F}
+.hourQuickAmountV202{font-size:12px;color:#315B48;display:grid;gap:5px;font-weight:800}
+.hourQuickAmountV202 input{border-radius:10px;border:1px solid #94B4A0;font-size:22px!important;font-weight:850!important;color:#1E6C96!important;padding:12px}
+.hourQuickChoicesV202{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:9px}
+.hourQuickChoicesV202>small{width:100%;font-size:12px;color:#AB5C19}
+.hourQuickChoiceV202{border:1px solid #DCA970;border-radius:10px;background:#FFF4E3;color:#553414;padding:8px 9px;font-size:12px;font-weight:750;cursor:pointer}
+.hourQuickSaleAdvancedV202{margin-top:12px;padding-top:8px;border-top:1px solid #E8ECE7;font-size:12px}
+.hourQuickSaleAdvancedV202 summary,.hourQuickAdvancedV202 summary,.hourQuickFallbackV202 summary{cursor:pointer;color:#325B4A;font-size:12px;font-weight:750;padding:8px 0}
+.hourQuickEditFieldsV202{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:7px}
+.hourQuickEditFieldsV202 label{font-size:11px;display:grid;gap:5px}
+.hourQuickEditFieldsV202 .field{width:100%;min-width:0}
+.hourQuickFallbackV202,.hourQuickAdvancedV202{border-top:1px solid #E8ECE7;padding:3px 0}
+.hourQuickFallbackV202 textarea{width:100%;max-width:100%;min-height:105px;padding:12px;border:1px solid #AFC9B9;border-radius:9px;font-size:13px;background:#FFF;color:#173F35}
+.hourQuickFallbackV202 .btn{margin-top:9px}
+.hourQuickConfirmV202{display:grid;gap:11px;border-top:1px solid #DEE8DE;padding-top:14px}
+.hourQuickSaveV202{width:100%;padding:13px;border-radius:12px;font-size:15px;font-weight:900}
+.hourQuickNoSaleV202{color:#9C302C;font-size:12px;padding:10px}
+.hourQuickBoxV202 [hidden]{display:none!important}
+@media(max-width:640px){
+.hourQuickBoxV202{max-height:95dvh;max-height:95vh;padding:14px 12px;gap:10px}
+.hourQuickDropV202{min-height:113px}
+.hourQuickCameraV202{font-size:29px}
+.hourQuickReviewHeaderV202{flex-direction:column;gap:4px}
+.hourQuickEditFieldsV202{grid-template-columns:1fr}
+}
