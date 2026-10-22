@@ -225,6 +225,8 @@ function showModal(){
    const chosen=modal.querySelector('#hourImportFileV198').files?.[0];
    if(!chosen)return;
    fileRef=chosen;parsed=[];modal.querySelector('#hourImportRowsV198').innerHTML='';
+   modal.querySelector('#hourImportTextV198').value='';
+   modal.querySelector('#hourQuickFallbackV202').open=false;
    modal.querySelector('#hourQuickConfirmV202').hidden=true;
    modal.querySelector('#hourImportResultV198').textContent='';
    await readOCR(modal);
@@ -280,6 +282,7 @@ async function readOCR(modal){
  }
  if(busy)return;
  busy=true;fileRef=file;
+ modal.querySelector('#hourImportFileV198').disabled=true;
  let worker=null,timeout;
  statusEl.textContent='⏳ Lendo print...';
  try{
@@ -318,6 +321,7 @@ async function readOCR(modal){
   clearTimeout(timeout);
   if(worker)try{await worker.terminate()}catch(_){}
   busy=false;
+  if(modal.isConnected)modal.querySelector('#hourImportFileV198').disabled=false;
  }
 }
 function renderReview(modal){
