@@ -21,16 +21,18 @@ export async function createAlertImage(contact,row){
   line('App.',66,105,32,'#fff');line('eStore',66,158,53,'#fff',true);line('CE+PI',66,215,55,'#DE7C00',true);
  }
  line('🚨 ALERTA',318,112,76,'#fff',true);line('eSTORE CONNECT',325,173,47,'#fff',true);
- const kind=row.closing?'FECHAMENTO eSTORE | 21H':row.condition==='stale'?'VENDA SEM ATUALIZAÇÃO HÁ 1H':row.condition==='zero'?'ACELERAR CAPTAÇÃO':'LOJA SEM VENDA NO PRINT';
+ const kind=row.closing?'FECHAMENTO eSTORE | 21H':row.condition==='stale'?'VENDA SEM ATUALIZAÇÃO HÁ 1H':row.condition==='zero'?'ACELERAR CAPTAÇÃO':'LOJA SEM ATUALIZAÇÃO';
  line(kind,325,230,37,'#fff',true);
  const name=String(contact?.person?.nome||contact?.name_original||'Liderança').split(/\s+/)[0].toUpperCase();
  line('OLÁ, '+name+'!  |  FILIAL '+row.st,55,357,49,red,true);
- const intro=row.closing?'É hora de informar a venda eStore do dia.':row.condition==='stale'?'Venda no print sem nova atualização há 1 hora.':row.condition==='zero'?'Sua filial está com a parcial zerada.':'Sua filial está sem venda informada no print.';
+ const intro=row.closing?'É hora de informar a venda eStore do dia.':row.condition==='stale'?'Venda no print sem nova atualização há 1 hora.':row.condition==='zero'?'Sua filial está com a parcial zerada.':'Sua filial precisa atualizar a venda no app.';
  wrap(intro,55,418,950,39,dark,true,48);
  rect(50,486,980,166,'#FFE7E7');g.strokeStyle=red;g.lineWidth=4;g.strokeRect(50,486,980,166);
- line(row.closing?'⚠ FECHAMENTO 21H — INFORME A VENDA':row.condition==='stale'?'⚠ VENDA DESATUALIZADA NO PRINT':'⚠ SEM VENDA INFORMADA NO PRINT',80,552,37,red,true);
+ line(row.closing?'⚠ FECHAMENTO 21H — INFORME A VENDA':row.condition==='stale'?'⚠ VENDA DESATUALIZADA':'⚠ ATENÇÃO — SEM ATUALIZAÇÃO',80,552,37,red,true);
  const since=row.condition==='stale'?row.last_sale_change_time:row.first_check_time;
- line(row.closing?'Informe o total captado hoje e os pedidos.':since?'Referência da pendência: '+since:'Horário de referência não registrado',80,612,35,red,true);
+ line(row.closing?'Informe o total captado hoje e os pedidos.':
+  Number(row.missing_partials)>0?Number(row.missing_partials)+' parciais sem input de venda':
+  since?'Venda e parcial desde as '+since:'Venda e parcial ainda não registradas',80,612,35,red,true);
  rect(50,679,980,165,'#E9EBEA');
  line('META eSTORE DO DIA',80,733,32,dark,true);line(money(row.meta),80,806,52,dark,true);
  line('META DE PEDIDOS',630,733,32,dark,true);line(String(row.orders)+' pedidos',630,806,52,dark,true);
