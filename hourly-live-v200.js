@@ -240,30 +240,85 @@ async function hashFor(file,text){
  return [...arr].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 function analyzeText(modal,fromOCR){
- const text=modal.querySelector('#hourImportTextV198').value;
- if(!text.trim())return modal.querySelector('#hourParseStateV198').textContent='Cole uma mensagem ou envie um print para reconhecimento.';
- parsed=parse(text);
- rawText=text;
- const statusEl=modal.querySelector('#hourParseStateV198');
- statusEl.textContent=parsed.length+' filiais reconhecidas; '+parsed.filter(x=>x.amounts.length).length+' com indicação de valor. '+(fromOCR?'Verifique cuidadosamente a leitura OCR.':'');
+ if(!modal.isConnected)return;
+ const txt=modal.querySelector('#hourImportTextV198').value;
+ if(!txt.trim()){
+   modal.querySelector('#hourParseStateV198').textContent='Não há texto reconhecido. Cole a mensagem recebida no WhatsApp.';
+   modal.querySelector('#hourQuickFallbackV202').open=true;
+   return;
+ }
+ parsed=parse(txt);rawText=txt;
+ const withSale=parsed.filter(x=>x.amounts.length).length;
+ modal.querySelector('#hourParseStateV198').textContent=withSale?
+  '✅ '+withSale+' loja(s) com valores para conferir. '+(fromOCR?'Revise o que foi lido no print.':'Confira os valores da mensagem.'):
+  'Não identifiquei valores de vendas com segurança. Confira o texto abaixo ou escolha outro print.';
  renderReview(modal);
+ if(!withSale)modal.querySelector('#hourQuickFallbackV202').open=true;
+}
+const quickImportAssetV202=(path)=>new URL('./vendor/ocr/'+path,new URL('./',window.location.href)).href;
+async function loadLocalOcrV202(){
+ if(window.Tesseract)return;
+ const s=document.createElement('script');
+ s.src=quickImportAssetV202('tesseract.min.js');
+ s.async=true;
+ await new Promise((resolve,reject)=>{
+  let settled=false;
+  const done=(err)=>{if(settled)return;settled=true;clearTimeout(timeout);s.onload=null;s.onerror=null;err?reject(err):resolve()};
+  const timeout=setTimeout(()=>done(new Error('O leitor de imagens não carregou.')),12000);
+  s.onload=()=>done();s.onerror=()=>done(new Error('Leitor de imagem indisponível.'));
+  document.head.appendChild(s);
+ });
+ if(!window.Tesseract)throw new Error('O reconhecimento de texto não está disponível no navegador.');
 }
 async function readOCR(modal){
- const state=modal.querySelector('#hourParseStateV198'),file=modal.querySelector('#hourImportFileV198')?.files?.[0];
- if(!file)return analyzeText(modal,false);
- if(!file.type.startsWith('image/')||file.size>8e6){state.textContent='Selecione uma imagem de até 8 MB.';return}
- if(busy)return;busy=true;fileRef=file;
- state.textContent='Reconhecendo texto da imagem no dispositivo...';
+ const statusEl=modal.querySelector('#hourParseStateV198');
+ const file=modal.querySelector('#hourImportFileV198')?.files?.[0];
+ if(!file)return;
+ if(!(/^image\/(jpeg|png|webp)$/i.test(file.type))||file.size>8000000){
+   statusEl.textContent='Selecione um print JPG, PNG ou WEBP de até 8 MB.';
+   return;
+ }
+ if(busy)return;
+ busy=true;fileRef=file;
+ let worker=null,timeout;
+ statusEl.textContent='⏳ Lendo print...';
  try{
-  if(!window.Tesseract){
-   const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
-   await new Promise((resolve,reject)=>{s.onload=resolve;s.onerror=reject;document.head.appendChild(s)});
-  }
-  let r;try{r=await window.Tesseract.recognize(file,'por+eng')}catch(_){r=await window.Tesseract.recognize(file,'eng')}
-  modal.querySelector('#hourImportTextV198').value=r?.data?.text||'';
+  const recognize=async()=>{
+   await loadLocalOcrV202();
+   const opts={
+    workerPath:quickImportAssetV202('worker.min.js'),
+    corePath:quickImportAssetV202('core/'),
+    langPath:quickImportAssetV202('lang/'),
+    workerBlobURL:false,
+    logger:p=>{
+     if(!modal.isConnected)return;
+     if(p?.status==='recognizing text'&&typeof p.progress==='number')
+       statusEl.textContent='🔎 Lendo números do print... '+Math.round(p.progress*100)+'%';
+     else if(p?.status==='loading language traineddata'||p?.status==='loading tesseract core')
+       statusEl.textContent='⏳ Preparando leitura da imagem...';
+    }
+   };
+   worker=await window.Tesseract.createWorker('eng',1,opts);
+   const result=await worker.recognize(file);
+   return String(result?.data?.text||'');
+  };
+  const raw=await Promise.race([
+   recognize(),
+   new Promise((_,reject)=>{timeout=setTimeout(()=>reject(new Error('A leitura demorou além do esperado.')),35000)})
+  ]);
+  if(!modal.isConnected)return;
+  modal.querySelector('#hourImportTextV198').value=raw;
   analyzeText(modal,true);
- }catch(e){state.textContent='A leitura do print não foi possível. Cole ou corrija manualmente o texto. '+String(e.message||e)}
- finally{busy=false}
+ }catch(error){
+  if(!modal.isConnected)return;
+  statusEl.textContent='Não foi possível ler automaticamente este print. Abra “Colar texto da mensagem” e confirme os valores, ou escolha outra imagem.';
+  modal.querySelector('#hourQuickFallbackV202').open=true;
+  console.warn('[eStore] OCR do print:',String(error?.message||error));
+ }finally{
+  clearTimeout(timeout);
+  if(worker)try{await worker.terminate()}catch(_){}
+  busy=false;
+ }
 }
 function renderReview(modal){
  const host=modal.querySelector('#hourImportRowsV198');
