@@ -136,3 +136,67 @@
  // Restaura a ligação se outros módulos legados substituírem a navegação no carregamento.
  [350,1100,2500].forEach(delay=>setTimeout(init,delay));
 })();
+
+/* V215: direcionamento diário de metas para supervisores e links de compartilhamento. */
+(function(){
+ "use strict";
+ const permitted=new Set(["home","result","metasv4","store","ranking","campaigns","poolv3","teamv3","reportsv3","profilev3","important","adminv3"]);
+ const labels={home:"Início",result:"Meu Resultado",metasv4:"Metas",store:"Minha Filial",ranking:"Ranking",campaigns:"Campanhas",poolv3:"Pool",teamv3:"Meu Time",reportsv3:"Relatórios",profilev3:"Perfil",important:"Informações",adminv3:"Administrativo"};
+ let current="home",lastId="",routed=false,shown=false,wrappedGo=null,wrappedShare=null;
+ function date(){
+   const parts=new Intl.DateTimeFormat("en-US",{timeZone:"America/Fortaleza",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+   const p=k=>parts.find(x=>x.type===k)?.value||"";
+   return p("year")+"-"+p("month")+"-"+p("day");
+ }
+ function id(){try{return String(U?.u?.id||"").trim()}catch(_){return ""}}
+ function logged(){return !!id()&&!document.getElementById("app")?.classList.contains("hide")}
+ function read(k){try{return localStorage.getItem(k)==="1"}catch(_){return false}}
+ function save(k){try{localStorage.setItem(k,"1")}catch(_){}}
+ function close(){document.getElementById("estoreGoalFirst215")?.remove()}
+ function openMenu(v){if(typeof window.go==="function")window.go(v);if(v==="metasv4")setTimeout(()=>document.querySelector(".hcBoxV4")?.scrollIntoView({behavior:"smooth",block:"start"}),200)}
+ function show(idNow){
+   const key="estore_goal_first_access_20261022_"+idNow+"_"+date();
+   save(key);shown=true;
+   if(document.getElementById("estoreGoalFirst215"))return;
+   const el=document.createElement("section");el.id="estoreGoalFirst215";
+   el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");
+   el.setAttribute("aria-label","Distribuição diária de metas");
+   el.innerHTML='<div class="goal-content"><button class="goal-dismiss" type="button" aria-label="Fechar">×</button><small>🎯 GESTÃO DO DIA</small><h2>Sua meta do dia está disponível!</h2><p>Acesse a distribuição diária por HC e alinhe o desafio com sua equipe.</p><button class="goal-open" type="button">Visualizar distribuição de metas →</button><button class="goal-later" type="button">Agora não</button></div>';
+   el.querySelector(".goal-dismiss").onclick=close;
+   el.querySelector(".goal-later").onclick=close;
+   el.querySelector(".goal-open").onclick=()=>{close();openMenu("metasv4")};
+   document.body.appendChild(el);
+ }
+ const css=document.createElement("style");css.textContent="#estoreGoalFirst215{position:fixed;inset:0;z-index:2147483200;background:#09281fd1;display:flex;justify-content:center;align-items:center;padding:18px;box-sizing:border-box}#estoreGoalFirst215 *{box-sizing:border-box}#estoreGoalFirst215 .goal-content{position:relative;width:min(450px,100%);background:#fffaf2;border:2px solid #DE7C00;border-radius:24px;padding:27px;color:#173F35;box-shadow:0 23px 70px #0005}#estoreGoalFirst215 small{font-size:11px;letter-spacing:.11em;font-weight:900;color:#9a621b}#estoreGoalFirst215 h2{font-size:clamp(21px,5vw,28px);line-height:1.15;margin:15px 0 12px;color:#173F35}#estoreGoalFirst215 p{font-size:15px;line-height:1.55;color:#466964;margin:0 0 21px}#estoreGoalFirst215 button{cursor:pointer;font:inherit}#estoreGoalFirst215 .goal-dismiss{position:absolute;top:12px;right:16px;background:transparent;border:0;font-size:28px;color:#173F35}#estoreGoalFirst215 .goal-open{width:100%;background:#173F35;color:#fff;border:0;border-radius:14px;padding:15px;font-weight:850}#estoreGoalFirst215 .goal-later{display:block;margin:13px auto 0;color:#466964;background:transparent;border:0;font-size:13px;font-weight:700}";
+ (document.head||document.documentElement).appendChild(css);
+ function tick(){
+   if(typeof window.go==="function"&&window.go!==wrappedGo&&!window.go.__goal215){
+     const orig=window.go,fn=function(view,...rest){if(permitted.has(view))current=view;return orig.call(this,view,...rest)};
+     fn.__goal215=true;wrappedGo=fn;window.go=fn;
+   }
+   if(typeof window.shareCanvas==="function"&&window.shareCanvas!==wrappedShare&&!window.shareCanvas.__goal215){
+     const orig=window.shareCanvas,fn=function(canvas,text,...rest){
+       const label=labels[current]||"Início",route=permitted.has(current)?current:"home";
+       const footer="\n\n📲 Acesse o App eStore CE+PI\n📍 Menu → "+label+"\n🔗 https://frannlima.github.io/app-estore-cepi/?view="+route;
+       const content=String(text||"");
+       return orig.call(this,canvas,content.includes("📲 Acompanhe no App eStore CE+PI")||content.includes("📲 Acesse o App eStore CE+PI")?content:content+footer,...rest);
+     };
+     fn.__goal215=true;wrappedShare=fn;window.shareCanvas=fn;
+   }
+   if(!logged())return;
+   const m=id();if(m!==lastId){lastId=m;routed=false;shown=false;close()}
+   if(!routed){
+     routed=true;
+     const v=new URLSearchParams(location.search).get("view");
+     if(v&&permitted.has(v)&&!(v==="adminv3"&&m!=="2457695")){openMenu(v);return}
+   }
+   if(!shown){
+     const key="estore_goal_first_access_20261022_"+m+"_"+date();
+     if(read(key)){shown=true;return}
+     if(m!=="2457695"&&!!U?.lead&&!U?.admin)show(m);
+     else shown=true;
+   }
+ }
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",tick,{once:true});else tick();
+ setInterval(tick,1400);
+})();
