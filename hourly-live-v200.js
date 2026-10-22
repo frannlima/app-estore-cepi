@@ -84,17 +84,28 @@ function statusCounts(j){
 }
 function parse(text){
  const found=new Map(),lines=String(text||'').replace(/\r/g,'').split(/\n/);
- for(const lineRaw of lines){
-  let line=lineRaw.replace(/[ \t]+/g,' ').trim().replace(/^[•·.\-]\s*/,'');
-  // O número imediatamente após a seta é META DE PEDIDOS, nunca captação.
-  const m=line.match(/^(?:L\s*)?(\d{3})\s*(?:➜|➔|➡|→|➤|➞|->|=>|[:：]|[—–]\s*>)\s*(.+)$/iu);
-  if(!m||!STORES.includes(m[1]))continue;
-  const textAfter=m[2].trim(),goal=textAfter.match(/^\*{0,2}\s*(\d{1,3})\s*\*{0,2}/);
-  if(!goal)continue;
-  const pricePart=textAfter.slice(goal[0].length);
-  const numbers=[...pricePart.matchAll(/(?:R\$\s*)?(\d{1,3}(?:\.\d{3})*,\d{2}|\d+[.,]\d{2})(?!\d)/g)]
-    .map(x=>moneyVal(x[1])).filter(x=>Number.isFinite(x)&&x>0&&x<1000000);
-  found.set(m[1],{st:m[1],goal:Number(goal[1]),amounts:numbers,source:line});
+ const clean=line=>String(line||'').normalize('NFKC').replace(/[\u200b-\u200f\uFEFF]/g,'').replace(/[\t\u00a0]/g,' ').trim();
+ const valueMatcher=/(?:R\s*[$＄]\s*)?(\d{1,3}(?:[.\s]\d{3})*,\s*\d{2}|\d{1,6}[.,]\s*\d{2})(?!\d)/g;
+ const values=tail=>[...tail.matchAll(valueMatcher)].map(x=>moneyVal(x[1].replace(/\s/g,''))).filter(n=>Number.isFinite(n)&&n>0&&n<1000000);
+ let prior=null;
+ for(const raw of lines){
+  const line=clean(raw).replace(/^[•·*.\-]\s*/,'').replace(/^\d{1,2}[).]\s*/,'');
+  if(!line)continue;
+  // O primeiro número inteiro após a seta é sempre META DE PEDIDOS, não venda.
+  // OCR pode trocar "➜" por "A", ">", ":" ou "->".
+  const m=line.match(/^(?:L\s*)?(\d{3})\s*(?:➜|➔|➡|→|➤|➞|[-=]+>|[>»›:：]|A(?=\s*\*?\d))\s*\*{0,2}\s*(\d{1,3})\s*\*{0,2}(.*)$/iu);
+  if(m&&STORES.includes(m[1])){
+   const st=m[1],goal=Number(m[2]);
+   if(goal>200){prior=null;continue}
+   found.set(st,{st,goal,amounts:values(m[3]||''),source:line.slice(0,260)});
+   prior=st;continue;
+  }
+  // Somente um valor isolado na linha seguinte, sem misturar outra filial.
+  if(prior&&/^(?:R\s*[$＄]\s*)?\d{1,6}[.,]\s*\d{2}(?:\s*[/+]\s*(?:R\$\s*)?\d+[.,]\s*\d{2})?\s*$/.test(line)){
+   const row=found.get(prior);
+   if(row&&!row.amounts.length){row.amounts=values(line);row.source+=' | '+line.slice(0,70)}
+   prior=null;
+  }else if(line.length>55||/^(?:L\s*)?\d{3}\s*(?:➜|➔|➡|→|A\s*\d|:|>)/i.test(line))prior=null;
  }
  return [...found.values()];
 }
