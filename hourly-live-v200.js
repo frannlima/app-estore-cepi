@@ -164,15 +164,20 @@ function caption(j){
   '📊 *Share:* '+fmtPercent(r.storeSales>0?r.captured/r.storeSales:null),
   (desvio<0?'🔻':'🔺')+' *Desvio:* '+moneyBR(desvio),
   '🏬 *Lojas com venda:* '+n+'/'+arr.length,
-  '⚠️ *Lojas sem venda informada:* '+miss.length
+  '⚠️ *Lojas sem venda informada:* - '+miss.length,
+  '',
+  '📍 *Filiais sem venda informada:*',
+  '          '+(miss.length?miss.join(', '):'Nenhuma'),
+  '',
+  '🔗 *Atualize a venda da sua loja*',
+  '',
+  '📲  Menu → Hora a Hora → Registrar incremento',
+  '',
+  APP_URL,
+  '',
+  '',
+  '_Moda que inspira o Brasil_'
  ];
- if(miss.length){
-  const preview=miss.slice(0,2).map(st=>'L'+st).join(', ');
-  lines.push('📍 *Filiais pendentes:* '+preview+(miss.length>2?' +'+(miss.length-2):''));
- }
- lines.push('','🔗 *Link direto para o Hora a Hora:*',APP_URL,
-            '📲 *Caminho no app:* Menu → Hora a Hora → Registrar incremento',
-            '','_Moda que inspira o Brasil_');
  return lines.join('\n');
 }
 async function directory(){
