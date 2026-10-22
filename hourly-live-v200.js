@@ -147,7 +147,6 @@ function decorateScreen(){
  '<p><b>Filiais pendentes:</b> '+(nf.length?nf.map(x=>'L'+x).join(' • '):'Nenhuma')+'</p><small>Contagem por intervalo desde o último lançamento. Mensagens do grupo não são lidas automaticamente: importe o print para considerar as vendas. Após validar a Central, as lojas com venda confirmada no grupo ficam fora dos alertas.</small>';
  if(supervisors)showDirectory();
 }
-function shortName(s){return String(s||'').trim().split(/\s+/).slice(0,2).join(' ')}
 function caption(j){
  if(!j)return '';
  const arr=j.stores||[],r={captured:0,meta:0,orders:0,orderTarget:0,storeSales:0};
@@ -155,25 +154,25 @@ function caption(j){
  const n=arr.filter(x=>Number(x.captured||0)>0).length,miss=noInput(j),desvio=r.captured-r.meta;
  const t=clock(),latestTime=j.result_date===t.date?t.time:'Fechamento';
  const lines=[
-  '📊 *PARCIAL eSTORE | CE+PI* • '+dateBR(j.result_date)+' '+latestTime,
-  '🎯 *Meta:* '+moneyBR(r.meta)+' | 💰 *Captado:* '+moneyBR(r.captured),
-  '🛍️ *Pedidos:* '+r.orders+'/'+r.orderTarget+' | 📈 *Ating.:* '+fmtPercent(r.meta>0?r.captured/r.meta:null),
-  '📊 *Share:* '+fmtPercent(r.storeSales>0?r.captured/r.storeSales:null)+' | '+(desvio<0?'🔻':'🔺')+' *Desvio:* '+moneyBR(desvio),
+  '📊 *PARCIAL eSTORE | CE+PI*',
+  '📅 '+dateBR(j.result_date)+' • '+latestTime,
+  '',
+  '🎯 *Meta:* '+moneyBR(r.meta),
+  '💰 *Captado:* '+moneyBR(r.captured),
+  '🛍️ *Pedidos:* '+r.orders+'/'+r.orderTarget,
+  '📈 *Atingimento:* '+fmtPercent(r.meta>0?r.captured/r.meta:null),
+  '📊 *Share:* '+fmtPercent(r.storeSales>0?r.captured/r.storeSales:null),
+  (desvio<0?'🔻':'🔺')+' *Desvio:* '+moneyBR(desvio),
   '🏬 *Lojas com venda:* '+n+'/'+arr.length,
-  '⚠️ *Sem input:* '+miss.length+' loja'+(miss.length===1?'':'s')+(miss.length?' • '+miss.slice(0,8).map(st=>'L'+st).join(', ')+(miss.length>8?' +'+(miss.length-8):''):'')
+  '⚠️ *Lojas sem venda informada:* '+miss.length
  ];
  if(miss.length){
-  let sup=(supervisors||[]).filter(x=>miss.includes(x.st)).flatMap(x=>x.people.map(y=>({st:x.st,name:y.name})));
-  // Nomes da base oficial, sem expor telefones nem depender de autorização para contatos.
-  if(!sup.length&&typeof COMMON!=='undefined'&&COMMON?.stores){
-   sup=miss.flatMap(st=>(COMMON.stores?.[st]?.sup||[]).filter(p=>{
-    const role=String(p.role||'').toLowerCase(),state=String(p.status||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-    return role.includes('supervisor')&&!role.includes('gerente')&&state.includes('atividade normal');
-   }).map(p=>({st,name:p.name||''})));
-  }
-  lines.push('🚨 *Supervisores:* '+(sup.length?sup.slice(0,5).map(x=>'L'+x.st+' '+shortName(x.name)).join(' • ')+(sup.length>5?' +'+(sup.length-5)+' no app':''):'consulte a relação de alertas no app'));
+  const preview=miss.slice(0,2).map(st=>'L'+st).join(', ');
+  lines.push('📍 *Filiais pendentes:* '+preview+(miss.length>2?' +'+(miss.length-2):''));
  }
- lines.push('','🔗 *Atualize a venda da sua loja:*',APP_URL,'','_Moda que inspira o Brasil_');
+ lines.push('','🔗 *Link direto para o Hora a Hora:*',APP_URL,
+            '📲 *Caminho no app:* Menu → Hora a Hora → Registrar incremento',
+            '','_Moda que inspira o Brasil_');
  return lines.join('\n');
 }
 async function directory(){
