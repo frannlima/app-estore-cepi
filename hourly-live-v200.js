@@ -146,7 +146,14 @@ function caption(j){
   '⚠️ *Sem input:* '+miss.length+' loja'+(miss.length===1?'':'s')+(miss.length?' • '+miss.slice(0,8).map(st=>'L'+st).join(', ')+(miss.length>8?' +'+(miss.length-8):''):'')
  ];
  if(miss.length){
-  const sup=(supervisors||[]).filter(x=>miss.includes(x.st)).flatMap(x=>x.people.map(y=>({st:x.st,name:y.name})));
+  let sup=(supervisors||[]).filter(x=>miss.includes(x.st)).flatMap(x=>x.people.map(y=>({st:x.st,name:y.name})));
+  // Nomes da base oficial, sem expor telefones nem depender de autorização para contatos.
+  if(!sup.length&&typeof COMMON!=='undefined'&&COMMON?.stores){
+   sup=miss.flatMap(st=>(COMMON.stores?.[st]?.sup||[]).filter(p=>{
+    const role=String(p.role||'').toLowerCase(),state=String(p.status||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+    return role.includes('supervisor')&&!role.includes('gerente')&&state.includes('atividade normal');
+   }).map(p=>({st,name:p.name||''})));
+  }
   lines.push('🚨 *Supervisores:* '+(sup.length?sup.slice(0,5).map(x=>'L'+x.st+' '+shortName(x.name)).join(' • ')+(sup.length>5?' +'+(sup.length-5)+' no app':''):'consulte a relação de alertas no app'));
  }
  lines.push('','🔗 *Atualize a venda da sua loja:*',APP_URL,'','_Moda que inspira o Brasil_');
