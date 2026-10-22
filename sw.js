@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v206-hourly-ocr-card';
-const BUILD='v206-hourly-ocr-card';
+const CACHE='estore-cepi-shell-v207-hourly-alert-card';
+const BUILD='v207-hourly-alert-card';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
