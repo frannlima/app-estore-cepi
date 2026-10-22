@@ -62,7 +62,7 @@ window.openAlertCenter=async()=>{if(!allowed())return;go('admin');render();await
 const previousAdmin=admin;admin=function(){const base=previousAdmin();if(!allowed())return base;return base.replace('<div id=adminWork>','<div class="card"><button class="btn" onclick="openAlertCenter()">Central de Alertas</button></div><div id=adminWork>');};
 // URL routes preserve login and never change the user's store or identity.
 let route=new URL(location.href).searchParams.get('menu');
-if(['hourly','metas'].includes(route)){const timer=setInterval(()=>{if(typeof U!=='undefined'&&U?.u&&!isDemo()&&document.getElementById('app')&&!document.getElementById('app').classList.contains('hide')){clearInterval(timer);go(route==='hourly'?'hourlyv5':'metasv4');}},600);setTimeout(()=>clearInterval(timer),300000);}
+if(['hourly','metas'].includes(route)){const timer=setInterval(()=>{if(typeof U!=='undefined'&&U?.u&&!isDemo()&&document.getElementById('shell')&&!document.getElementById('shell').classList.contains('hide')){clearInterval(timer);go(route==='hourly'?'hourly':'metas');}},600);setTimeout(()=>clearInterval(timer),300000);}
 const closeSecrets=()=>{password='';model=null;imageHash='';pendingRows=[];document.getElementById('acDialog')?.remove();};
 const originalLogout=typeof logout==='function'?logout:null;if(originalLogout)logout=function(...args){closeSecrets();return originalLogout(...args);};
 window.addEventListener('pagehide',closeSecrets);
