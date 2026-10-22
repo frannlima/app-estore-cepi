@@ -320,7 +320,7 @@ function analyzeText(modal,fromOCR){
  const withSale=parsed.filter(x=>x.amounts.length).length;
  const total=parsed.reduce((acc,row)=>acc+row.amounts.reduce((p,v)=>p+Math.round(v*100),0),0)/100;
  modal.querySelector('#hourParseStateV198').textContent=withSale?
-  '✅ '+parsed.length+' filiais reconhecidas • '+withSale+' com venda • Total: '+moneyBR(total)+'. Confira os valores e confirme.':
+  '✅ '+parsed.length+' filiais reconhecidas • '+withSale+' com venda • '+dateBR(modal.querySelector('#hourImportDateV198')?.value)+' • Total: '+moneyBR(total)+'. Confira antes de salvar.':
   'Ainda não identifiquei valores de vendas. Confira o texto colado. Somente metas não geram lançamento.';
  renderReview(modal);
  if(!withSale){modal.querySelector('#hourQuickFallbackV202').open=true;modal.querySelector('#hourQuickManualV205').open=true;}
@@ -461,7 +461,7 @@ function renderReview(modal){
 function refreshReviewV202(modal){
  const count=[...modal.querySelectorAll('[data-hir]')].filter(el=>el.querySelector('[data-hi-check]')?.checked&&moneyVal(el.querySelector('[data-hi-captured]')?.value)>0).length;
  const b=modal.querySelector('#hourImportCommitV198');
- if(b){b.disabled=count===0;b.textContent=count?'Conferir e salvar '+count+' filial'+(count===1?'':'is'):'Selecione as lojas para salvar';}
+ if(b){b.disabled=count===0;b.textContent=count?'Conferir e salvar '+count+' '+(count===1?'filial':'filiais'):'Selecione as lojas para salvar';}
 }
 async function commit(modal){
  const result=modal.querySelector('#hourImportResultV198');
