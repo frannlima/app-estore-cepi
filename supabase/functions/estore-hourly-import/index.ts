@@ -32,11 +32,11 @@ async function handle(request:Request){
     db.from("estore_alert_center_partials").select("reviewed_rows,check_time,result_date").eq("result_date",viewDate).order("created_at",{ascending:false}).limit(1)
    ]);
    if(pe.error||cr.error||review.error)throw pe.error||cr.error||review.error;
-   const people=(pe.data||[]).filter(p=>p.eligible_supervisor===true&&/supervisor/i.test(String(p.cargo||""))&&!/gerente/i.test(String(p.cargo||""))&&!/f[eé]rias|afast|deslig|inativ/i.test(String(p.situacao||"")));
+   const people=(pe.data||[]).filter(p=>p.eligible_supervisor===true&&/supervisor/i.test(String(p.cargo||""))&&!/gerente/i.test(String(p.cargo||""))&&!/afast|deslig|inativ/i.test(String(p.situacao||"")));
    const contacts=STORES.map(st=>({
     st,people:people.filter(p=>p.store_code===st).map(p=>{
      const c=(cr.data||[]).find(c=>c.matricula_confirmed===p.matricula&&c.store_code_confirmed===st&&c.store_code_original===st&&c.verification_status==="confirmado");
-     return {name:String(p.nome||""),role:String(p.cargo||""),phone:c&&/^\+55[1-9]\d9\d{8}$/.test(String(c.phone_suggested_e164))?String(c.phone_suggested_e164):null};
+     return {name:String(p.nome||""),role:String(p.cargo||""),situation:String(p.situacao||""),onLeave:/f[eé]rias/i.test(String(p.situacao||"")),phone:c&&/^\+55[1-9]\d9\d{8}$/.test(String(c.phone_suggested_e164))?String(c.phone_suggested_e164):null};
     }).sort((a,b)=>a.name.localeCompare(b.name,"pt-BR"))
    }));
    const groupStatus=Object.fromEntries(((review.data||[])[0]?.reviewed_rows||[]).filter((x:any)=>STORES.includes(String(x.st))).map((x:any)=>[String(x.st),String(x.status||'unknown')]));
