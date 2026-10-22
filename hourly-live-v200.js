@@ -439,7 +439,7 @@ function renderReview(modal){
  const total=cents(rows.flatMap(x=>x.amounts))/100;
  host.innerHTML='<div class="hourQuickReviewHeaderV202"><b>2. Confira o consolidado</b>'+
  '<small>'+rows.length+' lojas • '+moneyBR(total)+' em vendas identificadas</small></div>'+
- '<p class="hourImportRulesV208">Os valores após a meta foram somados por filial. O padrão é <b>total acumulado do dia</b>, para evitar duplicação de vendas já lançadas. Se a mensagem mostrar apenas novas vendas, altere o tipo na respectiva loja. Pedidos não são inferidos da meta; se não forem informados, serão registrados como 0.</p>'+
+ '<p class="hourImportRulesV208">Os valores após a meta foram somados por filial. <b>Cada valor informado conta como um pedido sugerido</b> (confira antes de salvar); a meta de pedidos não é venda. O padrão é <b>acumulado do dia</b>, descontando o que já foi registrado no app. Para informar somente vendas novas, altere o tipo da filial.</p>'+
  (rows.length?rows.map(x=>{
   const amount=cents(x.amounts)/100;
   const details=x.amounts.map(moneyBR).join(' + ');
@@ -449,7 +449,7 @@ function renderReview(modal){
    '<div class="hourSaleBreakdownV208">'+x.amounts.length+' valor'+(x.amounts.length===1?'':'es')+': '+esc(details)+'</div>'+
    '<label class="hourQuickAmountV202">Total captado (R$)<input class="field" data-hi-captured inputmode="decimal" value="'+amount.toFixed(2).replace('.',',')+'" placeholder="Confira o total"></label>'+
    '<details class="hourQuickSaleAdvancedV202"><summary>Pedidos reais e tipo de lançamento</summary>'+
-   '<div class="hourQuickEditFieldsV202"><label>Pedidos reais informados<input class="field" data-hi-orders type="number" min="0" max="10000" value="0" step="1"></label>'+
+   '<div class="hourQuickEditFieldsV202"><label>Pedidos identificados (conferir)<input class="field" data-hi-orders type="number" min="0" max="10000" value="'+x.amounts.length+'" step="1"></label>'+
    '<label>Como registrar<select class="field" data-hi-mode><option value="cumulative" selected>Acumulado do dia (recomendado)</option><option value="incremental">Somente novas vendas</option></select></label></div></details>'+
    '</div>';
  }).join(''):'<p class="hourQuickNoSaleV202">Nenhuma venda identificada. Valores como “073 ➜ 5” são apenas metas de pedidos e não geram lançamentos.</p>');
