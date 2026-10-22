@@ -119,8 +119,8 @@ function parse(text){
 }
 window.hourlyParsedPrintV198=parse;
 function seedMarkup(){
- return '<section class="card hourImportCardV198"><div class="hourNewHeadV198"><div><b>📥 Consolidar print do grupo</b><small>Importe vendas citadas no WhatsApp, confira valores e lance várias filiais de uma vez.</small></div></div>'+
- (isMain()?'<button type="button" class="btn" onclick="hourPrintOpenV198()">Importar print / texto</button><span class="hourSmallV198">Somente administrador; exige senha e revisão de cada lançamento.</span>':'<p class="muted">A importação regional é feita pelo administrador. Sua filial continua atualizando pelo formulário acima.</p>')+
+ return '<section class="card hourImportCardV198"><div class="hourNewHeadV198"><div><b>📋 Consolidar vendas do WhatsApp</b><small>Cole a mensagem completa do grupo, confira o total por filial e salve. Print opcional.</small></div></div>'+
+ (isMain()?'<button type="button" class="btn" onclick="hourPrintOpenV198()">Colar mensagem / importar print</button><span class="hourSmallV198">Somente administrador; exige senha e revisão de cada lançamento.</span>':'<p class="muted">A importação regional é feita pelo administrador. Sua filial continua atualizando pelo formulário acima.</p>')+
  '</section><section class="card hourAlertsCardV198" id="hourAlertsSectionV198"><div class="hourNewHeadV198"><div><b>🚨 Mobilização | Lojas sem input</b><small>Sem atualização não significa venda zerada. Acompanhe pendências por parcial.</small></div></div><div id="hourRadarV198" class="hourRadarV198">Carregando situação...</div>'+
  (isMain()?'<button type="button" class="btn alt" onclick="hourAlertDirectoryV198()">Ver supervisores e preparar alertas no WhatsApp</button>':'<p class="hourSmallV198">Alertas com contatos são restritos ao administrador.</p>')+
  '<div id="hourSupervisorListV198"></div></section>';
@@ -241,13 +241,15 @@ function showModal(){
  modal.id='hourPrintModalV198';modal.className='hourPrintOverlayV198 hourQuickOverlayV202';
  const t=clock(),date=t.date;
  modal.innerHTML='<div class="hourPrintBoxV198 hourQuickBoxV202" role="dialog" aria-modal="true" aria-label="Importação rápida de vendas do WhatsApp">'+
- '<div class="hourNewHeadV198"><div><h3>📷 Importar vendas do print</h3><small>Selecione o print, confira as filiais e salve. Não é necessário digitar os dados novamente.</small></div><button type="button" class="btn ghost" id="hourPrintCloseV198" aria-label="Fechar">✕</button></div>'+
- '<label class="hourQuickDropV202"><span class="hourQuickCameraV202">📷</span><strong>Escolher print do WhatsApp</strong><small>Toque para anexar • JPG, PNG ou WEBP</small><input type="file" id="hourImportFileV198" accept="image/png,image/jpeg,image/webp,image/*"></label>'+
- '<div id="hourParseStateV198" role="status" aria-live="polite" class="hourQuickStateV202">Nenhum print selecionado.</div>'+
+ '<div class="hourNewHeadV198"><div><h3>📋 Importar vendas por texto</h3><small>Cole a mensagem completa do WhatsApp. As metas não serão registradas como venda.</small></div><button type="button" class="btn ghost" id="hourPrintCloseV198" aria-label="Fechar">✕</button></div>'+
+ '<details class="hourQuickFallbackV202 hourPastePrimaryV208" id="hourQuickFallbackV202" open>'+
+ '<summary>1. Cole aqui a mensagem de metas e vendas</summary>'+
+ '<textarea rows="9" id="hourImportTextV198" placeholder="Cole a mensagem completa. Ex.:&#10;073 ➜ *5*159,99/79,99&#10;108 ➜ *8* 159.98 +69.98+165.99 +195.99 +305,98"></textarea>'+
+ '<button type="button" class="btn hourPasteAnalyzeV208" id="hourRunTextV198">Identificar vendas por loja</button></details>'+
+ '<details class="hourImageOptionalV208"><summary>📷 Ou anexar print (leitura opcional)</summary>'+
+ '<label class="hourQuickDropV202"><span class="hourQuickCameraV202">📷</span><strong>Escolher print do WhatsApp</strong><small>JPG, PNG ou WEBP</small><input type="file" id="hourImportFileV198" accept="image/png,image/jpeg,image/webp,image/*"></label></details>'+
+ '<div id="hourParseStateV198" role="status" aria-live="polite" class="hourQuickStateV202">Cole a mensagem e toque em Identificar vendas por loja.</div>'+
  '<div id="hourImportRowsV198"></div>'+
- '<details class="hourQuickFallbackV202" id="hourQuickFallbackV202"><summary>O print não foi reconhecido? Colar texto da mensagem</summary>'+
- '<textarea rows="5" id="hourImportTextV198" placeholder="Cole aqui a mensagem recebida no WhatsApp"></textarea>'+
- '<button type="button" class="btn alt" id="hourRunTextV198">Identificar vendas no texto</button></details>'+
  '<details class="hourQuickManualV205" id="hourQuickManualV205"><summary>Adicionar venda que não foi reconhecida</summary>'+
  '<div class="hourQuickManualFieldsV205"><label>Filial<select id="hourManualStoreV205">'+STORES.map(st=>'<option value="'+st+'">L'+st+'</option>').join('')+'</select></label>'+
  '<label>Valor captado (R$)<input id="hourManualValueV205" inputmode="decimal" placeholder="Ex.: 159,98"></label></div>'+
@@ -304,10 +306,22 @@ function analyzeText(modal,fromOCR){
    return;
  }
  parsed=parse(txt);rawText=txt;
+ if(!fromOCR){
+  fileRef=null;
+  const match=txt.match(/\b(\d{2})\/(\d{2})\/(\d{4})\b/);
+  if(match){
+   const parsedDate=match[3]+'-'+match[2]+'-'+match[1];
+   const d=new Date(parsedDate+'T12:00:00Z');
+   if(!Number.isNaN(d.getTime())&&d.toISOString().slice(0,10)===parsedDate){
+    modal.querySelector('#hourImportDateV198').value=parsedDate;
+   }
+  }
+ }
  const withSale=parsed.filter(x=>x.amounts.length).length;
+ const total=parsed.reduce((acc,row)=>acc+row.amounts.reduce((p,v)=>p+Math.round(v*100),0),0)/100;
  modal.querySelector('#hourParseStateV198').textContent=withSale?
-  '✅ '+withSale+' loja(s) com valores para conferir. '+(fromOCR?'Revise o que foi lido no print.':'Confira os valores da mensagem.'):
-  'Não identifiquei valores de vendas com segurança. Confira o texto abaixo ou escolha outro print.';
+  '✅ '+parsed.length+' filiais reconhecidas • '+withSale+' com venda • Total: '+moneyBR(total)+'. Confira os valores e confirme.':
+  'Ainda não identifiquei valores de vendas. Confira o texto colado. Somente metas não geram lançamento.';
  renderReview(modal);
  if(!withSale){modal.querySelector('#hourQuickFallbackV202').open=true;modal.querySelector('#hourQuickManualV205').open=true;}
 }
@@ -496,7 +510,7 @@ async function commit(modal){
    '<ul>'+(data.rows||[]).map(x=>'<li>L'+esc(x.st)+' — '+(x.status==='imported'?'Registrado '+moneyBR(x.captured):x.status==='stale'?'Lançamento mais recente preservado':x.status==='duplicate'?'Print já utilizado':'Nenhum incremento')+'</li>').join('')+'</ul></div>';
   modal.querySelector('#hourQuickConfirmV202').hidden=true;
   modal.querySelector('#hourPrintCloseV198').textContent='Concluir ✕';
-  await loadHourlyV5();
+  await loadHourly();
  }catch(err){
   result.textContent='Não foi possível salvar: '+String(err?.message||err);
   btn.disabled=false;
