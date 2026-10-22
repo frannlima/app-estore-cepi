@@ -18,7 +18,7 @@ const clock=()=>{const a=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{tim
 const dateBR=v=>/^\d{4}-\d\d-\d\d$/.test(v)?v.slice(8)+'/'+v.slice(5,7)+'/'+v.slice(0,4):'—';
 const localHour=stamp=>{try{return Number(new Intl.DateTimeFormat('en-GB',{timeZone:'America/Fortaleza',hour:'2-digit',hourCycle:'h23'}).format(new Date(stamp)))}catch(_){return 0}};
 const isMain=()=>typeof admV3==='function'&&admV3()&&user()?.id!=='0000000';
-let adminPassword='',supervisors=null,groupStatuses={},parsed=[],fileRef=null,rawText='',photoHash='',busy=false;
+let adminPassword='',supervisors=null,groupStatuses={},groupStatusesDate='',parsed=[],fileRef=null,rawText='',busy=false;
 let alertTemplateV198=null;
 import('./alert-center-core.mjs').then(m=>{alertTemplateV198=typeof m.message==='function'?m.message:null}).catch(()=>{});
 function reference(j){
@@ -35,13 +35,14 @@ function missingCount(r,ref){
 }
 function status(r,j){
  const ref=reference(j),update=Boolean(r.updated_at),sales=Number(r.captured||0),miss=missingCount(r,ref);
+ if(groupStatusesDate===j?.result_date&&groupStatuses[String(r.st).padStart(3,'0')]==='sale'&&!update)return{code:'course',label:'Em curso • informada no grupo',miss:0};
  if(!update)return{code:'missing',label:miss+' parciais sem input de venda',miss};
  if(sales>0&&miss<=1)return{code:'spinning',label:'Girando ponteiro',miss:0};
  if(miss>=2)return{code:'missing',label:miss+' parciais sem input de venda',miss};
  return{code:'course',label:'Em curso',miss:0};
 }
 function noInput(j){
- return(j?.stores||[]).filter(r=>status(r,j).code==='missing'&&groupStatuses[String(r.st).padStart(3,'0')]!=='sale').map(r=>String(r.st).padStart(3,'0'));
+ return(j?.stores||[]).filter(r=>status(r,j).code==='missing').map(r=>String(r.st).padStart(3,'0'));
 }
 function statusCounts(j){
  const all=j?.stores||[];
@@ -125,12 +126,13 @@ async function directory(){
  if(!r.ok||!j.ok){adminPassword='';throw Error(j.error||'Consulta indisponível')}
  supervisors=j.contacts||[];
  groupStatuses=j.groupStatus||{};
+ groupStatusesDate=curr()?.result_date||clock().date;
  try{decorateScreen()}catch(_){}
  return supervisors;
 }
 function alertMessage(row,person){
  const first=String(person.name||'Liderança').split(' ')[0],d=curr()?.result_date||clock().date;
- if(alertTemplateV198)return alertTemplateV198({name:person.name,st:row.st,meta:row.metaValue,orders:row.orderTarget,condition:'missing',date:d,time:clock().time});
+ if(alertTemplateV198){const msg=alertTemplateV198({name:person.name,st:row.st,meta:row.metaValue,orders:row.orderTarget,condition:'missing',date:d,time:clock().time});return clock().hour===21?msg+'\n\n⏰ Fechamento: informe a captação eStore acumulada do dia no Hora a Hora.':msg;}
  return '🚨 *ALERTA eSTORE CONNECT | HORA A HORA*\n\nOlá, '+first+'! Precisamos atualizar a captação da *filial '+row.st+'*.\n\n🎯 *Meta eStore:* '+moneyBR(row.metaValue)+'\n🛍️ *Meta de pedidos:* '+Number(row.orderTarget||0)+'\n⏱️ *Situação:* '+status(row,curr()).label+'\n📅 *Parcial:* '+dateBR(d)+'\n\n📲 Já teve vendas? Atualize o Hora a Hora: '+APP_URL+'\n\nCaso exista alguma dificuldade, sinalize para alinharmos o apoio. Contamos com você!';
 }
 function showDirectory(){
@@ -261,7 +263,7 @@ hourlyCaptionV6=caption;
 window.hourlyStatusV198=status;
 window.hourlyRadarV198=decorateScreen;
 const prevLogout=typeof logoutApp==='function'?logoutApp:null;
-if(prevLogout)logoutApp=function(...args){adminPassword='';supervisors=null;groupStatuses={};return prevLogout(...args)};
-window.addEventListener('pagehide',()=>{adminPassword='';supervisors=null;groupStatuses={}});
+if(prevLogout)logoutApp=function(...args){adminPassword='';supervisors=null;groupStatuses={};groupStatusesDate='';return prevLogout(...args)};
+window.addEventListener('pagehide',()=>{adminPassword='';supervisors=null;groupStatuses={};groupStatusesDate=''});
 console.info('[eStore] Hora a Hora v198: importação revisada e alertas assistidos');
 })();
