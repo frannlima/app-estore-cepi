@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v202-quick-import';
-const BUILD='v202-quick-import';
+const CACHE='estore-cepi-shell-v203-quick-ocr';
+const BUILD='v203-quick-ocr';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
