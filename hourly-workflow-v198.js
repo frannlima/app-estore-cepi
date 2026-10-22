@@ -259,7 +259,7 @@ async function commit(modal){
 const legacyHourly=hourlyV5;
 hourlyV5=function(){const html=legacyHourly();return html.replace('<div id=hourlyDashboardV5>',seedMarkup()+'<div id=hourlyDashboardV5>')};
 const legacyRender=renderHourlyV5;
-renderHourlyV5=function(){const result=legacyRender();try{decorateScreen()}catch(e){console.warn('[Hora v198] Falha no radar',e)}return result};
+renderHourlyV5=function(...args){const result=legacyRender(...args);try{decorateScreen()}catch(e){console.warn('[Hora v198] Falha no radar',e)}return result};
 hourlyCaptionV6=caption;
 window.hourlyStatusV198=status;
 window.hourlyRadarV198=decorateScreen;
