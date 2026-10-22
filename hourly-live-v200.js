@@ -421,7 +421,7 @@ function renderReview(modal){
    x.amounts.map(v=>'<button type="button" class="hourQuickChoiceV202" data-pick="'+v.toFixed(2)+'">'+moneyBR(v)+'</button>').join('')+
    '<button type="button" class="hourQuickChoiceV202" data-pick="'+x.amounts.reduce((a,b)=>a+b,0).toFixed(2)+'">Somar: '+moneyBR(x.amounts.reduce((a,b)=>a+b,0))+'</button></div>':'';
   return '<div class="hourQuickSaleV202" data-hir="'+x.st+'">'+
-   '<div class="hourQuickSaleHeaderV202"><label><input type="checkbox" data-hi-check '+(multiple?'':'checked')+'><b>L'+x.st+'</b></label><small>Meta '+x.goal+' pedidos</small></div>'+
+   '<div class="hourQuickSaleHeaderV202"><label><input type="checkbox" data-hi-check '+(multiple?'':'checked')+'><b>L'+x.st+'</b></label><small>'+(x.goal>0?'Meta '+x.goal+' pedidos':'Venda conferida manualmente')+'</small></div>'+
    '<label class="hourQuickAmountV202">Venda captada (R$)<input class="field" data-hi-captured inputmode="decimal" value="'+amount+'" placeholder="Confira ou digite o total"></label>'+
    shortcuts+'<details class="hourQuickSaleAdvancedV202"><summary>Editar pedidos e tipo de lançamento</summary>'+
    '<div class="hourQuickEditFieldsV202"><label>Pedidos realizados<input class="field" data-hi-orders type="number" min="0" max="10000" value="0" step="1"></label>'+
