@@ -188,22 +188,42 @@ function alertMessage(row,person){
 function showDirectory(){
  const target=document.getElementById('hourSupervisorListV198'),j=curr();
  if(!target||!j||!supervisors)return;
- const miss=noInput(j),map=new Map((j.stores||[]).map(x=>[x.st,x]));
- target.innerHTML='<div class="hourDirTitleV198">Supervisores responsáveis • '+miss.length+' lojas pendentes</div>'+
- (miss.length?miss.map(st=>{
-  const row=map.get(st),entry=supervisors.find(x=>x.st===st);
-  const people=entry?.people||[];
-  if(!people.length)return '<div class="hourDirRowV198"><b>L'+st+'</b><span>Sem supervisor ativo elegível cadastrado</span></div>';
-  return people.map((p,i)=>'<div class="hourDirRowV198"><b>L'+st+'</b><span>'+esc(p.name)+'<small>'+esc(p.role)+'</small></span>'+
-   (p.phone?'<button class="btn" data-hwa="'+st+'" data-hsup="'+i+'">WhatsApp ↗</button>':'<small>Contato pendente de validação</small>')+'</div>').join('');
- }).join(''):'<p class="muted">Nenhuma loja pendente.</p>')+
- '<label class="hourConfirmV198"><input type="checkbox" id="hourWorkingV198"> Confirmei que os destinatários estão em expediente e autorizados a receber contato agora.</label>'+
- '<p class="hourSmallV198">Abre uma mensagem individual para envio manual. Não envia em massa automaticamente. Contatos sem validação não são liberados.</p>';
- target.querySelectorAll('[data-hwa]').forEach(btn=>btn.onclick=()=>{
-  if(!target.querySelector('#hourWorkingV198')?.checked){alert('Confirme a jornada de trabalho dos supervisores antes de abrir o WhatsApp.');return}
-  const st=btn.dataset.hwa,entry=supervisors.find(x=>x.st===st),p=entry?.people?.[Number(btn.dataset.hsup)],row=map.get(st);
-  if(!p?.phone||!row)return;
-  window.open('https://wa.me/'+p.phone.replace(/\D/g,'')+'?text='+encodeURIComponent(alertMessage(row,p)),'_blank','noopener,noreferrer');
+ const missing=noInput(j),byStore=new Map((j.stores||[]).map(x=>[String(x.st),x]));
+ target.innerHTML='<div class="hourDirTitleV198">🚨 Cards de alerta • '+missing.length+' lojas sem input</div>'+
+ (missing.length?missing.map(st=>{
+  const entry=supervisors.find(x=>x.st===st),people=entry?.people||[];
+  if(!people.length)return '<div class="hourDirRowV198"><b>L'+st+'</b><span>Supervisor ativo não identificado na base.</span></div>';
+  return people.map((person,index)=>'<div class="hourDirRowV198"><b>L'+st+'</b><span>'+esc(person.name)+'<small>'+esc(person.role)+'</small></span>'+
+   (person.phone?'<button class="btn" data-hour-card="'+st+'" data-hour-person="'+index+'">Compartilhar card <span aria-hidden="true">↗</span></button>':
+    '<small>Contato não validado</small>')+'</div>').join('');
+ }).join(''):'<p class="muted">Nenhuma filial pendente nesta parcial.</p>')+
+ '<label class="hourConfirmV198"><input type="checkbox" id="hourWorkingV198"> Confirmei que o supervisor está em expediente e autorizado a receber o alerta.</label>'+
+ '<p class="hourSmallV198">O botão gera um card PNG individual com metas, ação imediata e link do app para o Hora a Hora. Selecione o supervisor no WhatsApp para compartilhar. Nenhum envio é automático.</p>'+
+ '<p id="hourCardStatusV205" class="hourSmallV198" role="status" aria-live="polite"></p>';
+ target.querySelectorAll('[data-hour-card]').forEach(button=>button.onclick=async()=>{
+  const notice=target.querySelector('#hourCardStatusV205');
+  if(!target.querySelector('#hourWorkingV198')?.checked){
+   notice.textContent='Confirme o expediente e a autorização para contato antes de compartilhar.';return;
+  }
+  const st=button.dataset.hourCard,entry=supervisors.find(x=>x.st===st);
+  const person=entry?.people?.[Number(button.dataset.hourPerson)],row=byStore.get(st);
+  if(!person?.phone||!row)return;
+  button.disabled=true;notice.textContent='Gerando card de alerta da filial L'+st+'...';
+  try{
+   const lib=await import('./alert-card-share.mjs');
+   const current=status(row,j),lastTime=row.updated_at?
+     new Date(row.updated_at).toLocaleTimeString('pt-BR',{timeZone:'America/Fortaleza',hour:'2-digit',minute:'2-digit'}):null;
+   const png=await lib.createAlertImage(
+    {person:{nome:person.name},name_original:person.name,store_code_original:st},
+    {st,meta:Number(row.metaValue),orders:Number(row.orderTarget),condition:'missing',
+     closing:clock().hour===21,first_check_time:lastTime,last_sale_change_time:lastTime,
+     missing_partials:current.miss,link:APP_URL}
+   );
+   const message=await lib.shareAlertImage(png,person.phone,clock().hour===21);
+   notice.textContent=message+' Destinatário: '+person.name+' (L'+st+').';
+  }catch(err){
+   notice.textContent='Não foi possível gerar ou compartilhar o card: '+String(err?.message||err);
+  }finally{button.disabled=false}
  });
 }
 window.hourAlertDirectoryV198=async function(){const host=document.getElementById('hourSupervisorListV198');try{if(host)host.innerHTML='<p class="muted">Consultando contatos protegidos...</p>';await directory();showDirectory();}catch(e){if(host)host.textContent=String(e.message||e)}};
