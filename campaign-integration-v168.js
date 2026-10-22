@@ -154,7 +154,7 @@
  function read(k){try{return localStorage.getItem(k)==="1"}catch(_){return false}}
  function save(k){try{localStorage.setItem(k,"1")}catch(_){}}
  function close(){document.getElementById("estoreGoalFirst215")?.remove()}
- function openMenu(v){if(typeof window.go==="function")window.go(v);if(v==="metasv4")setTimeout(()=>document.querySelector(".hcBoxV4")?.scrollIntoView({behavior:"smooth",block:"start"}),200)}
+ function openMenu(v){if(typeof go==="function")go(v);else if(typeof window.go==="function")window.go(v);if(v==="metasv4")setTimeout(()=>document.querySelector(".hcBoxV4")?.scrollIntoView({behavior:"smooth",block:"start"}),200)}
  function show(idNow){
    const key="estore_goal_first_access_20261022_"+idNow+"_"+date();
    save(key);shown=true;
