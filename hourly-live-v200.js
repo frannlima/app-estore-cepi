@@ -83,22 +83,20 @@ function statusCounts(j){
  return{spinning:all.filter(r=>status(r,j).code==='spinning').length,course:all.filter(r=>status(r,j).code==='course').length,missing:noInput(j).length};
 }
 function parse(text){
- const parsed=new Map();
- const lines=String(text||'').replace(/\r/g,'').split(/\n/);
- for(const ln of lines){
-  const line=ln.replace(/[ \t]+/g,' ').trim();
-  // Necessário formato "LOJA ➜ META DE PEDIDOS [VALORES DE VENDA]".
-  const m=line.match(/^(?:[•·*]\s*)?(?:L\s*)?(\d{3})\s*(?:➜|➔|➡|→|➤|➞|->|:)\s*(.+)$/u);
+ const found=new Map(),lines=String(text||'').replace(/\r/g,'').split(/\n/);
+ for(const lineRaw of lines){
+  let line=lineRaw.replace(/[ \t]+/g,' ').trim().replace(/^[•·.\-]\s*/,'');
+  // O número imediatamente após a seta é META DE PEDIDOS, nunca captação.
+  const m=line.match(/^(?:L\s*)?(\d{3})\s*(?:➜|➔|➡|→|➤|➞|->|=>|[:：]|[—–]\s*>)\s*(.+)$/iu);
   if(!m||!STORES.includes(m[1]))continue;
-  const tail=m[2].trim();
-  const goal=tail.match(/^\*{0,2}\s*(\d{1,3})\s*\*{0,2}/);
+  const textAfter=m[2].trim(),goal=textAfter.match(/^\*{0,2}\s*(\d{1,3})\s*\*{0,2}/);
   if(!goal)continue;
-  const after=tail.slice(goal[0].length);
-  const tokens=[...after.matchAll(/(?:R\$\s*)?(\d{1,3}(?:\.\d{3})*,\d{2}|\d+[.,]\d{2})(?!\d)/g)].map(x=>x[1]);
-  const amounts=tokens.map(moneyVal).filter(x=>Number.isFinite(x)&&x>0&&x<1e6);
-  parsed.set(m[1],{st:m[1],goal:Number(goal[1]),amounts,source:line});
+  const pricePart=textAfter.slice(goal[0].length);
+  const numbers=[...pricePart.matchAll(/(?:R\$\s*)?(\d{1,3}(?:\.\d{3})*,\d{2}|\d+[.,]\d{2})(?!\d)/g)]
+    .map(x=>moneyVal(x[1])).filter(x=>Number.isFinite(x)&&x>0&&x<1000000);
+  found.set(m[1],{st:m[1],goal:Number(goal[1]),amounts:numbers,source:line});
  }
- return [...parsed.values()];
+ return [...found.values()];
 }
 window.hourlyParsedPrintV198=parse;
 function seedMarkup(){
@@ -200,26 +198,40 @@ function showDirectory(){
 window.hourAlertDirectoryV198=async function(){const host=document.getElementById('hourSupervisorListV198');try{if(host)host.innerHTML='<p class="muted">Consultando contatos protegidos...</p>';await directory();showDirectory();}catch(e){if(host)host.textContent=String(e.message||e)}};
 function showModal(){
  document.getElementById('hourPrintModalV198')?.remove();
- const modal=document.createElement('div');modal.id='hourPrintModalV198';modal.className='hourPrintOverlayV198';
- const t=clock(),date=document.getElementById('hourDateV5')?.value||t.date;
- modal.innerHTML='<div class="hourPrintBoxV198" role="dialog" aria-modal="true" aria-label="Importar print conferido do WhatsApp">'+
- '<div class="hourNewHeadV198"><div><h3>📥 Importar print do WhatsApp</h3><small>Metas após as setas não são vendas. Somente valores financeiros informados podem ser lançados.</small></div><button type="button" class="btn ghost" id="hourPrintCloseV198">✕</button></div>'+
- '<div class="hourPrintDatesV198"><label>Data do resultado<input type="date" id="hourImportDateV198" value="'+date+'"></label><label>Horário do print<input type="time" id="hourImportTimeV198" value="'+t.time+'"></label></div>'+
- '<label class="hourUploadV198">📷 Anexar print do grupo (PNG/JPG/WEBP, até 8 MB)<input type="file" id="hourImportFileV198" accept="image/*"></label>'+
- '<label class="hourPasteLabelV198">Ou cole o texto da mensagem para leitura mais precisa<textarea rows="6" id="hourImportTextV198" placeholder="073 ➜ 5&#10;108 ➜ 8 159,98&#10;177 ➜ *4* 209,98 / 161,99"></textarea></label>'+
- '<div class="hourPrintActionsV198"><button class="btn alt" id="hourRunOCRV198">Ler print e preparar conferência</button><button class="btn ghost" id="hourRunTextV198">Analisar texto</button></div>'+
- '<div id="hourParseStateV198" role="status" class="hourSmallV198"></div><div id="hourImportRowsV198"></div>'+
- '<label class="hourConfirmV198"><input type="checkbox" id="hourImportReviewedV198"> Conferi data, horário e cada venda marcada. Os números após a seta representam a meta de pedidos.</label>'+
- '<label class="hourPasteLabelV198">Senha administrativa<input type="password" class="field" autocomplete="off" id="hourImportPwdV198" placeholder="Obrigatória para salvar"></label>'+
- '<button type="button" class="btn" id="hourImportCommitV198">Conferir e salvar lançamentos selecionados</button><div id="hourImportResultV198" role="status"></div>'+
- '</div>';
+ const modal=document.createElement('div');
+ modal.id='hourPrintModalV198';modal.className='hourPrintOverlayV198 hourQuickOverlayV202';
+ const t=clock(),date=t.date;
+ modal.innerHTML='<div class="hourPrintBoxV198 hourQuickBoxV202" role="dialog" aria-modal="true" aria-label="Importação rápida de vendas do WhatsApp">'+
+ '<div class="hourNewHeadV198"><div><h3>📷 Importar vendas do print</h3><small>Selecione o print, confira as filiais e salve. Não é necessário digitar os dados novamente.</small></div><button type="button" class="btn ghost" id="hourPrintCloseV198" aria-label="Fechar">✕</button></div>'+
+ '<label class="hourQuickDropV202"><span class="hourQuickCameraV202">📷</span><strong>Escolher print do WhatsApp</strong><small>Toque para anexar • JPG, PNG ou WEBP</small><input type="file" id="hourImportFileV198" accept="image/png,image/jpeg,image/webp,image/*"></label>'+
+ '<div id="hourParseStateV198" role="status" aria-live="polite" class="hourQuickStateV202">Nenhum print selecionado.</div>'+
+ '<div id="hourImportRowsV198"></div>'+
+ '<details class="hourQuickFallbackV202" id="hourQuickFallbackV202"><summary>O print não foi reconhecido? Colar texto da mensagem</summary>'+
+ '<textarea rows="5" id="hourImportTextV198" placeholder="Cole aqui a mensagem recebida no WhatsApp"></textarea>'+
+ '<button type="button" class="btn alt" id="hourRunTextV198">Identificar vendas no texto</button></details>'+
+ '<details class="hourQuickAdvancedV202"><summary>Alterar data ou horário do print</summary><div class="hourPrintDatesV198">'+
+ '<label>Data do resultado<input type="date" id="hourImportDateV198" value="'+date+'"></label>'+
+ '<label>Horário do print<input type="time" id="hourImportTimeV198" value="'+t.time+'"></label></div></details>'+
+ '<div class="hourQuickConfirmV202" id="hourQuickConfirmV202" hidden>'+
+ '<p class="hourSmallV198">Somente as vendas assinaladas serão registradas. Confira o valor de cada loja. Meta de pedidos não é venda.</p>'+
+ '<label class="hourPasteLabelV198" id="hourPwdLabelV202">Senha administrativa<input type="password" class="field" autocomplete="off" id="hourImportPwdV198" placeholder="Informe para confirmar"></label>'+
+ '<button type="button" class="btn hourQuickSaveV202" id="hourImportCommitV198">Confirmar e salvar vendas</button></div>'+
+ '<div id="hourImportResultV198" role="status" aria-live="polite"></div></div>';
  document.body.appendChild(modal);document.body.style.overflow='hidden';
- const close=()=>{modal.remove();document.body.style.overflow='';fileRef=null;rawText='';parsed=[];};
+ const close=()=>{modal.remove();document.body.style.overflow='';fileRef=null;parsed=[];busy=false};
  modal.querySelector('#hourPrintCloseV198').onclick=close;
  modal.addEventListener('click',e=>{if(e.target===modal)close()});
- modal.querySelector('#hourRunTextV198').onclick=()=>analyzeText(modal,false);
- modal.querySelector('#hourRunOCRV198').onclick=()=>readOCR(modal);
+ modal.querySelector('#hourImportFileV198').addEventListener('change',async()=>{
+   const chosen=modal.querySelector('#hourImportFileV198').files?.[0];
+   if(!chosen)return;
+   fileRef=chosen;parsed=[];modal.querySelector('#hourImportRowsV198').innerHTML='';
+   modal.querySelector('#hourQuickConfirmV202').hidden=true;
+   modal.querySelector('#hourImportResultV198').textContent='';
+   await readOCR(modal);
+ });
+ modal.querySelector('#hourRunTextV198').onclick=()=>{fileRef=null;analyzeText(modal,false)};
  modal.querySelector('#hourImportCommitV198').onclick=()=>commit(modal);
+ if(adminPassword)modal.querySelector('#hourPwdLabelV202').hidden=true;
 }
 window.hourPrintOpenV198=function(){if(!isMain())return;showModal()};
 async function hashFor(file,text){
