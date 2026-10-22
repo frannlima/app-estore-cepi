@@ -359,31 +359,50 @@ function refreshReviewV202(modal){
  if(b){b.disabled=count===0;b.textContent=count?'Salvar '+count+' venda'+(count===1?'':'s')+' confirmada'+(count===1?'':'s'):'Selecione a venda para salvar';}
 }
 async function commit(modal){
- const result=modal.querySelector('#hourImportResultV198'),date=modal.querySelector('#hourImportDateV198').value,time=modal.querySelector('#hourImportTimeV198').value,password=modal.querySelector('#hourImportPwdV198').value;
- if(!modal.querySelector('#hourImportReviewedV198').checked)return result.textContent='Confirme a revisão dos lançamentos.';
- if(!password)return result.textContent='Informe a senha administrativa.';
+ const result=modal.querySelector('#hourImportResultV198');
+ const date=modal.querySelector('#hourImportDateV198')?.value;
+ const time=modal.querySelector('#hourImportTimeV198')?.value;
+ const password=modal.querySelector('#hourImportPwdV198')?.value||adminPassword;
+ if(!password){
+  result.textContent='Informe a senha administrativa para concluir o lançamento.';
+  modal.querySelector('#hourPwdLabelV202').hidden=false;
+  modal.querySelector('#hourImportPwdV198').focus();
+  return;
+ }
  const rows=[];
  for(const el of modal.querySelectorAll('[data-hir]')){
   if(!el.querySelector('[data-hi-check]')?.checked)continue;
-  const captured=moneyVal(el.querySelector('[data-hi-captured]')?.value),orders=Number(el.querySelector('[data-hi-orders]')?.value);
-  if(!Number.isFinite(captured)||captured<=0||!Number.isInteger(orders)||orders<0)return result.textContent='Valor ou pedidos inválidos na filial '+el.dataset.hir;
+  const captured=moneyVal(el.querySelector('[data-hi-captured]')?.value);
+  const orders=Number(el.querySelector('[data-hi-orders]')?.value);
+  if(!Number.isFinite(captured)||captured<=0||!Number.isInteger(orders)||orders<0){
+   result.textContent='Confira o valor e os pedidos da filial L'+el.dataset.hir+'.';
+   return;
+  }
   rows.push({st:el.dataset.hir,captured,orders,mode:el.querySelector('[data-hi-mode]').value});
  }
- if(!rows.length)return result.textContent='Selecione ao menos uma loja com venda confirmada.';
+ if(!rows.length){result.textContent='Selecione pelo menos uma venda confirmada.';return}
  const btn=modal.querySelector('#hourImportCommitV198');
- if(btn.disabled)return;btn.disabled=true;result.textContent='Verificando duplicidades e salvando lojas conferidas...';
+ if(btn.disabled)return;
+ btn.disabled=true;result.textContent='Salvando '+rows.length+' filial(is)...';
  try{
-  const text=modal.querySelector('#hourImportTextV198').value;
+  const text=modal.querySelector('#hourImportTextV198')?.value||'';
   const source_hash=await hashFor(fileRef,text);
-  const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:'commit',matricula:String(user().id),password,date,time,source_hash,rows,reviewed:true})});
-  const json=await res.json();
-  if(!res.ok||!json.ok)throw Error(json.error||'Falha ao salvar');
-  result.innerHTML='<div class="hourResultV198">✅ '+json.imported+' loja(s) adicionadas ao acumulado. '+json.skipped+' ignorada(s) para evitar duplicidade ou parcial desatualizada.<ul>'+
-   (json.rows||[]).map(x=>'<li>L'+esc(x.st)+' — '+(x.status==='imported'?'Adicionado '+moneyBR(x.captured):x.status==='stale'?'Parcial anterior ao lançamento já existente':x.status==='duplicate'?'Print já importado':'Sem novo valor')+'</li>').join('')+'</ul></div>';
+  const response=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({
+   action:'commit',matricula:String(user()?.id||''),password,date,time,source_hash,rows,reviewed:true
+  })});
+  const data=await response.json();
+  if(!response.ok||!data.ok)throw Error(data.error||'Não foi possível salvar as vendas.');
   adminPassword=password;
+  const imported=data.imported||0,ignored=data.skipped||0;
+  result.innerHTML='<div class="hourResultV198"><strong>✅ Importação concluída!</strong><p>'+imported+' loja(s) atualizada(s)'+(ignored?' • '+ignored+' ignorada(s) por duplicidade ou parcial anterior':'')+'.</p>'+
+   '<ul>'+(data.rows||[]).map(x=>'<li>L'+esc(x.st)+' — '+(x.status==='imported'?'Registrado '+moneyBR(x.captured):x.status==='stale'?'Lançamento mais recente preservado':x.status==='duplicate'?'Print já utilizado':'Nenhum incremento')+'</li>').join('')+'</ul></div>';
+  modal.querySelector('#hourQuickConfirmV202').hidden=true;
+  modal.querySelector('#hourPrintCloseV198').textContent='Concluir ✕';
   await loadHourlyV5();
- }catch(e){result.textContent=String(e.message||e)}
- finally{btn.disabled=false}
+ }catch(err){
+  result.textContent='Não foi possível salvar: '+String(err?.message||err);
+  btn.disabled=false;
+ }
 }
 // Decorar componentes depois que o dashboard original termina de renderizar.
 const legacyHourly=hourlyV5;
