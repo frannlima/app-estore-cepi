@@ -205,7 +205,7 @@ function showDirectory(){
  (missing.length?missing.map(st=>{
   const entry=supervisors.find(x=>x.st===st),people=entry?.people||[];
   if(!people.length)return '<div class="hourDirRowV198"><b>L'+st+'</b><span>Supervisor ativo não identificado na base.</span></div>';
-  return people.map((person,index)=>'<div class="hourDirRowV198"><b>L'+st+'</b><span>'+esc(person.name)+'<small>'+esc(person.role)+'</small></span>'+
+  return people.map((person,index)=>'<div class="hourDirRowV198"><b>L'+st+'</b><span>'+esc(person.name)+'<small>'+esc(person.role)+'</small>'+(person.onLeave?'<small class="hourLeaveV209">⚠ Cadastro de RH: férias. Confirme o retorno e a jornada antes de enviar.</small>':'')+'</span>'+
    (person.phone?'<button class="btn" data-hour-card="'+st+'" data-hour-person="'+index+'">Compartilhar card <span aria-hidden="true">↗</span></button>':
     '<small>Contato não validado</small>')+'</div>').join('');
  }).join(''):'<p class="muted">Nenhuma filial pendente nesta parcial.</p>')+
@@ -220,6 +220,7 @@ function showDirectory(){
   const st=button.dataset.hourCard,entry=supervisors.find(x=>x.st===st);
   const person=entry?.people?.[Number(button.dataset.hourPerson)],row=byStore.get(st);
   if(!person?.phone||!row)return;
+  if(person.onLeave&&!window.confirm('A base de RH registra férias para '+person.name+'. Ela já retornou e está em expediente, autorizada a receber este alerta?')){notice.textContent='Envio não iniciado: supervisora consta em férias na base de RH.';return;}
   button.disabled=true;notice.textContent='Gerando card de alerta da filial L'+st+'...';
   try{
    const lib=await import('./alert-card-share.mjs?build=v205');
