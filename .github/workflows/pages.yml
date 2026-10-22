@@ -27,6 +27,24 @@ jobs:
         uses: actions/configure-pages@v5
         with:
           enablement: true
+      - name: Prepare local OCR assets for mobile print reading
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p vendor/ocr/core vendor/ocr/lang
+          BASE_JS="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1"
+          BASE_CORE="https://cdn.jsdelivr.net/npm/tesseract.js-core@5.1.1"
+          curl -fL --retry 3 --connect-timeout 15 --max-time 100 "$BASE_JS/dist/tesseract.min.js" -o vendor/ocr/tesseract.min.js
+          curl -fL --retry 3 --connect-timeout 15 --max-time 100 "$BASE_JS/dist/worker.min.js" -o vendor/ocr/worker.min.js
+          for variant in tesseract-core tesseract-core-simd tesseract-core-lstm tesseract-core-simd-lstm; do
+            for extension in wasm.js wasm; do
+              curl -fL --retry 3 --connect-timeout 15 --max-time 150 "$BASE_CORE/$variant.$extension" -o "vendor/ocr/core/$variant.$extension"
+            done
+          done
+          curl -fL --retry 3 --connect-timeout 15 --max-time 150 "https://tessdata.projectnaptha.com/4.0.0/eng.traineddata.gz" -o vendor/ocr/lang/eng.traineddata.gz
+          curl -fL --retry 3 --connect-timeout 15 --max-time 60 "$BASE_JS/LICENSE" -o vendor/ocr/TESSERACT_LICENSE
+          curl -fL --retry 3 --connect-timeout 15 --max-time 60 "$BASE_CORE/LICENSE" -o vendor/ocr/CORE_LICENSE
+          test -s vendor/ocr/tesseract.min.js && test -s vendor/ocr/core/tesseract-core-simd-lstm.wasm && test -s vendor/ocr/lang/eng.traineddata.gz
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
