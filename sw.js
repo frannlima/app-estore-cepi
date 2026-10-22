@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v217-perfil-rosto';
-const BUILD='v217-perfil-rosto';
+const CACHE='estore-cepi-shell-v218-fotos-antigas';
+const BUILD='v218-fotos-antigas';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
