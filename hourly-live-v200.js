@@ -86,26 +86,34 @@ function parse(text){
  const found=new Map(),lines=String(text||'').replace(/\r/g,'').split(/\n/);
  const clean=line=>String(line||'').normalize('NFKC').replace(/[\u200b-\u200f\uFEFF]/g,'').replace(/[\t\u00a0]/g,' ').trim();
  const valueMatcher=/(?:R\s*[$＄]\s*)?(\d{1,3}(?:[.\s]\d{3})*,\s*\d{2}|\d{1,6}[.,]\s*\d{2})(?!\d)/g;
- const values=tail=>[...tail.matchAll(valueMatcher)].map(x=>moneyVal(x[1].replace(/\s/g,''))).filter(n=>Number.isFinite(n)&&n>0&&n<1000000);
+ const amounts=tail=>[...String(tail).matchAll(valueMatcher)].map(x=>moneyVal(x[1].replace(/\s/g,''))).filter(n=>Number.isFinite(n)&&n>0&&n<1000000);
  let prior=null;
  for(const raw of lines){
   const line=clean(raw).replace(/^[•·*.\-]\s*/,'').replace(/^\d{1,2}[).]\s*/,'');
   if(!line)continue;
-  // O primeiro número inteiro após a seta é sempre META DE PEDIDOS, não venda.
-  // OCR pode trocar "➜" por "A", ">", ":" ou "->".
+  // Número inteiro após a seta = meta de pedidos, jamais uma venda.
   const m=line.match(/^(?:L\s*)?(\d{3})\s*(?:➜|➔|➡|→|➤|➞|[-=]+>|[>»›:：]|A(?=\s*\*?\d))\s*\*{0,2}\s*(\d{1,3})\s*\*{0,2}(.*)$/iu);
   if(m&&STORES.includes(m[1])){
    const st=m[1],goal=Number(m[2]);
    if(goal>200){prior=null;continue}
-   found.set(st,{st,goal,amounts:values(m[3]||''),source:line.slice(0,260)});
+   const items=amounts(m[3]||'');
+   const existing=found.get(st);
+   found.set(st,{st,goal,amounts:existing?[...existing.amounts,...items]:items,source:line.slice(0,400)});
    prior=st;continue;
   }
-  // Somente um valor isolado na linha seguinte, sem misturar outra filial.
-  if(prior&&/^(?:R\s*[$＄]\s*)?\d{1,6}[.,]\s*\d{2}(?:\s*[/+]\s*(?:R\$\s*)?\d+[.,]\s*\d{2})?\s*$/.test(line)){
+  // Aceita a continuação do WhatsApp: "+195.99 + 305,98" ou "/79,99".
+  // Somente tokens financeiros e separadores, jamais texto solto ou outra filial.
+  const listed=amounts(line);
+  const remaining=line.replace(valueMatcher,'').replace(/[\s+\/|;,R$]/g,'');
+  if(prior&&listed.length&&remaining.length===0){
    const row=found.get(prior);
-   if(row&&!row.amounts.length){row.amounts=values(line);row.source+=' | '+line.slice(0,70)}
-   prior=null;
-  }else if(line.length>55||/^(?:L\s*)?\d{3}\s*(?:➜|➔|➡|→|A\s*\d|:|>)/i.test(line))prior=null;
+   if(row){
+    row.amounts.push(...listed);
+    row.source+=' | '+line.slice(0,120);
+   }
+   continue;
+  }
+  prior=null;
  }
  return [...found.values()];
 }
