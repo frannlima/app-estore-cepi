@@ -29,7 +29,8 @@ function missingCount(r,ref){
  const st=String(r.st).padStart(3,'0');
  const street=['084','113','146'].includes(st);
  const opening=street?8:10,closing=street?18:22;
- const until=Math.min(ref.hour,closing),base=r.updated_at&&ref.date===clock().date?Math.max(opening,localHour(r.updated_at)):opening;
+ const updatedDay=r.updated_at?new Intl.DateTimeFormat('en-CA',{timeZone:'America/Fortaleza',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(r.updated_at)):'';
+ const until=Math.min(ref.hour,closing),base=r.updated_at&&updatedDay===ref.date?Math.max(opening,localHour(r.updated_at)):opening;
  // Conta janelas horárias vencidas, não vendas zeradas.
  return Math.max(0,until-base-(ref.minute<5&&until===ref.hour?1:0));
 }
