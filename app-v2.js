@@ -156,8 +156,8 @@ let REPORT_METRIC='sales';
 
 function escV3(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function firstV3(){return U?.u?.name?U.u.name.trim().split(/\s+/)[0]:''}
-function supV3(){return !!(U?.lead||U?.admin)}
-function admV3(){return !!U?.admin}
+function supV3(){return !!(U?.lead||admV3())}
+function admV3(){return String(U?.u?.id||'')==='2457695'&&!!U?.admin}
 function clampV3(v,a,b){return Math.max(a,Math.min(b,v))}
 function storeFullV3(){
   const raw=COMMON?.stores?.[U?.u?.st]?.name||'';
@@ -545,7 +545,7 @@ function previewHcV4(){const d=$('#hcDateV4')?.value,h=Number($('#hcCountV4')?.v
 async function saveHcV4(){const d=$('#hcDateV4')?.value,h=Math.trunc(Number($('#hcCountV4')?.value||0)),out=$('#hcOutV4');if(!d||h<1){out.innerHTML='<p class=bad>Informe a data e o HC disponível.</p>';return}try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'hc_set',matricula:String(U.u.id),st:String(U.u.st),date:d,hc:h})});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||'Não foi possível salvar.');APP_DELTA.hcSchedule=APP_DELTA.hcSchedule||{};APP_DELTA.hcSchedule[d]=APP_DELTA.hcSchedule[d]||{};APP_DELTA.hcSchedule[d][String(U.u.st)]={hc:h};out.innerHTML='<div class=notice>Distribuição por HC salva.</div>';setTimeout(()=>go('metasv4'),700)}catch(e){out.innerHTML='<p class=bad>'+escV3(e.message||e)+'</p>'}}
 
 function shareLinesV4(type){const x=person(),sp=storeP();if(type==='result')return ['Meu Resultado • '+pLabel[PER],'Captada: '+money(x.c),'Aprovada: '+money(x.a),'Pedidos: '+num(x.o),'Comissão: '+money(x.com)];if(type==='store')return ['Filial '+storeFullV3()+' • '+pLabel[PER],'Meta: '+money(sp.ef||sp.ee),'Realizado: '+money(sp.c),'Atingimento: '+pct(sp.att),'Share: '+pct(sp.share),'Pedidos: '+num(sp.o)];if(type==='meta'){const d=metaDistributionV4(PER),t=d.configured?d.individual:null;return ['Metas • '+pLabel[PER],'Meta filial: '+money(sp.ef||sp.ee),'Realizado: '+money(x.c),t!=null?'Meta individual: '+money(t):'Meta individual: aguardando distribuição por HC',t!=null?'Pedidos meta: '+num(Math.ceil(t/400)):'']}if(type==='pool'){const p=U.pool||{};return ['Pool eStore','Venda aprovada: '+money(p.approved||0),'Pool 3%: '+money(p.pool||0),'Elegíveis: '+num(p.eligible?.length||0),'Rateio estimado: '+money(p.sim||0)]}if(type==='team'){const a=U.team?.[PER]||[];return ['Meu Time • '+pLabel[PER],'Colaboradores: '+num(a.length),'Ativos: '+num(a.filter(v=>(v.c||0)>0).length),'Venda captada: '+money(a.reduce((sum,v)=>sum+Number(v.c||0),0))]}return ['Ranking eStore • '+pLabel[PER],'Filial '+U.u.st,'Minha posição CE+PI: '+(x.rr?num(x.rr)+'º':'—'),'Venda captada: '+money(x.c)]}
-function shareV4(type,title){const lines=shareLinesV4(type).filter(Boolean),text=title+'\n'+lines.join('\n');shareCanvas(window.RiachueloBrandCards.decorateCanvas(canvasCard(title,lines)),text)}
+function shareV4(type,title){const lines=shareLinesV4(type).filter(Boolean);const routes={result:['result','Meu Resultado'],store:['store','Minha Filial'],meta:['metasv4','Metas'],pool:['poolv3','Pool'],team:['teamv3','Meu Time'],ranking:['ranking','Ranking']};const route=routes[type]||['home','Início'];const text=title+'\n'+lines.join('\n')+'\n\n📲 Acompanhe no App eStore CE+PI\n📍 Menu → '+route[1]+'\n🔗 https://frannlima.github.io/app-estore-cepi/?view='+route[0];shareCanvas(window.RiachueloBrandCards.decorateCanvas(canvasCard(title,lines)),text)}
 function shareResultV4(){shareV4('result','Meu Resultado eStore')} function shareStoreV4(){shareV4('store','Dashboard eStore')} function shareMetaV4(){shareV4('meta','Metas eStore')} function sharePoolV4(){shareV4('pool','Pool eStore')} function shareTeamV4(){shareV4('team','Meu Time eStore')} function shareRankingV4(){shareV4('ranking','Ranking eStore')}
 function shareBarV4(type){const fn='share'+type[0].toUpperCase()+type.slice(1)+'V4()';return `<div class=shareBarV4><button onclick="${fn}">Compartilhar no WhatsApp</button></div>`}
 
@@ -1992,7 +1992,7 @@ connectionCampaignV37=function(){
     '<div class="connectionCopyV37"><h2>🔊 '+escV3(x.title||'Campanha eStore')+'</h2><p>'+escV3(x.description||x.text||'Confira a campanha ativa no eStore.')+'</p>'+
     '<div class="connectionTagsV37"><span>#eStore</span><span>#Campanha</span><span>#CEPI</span></div></div></article>';
 };
-showCampaignPopupV37=function(){
+showCampaignPopupV37=function(){return; // Campanha visível apenas no menu, sem abertura automática.
   removeLegacyPromoV38(document);
   const x=currentCampaignV38();
   if(!x||document.getElementById('campaignPopupV37'))return;
@@ -2243,7 +2243,7 @@ adminV3=function(){
     },180);
   };
 
-  showCampaignPopupV37=function(){
+  showCampaignPopupV37=function(){return; // Campanha visível apenas no menu, sem abertura automática.
     try{ removeLegacyPromoV38(document); }catch(_){}
     if(popupShownV82||document.getElementById('campaignPopupV37')) return;
     const x=typeof currentCampaignV38==='function'?currentCampaignV38():null;
@@ -2321,7 +2321,7 @@ adminV3=function(){
 /* ===== V86 2026-10-02: popup campanha com banner aprovado ===== */
 CAMPAIGN_OCT_V37.art='./assets/campaign-popup-v86.svg?v=86';
 
-showCampaignPopupV37=function(){
+showCampaignPopupV37=function(){return; // Campanha visível apenas no menu, sem abertura automática.
   if(!campaignActiveV37()||!U?.u?.id||document.getElementById('campaignPopupV37'))return;
   const el=document.createElement('div');
   el.id='campaignPopupV37';
@@ -2908,6 +2908,7 @@ showCampaignPopupV37=function(){
     overlay.querySelector('.tpClose189')?.focus();
   }
   async function tryShow(){
+    return; // Pop-up da terceira parcial desativado; ranking segue no menu Campanhas.
     if(isExpired()||!loggedIn())return;
     const id=currentMatricula();
     if(!/^\d{4,12}$/.test(id)||id==='0000000'||localSeen(id)||checked.has(id)||checking.has(id))return;
