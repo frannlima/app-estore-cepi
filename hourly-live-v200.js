@@ -210,7 +210,7 @@ function showDirectory(){
   if(!person?.phone||!row)return;
   button.disabled=true;notice.textContent='Gerando card de alerta da filial L'+st+'...';
   try{
-   const lib=await import('./alert-card-share.mjs');
+   const lib=await import('./alert-card-share.mjs?build=v205');
    const current=status(row,j),lastTime=row.updated_at?
      new Date(row.updated_at).toLocaleTimeString('pt-BR',{timeZone:'America/Fortaleza',hour:'2-digit',minute:'2-digit'}):null;
    const png=await lib.createAlertImage(
@@ -240,6 +240,10 @@ function showModal(){
  '<details class="hourQuickFallbackV202" id="hourQuickFallbackV202"><summary>O print não foi reconhecido? Colar texto da mensagem</summary>'+
  '<textarea rows="5" id="hourImportTextV198" placeholder="Cole aqui a mensagem recebida no WhatsApp"></textarea>'+
  '<button type="button" class="btn alt" id="hourRunTextV198">Identificar vendas no texto</button></details>'+
+ '<details class="hourQuickManualV205" id="hourQuickManualV205"><summary>Adicionar venda que não foi reconhecida</summary>'+
+ '<div class="hourQuickManualFieldsV205"><label>Filial<select id="hourManualStoreV205">'+STORES.map(st=>'<option value="'+st+'">L'+st+'</option>').join('')+'</select></label>'+
+ '<label>Valor captado (R$)<input id="hourManualValueV205" inputmode="decimal" placeholder="Ex.: 159,98"></label></div>'+
+ '<button type="button" class="btn alt" id="hourManualAddV205">Adicionar para conferência</button></details>'+
  '<details class="hourQuickAdvancedV202"><summary>Alterar data ou horário do print</summary><div class="hourPrintDatesV198">'+
  '<label>Data do resultado<input type="date" id="hourImportDateV198" value="'+date+'"></label>'+
  '<label>Horário do print<input type="time" id="hourImportTimeV198" value="'+t.time+'"></label></div></details>'+
@@ -263,6 +267,17 @@ function showModal(){
    await readOCR(modal);
  });
  modal.querySelector('#hourRunTextV198').onclick=()=>{fileRef=null;analyzeText(modal,false)};
+ modal.querySelector('#hourManualAddV205').onclick=()=>{
+  const st=modal.querySelector('#hourManualStoreV205').value,amount=moneyVal(modal.querySelector('#hourManualValueV205').value);
+  const info=modal.querySelector('#hourParseStateV198');
+  if(!STORES.includes(st)||!Number.isFinite(amount)||amount<=0||amount>=1000000){info.textContent='Informe uma filial válida e um valor maior que zero.';return}
+  parsed=parsed.filter(x=>x.st!==st);
+  parsed.push({st,goal:0,amounts:[amount],source:'Venda informada manualmente para revisão'});
+  renderReview(modal);
+  info.textContent='✅ Venda da L'+st+' adicionada para conferência.';
+  modal.querySelector('#hourQuickManualV205').open=false;
+  modal.querySelector('#hourManualValueV205').value='';
+ };
  modal.querySelector('#hourImportCommitV198').onclick=()=>commit(modal);
  if(adminPassword)modal.querySelector('#hourPwdLabelV202').hidden=true;
 }
@@ -286,7 +301,7 @@ function analyzeText(modal,fromOCR){
   '✅ '+withSale+' loja(s) com valores para conferir. '+(fromOCR?'Revise o que foi lido no print.':'Confira os valores da mensagem.'):
   'Não identifiquei valores de vendas com segurança. Confira o texto abaixo ou escolha outro print.';
  renderReview(modal);
- if(!withSale)modal.querySelector('#hourQuickFallbackV202').open=true;
+ if(!withSale){modal.querySelector('#hourQuickFallbackV202').open=true;modal.querySelector('#hourQuickManualV205').open=true;}
 }
 const quickImportAssetV202=(path)=>new URL('./vendor/ocr/'+path,new URL('./',window.location.href)).href;
 async function loadLocalOcrV202(){
