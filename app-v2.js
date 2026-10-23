@@ -486,7 +486,7 @@ function importV3(){
  <p class="muted">No Painel Executivo, selecione Semana ou Mês e utilize <b>Importar Semana/Mês</b>. O controle oficial de share fica naquele painel até a migração segura do serviço de processamento.</p>
  <button class="btn" type="button" onclick="go('executive')">Abrir Painel Executivo — importar acumulado</button>
  </div>
- <div id="estoreCentralHistoryV1" hidden><div class="notice">Histórico existente preservado no Supabase. O D-1 alimenta os indicadores individuais e gerenciais; semana e mês comparam a consolidação diária com o último acumulado oficial. Valores oficiais devem prevalecer somente para o intervalo correspondente.</div><p class="muted">O status de conciliação por período será habilitado após a integração das rotinas de BOPIS e campanhas ao processador central.</p></div>
+ <div id="estoreCentralHistoryV1" hidden><div class="notice">Conferência das fontes existentes: não duplica pedidos nem altera comissões.</div><button class="btn" type="button" onclick="estoreCentralAuditV2()">↻ Conferir bases D-1, semana e mês</button><div id="estoreCentralAuditOutV2" role="status" aria-live="polite"></div></div>
  </div>`;
 }
 function estoreCentralModeV1(mode){
@@ -517,6 +517,34 @@ async function estoreCentralImportBopisV1(){
  finally{if(btn)btn.disabled=false}
 }
 window.estoreCentralImportBopisV1=estoreCentralImportBopisV1;
+async function estoreCentralAuditV2(){
+ if(!admV3())return;
+ const out=document.getElementById('estoreCentralAuditOutV2');if(!out)return;
+ out.textContent='Consultando as bases existentes...';
+ const id=String(U?.u?.id||'');
+ const records=[
+ ['Gerencial, lojas e colaboradores','delta',{action:'delta',matricula:id}],
+ ['Períodos individuais e ranking','person_period',{action:'person_period',matricula:id,store:U.u.st,period:'month'}],
+ ['BOPIS e Pool','bopis_dashboard',{action:'bopis_dashboard',matricula:id,period:'month'}]
+ ];
+ const checks=await Promise.all(records.map(async([label,action,body])=>{
+  try{const r=await fetch(ESTORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),cache:'no-store'});const j=await r.json();if(!r.ok||j.ok===false||j.error)throw Error(j.error||'Falha na consulta');return {label,ok:true,detail:'Fonte respondeu; indicador disponível para consulta.'}}
+  catch(e){return {label,ok:false,detail:String(e.message||e)}}}));
+ try{
+  const r=await fetch('https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-executive',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'get',matricula:id}),cache:'no-store'});
+  const j=await r.json();if(!r.ok||!j.ok)throw Error(j.error||'Consulta indisponível');
+  const benchmarks=Array.isArray(j.benchmarks)?j.benchmarks:[];
+  const daily=Array.isArray(j.daily)?j.daily:[];
+  const first=benchmarks.filter(x=>x.period==='week'&&x.regional_share!=null).sort((a,b)=>String(b.end_date).localeCompare(String(a.end_date)))[0];
+  const month=benchmarks.filter(x=>x.period==='month'&&x.regional_share!=null).sort((a,b)=>String(b.end_date).localeCompare(String(a.end_date)))[0];
+  checks.push({label:'Painel Executivo | D-1',ok:daily.length>0,detail:daily.length+' data(s) com histórico gerencial.'});
+  checks.push({label:'Share oficial | Semana',ok:!!first,detail:first?'Até '+first.end_date:'Sem benchmark semanal oficial'});
+  checks.push({label:'Share oficial | Mês',ok:!!month,detail:month?'Até '+month.end_date:'Sem benchmark mensal oficial'});
+ }catch(e){checks.push({label:'Painel Executivo | benchmarks',ok:false,detail:String(e.message||e)})}
+ out.innerHTML='<div style="display:grid;gap:8px;margin-top:12px">'+checks.map(x=>'<div class="notice" style="border-left:4px solid '+(x.ok?'#20835e':'#c88c25')+'"><b>'+(x.ok?'✓ ':'⚠ ')+x.label+'</b><small style="display:block">'+String(x.detail).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))+'</small></div>').join('')+'</div><p class="muted">Conferência de disponibilidade: não comprova conciliação financeira ou atualização de todos os menus.</p>';
+}
+window.estoreCentralAuditV2=estoreCentralAuditV2;
+
 
 
 function infoAdminV3(){
