@@ -236,6 +236,46 @@ function executivePanelViewV1(){
  EX.active=true;
  return '<div class="execPageV1"><div class="execToolbarV1"><div class="execSegmentV1"><button class="'+(EX.period==="day"?"on":"")+'" onclick="execSetPeriodV1(\'day\')">D-1</button><button class="'+(EX.period==="week"?"on":"")+'" onclick="execSetPeriodV1(\'week\')">Semana</button><button class="'+(EX.period==="month"?"on":"")+'" onclick="execSetPeriodV1(\'month\')">Mês</button></div><div style="display:flex;flex-wrap:wrap;gap:7px"><button class="light" onclick="execRefreshV1()">↻ Atualizar</button>'+(isMain()?'<button class="orange" onclick="execShowAdminV1()">＋ Importar Semana/Mês</button>':'')+'<button onclick="execShareV1()">↗ Compartilhar</button></div></div><div id="execMessageV1"></div><div id="execVisualV1"><div class="execSectionV1">Consolidando relatórios oficiais e o FCA...</div></div><div id="execAdminSlotV1"></div></div>';
 }
+
+// Radar competitivo: somente dados oficiais; não simular posições das demais regionais.
+function competitiveRadar(){
+ const end=latestDate(),weekEnd=isoWeek(end);
+ const prior=new Date(weekEnd+"T12:00:00Z");prior.setUTCDate(prior.getUTCDate()-7);
+ const priorStart=prior.toISOString().slice(0,10);
+ const priorEnd=new Date(prior.getTime()+6*86400000).toISOString().slice(0,10);
+ const prev=(EX.data?.benchmarks||[]).filter(x=>x.period==="week"&&x.start_date===priorStart&&x.end_date===priorEnd&&x.regional_share!=null).sort((a,b)=>String(b.updated_at||"").localeCompare(String(a.updated_at||"")))[0];
+ const curr=(EX.data?.benchmarks||[]).filter(x=>x.period==="week"&&x.start_date===weekEnd&&x.end_date===end&&x.regional_share!=null)[0];
+ const previous=prev?.regional_share==null?null:n(prev.regional_share);
+ const current=curr?.regional_share==null?null:n(curr.regional_share);
+ const change=previous==null||current==null?null:current-previous;
+ const reg=Array.isArray(EX.data?.competitive_regions)?EX.data.competitive_regions:[];
+ const comparable=reg.filter(x=>x&&x.previous_share!=null&&x.current_share!=null&&Number.isFinite(Number(x.previous_share))&&Number.isFinite(Number(x.current_share))).map(x=>({...x,delta:Number(x.current_share)-Number(x.previous_share)})).sort((a,b)=>a.delta-b.delta);
+ const ce=comparable.find(x=>/^(CE\\s*\\+\\s*PI|CEPI)$/i.test(String(x.region||x.name||"").trim()));
+ const ranked=ce?comparable.findIndex(x=>x===ce)+1:null;
+ const countPrioritized=Number(EX.data?.prioritized_count)||0;
+ const cutoff=comparable.length&&countPrioritized>0&&comparable.length>countPrioritized?comparable[countPrioritized-1].delta:null;
+ const risk=ranked!=null&&countPrioritized>0?(ranked<=countPrioritized?"Dentro da zona de priorização":"Fora da zona de priorização"):change==null?"Aguardando comparação":"Monitorar retração";
+ const riskColor=ranked!=null&&countPrioritized>0?(ranked<=countPrioritized?"danger":"ok"):"neutral";
+ // Valor necessário só é calculável com faturamento total acumulado/projetado validado.
+ const sales=Number(EX.data?.regional_sales_projection);
+ const capture=Number(EX.data?.regional_capture_projection);
+ const need=cutoff!=null&&Number.isFinite(sales)&&sales>0&&Number.isFinite(capture)&&capture>=0&&previous!=null?
+ Math.max(0,Math.ceil(((previous+cutoff+0.00001)*sales-capture)*100)/100):null;
+ const score=change==null?'Referência semanal indisponível':(change>=0?'▲ '+pp(change):'▼ '+pp(change));
+ return '<section class="execSectionV1 execRadarV4" aria-label="Radar competitivo de share semanal">'+
+ '<div class="execSectionHeadV2"><h3>RADAR COMPETITIVO | SHARE SEMANAL</h3><span class="execTinyV2">CE+PI vs regionais</span></div>'+
+ '<div class="execRadarGridV4">'+
+ '<div><small>SEMANA ANTERIOR</small><strong>'+percent(previous)+'</strong></div>'+
+ '<div><small>SHARE ATUAL</small><strong>'+percent(current)+'</strong></div>'+
+ '<div><small>EVOLUÇÃO</small><strong class="'+(change!=null&&change<0?'execDangerV1':'execSuccessV1')+'">'+(change==null?'—':score)+'</strong></div>'+
+ '<div><small>POSIÇÃO DE RETRAÇÃO</small><strong>'+(ranked==null?'—':ranked+'º / '+comparable.length)+'</strong></div></div>'+
+ '<div class="execRadarActionV4 '+riskColor+'"><strong>'+e(risk)+'</strong><span>Captação para sair do corte: <b>'+money2(need)+'</b></span></div>'+
+ (need==null?'<p class="execTinyV2">Para calcular o desafio em R$, importar todas as regionais, quantidade priorizada e projeção de venda total. Sem dados comparáveis não é atribuída posição.</p>':'<p class="execTinyV2">Estimativa sobre venda total projetada, com margem de 0,001 p.p.; a posição pode mudar até domingo.</p>')+
+ '<details class="execRadarDetailsV4"><summary>Ver ranking e critério de corte ▾</summary>'+
+ (comparable.length?'<div class="execRadarRankV4">'+comparable.map((x,i)=>'<div><span>'+(i+1)+'º • '+e(x.region||x.name||'Regional')+'</span><b class="'+(x.delta<0?'execDangerV1':'execSuccessV1')+'">'+pp(x.delta)+'</b></div>').join('')+'</div>':'<p class="execHelpV1">Aguardando relatório comparativo semanal de todas as regionais. Não há classificação regional comprovada.</p>')+
+ '</details></section>';
+}
+
 function render(){
  const root=document.getElementById("execVisualV1");if(!root)return;
  if(!EX.data){root.innerHTML='<div class="execSectionV1">Consultando as fontes oficiais...</div>';return}
@@ -297,7 +337,7 @@ function render(){
  '<div class="execKpiV1"><label>SHARE REGIONAL</label><strong>'+percent(share)+'</strong><small>Oficial / gerencial</small></div>'+
  '<div class="execKpiV1"><label>ATING. META</label><strong>'+percent(reach)+'</strong><small>Meta eStore</small></div></div>'+
  '<div class="execCompareV1"><div class="execCompareRowsV2">'+regionLine+companyLine+'</div><div class="execDiffV1"><b class="'+(gap!=null&&gap>=0?"execSuccessV1":"")+'">'+pp(gap)+'</b><small>Desvio vs empresa</small></div></div></section>'+
- chart+
+ competitiveRadar()+chart+
  '<section class="execSectionV1"><div class="execSectionHeadV2"><h3>DESTAQUES POR FILIAL</h3></div><div class="execTriGridV1">'+mini+'</div></section>'+
  '<section class="execPairV1">'+zeroCard+rightCard+'</section>'+
  movementPanel+podium+
