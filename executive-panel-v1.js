@@ -263,7 +263,7 @@ function competitiveRadar(){
  const snapshot=weekStart===RADAR_OCT26.currentStart&&end===RADAR_OCT26.currentEnd;
  const historical=(EX.data?.benchmarks||[]).find(x=>x.period==="week"&&x.start_date===prevStart&&x.end_date===prevEnd&&x.regional_share!=null);
  const currentBench=(EX.data?.benchmarks||[]).find(x=>x.period==="week"&&x.start_date===weekStart&&x.end_date===end&&x.regional_share!=null);
- const previous=historical?Number(historical.regional_share):snapshot?.34/100:null;
+ const previous=historical?Number(historical.regional_share):snapshot ? 0.0034 : null;
  const current=currentBench?Number(currentBench.regional_share):snapshot?RADAR_OCT26.regionalShare:null;
  const delta=previous!=null&&current!=null?current-previous:null;
  const remote=Array.isArray(EX.data?.competitive_regions)?EX.data.competitive_regions:[];
@@ -281,8 +281,8 @@ function competitiveRadar(){
  const definiteRisk=rank!=null&&lastRank!=null&&lastRank<=cutoffCount;
  const tieRisk=rank!=null&&rank<=cutoffCount&&!definiteRisk;
  const safe=rank!=null&&rank>cutoffCount;
- const label=!rows.length?"Aguardando comparação regional":safe?"Fora da faixa das 5 menores evoluções":tieRisk?"Atenção • empate na linha de corte":definiteRisk?"Entre as 5 menores evoluções":"Acompanhamento semanal";
- const status=!rows.length?"neutral":safe?"ok":"danger";
+ const label=!rows.length?"Aguardando comparação regional":safe?"Fora da faixa das 5 menores evoluções":tieRisk?"Atenção • empate na linha de corte":definiteRisk?"Atenção • entre as 5 menores evoluções":"Acompanhamento semanal";
+ const status=!rows.length?"neutral":safe?"ok":delta!=null&&delta>=0?"warning":"danger";
  // Venda total inferida de captação e share regional da mesma parcial;
  // adicional pressupõe denominador constante e ranking dos concorrentes estático.
  const capture=snapshot?RADAR_OCT26.captured:Number(EX.data?.regional_capture_projection);
