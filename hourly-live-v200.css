@@ -136,3 +136,6 @@
 
 /* Cadastro de supervisores: advertência de afastamento/férias no Hora a Hora */
 .hourDirRowV198 .hourLeaveV209{display:block;margin-top:5px;padding:6px 8px;border-radius:6px;background:#FFF3E1;color:#914E18;font-size:11px;line-height:1.35;font-weight:800;white-space:normal}
+
+/* Share regional calculado apenas com venda Flash por filial. */
+.hourV200FlashSource{font-size:11px;color:#335d50;background:#ecf5ed;border:1px solid #c9ddcc;border-radius:10px;padding:9px 11px;margin:8px 0 12px;line-height:1.45;font-weight:750}

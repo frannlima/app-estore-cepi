@@ -15,15 +15,15 @@
      ['💰','Captado',rr.sales,'money'],
      ['🛍️','Pedidos',rr.orders+' / '+rr.goal,'text'],
      ['📈','Atingimento',rr.meta?rr.sales/rr.meta:null,'percent'],
-     ['📊','Share',rr.storeSales?rr.sales/rr.storeSales:null,'percent'],
+     ['📊','Share Flash',j.regionalFlash?.complete?j.regionalFlash.share:null,'percent'],
      ['📉','Desvio',rr.sales-rr.meta,'money']
    ];
    const fmt=(v,type)=>type==='money'?Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):type==='percent'?(v==null?'—':(v*100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%'):String(v);
    const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
    const panel=document.querySelector('#hourPanel');
-   if(panel)panel.innerHTML='<div class="hourV200Grid">'+values.map(([ic,title,v,type])=>'<div class="hourV200Metric"><span><i>'+ic+'</i> '+title+'</span><b class="'+(title==='Desvio'?(v<0?'hourV200Negative':'hourV200Positive'):'')+'">'+fmt(v,type)+'</b></div>').join('')+'</div>';
+   if(panel)panel.innerHTML='<div class="hourV200Grid">'+values.map(([ic,title,v,type])=>'<div class="hourV200Metric"><span><i>'+ic+'</i> '+title+'</span><b class="'+(title==='Desvio'?(v<0?'hourV200Negative':'hourV200Positive'):'')+'">'+fmt(v,type)+'</b></div>').join('')+'</div>'+'<p class="hourV200FlashSource">Share eStore ÷ Total Flash • '+Number(j.regionalFlash?.covered_stores||0)+'/18 lojas • '+(j.regionalFlash?.complete?'Base completa':'Share regional indisponível até concluir a coleta')+'</p>';
    const details=document.querySelector('#hourDetails');
-   if(details)details.innerHTML='<div class="hourV200TableWrap"><table class="hourV200Table"><thead><tr><th>Filial</th><th>Meta</th><th>Captado</th><th>Pedidos</th><th>Ating.</th><th>Share</th><th>Desvio</th><th>Status</th></tr></thead><tbody>'+rows.map(r=>{
+   if(details)details.innerHTML='<div class="hourV200TableWrap"><table class="hourV200Table"><thead><tr><th>Filial</th><th>Meta</th><th>Captado</th><th>Pedidos</th><th>Ating.</th><th>Share Flash</th><th>Desvio</th><th>Status</th></tr></thead><tbody>'+rows.map(r=>{
     const st=window.hourlyStatusV198?.(r,j)||{label:r.updated_at?'Em curso':'Sem input',code:r.updated_at?'course':'missing'};
     const delta=Number(r.captured||0)-Number(r.metaValue||0);
     return '<tr class="'+(st.code==='missing'?'hourV200Pending':'')+'"><td>L'+safe(r.st)+'</td><td>'+fmt(r.metaValue,'money')+'</td><td>'+fmt(r.captured,'money')+'</td><td>'+Number(r.orders||0)+'/'+Number(r.orderTarget||0)+'</td><td>'+fmt(r.att,'percent')+'</td><td>'+fmt(r.share,'percent')+'</td><td class="'+(delta<0?'hourV200Negative':'hourV200Positive')+'">'+fmt(delta,'money')+'</td><td><span class="hourV200Status '+st.code+'">'+safe(st.label)+'</span></td></tr>';
@@ -131,7 +131,7 @@ function decorateScreen(){
  const rowBase=root.querySelector('.hourTableV6 table');
  if(rowBase){
   const rows=[...(j.stores||[])].sort((a,b)=>Number(b.captured||0)-Number(a.captured||0));
-  rowBase.innerHTML='<thead><tr><th>Filial</th><th>Meta eStore</th><th>Captado</th><th>Pedidos</th><th>Ating.</th><th>Share</th><th>Desvio</th><th>Status</th></tr></thead><tbody>'+rows.map(r=>{
+  rowBase.innerHTML='<thead><tr><th>Filial</th><th>Meta eStore</th><th>Captado</th><th>Pedidos</th><th>Ating.</th><th>Share Flash</th><th>Desvio</th><th>Status</th></tr></thead><tbody>'+rows.map(r=>{
    const st=status(r,j),dev=Number(r.captured||0)-Number(r.metaValue||0);
    return '<tr class="hourRowV6 hourDynamicV198 '+st.code+'"><td><b>L'+esc(r.st)+'</b></td>'+
    '<td>'+moneyBR(r.metaValue)+'</td><td>'+moneyBR(r.captured)+'</td>'+
@@ -161,7 +161,7 @@ function caption(j){
   '💰 *Captado:* '+moneyBR(r.captured),
   '🛍️ *Pedidos:* '+r.orders+'/'+r.orderTarget,
   '📈 *Atingimento:* '+fmtPercent(r.meta>0?r.captured/r.meta:null),
-  '📊 *Share:* '+fmtPercent(r.storeSales>0?r.captured/r.storeSales:null),
+  '📊 *Share Flash:* '+(j.regionalFlash?.complete?fmtPercent(j.regionalFlash.share):'— • coleta '+Number(j.regionalFlash?.covered_stores||0)+'/18 lojas'),
   (desvio<0?'🔻':'🔺')+' *Desvio:* '+moneyBR(desvio),
   '🏬 *Lojas com venda:* '+n+'/'+arr.length,
   '⚠️ *Lojas sem venda informada:* - '+miss.length,
@@ -572,7 +572,7 @@ async function createPoster(j){
  ['💰','CAPTAÇÃO',money(total.captured)],
  ['🛍️','PEDIDOS',count(total.orders)+' / '+count(total.orderTarget)],
  ['🎯','ATINGIMENTO',percent(total.meta>0?total.captured/total.meta:null)],
- ['📊','SHARE REGIONAL',total.storeSales>0?percent(total.captured/total.storeSales):'—'],
+ ['📊','SHARE FLASH',j.regionalFlash?.complete?percent(j.regionalFlash.share):'—'],
  ['↕️','DESVIO PARA META',(delta>0?'+':'')+money(delta)]
  ];
  kpis.forEach(([icon,title,val],i)=>{
@@ -630,7 +630,7 @@ async function createPoster(j){
  const fb=footerY;ctx.fillStyle='#FFEAD8';rrect(ctx,45,fb,990,80,14,'#FFF2E8');
  put(ctx,'⚠️ LOJAS SEM INPUT DE VENDAS • '+pending.length,66,fb+25,19,RED,true);
  fit(ctx,pending.map(x=>'L'+x).join('  •  ')||'Nenhuma filial pendente',66,fb+55,940,19,GREEN,true);
- put(ctx,'Meta: '+money(total.meta)+'   •   Captação: '+money(total.captured)+'   •   Lojas com venda: '+active+'/'+n,54,fb+111,18,GREEN,true);
+ put(ctx,'Meta: '+money(total.meta)+'   •   Captação: '+money(total.captured)+'   •   Flash: '+Number(j.regionalFlash?.covered_stores||0)+'/18 lojas',54,fb+111,18,GREEN,true);
  ctx.fillStyle=GREEN;ctx.fillRect(0,c.height-54,1080,54);
  put(ctx,'Moda que inspira o Brasil  •  App eStore CE+PI',55,c.height-26,18,'#FFFFFF',true);
  return c;
