@@ -142,9 +142,9 @@
       '• *Caixa / Atendimento:* '+fmtPct(a['Caixa / Atendimento'].disp)+' • '+intBR(a['Caixa / Atendimento'].zeros)+' zerados / '+intBR(a['Caixa / Atendimento'].total)+' HC • '+evoPct(evolution(a['Caixa / Atendimento'].disp,pa?.['Caixa / Atendimento']?.disp))
     ].join('\n');
   }
-  async function storeCanvas(){
-    const d=teamCardData();if(!d||d.regional)return null;
-    const current=d.j,prev=await previousTeamData(current),rows=current?.store?.rows||d.rows||[],pr=prev?.store?.rows||[];
+  async function storeCanvas(input){
+    const d=input?.raw||teamCardData();if(!d||d.regional)return null;
+    const current=d.j,prev=input&&Object.hasOwn(input,'prev')?input.prev:await previousTeamData(current),rows=current?.store?.rows||d.rows||[],pr=prev?.store?.rows||[];
     const m=metric(rows),pm=prev?metric(pr):null,e=evolution(m.disp,pm?.disp),a=areas(rows),pa=prev?areas(pr):{};
     const W=1080,H=1510,cv=document.createElement('canvas');cv.width=W;cv.height=H;
     const ctx=cv.getContext('2d');ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
@@ -213,25 +213,143 @@
     return await storeCanvas();
   };
 
+
+  // O navegador móvel pode perder a ativação do clique durante carregamentos
+  // assíncronos (histórico e logo); o envio exige um segundo toque na prévia.
+  let sharing=false;
+  const safeText=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  async function canvasBlob(canvas){
+    if(!canvas)throw new Error('Dados da filial ainda não disponíveis');
+    const blob=await new Promise(resolve=>{
+      try{canvas.toBlob(resolve,'image/png');}catch(e){console.warn('[V113] canvas.toBlob',e);resolve(null)}
+    });
+    if(!blob)throw new Error('A conversão do card em PNG não foi concluída');
+    return blob;
+  }
+  function minimalCard(raw){
+    // Plano B sem imagens externas nem molduras: funciona até quando o SVG falha.
+    const rows=raw?.j?.store?.rows||raw?.rows||[];
+    const m=metric(rows),total=rows.reduce((a,x)=>a+(Number(x.c)||0),0);
+    const cv=document.createElement('canvas');cv.width=1080;cv.height=750;
+    const c=cv.getContext('2d');
+    if(!c)throw new Error('Canvas indisponível no navegador');
+    c.fillStyle=P.paper;c.fillRect(0,0,1080,750);
+    c.fillStyle=P.green;c.fillRect(0,0,1080,176);
+    txt(c,'RIACHUELO',46,54,'700 37px Arial',P.white);
+    txt(c,'MEU TIME • FILIAL '+String(U.u.st),46,111,'700 35px Arial',P.white);
+    txt(c,periodName()+' • '+fmtDate(raw?.j?.endDate),46,146,'500 20px Arial',P.white);
+    const cards=[
+      ['COLABORADORES',intBR(m.total)],
+      ['COM VENDA',intBR(m.sold)+' • '+fmtPct(m.total?m.sold/m.total:0)],
+      ['ZERADOS',intBR(m.zeros)+' • '+fmtPct(m.disp)],
+      ['CAPTAÇÃO',moneyBR(total)]
+    ];
+    cards.forEach(([label,value],i)=>{
+      const x=45+(i%2)*515,y=221+Math.floor(i/2)*194;
+      rr(c,x,y,492,172,17,P.white,'#E4E0D8');
+      txt(c,label,x+24,y+43,'700 20px Arial',P.sage);
+      txt(c,value,x+24,y+113,'700 35px Arial',P.green,'left',447);
+    });
+    c.fillStyle=P.green;c.fillRect(0,654,1080,96);
+    txt(c,'Moda que inspira o Brasil  •  eStore CE+PI',44,700,'700 22px Arial',P.white);
+    return cv;
+  }
+  async function renderCard(raw,prev){
+    let source;
+    try{
+      source=await storeCanvas({raw,prev});
+      if(!source)throw new Error('Sem dados para gerar a imagem');
+    }catch(e){
+      console.warn('[V113] Card detalhado indisponível, gerando resumo seguro',e);
+      source=minimalCard(raw);
+    }
+    let decorated=source;
+    try{
+      const fn=window.RiachueloBrandCards?.decorateCanvas;
+      if(typeof fn==='function')decorated=fn(source)||source;
+      return await canvasBlob(decorated);
+    }catch(e){
+      console.warn('[V113] Moldura institucional indisponível, mantendo o card original',e);
+      try{return await canvasBlob(source)}
+      catch(err){
+        console.warn('[V113] Card original indisponível, gerando card simplificado',err);
+        return await canvasBlob(minimalCard(raw));
+      }
+    }
+  }
+  function closePreview(dialog,url){
+    if(dialog?.open)dialog.close();
+    URL.revokeObjectURL(url);
+    dialog?.remove();
+  }
+  function openPreview(blob,caption,filename){
+    document.getElementById('teamSharePreviewV114')?.remove();
+    const url=URL.createObjectURL(blob),file=new File([blob],filename,{type:'image/png'});
+    const dialog=document.createElement('dialog');dialog.id='teamSharePreviewV114';
+    dialog.setAttribute('aria-label','Prévia do card da filial');
+    dialog.style.cssText='border:0;border-radius:20px;max-width:min(96vw,600px);width:100%;max-height:90vh;padding:15px;background:#F7F5EF;color:#173F35;box-shadow:0 18px 65px #0005';
+    dialog.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px">'+
+      '<strong>Card da filial '+safeText(U.u.st)+'</strong><button type="button" id="teamCloseV114" class="btn ghost">Fechar</button></div>'+
+      '<img alt="Prévia do resultado da filial" style="display:block;width:100%;height:auto;max-height:49vh;object-fit:contain;border-radius:11px;background:#fff" src="'+url+'">'+
+      '<p style="font-size:12px;line-height:1.4">Confira a imagem e escolha como enviar. A legenda é preparada junto com o card.</p>'+
+      '<div style="display:grid;gap:8px;grid-template-columns:repeat(2,minmax(0,1fr))">'+
+      '<button type="button" class="btn" id="teamSendV114">Compartilhar imagem</button>'+
+      '<button type="button" class="btn ghost" id="teamSaveV114">Salvar imagem</button>'+
+      '<button type="button" class="btn ghost" style="grid-column:1/-1" id="teamCopyV114">Copiar legenda</button></div>'+
+      '<p id="teamStatusV114" role="status" style="font-size:12px;white-space:pre-wrap"></p>';
+    document.body.appendChild(dialog);
+    const state=dialog.querySelector('#teamStatusV114');
+    const copy=async()=>{
+      if(navigator.clipboard?.writeText){
+        try{await navigator.clipboard.writeText(caption);state.textContent='Legenda copiada.';return true}catch(e){console.warn('[V113] clipboard',e)}
+      }
+      state.textContent='Selecione e copie a legenda abaixo:';
+      let textarea=dialog.querySelector('#teamCaptionV114');
+      if(!textarea){textarea=document.createElement('textarea');textarea.id='teamCaptionV114';textarea.readOnly=true;textarea.style.cssText='width:100%;height:115px;margin-top:8px';textarea.value=caption;state.after(textarea)}
+      textarea.focus();textarea.select();return false;
+    };
+    const save=()=>{
+      const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
+      state.textContent='Arquivo PNG preparado para salvar. Se o navegador bloquear, pressione a imagem e selecione Salvar.';
+    };
+    dialog.querySelector('#teamSendV114').onclick=()=>{
+      // Chamar navigator.share diretamente no clique, sem await anterior.
+      if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
+        const button=dialog.querySelector('#teamSendV114');
+        button.disabled=true;
+        navigator.share({files:[file],title:'Meu Time • Filial '+U.u.st,text:caption}).then(()=>{
+          button.disabled=false;closePreview(dialog,url);
+        }).catch(e=>{
+          button.disabled=false;
+          if(e?.name==='AbortError'){state.textContent='Compartilhamento cancelado.';return}
+          console.warn('[V113] share nativo',e);
+          state.textContent='O navegador não permitiu enviar imagem e legenda juntos. Use Salvar imagem e Copiar legenda.';
+        });
+      }else{
+        state.textContent='Este navegador não aceita compartilhamento de arquivos. Utilize Salvar imagem e Copiar legenda.';
+      }
+    };
+    dialog.querySelector('#teamSaveV114').onclick=save;
+    dialog.querySelector('#teamCopyV114').onclick=()=>void copy();
+    dialog.querySelector('#teamCloseV114').onclick=()=>closePreview(dialog,url);
+    dialog.addEventListener('cancel',e=>{e.preventDefault();closePreview(dialog,url)});
+    if(typeof dialog.showModal==='function')dialog.showModal();
+    else{dialog.setAttribute('open','');dialog.style.position='fixed';dialog.style.inset='4% auto auto';dialog.style.zIndex='999999'}
+  }
   window.shareTeamCard=async function(){
     if(TEAM_SCOPE==='regional')return await baseShareTeamCardV113();
+    if(sharing)return;
+    sharing=true;
     try{
-      const raw=teamCardData();if(!raw||raw.regional)return;
-      const prev=await previousTeamData(raw.j),caption=storeCaption(raw.j,prev),c=window.RiachueloBrandCards.decorateCanvas(await storeCanvas());
-      if(!c)return alert('Aguarde o carregamento dos dados do Meu Time.');
-      const b=await new Promise(r=>c.toBlob(r,'image/png',.98));if(!b)throw new Error('Falha ao gerar imagem');
-      const f=new File([b],'Meu_Time_Dispersao_Filial_'+U.u.st+'_'+PER+'.png',{type:'image/png'});
-      if(navigator.share){
-        try{
-          if(!navigator.canShare||navigator.canShare({files:[f]})){
-            await navigator.share({files:[f],title:'Meu Time • Dispersão Filial '+U.u.st,text:caption});return;
-          }
-        }catch(e){if(e?.name==='AbortError')return}
-      }
-      try{await navigator.clipboard.writeText(caption)}catch(e){}
-      const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;document.body.appendChild(a);a.click();
-      setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);
-      alert('Painel gerado. A legenda foi copiada para compartilhamento.');
-    }catch(e){console.error('[V113] compartilhar filial',e);alert('Não foi possível compartilhar o card da filial. Tente novamente.')}
+      const raw=teamCardData();
+      if(!raw||raw.regional)throw new Error('Aguarde os resultados da filial antes de compartilhar.');
+      const prev=await previousTeamData(raw.j);
+      const caption=storeCaption(raw.j,prev);
+      const blob=await renderCard(raw,prev);
+      openPreview(blob,caption,'Meu_Time_Dispersao_Filial_'+U.u.st+'_'+PER+'.png');
+    }catch(e){
+      console.error('[V113] Erro no compartilhamento da filial:',e);
+      alert('Falha ao preparar o card: '+String(e?.message||'erro desconhecido')+'. Atualize os resultados e tente novamente.');
+    }finally{sharing=false}
   };
 })();
