@@ -477,7 +477,7 @@ function importV3(){
   <div><span class=uOrangeV3>▥</span><b>2. Gerencial eStore</b><small>Lojas, regionais, empresa e share oficial D-1</small><input class=field type=file id=fGer accept=".xlsx,.xls,.csv"></div>
  </div>
  <div class=importActionsV3><label>Data do resultado D-1</label><input class=field type=date id=updDate><input class=field type=password id=updPwd placeholder="Senha ADM"><button class=btn id=updBtn onclick="validateUpdate()">Validar e publicar D-1</button><div id=updOut></div></div>
- <details style="margin-top:12px"><summary>Importar BOPIS (somente quando houver)</summary><p class="muted">O BOPIS permanece em sua rotina protegida para separar modalidade de entrega, comissão e campanhas. Abra o painel BOPIS no Administrativo, envie o arquivo e confira o fechamento.</p></details>
+ <details style="margin-top:12px"><summary>3. BOPIS — quando houver movimento</summary><p class="muted">Arquivo separado, no mesmo espaço administrativo. É processado pelo serviço BOPIS, que trata a dedução da comissão/Pool.</p><input class="field" type="file" id="estoreCentralBopisFileV1" accept=".xlsx,.xls,.csv"><input class="field" type="password" id="estoreCentralBopisPwdV1" placeholder="Senha ADM"><button class="btn" type="button" onclick="estoreCentralImportBopisV1()">Importar BOPIS</button><div id="estoreCentralBopisOutV1" role="status"></div></details>
  <details style="margin-top:12px"><summary>Atualizar metas (somente quando houver nova referência)</summary>
  <div class=uploadCardsV3><div><span class=uPinkV3>▣</span><b>Metas</b><input class=field type=file id=fMeta accept=".xlsx,.xls,.csv"></div></div>
  <div class=importActionsV3><input class=field type=password id=metaPwd placeholder="Senha ADM"><button class=btn id=metaBtn onclick="uploadMeta()">Incorporar meta</button><div id=metaOut></div></div></details>
@@ -497,6 +497,27 @@ function estoreCentralModeV1(mode){
  tabs.forEach((btn,i)=>{btn.classList.toggle('ghost',['daily','official','history'][i]!==mode)});
 }
 window.estoreCentralModeV1=estoreCentralModeV1;
+async function estoreCentralImportBopisV1(){
+ if(!admV3())return;
+ const file=document.getElementById('estoreCentralBopisFileV1')?.files?.[0];
+ const password=document.getElementById('estoreCentralBopisPwdV1')?.value||'';
+ const out=document.getElementById('estoreCentralBopisOutV1');
+ if(!file||!password.trim()){if(out)out.textContent='Anexe o BOPIS e informe a senha ADM.';return}
+ const btn=out?.previousElementSibling;if(btn)btn.disabled=true;
+ if(out)out.textContent='Validando o arquivo BOPIS...';
+ try{
+  const fd=new FormData();fd.append('action','bopis_import');fd.append('matricula',String(U.u.id));fd.append('password',password);fd.append('bopis_report',file);
+  const response=await fetch(ESTORE_API,{method:'POST',body:fd});
+  const data=await response.json();
+  if(!response.ok||!data.ok)throw Error(data.error||'Falha ao processar BOPIS.');
+  if(out)out.textContent='BOPIS incorporado: '+Number(data.rows||0)+' registro(s), '+Number(data.stores||0)+' loja(s). Base de Pool recalculada.';
+  const pwd=document.getElementById('estoreCentralBopisPwdV1');if(pwd)pwd.value='';
+  if(typeof loadContentV3==='function')await loadContentV3();
+ }catch(err){if(out)out.textContent='Importação não concluída: '+String(err.message||err)}
+ finally{if(btn)btn.disabled=false}
+}
+window.estoreCentralImportBopisV1=estoreCentralImportBopisV1;
+
 
 function infoAdminV3(){
  return `<div class=adminSectionV3><div class=title>Informações Importantes</div>
