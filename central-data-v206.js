@@ -49,7 +49,7 @@ function addTile(){
  grid.insertBefore(tile,grid.firstChild);
  // As ações antigas não desaparecem: passam a ser acessadas pela própria Central.
  for(const b of [...grid.querySelectorAll("button")]){
-   if(b!==tile&&["Atualizar Resultados","Comparativo Semanal","Atualizar Metas"].includes((b.textContent||"").trim()))b.hidden=true;
+   if(b!==tile&&["Atualizar Resultados","Comparativo Semanal","Atualizar Metas"].includes((b.textContent||"").trim())){b.hidden=true;b.style.display="none"}
  }
 }
 function viewDaily(){
@@ -165,12 +165,12 @@ window.centralAuditV206=async function(){
  out.textContent=items.join("\n");
 };
 function install(){
- if(!adminAllowed())return;
- addTile();
- const view=by("view");
+ // O login ocorre após o carregamento da página; a observação deve começar antes.
+ const view=by("view")||by("shell");
  if(!view||window.__centralObserverV206)return;
  window.__centralObserverV206=new MutationObserver(function(){addTile()});
  window.__centralObserverV206.observe(view,{childList:true,subtree:true});
+ addTile();
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install,{once:true});
 else install();
