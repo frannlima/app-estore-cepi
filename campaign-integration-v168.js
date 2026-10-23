@@ -257,3 +257,15 @@
  const interval=setInterval(suppress,2500);
  window.addEventListener("pagehide",()=>clearInterval(interval),{once:true});
 })();
+
+/* V206: carrega a Central de Dados no ADM efetivo (index.html), não no app-v2 legado. */
+(function(){
+  "use strict";
+  if(window.__centralDataLoaderV206)return;
+  window.__centralDataLoaderV206=true;
+  const script=document.createElement("script");
+  script.src="./central-data-v206.js?build=v206";
+  script.async=false;
+  script.onerror=function(){console.warn("[eStore] Central de Dados v206 indisponível.");};
+  document.head.appendChild(script);
+})();
