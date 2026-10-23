@@ -335,16 +335,12 @@ async function loadExecutiveV1(){
 function setPeriod(period){if(!["day","week","month"].includes(period))return;EX.period=period;const view=document.getElementById("view");if(view&&typeof go==="function"){go("executive")}else render()}
 /* V3: print como entrada principal; datas do D-1 vinculadas ao resultado importado. */
 function benchmarkPeriodChangedV3(){
- const period=document.getElementById("exIn_period")?.value||"day";
- const bounds=periodBounds(period,latestDate());
+ const period=document.getElementById("exIn_period")?.value||"week",y=previousBusinessDate();
  const start=document.getElementById("exIn_start_date"),end=document.getElementById("exIn_end_date");
- if(start)start.value=bounds.start_date||"";
- if(end)end.value=bounds.end_date||"";
- const day=document.getElementById("exDayDateV3"),range=document.getElementById("exDateRangeV3");
- if(day){day.hidden=period!=="day";day.textContent="📅 D-1 • "+dia(bounds.end_date)+" — data do resultado alimentado no app";}
- if(range)range.hidden=period==="day";
- const status=document.getElementById("exDateHintV3");
- if(status)status.textContent=period==="day"?"A data é vinculada automaticamente ao último input selecionado no painel.":'Confira as datas exatas do intervalo exibido no print antes de anexá-lo.';
+ if(start)start.value=period==="week"?isoWeek(y):firstMonth(y);
+ if(end)end.value=y;
+ const hint=document.getElementById("exDateHintV3");
+ if(hint)hint.textContent="Informe apenas o intervalo exato do print. Os números serão lidos e salvos automaticamente quando consistentes.";
 }
 function benchmarkReviewV3(force){
  const panel=document.getElementById("exBenchmarkReviewV3");
@@ -355,29 +351,20 @@ function benchmarkReviewV3(force){
 function showAdmin(){
  if(!isMain())return notify("Importação restrita ao administrador principal.");
  const slot=document.getElementById("execAdminSlotV1");if(!slot)return;
- const b=periodBounds(EX.period,latestDate());
- const fields=[["company_captured","Captação empresa (R$)"],["company_approved","Aprovado empresa (R$)"],["company_orders","Pedidos empresa"],["company_share","Share empresa (%)"],["regional_captured","Captação CE+PI (R$)"],["regional_orders","Pedidos CE+PI"],["regional_share","Share CE+PI (%)"]];
- EX.draft={period:EX.period,start_date:b.start_date,end_date:b.end_date,company_captured:"",company_approved:"",company_orders:"",company_share:"",regional_captured:"",regional_orders:"",regional_share:""};
  if(EX.ocrImageUrl){URL.revokeObjectURL(EX.ocrImageUrl);EX.ocrImageUrl=null}
+ const period=EX.period==="month"?"month":"week";
  slot.innerHTML='<section class="execAdminV1 execImportSimplifiedV3" id="execBenchmarkAdminV1">'+
- '<h3>Benchmark oficial | Empresa</h3>'+
- '<p class="execHelpV1">Anexe o print oficial com o resultado das regionais e total da empresa. O aplicativo realiza a leitura e preenche os números reconhecidos para conferência, sem estimativas.</p>'+
- '<div class="execImportPeriodV3"><div class="execFieldV1"><label for="exIn_period">Período</label><select id="exIn_period" onchange="execBenchmarkPeriodChangedV3()"><option value="day">D-1</option><option value="week">Semana</option><option value="month">Mês</option></select></div>'+
- '<div class="execImportDatesV3"><div id="exDayDateV3" class="execDayBadgeV3"></div>'+
- '<div id="exDateRangeV3" class="execDateRangeV3" hidden><div class="execFieldV1"><label for="exIn_start_date">De</label><input id="exIn_start_date" type="date"></div>'+
+ '<h3>Importação oficial | Semana e Mês</h3>'+
+ '<p class="execHelpV1">D-1 é alimentado automaticamente pelo gerencial. Para semana ou mês, selecione o período do print e anexe a imagem. Não é necessário digitar ou confirmar os valores.</p>'+
+ '<div class="execImportPeriodV3"><div class="execFieldV1"><label for="exIn_period">Período</label><select id="exIn_period" onchange="execBenchmarkPeriodChangedV3()"><option value="week">Semana</option><option value="month">Mês</option></select></div>'+
+ '<div class="execImportDatesV3"><div id="exDateRangeV3" class="execDateRangeV3"><div class="execFieldV1"><label for="exIn_start_date">De</label><input id="exIn_start_date" type="date"></div>'+
  '<div class="execFieldV1"><label for="exIn_end_date">Até</label><input id="exIn_end_date" type="date"></div></div>'+
  '<small id="exDateHintV3" class="execHelpV1"></small></div></div>'+
- '<label class="execUploadMainV3" for="exPrintFileV1"><span class="execUploadIconV3">▣</span><span><strong>Anexar print oficial</strong><small>Selecione a imagem da tela ou um print salvo no celular · PNG, JPG ou WEBP, até 8 MB</small></span><input id="exPrintFileV1" accept="image/*" type="file" onchange="execReadPrintV1(event)" hidden></label>'+
- '<div id="exOcrStatusV1" class="execReadStatusV3" role="status" aria-live="polite">Aguardando o print para fazer a leitura automática.</div>'+
- '<details id="exOriginalPrintV3" class="execOriginalPrintV3" hidden><summary>Visualizar o print original</summary><img id="exOriginalImageV3" alt="Print original anexado para conferir o benchmark" loading="lazy"></details>'+
- '<details id="exBenchmarkReviewV3" class="execReviewV3" hidden><summary>Indicadores extraídos · conferir ou corrigir <span id="exReviewCountV3"></span></summary>'+
- '<p class="execHelpV1">Os dados reconhecidos são apresentados abaixo. Corrija somente os campos que estiverem diferentes do print. Campos não identificados ficam em branco.</p>'+
- '<div class="execInputsV1">'+fields.map(([key,label])=>'<div class="execFieldV1"><label for="exIn_'+key+'">'+label+'</label><input id="exIn_'+key+'" inputmode="decimal" autocomplete="off" placeholder="Não identificado" aria-label="'+label+'"></div>').join("")+'</div></details>'+
- '<div class="execImportActionsV3"><button type="button" class="execActionV1" onclick="execBenchmarkReviewV3(true)">Revisar campos</button>'+
- '<button type="button" class="execActionV1 execConfirmV3" onclick="execSaveBenchmarkV1()">✓ Conferir e salvar</button>'+
- '<button type="button" class="execActionV1" style="background:#e2e5df;color:#173F35" onclick="document.getElementById(\'execAdminSlotV1\').innerHTML=\'\'">Fechar</button></div>'+
- '<p class="execHelpV1">Obrigatório: captação e share da empresa. Se algum número não for reconhecido com segurança, o campo permanece vazio para correção; nenhum dado é estimado.</p></section>';
- const periodEl=document.getElementById("exIn_period");if(periodEl)periodEl.value=EX.period;
+ '<label class="execUploadMainV3" for="exPrintFileV1"><span class="execUploadIconV3">▣</span><span><strong>Anexar print oficial</strong><small>Leitura e registro automáticos · PNG/JPG/WEBP até 8 MB</small></span><input id="exPrintFileV1" accept="image/*" type="file" onchange="execReadPrintV1(event)" hidden></label>'+
+ '<div id="exOcrStatusV1" class="execReadStatusV3" role="status" aria-live="polite">Informe as datas e anexe o print com as linhas CE+PI e Empresa.</div>'+
+ '<details id="exOriginalPrintV3" class="execOriginalPrintV3" hidden><summary>Ver print utilizado</summary><img id="exOriginalImageV3" alt="Print de resultado" loading="lazy"></details>'+
+ '<div class="execImportActionsV3"><button type="button" class="execActionV1" style="background:#e2e5df;color:#173F35" onclick="document.getElementById(\'execAdminSlotV1\').innerHTML=\'\'">Fechar</button></div></section>';
+ document.getElementById("exIn_period").value=period;
  benchmarkPeriodChangedV3();
  slot.scrollIntoView({behavior:"smooth",block:"start"});
 }
@@ -426,76 +413,57 @@ function ocrParse(text){
 async function readPrint(ev){
  const file=ev?.target?.files?.[0],status=document.getElementById("exOcrStatusV1");
  if(!file)return;
- if(!file.type.startsWith("image/")||file.size>8e6){notify("Envie uma imagem de até 8 MB.");return}
- const review=document.getElementById("exBenchmarkReviewV3");
- if(review){review.hidden=true;review.open=false}
- for(const key of ["company_captured","company_approved","company_orders","company_share","regional_captured","regional_orders","regional_share"]){
-  const element=document.getElementById("exIn_"+key);if(element)element.value="";
+ const period=document.getElementById("exIn_period")?.value;
+ const start=document.getElementById("exIn_start_date")?.value;
+ const end=document.getElementById("exIn_end_date")?.value;
+ const y=previousBusinessDate();
+ if(!["week","month"].includes(period)||!start||!end||start>end||end>y||
+   (period==="week"&&isoWeek(start)!==isoWeek(end))||
+   (period==="month"&&start.slice(0,7)!==end.slice(0,7))){
+  if(status){status.className="execReadStatusV3 warning";status.textContent="Intervalo inválido. Utilize datas da mesma semana ou mês, até D-1.";}
+  ev.target.value="";return;
  }
+ if(!file.type.startsWith("image/")||file.size>8e6){notify("Anexe uma imagem de até 8 MB.");return}
  if(EX.ocrImageUrl)URL.revokeObjectURL(EX.ocrImageUrl);
  EX.ocrImageUrl=URL.createObjectURL(file);
  const preview=document.getElementById("exOriginalImageV3"),details=document.getElementById("exOriginalPrintV3");
  if(preview)preview.src=EX.ocrImageUrl;
  if(details)details.hidden=false;
- if(status){status.className="execReadStatusV3";status.textContent="Lendo o print e procurando o total da empresa e a linha CE+PI…";}
+ if(status){status.className="execReadStatusV3";status.textContent="Analisando o print e validando os indicadores oficiais...";}
  try{
   const t=await loadLib("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js","Tesseract");
   let result;
-  try{result=await t.recognize(file,"por+eng")}catch(primary){
-   if(status)status.textContent="Tentando uma segunda leitura do print…";
-   result=await t.recognize(file,"eng");
+  try{result=await t.recognize(file,"por+eng")}
+  catch(_){result=await t.recognize(file,"eng")}
+  const parsed=ocrParse(result?.data?.text||""),company=parsed.company,regional=parsed.regional;
+  const nums=[company.captured,company.share,regional.captured,regional.share];
+  if(nums.some(x=>x==null||!Number.isFinite(Number(x)))||
+     company.captured<=0||regional.captured<0||company.captured<regional.captured||
+     company.share<0||company.share>5||regional.share<0||regional.share>5){
+   throw Error("Leitura insuficiente ou inconsistente. Use um print mais nítido com captação e share de CE+PI e empresa. Nenhum valor foi salvo.");
   }
-  EX.ocrText=result?.data?.text||"";
-  const parsed=ocrParse(EX.ocrText);
-  const fields=[["company_captured",parsed.company.captured],["company_approved",parsed.company.approved],
-    ["company_orders",parsed.company.orders],["company_share",parsed.company.share],
-    ["regional_captured",parsed.regional.captured],["regional_orders",parsed.regional.orders],
-    ["regional_share",parsed.regional.share]];
-  // Valores impossíveis permanecem sem publicação, aguardando conferência.
-  if(parsed.company.captured!=null&&parsed.regional.captured!=null&&parsed.company.captured<parsed.regional.captured)
-   fields.forEach(item=>{if(item[0]==="company_captured")item[1]=null});
-  let found=0;
-  fields.forEach(([key,value])=>{
-   const el=document.getElementById("exIn_"+key);
-   if(el&&value!=null){el.value=String(value).replace(".",",");found++}
-  });
-  if(review){review.hidden=false;review.open=true}
-  const count=document.getElementById("exReviewCountV3");if(count)count.textContent=found+" de 7";
-  const mandatory=fields.find(x=>x[0]==="company_captured")?.[1]!=null&&parsed.company.share!=null;
-  if(status){
-   status.className="execReadStatusV3 "+(mandatory?"success":"warning");
-   status.textContent=mandatory?
-    "Leitura concluída: "+found+" de 7 campos reconhecidos. Confira os valores com o print e salve. Os campos em branco são opcionais, exceto captação e share empresa.":
-    "Leitura parcial: "+found+" de 7 campos. Captação ou share da empresa não foram reconhecidos com segurança. Confira o print e corrija somente os campos pendentes antes de salvar.";
-  }
+  const record={period,start_date:start,end_date:end,company_captured:company.captured,
+   company_approved:company.approved,company_orders:company.orders,company_share:company.share/100,
+   regional_captured:regional.captured,regional_orders:regional.orders,regional_share:regional.share/100};
+  if(status)status.textContent="Dados reconhecidos. Salvando intervalo oficial...";
+  await saveBenchmark(record);
+  if(status?.isConnected){status.className="execReadStatusV3 success";status.textContent="✅ Print de "+dia(start)+" a "+dia(end)+" importado. O painel já utiliza os novos números.";}
  }catch(err){
-  if(review){review.hidden=false;review.open=true}
-  if(status){status.className="execReadStatusV3 warning";status.textContent="Não foi possível ler este print automaticamente ("+String(err.message||err)+"). Confira a imagem original e use os campos de correção."}
- }
+  if(status){status.className="execReadStatusV3 warning";status.textContent=String(err.message||err)}
+ }finally{if(ev?.target)ev.target.value=""}
 }
-async function saveBenchmark(){
+async function saveBenchmark(record){
  if(!isMain())return notify("Importação não autorizada.");
- const get=(k)=>document.getElementById("exIn_"+k)?.value??"";
- const period=get("period"),start=get("start_date"),end=get("end_date");
- const nr=(key)=>numeric(get(key));const regionalShare=nr("regional_share"),companyShare=nr("company_share");
- if(!start||!end||end<start||companyShare==null||nr("company_captured")==null)return notify("Informe o período, captação e share oficial da empresa.");
- if((period==="day"&&start!==end)||(period==="month"&&start.slice(0,7)!==end.slice(0,7)))return notify("Verifique as datas do período selecionado.");
- const record={period,start_date:start,end_date:end,company_captured:nr("company_captured"),
- company_approved:nr("company_approved"),company_orders:nr("company_orders"),company_share:companyShare/100,
- regional_captured:nr("regional_captured"),regional_orders:nr("regional_orders"),regional_share:regionalShare==null?null:regionalShare/100};
- const promptText="Confirme os dados do print oficial: "+period+" de "+dia(start)+" a "+dia(end)+"; empresa "+money2(record.company_captured)+" • share "+percent(record.company_share)+"; CE+PI "+percent(record.regional_share)+". Publicar?";
- if(!confirm(promptText))return;
+ if(!record)return notify("Para importar semana ou mês, anexe o print do intervalo.");
  let pwd="";
  try{pwd=typeof adminPwd==="function"?adminPwd():""}catch(_){}
- if(!pwd)pwd=prompt("Senha do administrador principal para publicar o benchmark:")||"";
- if(!pwd)return;
- try{
-  const r=await exApi({action:"save",matricula:mat(),password:pwd,record});
-  if(!r.ok)throw Error("Importação não confirmada.");
-  notify("Benchmark validado e publicado para a regional.");
-  document.getElementById("execAdminSlotV1").innerHTML="";
-  await loadExecutiveV1();
- }catch(err){alert("Não foi possível salvar: "+String(err.message||err))}
+ if(!pwd)pwd=prompt("Senha administrativa para autorizar o registro do print:")||"";
+ if(!pwd)throw Error("Importação cancelada: senha administrativa necessária.");
+ const r=await exApi({action:"save",matricula:mat(),password:pwd,record});
+ if(!r.ok)throw Error("Não foi possível registrar o período.");
+ EX.period=record.period;
+ await loadExecutiveV1();
+ notify("Acumulado oficial e share atualizados sem confirmação manual dos valores.");
 }
 function caption(){
  const r=regionalData(),b=r.benchmark,z=opportunities(),ref=latestDate();
