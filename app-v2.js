@@ -462,16 +462,41 @@ function saveProfilePhotoV3(input){
 }
 
 function importV3(){
- return `<div class=adminSectionV3><div class=title>Importação de Relatórios</div>
- <div class=uploadCardsV3>
-  <div><span class=uGreenV3>▤</span><b>Relatório Colaboradores</b><small>Planilha de vendas por colaborador</small><input class=field type=file id=fCol accept=".xlsx,.xls,.csv"></div>
-  <div><span class=uOrangeV3>▥</span><b>Relatório Gerencial / Share</b><small>Vendas, pedidos e share</small><input class=field type=file id=fGer accept=".xlsx,.xls,.csv"></div>
-  <div><span class=uPinkV3>▣</span><b>Planilha de Metas</b><small>Metas por filial e período</small><input class=field type=file id=fMeta accept=".xlsx,.xls,.csv"></div>
+ return `<div class="adminSectionV3" id="estoreDataCenterV1">
+ <div class="title">Central de Dados eStore | Importação Única</div>
+ <p class="muted">Uma carga para os resultados D-1; acumulado oficial para conciliar semana e mês. Os dados históricos já registrados são preservados.</p>
+ <div class="estoreCentralTabsV1" role="tablist" style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0">
+ <button class="btn" type="button" onclick="estoreCentralModeV1('daily')">D-1 Diário</button>
+ <button class="btn ghost" type="button" onclick="estoreCentralModeV1('official')">Acumulado oficial</button>
+ <button class="btn ghost" type="button" onclick="estoreCentralModeV1('history')">Histórico e status</button>
  </div>
- <div class=importActionsV3><label>Data do resultado</label><input class=field type=date id=updDate><input class=field type=password id=updPwd placeholder="Senha ADM"><button class=btn id=updBtn onclick="validateUpdate()">Incorporar resultado diário</button><div id=updOut></div></div>
- <div class=importActionsV3><input class=field type=password id=metaPwd placeholder="Senha ADM para metas"><button class=btn id=metaBtn onclick="uploadMeta()">Incorporar meta</button><div id=metaOut></div></div>
+ <div id="estoreCentralDailyV1">
+ <div class="notice">Envie os dois relatórios da mesma data. Se houver BOPIS, importe-o separadamente no painel BOPIS, sem duplicar o gerencial.</div>
+ <div class=uploadCardsV3>
+  <div><span class=uGreenV3>▤</span><b>1. Colaboradores</b><small>Captação, aprovado, pedidos e comissões</small><input class=field type=file id=fCol accept=".xlsx,.xls,.csv"></div>
+  <div><span class=uOrangeV3>▥</span><b>2. Gerencial eStore</b><small>Lojas, regionais, empresa e share oficial D-1</small><input class=field type=file id=fGer accept=".xlsx,.xls,.csv"></div>
+ </div>
+ <div class=importActionsV3><label>Data do resultado D-1</label><input class=field type=date id=updDate><input class=field type=password id=updPwd placeholder="Senha ADM"><button class=btn id=updBtn onclick="validateUpdate()">Validar e publicar D-1</button><div id=updOut></div></div>
+ <details style="margin-top:12px"><summary>Importar BOPIS (somente quando houver)</summary><p class="muted">O BOPIS permanece em sua rotina protegida para separar modalidade de entrega, comissão e campanhas. Abra o painel BOPIS no Administrativo, envie o arquivo e confira o fechamento.</p></details>
+ <details style="margin-top:12px"><summary>Atualizar metas (somente quando houver nova referência)</summary>
+ <div class=uploadCardsV3><div><span class=uPinkV3>▣</span><b>Metas</b><input class=field type=file id=fMeta accept=".xlsx,.xls,.csv"></div></div>
+ <div class=importActionsV3><input class=field type=password id=metaPwd placeholder="Senha ADM"><button class=btn id=metaBtn onclick="uploadMeta()">Incorporar meta</button><div id=metaOut></div></div></details>
+ </div>
+ <div id="estoreCentralOfficialV1" hidden><div class="notice">O acumulado oficial é uma fotografia do Power BI para o intervalo exato: substitui a referência gerencial daquele período, sem somar novamente os pedidos já registrados no D-1.</div>
+ <p class="muted">No Painel Executivo, selecione Semana ou Mês e utilize <b>Importar Semana/Mês</b>. O controle oficial de share fica naquele painel até a migração segura do serviço de processamento.</p>
+ <button class="btn" type="button" onclick="go('executive')">Abrir Painel Executivo — importar acumulado</button>
+ </div>
+ <div id="estoreCentralHistoryV1" hidden><div class="notice">Histórico existente preservado no Supabase. O D-1 alimenta os indicadores individuais e gerenciais; semana e mês comparam a consolidação diária com o último acumulado oficial. Valores oficiais devem prevalecer somente para o intervalo correspondente.</div><p class="muted">O status de conciliação por período será habilitado após a integração das rotinas de BOPIS e campanhas ao processador central.</p></div>
  </div>`;
 }
+function estoreCentralModeV1(mode){
+ for(const [key,id] of [['daily','estoreCentralDailyV1'],['official','estoreCentralOfficialV1'],['history','estoreCentralHistoryV1']]){
+ const el=document.getElementById(id);if(el)el.hidden=mode!==key;
+ }
+ const tabs=document.querySelectorAll('#estoreDataCenterV1 .estoreCentralTabsV1 button');
+ tabs.forEach((btn,i)=>{btn.classList.toggle('ghost',['daily','official','history'][i]!==mode)});
+}
+window.estoreCentralModeV1=estoreCentralModeV1;
 
 function infoAdminV3(){
  return `<div class=adminSectionV3><div class=title>Informações Importantes</div>
