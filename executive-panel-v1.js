@@ -34,8 +34,26 @@ function isLeader(){try{return typeof isLead==="function"&&isLead()}catch(_){ret
 function isMain(){try{return typeof isMasterAdmin==="function"&&isMasterAdmin()&&!isDemo()}catch(_){return false}}
 function isGuest(){try{return typeof isDemo==="function"&&isDemo()}catch(_){return true}}
 function currentAsOf(){return String(w.COMMON?.asof||w.DB?.asof||"")}
-function latestDate(){return EX.date||EX.data?.daily?.at(-1)?.date||currentAsOf()}
-function periodBounds(period,date){return {period,start_date:period==="day"?date:period==="week"?isoWeek(date):firstMonth(date),end_date:date}}
+function previousBusinessDate(){
+ const d=new Date(Date.now()-86400000);
+ const parts=new Intl.DateTimeFormat("en-US",{timeZone:"America/Fortaleza",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(d);
+ const v=k=>parts.find(p=>p.type===k)?.value||"";
+ return v("year")+"-"+v("month")+"-"+v("day");
+}
+function latestDate(){
+ const y=previousBusinessDate();
+ if(EX.period==="day")return y;
+ const start=EX.period==="week"?isoWeek(y):firstMonth(y);
+ const snap=(EX.data?.benchmarks||[]).filter(b=>b.period===EX.period&&b.end_date>=start&&b.end_date<=y&&b.start_date>=start&&validBenchmark(b,0))
+ .sort((a,b)=>String(b.end_date).localeCompare(String(a.end_date)))[0];
+ return snap?.end_date||y;
+}
+function periodBounds(period,date){
+ if(period==="day")return {period,start_date:date,end_date:date};
+ const first=period==="week"?isoWeek(date):firstMonth(date);
+ const snap=(EX.data?.benchmarks||[]).find(b=>b.period===period&&b.end_date===date&&b.start_date>=first&&b.start_date<=date&&validBenchmark(b,0));
+ return {period,start_date:snap?.start_date||first,end_date:date};
+}
 function rawBenchmark(){const b=periodBounds(EX.period,latestDate());return (EX.data?.benchmarks||[]).find(x=>x.period===b.period&&same(x.start_date,b.start_date)&&same(x.end_date,b.end_date))||null}
 function validBenchmark(b,regionalCap){
  if(!b)return false;
@@ -49,25 +67,33 @@ function numeric(v){if(v==null||v==="")return null;const c=String(v).trim().repl
 function dailyRows(date){const d=(EX.data?.daily||[]).find(x=>x.date===date);return d?d.stores.filter(x=>STORES.includes(x.st)):[]}
 function baseRows(period){const rows=w.COMMON?.regional?.[period]||[];return rows.filter(x=>STORES.includes(String(x.st||"").padStart(3,"0"))).map(x=>({...x,st:String(x.st).padStart(3,"0")}))}
 function regionalData(){
- const dt=latestDate(),b=matchBenchmark(),sameCurrent=same(dt,currentAsOf());
+ const date=latestDate(),bounds=periodBounds(EX.period,date),b=matchBenchmark();
  let rows=[],strict=false;
  if(EX.period==="day"){
-   const daily=EX.data?.daily?.find(x=>same(x.date,dt));
-   if(daily){rows=dailyRows(dt).map(x=>{const z=baseRows("day").find(y=>y.st===x.st);return {...x,ee:sameCurrent?z?.ee:null,ge:sameCurrent?z?.ge:null,share:x.share!=null?x.share:z?.share}});strict=rows.length===STORES.length;}
-   else if(sameCurrent){rows=baseRows("day");strict=rows.length===STORES.length;}
- }else if(sameCurrent){rows=baseRows(EX.period);strict=rows.length===STORES.length;}
- const total=rows.reduce((acc,x)=>({captured:acc.captured+n(x.c),orders:acc.orders+n(x.o),approved:acc.approved+n(x.a),base:acc.base+n(x.ge),target:acc.target+n(x.ee)}),{captured:0,orders:0,approved:0,base:0,target:0});
- let share=total.base>0?total.captured/total.base:null,delta=null;
- const f=EX.fca;
- if(EX.period==="week"&&f){
-  const p=f.showPartial&&f.currentPartial&&same(f.currentPartial.end,dt)?f.currentPartial:null;
-  if(p?.regional){share=p.regional.share==null?share:n(p.regional.share);delta=p.share_delta==null?null:n(p.share_delta)}
-  else if(!p&&same(f.closedWeekEnd,dt)&&f.summary?.share!=null){share=n(f.summary.share);delta=f.summary.share_delta==null?null:n(f.summary.share_delta)}
+  rows=dailyRows(date);
+  strict=rows.length===STORES.length;
+ }else{
+  const days=(EX.data?.daily||[]).filter(x=>x.date>=bounds.start_date&&x.date<=bounds.end_date);
+  const byStore=new Map();
+  for(const day of days)for(const x of day.stores||[]){
+   if(!STORES.includes(x.st))continue;
+   const old=byStore.get(x.st)||{st:x.st,c:0,o:0,a:0,target:0,share:null};
+   old.c+=n(x.c);old.o+=n(x.o);old.a+=n(x.a);if(x.target!=null)old.target+=n(x.target);
+   byStore.set(x.st,old);
+  }
+  rows=[...byStore.values()];
+  const expected=Math.round((new Date(bounds.end_date+"T12:00:00Z")-new Date(bounds.start_date+"T12:00:00Z"))/86400000)+1;
+  strict=days.length===expected&&days.every(d=>d.stores?.length===STORES.length);
  }
- // Quando há a linha oficial CE+PI na imagem, ela prevalece para o período selecionado.
+ const total=rows.reduce((a,x)=>({captured:a.captured+n(x.c),orders:a.orders+n(x.o),approved:a.approved+n(x.a),base:a.base+n(x.ge),target:a.target+n(x.target)}),{captured:0,orders:0,approved:0,base:0,target:0});
+ let share=EX.period==="day"&&total.base>0?total.captured/total.base:null;
  if(b?.regional_share!=null)share=n(b.regional_share);
- if(!rows.length&&b?.regional_captured!=null){total.captured=n(b.regional_captured);total.orders=b.regional_orders==null?null:n(b.regional_orders)}
- return {rows,strict,total,share,delta,benchmark:b};
+ if(EX.period!=="day"){
+  total.captured=b?.regional_captured!=null?n(b.regional_captured):null;
+  total.orders=b?.regional_orders!=null?n(b.regional_orders):null;
+ }
+ if(EX.period==="day"&&!rows.length){total.captured=null;total.orders=null;}
+ return {rows,strict,total,share,delta:null,benchmark:b};
 }
 function activeStores(){const day=dailyRows(latestDate());const r=regionalData();return EX.period==="day"?(day.length?day:r.rows):r.rows}
 function topRows(type){return [...activeStores()].sort((a,b)=>n(b[type])-n(a[type])||a.st.localeCompare(b.st)).filter(x=>type==="share"?x.share!=null:n(x[type])>0).slice(0,3)}
@@ -208,15 +234,15 @@ function dailyStoreChart(rows){
 function executivePanelViewV1(){
  if(!isLeader())return '<div class="notice">Painel Executivo disponível para supervisores e gestores.</div>';
  EX.active=true;
- return '<div class="execPageV1"><div class="execToolbarV1"><div class="execSegmentV1"><button class="'+(EX.period==="day"?"on":"")+'" onclick="execSetPeriodV1(\'day\')">D-1</button><button class="'+(EX.period==="week"?"on":"")+'" onclick="execSetPeriodV1(\'week\')">Semana</button><button class="'+(EX.period==="month"?"on":"")+'" onclick="execSetPeriodV1(\'month\')">Mês</button></div><div style="display:flex;flex-wrap:wrap;gap:7px"><button class="light" onclick="execRefreshV1()">↻ Atualizar</button>'+(isMain()?'<button class="orange" onclick="execShowAdminV1()">＋ Benchmark</button>':'')+'<button onclick="execShareV1()">↗ Compartilhar</button></div></div><div id="execMessageV1"></div><div id="execVisualV1"><div class="execSectionV1">Consolidando relatórios oficiais e o FCA...</div></div><div id="execAdminSlotV1"></div></div>';
+ return '<div class="execPageV1"><div class="execToolbarV1"><div class="execSegmentV1"><button class="'+(EX.period==="day"?"on":"")+'" onclick="execSetPeriodV1(\'day\')">D-1</button><button class="'+(EX.period==="week"?"on":"")+'" onclick="execSetPeriodV1(\'week\')">Semana</button><button class="'+(EX.period==="month"?"on":"")+'" onclick="execSetPeriodV1(\'month\')">Mês</button></div><div style="display:flex;flex-wrap:wrap;gap:7px"><button class="light" onclick="execRefreshV1()">↻ Atualizar</button>'+(isMain()?'<button class="orange" onclick="execShowAdminV1()">＋ Importar Semana/Mês</button>':'')+'<button onclick="execShareV1()">↗ Compartilhar</button></div></div><div id="execMessageV1"></div><div id="execVisualV1"><div class="execSectionV1">Consolidando relatórios oficiais e o FCA...</div></div><div id="execAdminSlotV1"></div></div>';
 }
 function render(){
  const root=document.getElementById("execVisualV1");if(!root)return;
  if(!EX.data){root.innerHTML='<div class="execSectionV1">Consultando as fontes oficiais...</div>';return}
  const d=regionalData(),bench=d.benchmark,raw=rawBenchmark(),bad=raw&&!bench;
  const share=d.share,company=bench?.company_share==null?null:n(bench.company_share);
- const gap=share==null||company==null?null:share-company,cap=d.rows.length?d.total.captured:(bench?.regional_captured??null);
- const orders=d.rows.length?d.total.orders:(bench?.regional_orders??null),target=d.total.target||null;
+ const gap=share==null||company==null?null:share-company,cap=d.total.captured==null?null:d.total.captured;
+ const orders=d.total.orders==null?null:d.total.orders,target=d.total.target||null;
  const reach=cap!=null&&target>0?cap/target:null;
  const ref=latestDate(),bounds=periodBounds(EX.period,ref),periodName=EX.period==="day"?"D-1":EX.period==="week"?"SEMANA":"MÊS";
  const dateText=EX.period==="day"?dia(ref):dia(bounds.start_date)+" – "+dia(ref);
@@ -224,9 +250,9 @@ function render(){
  const bar=(v)=>v==null?"0%":Math.min(100,v/maxCompare*100)+"%";
  const trend=d.delta,opp=opportunities(),recs=topCollaborators(),ordered=[recs[1],recs[0],recs[2]];
 
- const benchmarkMessage=bad?'<div class="execErrorV1">⚠ Benchmark inconsistente para '+e(dateText)+'. O share da empresa foi ocultado até a conferência da captação e do percentual no print oficial.</div>':
- !bench?'<p class="execNoticeV2">Benchmark nacional pendente neste intervalo. Importe o print oficial para habilitar a comparação em p.p.</p>':"";
- const regionLine='<div class="execCompareLineV2"><span>CE+PI</span><b>'+percent(share)+'</b><div class="execMeterV1"><i style="width:'+bar(share)+'"></i></div></div>';
+ const benchmarkMessage=bad?'<div class="execErrorV1">⚠ Benchmark oficial de '+e(dateText)+' inconsistente: a captação empresa é inferior à captação CE+PI. Indicadores afetados ficam indisponíveis; valores gerenciais são preservados.</div>':
+  !bench?'<p class="execNoticeV2">'+(EX.period==="day"?"D-1 sincronizado pelo gerencial. Share regional indisponível: faltam as vendas totais reais das filiais ou o share oficial; não é possível calculá-lo apenas pela captação.":"Aguardando print oficial do intervalo para acumular e comparar share de CE+PI e empresa.")+'</p>':"";
+  const regionLine='<div class="execCompareLineV2"><span>CE+PI</span><b>'+percent(share)+'</b><div class="execMeterV1"><i style="width:'+bar(share)+'"></i></div></div>';
  const companyLine='<div class="execCompareLineV2"><span>Empresa</span><b>'+percent(company)+'</b><div class="execMeterV1 national"><i style="width:'+bar(company)+'"></i></div></div>';
  const mini=[
   top3HTML("TOP 3 | CAPTAÇÃO",topRows("c"),"c",money),
@@ -301,7 +327,7 @@ async function loadExecutiveV1(){
   EX.fca=fca.status==="fulfilled"?fca.value:null;
   EX.ranking=ranking.status==="fulfilled"?ranking.value:null;
   EX.highlight=highlights.status==="fulfilled"?highlights.value:null;
-  const dates=EX.data.daily||[];if(!EX.date||!dates.some(x=>x.date===EX.date))EX.date=dates.at(-1)?.date||currentAsOf();
+  EX.date=null; // D-1 recalculado a cada consulta.
   render();
  }catch(err){EX.error=String(err.message||err);if(root)root.innerHTML='<div class="execErrorV1">Não foi possível obter o histórico do painel: '+e(EX.error)+' <button onclick="execRefreshV1()">Tentar novamente</button></div>'}
  finally{EX.loading=false}
