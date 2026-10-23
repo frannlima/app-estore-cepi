@@ -294,3 +294,5 @@
 .execRadarRankV4{margin-top:9px;max-height:250px;overflow:auto}
 .execRadarRankV4>div{display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid #e9e9e5;font-size:12px;gap:10px}
 @media(max-width:620px){.execRadarGridV4{grid-template-columns:repeat(2,minmax(0,1fr))}.execRadarGridV4>div{padding:10px}.execRadarActionV4{display:grid}.execRadarGridV4 strong{font-size:21px}}
+
+.execRadarActionV4.warning{border-left-color:#dd922b;background:#fff7e8}
