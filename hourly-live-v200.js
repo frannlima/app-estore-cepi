@@ -122,7 +122,7 @@ function seedMarkup(){
  return '<section class="card hourImportCardV198"><div class="hourNewHeadV198"><div><b>📋 Consolidar vendas do WhatsApp</b><small>Cole a mensagem completa do grupo, confira o total por filial e salve. Print opcional.</small></div></div>'+
  (isMain()?'<button type="button" class="btn" onclick="hourPrintOpenV198()">Colar mensagem / importar print</button><span class="hourSmallV198">Somente administrador; exige senha e revisão de cada lançamento.</span>':'<p class="muted">A importação regional é feita pelo administrador. Sua filial continua atualizando pelo formulário acima.</p>')+
  '</section><section class="card hourAlertsCardV198" id="hourAlertsSectionV198"><div class="hourNewHeadV198"><div><b>🚨 Mobilização | Lojas sem input</b><small>Sem atualização não significa venda zerada. Acompanhe pendências por parcial.</small></div></div><div id="hourRadarV198" class="hourRadarV198">Carregando situação...</div>'+
- (isMain()?'<button type="button" class="btn alt" onclick="hourAlertDirectoryV198()">Ver supervisores e preparar alertas no WhatsApp</button>':'<p class="hourSmallV198">Alertas com contatos são restritos ao administrador.</p>')+
+ (isMain()?'<div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="btn alt" onclick="hourAlertDirectoryV198()">Ver supervisores e preparar alertas no WhatsApp</button><button type="button" class="btn ghost" onclick="openAlertCenter()">Gerenciar parciais e contatos</button></div>':'<p class="hourSmallV198">Alertas com contatos são restritos ao administrador.</p>')+
  '<div id="hourSupervisorListV198"></div></section>';
 }
 function decorateScreen(){
