@@ -90,14 +90,24 @@
     }
   }
   async function officialLogoWhite(){
-    return await new Promise(ok=>{const i=new Image();i.onload=()=>ok(i);i.onerror=()=>ok(null);i.src='./assets/riachuelo-logo-horizontal-oficial-white-v133.svg?v=133'});
+    return await new Promise(ok=>{
+      const i=new Image();let done=false;
+      const finish=value=>{if(done)return;done=true;clearTimeout(timer);ok(value)};
+      const timer=setTimeout(()=>finish(null),3000);
+      i.onload=()=>finish(i);i.onerror=()=>finish(null);
+      i.src='./assets/riachuelo-logo-horizontal-oficial-white-v133.svg?v=133';
+    });
   }
   async function previousTeamData(current){
     const end=String(current?.endDate||current?.asof||'').slice(0,10);
     if(!end)return null;
     const ref=previousReference(end);
     try{
-      const j=await api({action:'team_period',matricula:U.u.id,period:PER,store:U.u.st,reference_date:ref,date:ref,asof:ref,end_date:ref});
+      let timer;
+      const j=await Promise.race([
+        api({action:'team_period',matricula:U.u.id,period:PER,store:U.u.st,reference_date:ref,date:ref,asof:ref,end_date:ref}),
+        new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('Comparativo anterior excedeu 4 segundos')),4000)})
+      ]).finally(()=>clearTimeout(timer));
       if(j?.dataAvailable===false)return null;
       return j;
     }catch(e){console.warn('[V113] comparação da filial indisponível',e);return null}
