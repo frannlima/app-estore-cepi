@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v227-single-alert-card';
-const BUILD='v227-single-alert-card';
+const CACHE='estore-cepi-shell-v228-single-alert-reload';
+const BUILD='v228-single-alert-reload';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
@@ -126,7 +126,7 @@ self.addEventListener('fetch',event=>{
   event.waitUntil(networkPromise.then(()=>{}));
   event.respondWith(
     (async()=>{
-      const critical=url.pathname.endsWith('.js')||url.pathname.endsWith('.css');
+      const critical=url.pathname.endsWith('.js')||url.pathname.endsWith('.mjs')||url.pathname.endsWith('.css');
       if(critical){
         // JS/CSS: garantir atualização após deploy e manter fallback offline.
         const live=await networkPromise;
