@@ -33,3 +33,13 @@ O teste manual no Firebase Console já funcionou, mas o backend Supabase precisa
 2. Enviar aviso automático a cada loja apenas após 2 parciais consecutivas e regras de horário/folga e consentimento.
 3. Adicionar ao Administrativo painel de fila, eventos de entrega, reenvio e pausas e aprovar ativação gradual.
 4. Resolver separadamente os avisos de segurança sobre RLS em outras tabelas do Meu Acompanhamento, antes de expor novos dados pessoais.
+
+
+## Atualização técnica — radar de parciais (23/10/2026)
+- View privada `estore_push_pending_preview`: verifica duas parciais consecutivas com condição `sem_alimentacao` ou `atrasada`; uma atualização registrada depois da última verificação cancela a elegibilidade. Não considera `zerada` automaticamente como falta de input.
+- Janela de envio respeita fuso America/Fortaleza: 14h–17h59 para as lojas de rua 084, 113 e 146; 14h–21h59 para as demais. Os registros de avaliação expiram após 85 minutos para evitar cobrança por dados antigos.
+- A central mostra separadamente: lojas com pendência na última consolidação, filiais elegíveis **agora** e ausência de sincronização Flash.
+- Supabase Edge `estore-push-pilot` versão 3: ação `pending`, protegida por senha administrativa, para consultar o radar.
+- Verificação: 18 lojas na base, 10 apontadas na última consolidação disponível, 0 elegíveis após o encerramento da janela. Nenhuma mensagem enviada pelo novo backend.
+
+**Não declarar a automação homologada ou ativa:** faltam (a) `FIREBASE_SERVICE_ACCOUNT_JSON` nos Secrets do Supabase; (b) homologação do botão de teste remoto via servidor; (c) job de despacho recorrente com controles de opt-in, férias/folgas, deduplicação e responsáveis por filial; (d) origem Flash confirmada.
