@@ -46,7 +46,8 @@ async function handle(request:Request){
    const date=String(body.date||""),clock=String(body.time||""),hash=String(body.source_hash||"");
    const items=body.rows;
    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!/^([01]\d|2[0-3]):[0-5]\d$/.test(clock)||!/^[0-9a-f]{64}$/.test(hash)||
-    !Array.isArray(items)||!items.length||items.length>18||body.reviewed!==true)
+    !Array.isArray(items)||items.length>18||body.reviewed!==true||
+    (items.length===0&&(!Array.isArray(body.partial_rows)||!body.partial_rows.length)))
     return reply({error:"Revise a data, hora, lojas e valores antes de importar"},400);
    const seen=new Set();
    const clean:any[]=[];
@@ -62,10 +63,42 @@ async function handle(request:Request){
    }
    const reference=new Date(date+"T"+clock+":00-03:00");
    if(Number.isNaN(reference.getTime())||reference.getTime()>Date.now()+5*60000)return reply({error:"Horário inválido ou futuro"},400);
-   const {data,error}=await db.rpc("estore_hourly_import_reviewed",
-     {p_actor:String(body.matricula),p_date:date,p_reference:reference.toISOString(),p_hash:hash,p_rows:clean});
-   if(error)throw error;
-   return reply(data||{ok:true,rows:[]});
+   let data:any={ok:true,rows:[],imported:0,skipped:0};
+   if(clean.length){
+    const result=await db.rpc("estore_hourly_import_reviewed",
+      {p_actor:String(body.matricula),p_date:date,p_reference:reference.toISOString(),p_hash:hash,p_rows:clean});
+    if(result.error)throw result.error;
+    data=result.data||data;
+   }
+   // A importação validada do consolidado também serve de parcial para a Central.
+   // A ausência de loja no texto equivale a "a conferir", nunca venda zero comprovada.
+   let partial_recorded=false,partial_notice="";
+   const seenPartial=new Set<string>();
+   const inputPartial=Array.isArray(body.partial_rows)?body.partial_rows:[];
+   const partialValid=body.partial_reviewed===true&&inputPartial.length>0&&inputPartial.length<=18&&
+     inputPartial.every((r:any)=>{
+      const st=String(r?.st||"");
+      if(!STORES.includes(st)||seenPartial.has(st)||!["sale","missing","zero","unknown"].includes(r.status))return false;
+      seenPartial.add(st);return true;
+     });
+   const fortalezaDate=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Fortaleza",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+   if(body.partial_reviewed===true&&!partialValid)return reply({error:"Classificação da parcial inválida; verifique as filiais."},400);
+   if(partialValid&&date===fortalezaDate&&clock>="14:00"&&clock<="21:59"){
+    const map=new Map(inputPartial.map((r:any)=>[String(r.st),r]));
+    const reviewed_rows=STORES.map(st=>{
+     const r:any=map.get(st),status=r?.status||"unknown";
+     const signature=String(r?.sale_signature||"");
+     return {st,status,sale_signature:status==="sale"&&/^\\d{1,10}(\\|\\d{1,10}){0,8}$/.test(signature)?signature:null};
+    });
+    if(reviewed_rows.some((x:any)=>["sale","missing","zero"].includes(x.status))){
+     const inserted=await db.from("estore_alert_center_partials")
+       .insert({result_date:date,check_time:clock,source_hash:hash,reviewed_rows,created_by:String(body.matricula)});
+     if(!inserted.error)partial_recorded=true;
+     else if(inserted.error.code==="23505")partial_notice="Parcial já validada anteriormente; não duplicada.";
+     else{console.error("Alert partial save:",inserted.error.code);partial_notice="Vendas salvas, porém a referência da Central de Alertas precisa ser conferida.";}
+    }
+   }else if(partialValid)partial_notice="Vendas salvas. Parciais de alertas são ativadas apenas para o dia atual, das 14h às 21h59.";
+   return reply({...data,partial_recorded,partial_notice});
   }
   return reply({error:"Ação indisponível"},400);
  }catch(error){
