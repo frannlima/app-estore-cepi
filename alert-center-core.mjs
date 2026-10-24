@@ -27,8 +27,10 @@ export function evaluateAlert({st,group,history=[],captured=0,updated_at=null,no
   condition='stale';eligible=true;
   alert_reason=Number(captured)>0?'Venda contabilizada; supervisor precisa atualizar a parcial':'Sem novo lançamento; confirmar situação atual da loja';
  }else if(group==='sale'||Number(captured)>0){
-  condition='group_sale';eligible=true;
-  alert_reason='Venda já incluída no consolidado; aguardando confirmação de parcial do supervisor (não duplicar)';
+  const printTs=lastSaleChange?new Date(today+'T'+lastSaleChange+':00-03:00').getTime():NaN;
+  const printAge=Number.isFinite(printTs)?Math.max(0,Math.floor((now.getTime()-printTs)/60000)):null;
+  condition='group_sale';eligible=printAge===null||printAge>=60;
+  alert_reason=eligible?'Venda contabilizada no consolidado há pelo menos 60 minutos; aguardando a loja confirmar a parcial':'Venda do consolidado informada há menos de 60 minutos; aguardando a loja';
  }else if(group==='zero'){
   condition='zero';eligible=true;alert_reason='Sem venda no consolidado nem lançamento da loja';
  }else if(group==='missing'){
