@@ -52,7 +52,8 @@ const dateBR=v=>/^\d{4}-\d\d-\d\d$/.test(v)?v.slice(8)+'/'+v.slice(5,7)+'/'+v.sl
 const localHour=stamp=>{try{return Number(new Intl.DateTimeFormat('en-GB',{timeZone:'America/Fortaleza',hour:'2-digit',hourCycle:'h23'}).format(new Date(stamp)))}catch(_){return 0}};
 const isMain=()=>typeof admV3==='function'&&admV3()&&user()?.id!=='0000000';
 let adminPassword='',supervisors=null,groupStatuses={},groupStatusesDate='',parsed=[],fileRef=null,rawText='',busy=false;
-let alertTemplateV198=null;
+let alertTemplateV198=null,priorityQueueV225=null;
+const queueImportV225=import('./hourly-alert-queue-v225.mjs?build=v225').then(m=>{priorityQueueV225=m;if(supervisors&&curr())showDirectory();return m}).catch(e=>{console.warn('[eStore] Fila de contatos indisponível',e);return null});
 import('./alert-center-core.mjs').then(m=>{alertTemplateV198=typeof m.message==='function'?m.message:null}).catch(()=>{});
 function reference(j){
  const t=clock(),selected=String(j?.result_date||t.date);
@@ -127,7 +128,7 @@ function seedMarkup(){
  return '<section class="card hourCheckinCardV209"><div class="hourNewHeadV198"><div><b>✅ Atualizar parcial da minha loja</b><small>Sem novos pedidos? Confirme a parcial sem somar valores ou pedidos ao resultado.</small></div></div><button type="button" class="btn alt" onclick="hourlyConfirmNoSalesV209(this)">Confirmar sem novas vendas</button><small class="hourSmallV198" id="hourCheckinFeedbackV209" aria-live="polite"></small></section>'+
  '<section class="card hourImportCardV198"><div class="hourNewHeadV198"><div><b>📋 Consolidar vendas do WhatsApp</b><small>Cole a mensagem, confira as vendas e salve. A mesma parcial alimentará a Central de Alertas.</small></div></div>'+
  (isMain()?'<button type="button" class="btn" onclick="hourPrintOpenV198()">Colar mensagem / importar print</button><span class="hourSmallV198">Somente administrador; exige senha e revisão de cada lançamento.</span>':'<p class="muted">A importação regional é feita pelo administrador. Sua filial continua atualizando pelo formulário acima.</p>')+
- '</section><section class="card hourAlertsCardV198" id="hourAlertsSectionV198"><div class="hourNewHeadV198"><div><b>🚨 Mobilização | Lojas sem input</b><small>Sem atualização não significa venda zerada. Acompanhe pendências por parcial.</small></div></div><div id="hourRadarV198" class="hourRadarV198">Carregando situação...</div>'+
+ '</section><section class="card hourAlertsCardV198" id="hourAlertsSectionV198"><div class="hourNewHeadV198"><div><b>🚨 Mobilização | Filiais sem venda informada</b><small>Após consolidar, a lista de supervisores elegíveis aparece automaticamente abaixo. Sem informação não significa venda zero confirmada.</small></div></div><div id="hourRadarV198" class="hourRadarV198">Carregando situação...</div>'+
  (isMain()?'<div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="btn alt" onclick="hourAlertDirectoryV198()">Ver supervisores e preparar alertas no WhatsApp</button><button type="button" class="btn ghost" onclick="openAlertCenter()">Gerenciar parciais e contatos</button></div>':'<p class="hourSmallV198">Alertas com contatos são restritos ao administrador.</p>')+
  '<div id="hourSupervisorListV198"></div></section>';
 }
@@ -203,7 +204,7 @@ function alertMessage(row,person){
  if(alertTemplateV198){const msg=alertTemplateV198({name:person.name,st:row.st,meta:row.metaValue,orders:row.orderTarget,condition:'missing',date:d,time:clock().time});return clock().hour===21?msg+'\n\n⏰ Fechamento: informe a captação eStore acumulada do dia no Hora a Hora.':msg;}
  return '🚨 *ALERTA eSTORE CONNECT | HORA A HORA*\n\nOlá, '+first+'! Precisamos atualizar a captação da *filial '+row.st+'*.\n\n🎯 *Meta eStore:* '+moneyBR(row.metaValue)+'\n🛍️ *Meta de pedidos:* '+Number(row.orderTarget||0)+'\n⏱️ *Situação:* '+status(row,curr()).label+'\n📅 *Parcial:* '+dateBR(d)+'\n\n📲 Já teve vendas? Atualize o Hora a Hora: '+APP_URL+'\n\nCaso exista alguma dificuldade, sinalize para alinharmos o apoio. Contamos com você!';
 }
-function showDirectory(){
+function showLegacyDirectory(){
  const target=document.getElementById('hourSupervisorListV198'),j=curr();
  if(!target||!j||!supervisors)return;
  const missing=noInput(j),byStore=new Map((j.stores||[]).map(x=>[String(x.st),x]));
@@ -244,6 +245,15 @@ function showDirectory(){
    notice.textContent='Não foi possível gerar ou compartilhar o card: '+String(err?.message||err);
   }finally{button.disabled=false}
  });
+}
+function showDirectory(target=document.getElementById('hourSupervisorListV198')){
+ const j=curr();if(!j||!target||!supervisors)return;
+ if(priorityQueueV225)return priorityQueueV225.renderPriorityQueue({
+  target,data:j,contacts:supervisors,
+  groupStatuses:groupStatusesDate===j.result_date?groupStatuses:{}
+ });
+ if(target.id==='hourSupervisorListV198')return showLegacyDirectory();
+ target.textContent='Preparando os contatos validados...';
 }
 window.hourAlertDirectoryV198=async function(){const host=document.getElementById('hourSupervisorListV198');try{if(host)host.innerHTML='<p class="muted">Consultando contatos protegidos...</p>';await directory();showDirectory();}catch(e){if(host)host.textContent=String(e.message||e)}};
 window.hourlyConfirmNoSalesV209=async function(button){
@@ -287,7 +297,7 @@ function showModal(){
  '<p class="hourSmallV198">Somente as vendas assinaladas serão registradas. Confira o valor de cada loja. Meta de pedidos não é venda.</p>'+
  '<label class="hourPasteLabelV198" id="hourPwdLabelV202">Senha administrativa<input type="password" class="field" autocomplete="off" id="hourImportPwdV198" placeholder="Informe para confirmar"></label>'+
  '<button type="button" class="btn hourQuickSaveV202" id="hourImportCommitV198">Confirmar e salvar vendas</button></div>'+
- '<div id="hourImportResultV198" role="status" aria-live="polite"></div></div>';
+ '<div id="hourImportResultV198" role="status" aria-live="polite"></div><div id="hourImportQueueV225" class="hourImportQueueV225" hidden></div></div>';
  document.body.appendChild(modal);document.body.style.overflow='hidden';
  const close=()=>{modal.remove();document.body.style.overflow='';fileRef=null;parsed=[];busy=false};
  modal.querySelector('#hourPrintCloseV198').onclick=close;
@@ -479,6 +489,8 @@ function renderReview(modal){
    '<label>Como registrar<select class="field" data-hi-mode><option value="cumulative" selected>Acumulado do dia (recomendado)</option><option value="incremental">Somente novas vendas</option></select></label></div></details>'+
    '</div>';
  }).join(''):'<p class="hourQuickNoSaleV202">Nenhuma venda identificada. Valores como “073 ➜ 5” são apenas metas de pedidos e não geram lançamentos.</p>');
+ const preview=STORES.filter(st=>!parsed.some(x=>x.st===st&&x.amounts.length>0));
+ host.innerHTML+='<p class="hourPriorityPreviewV225"><b>📍 Prévia:</b> '+preview.length+' filiais sem valores de venda nesta mensagem ('+preview.map(st=>'L'+st).join(' • ')+'). Após salvar, o painel descontará as lojas com vendas já informadas no Hora a Hora e apresentará os supervisores validados.</p>';
  modal.querySelector('#hourQuickConfirmV202').hidden=!parsed.length;
  host.querySelectorAll('[data-hi-check]').forEach(c=>c.onchange=()=>refreshReviewV202(modal));
  host.querySelectorAll('[data-hi-captured]').forEach(inp=>inp.oninput=()=>refreshReviewV202(modal));
@@ -533,6 +545,17 @@ async function commit(modal){
   modal.querySelector('#hourQuickConfirmV202').hidden=true;
   modal.querySelector('#hourPrintCloseV198').textContent='Concluir ✕';
   await loadHourly();
+  const queue=modal.querySelector('#hourImportQueueV225');
+  if(queue){
+   queue.hidden=false;queue.innerHTML='<p class="hourSmallV198">Consultando os supervisores e preparando a fila do WhatsApp...</p>';
+   try{
+    await directory();await queueImportV225;
+    showDirectory();showDirectory(queue);
+    result.insertAdjacentHTML('beforeend','<p class="hourSmallV198">📲 Supervisores das lojas sem venda informada listados abaixo, com WhatsApp direto.</p>');
+   }catch(queueError){
+    queue.innerHTML='<p class="hourSmallV198">Resultado salvo, mas os contatos não foram carregados: '+esc(String(queueError?.message||queueError))+'. Consulte Mobilização.</p>';
+   }
+  }
  }catch(err){
   result.textContent='Não foi possível salvar: '+String(err?.message||err);
   btn.disabled=false;
