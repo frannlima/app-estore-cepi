@@ -33,7 +33,15 @@ document.getElementById("register").onclick=e=>act(e.currentTarget,async()=>{
   if(!isSecureContext||!('serviceWorker'in navigator)||!(await isSupported()))throw Error("FCM não está disponível neste navegador.");
   const permission=await Notification.requestPermission();if(permission!=="granted")throw Error("Autorize notificações no Chrome.");
   status("Obtendo token FCM com segurança…");
-  const reg=await navigator.serviceWorker.register("../teste-alerta/sw.js",{scope:"../teste-alerta/"});await navigator.serviceWorker.ready;
+  const reg=await navigator.serviceWorker.register("../teste-alerta/sw.js",{scope:"../teste-alerta/"});
+  if(!reg.active){
+    const worker=reg.installing||reg.waiting;
+    if(!worker)throw Error("Service Worker não está pronto.");
+    await Promise.race([
+      new Promise((resolve,reject)=>{const update=()=>{if(worker.state==="activated")resolve(null);else if(worker.state==="redundant")reject(Error("Service Worker não ativado."));};worker.addEventListener("statechange",update);update();}),
+      new Promise((_,reject)=>setTimeout(()=>reject(Error("Tempo esgotado ao ativar as notificações.")),12000))
+    ]);
+  }
   const app=initializeApp(firebaseConfig);const token=await getToken(getMessaging(app),{vapidKey,serviceWorkerRegistration:reg});
   if(!token)throw Error("O Firebase não forneceu um token.");
   const r=await call("register",{token});if(r)status("✅ Android vinculado à matrícula 2457695. O token não foi exibido nem publicado.");
