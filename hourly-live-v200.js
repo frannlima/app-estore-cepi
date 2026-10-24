@@ -53,7 +53,7 @@ const localHour=stamp=>{try{return Number(new Intl.DateTimeFormat('en-GB',{timeZ
 const isMain=()=>typeof admV3==='function'&&admV3()&&user()?.id!=='0000000';
 let adminPassword='',supervisors=null,groupStatuses={},groupStatusesDate='',parsed=[],fileRef=null,rawText='',busy=false;
 let alertTemplateV198=null,priorityQueueV225=null;
-const queueImportV225=import('./hourly-alert-queue-v225.mjs?build=v225').then(m=>{priorityQueueV225=m;if(supervisors&&curr())showDirectory();return m}).catch(e=>{console.warn('[eStore] Fila de contatos indisponível',e);return null});
+const queueImportV225=import('./hourly-alert-queue-v225.mjs?build=v228').then(m=>{priorityQueueV225=m;if(supervisors&&curr())showDirectory();return m}).catch(e=>{console.warn('[eStore] Fila de contatos indisponível',e);return null});
 import('./alert-center-core.mjs').then(m=>{alertTemplateV198=typeof m.message==='function'?m.message:null}).catch(()=>{});
 function reference(j){
  const t=clock(),selected=String(j?.result_date||t.date);
