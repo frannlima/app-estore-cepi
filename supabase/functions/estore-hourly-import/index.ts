@@ -88,7 +88,7 @@ async function handle(request:Request){
     const reviewed_rows=STORES.map(st=>{
      const r:any=map.get(st),status=r?.status||"unknown";
      const signature=String(r?.sale_signature||"");
-     return {st,status,sale_signature:status==="sale"&&/^\\d{1,10}(\\|\\d{1,10}){0,8}$/.test(signature)?signature:null};
+     return {st,status,sale_signature:status==="sale"&&/^\d{1,10}(\|\d{1,10}){0,8}$/.test(signature)?signature:null};
     });
     if(reviewed_rows.some((x:any)=>["sale","missing","zero"].includes(x.status))){
      const inserted=await db.from("estore_alert_center_partials")
