@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {pendingNoSale,alertMessage} from '../hourly-alert-queue-v225.mjs';
+import {pendingNoSale,alertMessage,renderPriorityQueue} from '../hourly-alert-queue-v225.mjs';
 import {recipientWhatsAppUrl,canNativeFileShare} from '../alert-card-share.mjs';
 const now=new Date('2026-10-24T23:13:00Z'); // 20:13 Fortaleza
 const date='2026-10-24';
@@ -44,4 +44,30 @@ test('WhatsApp link targets the verified supervisor and includes the whole capti
 });
 test('native file sharing is unavailable in headless node, manual option stays available',()=>{
  assert.equal(canNativeFileShare(),false);
+});
+
+test('send button wires a real click handler and shows feedback next to the supervisor',()=>{
+ const at=new Date('2026-10-24T20:51:00Z');
+ const handlers={};
+ const local={textContent:''};
+ const bottom={textContent:''};
+ const button={
+   dataset:{qaSend:'138',qaP:'0'},
+   textContent:'Enviar alerta',
+   addEventListener(type,cb){handlers[type]=cb;},
+   closest(){return{querySelector(sel){assert.equal(sel,'[data-qa-inline]');return local}};}
+ };
+ const target={
+   innerHTML:'',
+   querySelector(sel){if(sel==='[data-qa-response]')return bottom;return null},
+   querySelectorAll(sel){return sel==='[data-qa-send]'?[button]:[]}
+ };
+ const data={result_date:'2026-10-24',stores:[{st:'138',metaValue:1217.35,captured:0,orderTarget:5,updated_at:null}]};
+ const contacts=[{st:'138',people:[{name:'Josiane Souza de Brito',role:'Supervisor Comercial',phone:'+55 85 99999-1234',onLeave:false}]}];
+ const result=renderPriorityQueue({target,data,contacts,at});
+ assert.equal(result.total,1);
+ assert.match(target.innerHTML,/Enviar alerta/);
+ assert.match(target.innerHTML,/data-qa-inline/);
+ assert.doesNotMatch(target.innerHTML,/data-qa-check/);
+ assert.equal(typeof handlers.click,'function');
 });
