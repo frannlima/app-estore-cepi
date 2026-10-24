@@ -185,3 +185,11 @@
 .hourPriorityActionsV225 .hourPrioritySendV227:disabled{opacity:.65;cursor:progress}
 .hourPriorityResponseV225 a{display:inline-block;font-weight:800;color:#124c40;text-decoration:underline;margin-top:5px}
 @media(max-width:700px){.hourPriorityActionsV225 .hourPrioritySendV227{width:100%;min-height:42px}}
+
+/* v229: resposta visível exatamente no contato acionado. */
+.hourPriorityPersonV225{flex-wrap:wrap}
+.hourPriorityInlineV229{display:block;flex-basis:100%;font-size:12px;line-height:1.45;color:#1d5a43;font-weight:750;min-height:0;overflow-wrap:anywhere}
+.hourPriorityInlineV229:not(:empty){padding:8px 10px;margin-top:5px;background:#e8f2eb;border:1px solid #d3e6d8;border-radius:8px}
+.hourPriorityPersonV225 .hourPrioritySendV227{cursor:pointer;touch-action:manipulation}
+.hourPriorityPersonV225 .hourPrioritySendV227:focus-visible{outline:3px solid #dd9700;outline-offset:2px}
+@media(max-width:700px){.hourPriorityInlineV229:not(:empty){width:100%;padding:9px}}
