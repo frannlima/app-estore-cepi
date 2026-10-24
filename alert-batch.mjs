@@ -2,7 +2,7 @@
 import {createAlertImage,shareAlertImage} from './alert-card-share.mjs';
 const selected=new Map();
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const eligibleRow=r=>!!r?.partial_id&&r.active===true&&r.eligible===true&&Number(r.meta)>0&&Number(r.orders)>0&&['missing','zero','sale'].includes(r.group_status);
+const eligibleRow=r=>!!r?.partial_id&&r.active===true&&r.eligible===true&&Number(r.meta)>0&&Number(r.orders)>0&&['missing','zero','sale','unknown'].includes(r.group_status);
 const eligibleContact=(c,r)=>!!c?.person&&c.verification_status==='confirmado'&&c.store_code_original===r.st&&c.store_code_confirmed===r.st&&c.matricula_confirmed===c.person.matricula&&c.person.store_code===r.st&&c.person.eligible_supervisor===true&&/supervisor/i.test(c.person.cargo||'')&&!/gerente/i.test(c.person.cargo||'')&&c.person.situacao==='Atividade Normal'&&/^\+55[1-9]\d9\d{8}$/.test(c.phone_suggested_e164||'');
 const targets=model=>(model?.rows||[]).filter(eligibleRow).sort((a,b)=>(a.group_status==='sale')-(b.group_status==='sale')||a.st.localeCompare(b.st)).map(row=>({row,contacts:(model?.contacts||[]).filter(c=>eligibleContact(c,row))}));
 export function batchMarkup(model){
@@ -11,10 +11,10 @@ export function batchMarkup(model){
  for(const t of rows){
   const options=t.contacts.map(c=>'<option value="'+c.id+'" '+(String(selected.get(t.row.st))===String(c.id)?'selected':'')+'>'+esc(c.person?.nome||c.name_original)+'</option>').join('');
   const choice=t.contacts.length?'<select class="field" aria-label="Supervisor da filial '+t.row.st+'" data-ac-batch-store="'+t.row.st+'"><option value="">Selecionar supervisor</option>'+options+'</select>':'<small class="acPending">Contato sem validação, fora de atividade ou sem vínculo confirmado.</small>';
-  const situation=t.row.closing?'Fechamento 21h: informar a venda captada no dia':t.row.group_status==='sale'?'Venda informada no print há 60 min ou mais':t.row.group_status==='zero'?'Parcial zerada: alerta prioritário':'Sem venda no print: alerta prioritário';
+  const situation=t.row.closing?'Fechamento 21h: confirmar captação eStore do dia':t.row.condition==='stale'?'Venda registrada; parcial da loja há mais de 60 min':t.row.condition==='group_sale'?'Venda no consolidado; confirmar parcial sem duplicar':t.row.condition==='zero'?'Sem venda registrada: confirmar ou atualizar':'Loja sem lançamento: alerta prioritário';
   blocks+='<div class="acBatchRow"><span><b>Filial '+esc(t.row.st)+'</b><small>'+situation+'</small></span>'+choice+'</div>';
  }
- return '<section class="acBatch"><div class="acBatchTitle"><div><strong>🚨 Alertas das lojas priorizadas</strong><p>Sem venda no print: prioridade imediata. Com venda: alerta somente após 60 minutos sem nova atualização comprovada. Selecione um supervisor por filial.</p></div><b class="acBatchCount">'+rows.length+' lojas</b></div>'+
+ return '<section class="acBatch"><div class="acBatchTitle"><div><strong>🚨 Alertas das lojas priorizadas</strong><p>Loja sem registro: prioridade. Com venda contabilizada: alerta somente após 60 minutos sem nova atualização confirmada. Selecione um supervisor por filial.</p></div><b class="acBatchCount">'+rows.length+' lojas</b></div>'+
  '<div class="acBatchStats"><span>🔴 '+rows.length+' priorizadas</span><span>✅ '+enabled+' com contato apto</span><span>⚠️ '+(rows.length-enabled)+' aguardam validação</span></div>'+
  (model?.needs_reconfirm?'<p class="acBatchFreshNote"><b>Referência: '+esc(model.reference_time||'?')+'.</b> Existe um registro posterior ('+esc(model.latest_record_time||'?')+') sem classificação. Revise o registro mais recente ou confirme o uso da parcial classificada.</p><label class="acConfirm"><input type="checkbox" id="acBatchReferenceConfirm"> Autorizo usar a parcial classificada de '+esc(model.reference_time||'?')+' como referência deste lote.</label>':'<p class="acBatchFreshNote">Referência da parcial validada: <b>'+esc(model?.reference_time||'não informada')+'</b>.</p>')+
  (blocks?'<div class="acBatchTargets">'+blocks+'</div>':'<p>Nenhuma filial exige alerta agora. Lojas com venda informada há menos de 60 minutos permanecem fora do lote; classificações não conferidas não disparam.</p>')+
