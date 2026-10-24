@@ -23,6 +23,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Validate Hora a Hora and Alerts
+        run: |
+          node --check hourly-live-v200.js
+          node --check alert-center.js
+          node --check alert-center-core.mjs
+          node --test tests/alert-center.test.mjs
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
