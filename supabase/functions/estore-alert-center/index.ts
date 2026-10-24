@@ -66,7 +66,7 @@ export async function handle(req:Request){
     updated_at:lastDirect,last_consolidated_at:latest,last_entry_kind:latestDirect?.entry_kind||null,
     captured_imported:ee.filter((e:any)=>e.source==='print_whatsapp_revisado').reduce((sum:number,e:any)=>sum+Number(e.captured||0),0)};
    const p=latestPartial,group=p?.reviewed_rows?.find((x:any)=>x.st===st)?.status;
-   const signal=evaluateAlert({st,group,history:partials,captured:row.captured,updated_at:latest,now,date});
+   const signal=evaluateAlert({st,group,history:partials,captured:row.captured,updated_at:row.updated_at,now,date});
    const meta=Number(states.meta_schedule?.[date]?.[st]?.metaEstore||0);
    const ticket=Number(states.historical_ticket_ytd?.values?.[st]||states.historical_ticket_ytd?.[st]?.ticket||states.historical_ticket_ytd?.[st]||0);
    return {...row,meta,orders:Number(states.meta_schedule?.[date]?.[st]?.metaPedidos||0)||(ticket>0&&meta>0?Math.ceil(meta/ticket):0),group_status:group||'unknown',...signal,active:date===local.date&&local.hour>=14&&local.hour<=21,partial_id:p?.id||null,check_time:p?.check_time||null,first_check_time:firstTime,reference_time:p?.check_time||null,latest_record_time:latestInput?.check_time||null,needs_reconfirm:needsReconfirm};
