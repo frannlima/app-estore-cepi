@@ -125,7 +125,7 @@ function parse(text){
 window.hourlyParsedPrintV198=parse;
 function seedMarkup(){
  return '<section class="card hourCheckinCardV209"><div class="hourNewHeadV198"><div><b>✅ Atualizar parcial da minha loja</b><small>Sem novos pedidos? Confirme a parcial sem somar valores ou pedidos ao resultado.</small></div></div><button type="button" class="btn alt" onclick="hourlyConfirmNoSalesV209(this)">Confirmar sem novas vendas</button><small class="hourSmallV198" id="hourCheckinFeedbackV209" aria-live="polite"></small></section>'+
- '<section class="card hourImportCardV198"><div class="hourNewHeadV198"><div><b>📋 Consolidar vendas do WhatsApp</b><small>Cole a mensagem completa do grupo, confira o total por filial e salve. Print opcional.</small></div></div>'+
+ '<section class="card hourImportCardV198"><div class="hourNewHeadV198"><div><b>📋 Consolidar vendas do WhatsApp</b><small>Cole a mensagem, confira as vendas e salve. A mesma parcial alimentará a Central de Alertas.</small></div></div>'+
  (isMain()?'<button type="button" class="btn" onclick="hourPrintOpenV198()">Colar mensagem / importar print</button><span class="hourSmallV198">Somente administrador; exige senha e revisão de cada lançamento.</span>':'<p class="muted">A importação regional é feita pelo administrador. Sua filial continua atualizando pelo formulário acima.</p>')+
  '</section><section class="card hourAlertsCardV198" id="hourAlertsSectionV198"><div class="hourNewHeadV198"><div><b>🚨 Mobilização | Lojas sem input</b><small>Sem atualização não significa venda zerada. Acompanhe pendências por parcial.</small></div></div><div id="hourRadarV198" class="hourRadarV198">Carregando situação...</div>'+
  (isMain()?'<div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="btn alt" onclick="hourAlertDirectoryV198()">Ver supervisores e preparar alertas no WhatsApp</button><button type="button" class="btn ghost" onclick="openAlertCenter()">Gerenciar parciais e contatos</button></div>':'<p class="hourSmallV198">Alertas com contatos são restritos ao administrador.</p>')+
@@ -479,7 +479,7 @@ function renderReview(modal){
    '<label>Como registrar<select class="field" data-hi-mode><option value="cumulative" selected>Acumulado do dia (recomendado)</option><option value="incremental">Somente novas vendas</option></select></label></div></details>'+
    '</div>';
  }).join(''):'<p class="hourQuickNoSaleV202">Nenhuma venda identificada. Valores como “073 ➜ 5” são apenas metas de pedidos e não geram lançamentos.</p>');
- modal.querySelector('#hourQuickConfirmV202').hidden=!rows.length;
+ modal.querySelector('#hourQuickConfirmV202').hidden=!parsed.length;
  host.querySelectorAll('[data-hi-check]').forEach(c=>c.onchange=()=>refreshReviewV202(modal));
  host.querySelectorAll('[data-hi-captured]').forEach(inp=>inp.oninput=()=>refreshReviewV202(modal));
  refreshReviewV202(modal);
@@ -487,7 +487,7 @@ function renderReview(modal){
 function refreshReviewV202(modal){
  const count=[...modal.querySelectorAll('[data-hir]')].filter(el=>el.querySelector('[data-hi-check]')?.checked&&moneyVal(el.querySelector('[data-hi-captured]')?.value)>0).length;
  const b=modal.querySelector('#hourImportCommitV198');
- if(b){b.disabled=count===0;b.textContent=count?'Conferir e salvar '+count+' '+(count===1?'filial':'filiais'):'Selecione as lojas para salvar';}
+ if(b){const noSale=parsed.length>0&&parsed.every(x=>x.amounts.length===0);b.disabled=count===0&&!noSale;b.textContent=count?'Conferir e salvar '+count+' '+(count===1?'filial':'filiais'):noSale?'Salvar parcial sem vendas':'Selecione as lojas para salvar';}
 }
 async function commit(modal){
  const result=modal.querySelector('#hourImportResultV198');
@@ -511,7 +511,7 @@ async function commit(modal){
   }
   rows.push({st:el.dataset.hir,captured,orders,mode:el.querySelector('[data-hi-mode]').value});
  }
- if(!rows.length){result.textContent='Selecione pelo menos uma venda confirmada.';return}
+ if(!rows.length&&!(parsed.length>0&&parsed.every(x=>x.amounts.length===0))){result.textContent='Selecione uma venda ou revise uma parcial sem vendas.';return}
  const btn=modal.querySelector('#hourImportCommitV198');
  if(btn.disabled)return;
  btn.disabled=true;result.textContent='Salvando '+rows.length+' filial(is)...';
@@ -519,13 +519,16 @@ async function commit(modal){
   const text=modal.querySelector('#hourImportTextV198')?.value||'';
   const source_hash=await hashFor(fileRef,text);
   const response=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({
-   action:'commit',matricula:String(user()?.id||''),password,date,time,source_hash,rows,reviewed:true
+   action:'commit',matricula:String(user()?.id||''),password,date,time,source_hash,rows,reviewed:true,
+   partial_reviewed:true,partial_rows:parsed.map(x=>({st:x.st,status:x.amounts.length?'sale':'missing',
+    sale_signature:x.amounts.length?x.amounts.slice(0,9).map(v=>String(Math.round(v*100))).join('|'):null}))
   })});
   const data=await response.json();
   if(!response.ok||!data.ok)throw Error(data.error||'Não foi possível salvar as vendas.');
   adminPassword=password;
   const imported=data.imported||0,ignored=data.skipped||0;
-  result.innerHTML='<div class="hourResultV198"><strong>✅ Importação concluída!</strong><p>'+imported+' loja(s) atualizada(s)'+(ignored?' • '+ignored+' ignorada(s) por duplicidade ou parcial anterior':'')+'.</p>'+
+  const classified=data.partial_recorded?' • referência registrada na Central de Alertas':data.partial_notice?' • '+esc(data.partial_notice):'';
+  result.innerHTML='<div class="hourResultV198"><strong>✅ Importação concluída!</strong><p>'+imported+' loja(s) com novo incremento'+(ignored?' • '+ignored+' preservada(s) sem duplicidade':'')+classified+'.</p>'+
    '<ul>'+(data.rows||[]).map(x=>'<li>L'+esc(x.st)+' — '+(x.status==='imported'?'Registrado '+moneyBR(x.captured):x.status==='stale'?'Lançamento mais recente preservado':x.status==='duplicate'?'Print já utilizado':'Nenhum incremento')+'</li>').join('')+'</ul></div>';
   modal.querySelector('#hourQuickConfirmV202').hidden=true;
   modal.querySelector('#hourPrintCloseV198').textContent='Concluir ✕';
