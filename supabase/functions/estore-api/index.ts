@@ -629,6 +629,14 @@ function pick(r:any,...keys:string[]){
   return null;
 }
 function isCePiRegion(v:any){return String(v??"").normalize("NFKC").toUpperCase().replace(/\s+/g,"").replace(/[^A-Z]/g,"")==="CEPI";}
+/** Official D-1 reference: never advance a closed report using provisional
+ * collaborator rows from the current day. */
+async function latestD1Date():Promise<string>{
+  const {data,error}=await db.from("daily_updates")
+    .select("result_date").order("result_date",{ascending:false}).limit(1);
+  if(error)throw error;
+  return String(data?.[0]?.result_date||BASELINE);
+}
 
 async function adminAllowed(matricula:string){ return String(matricula||"").trim()==="2457695"; }
 async function demoSourceMatricula(){
@@ -939,11 +947,7 @@ async function fcaWeeklyData(matricula:string){
 
   const today=fortalezaToday(),currentWeekStart=weekStartOf(today),deadline=addIsoDays(currentWeekStart,2);
   const closedWeekStart=addIsoDays(currentWeekStart,-7),closedWeekEnd=addIsoDays(currentWeekStart,-1),previousWeekStart=addIsoDays(currentWeekStart,-14),previousWeekEnd=addIsoDays(currentWeekStart,-8);
-  const [lastUpdate,lastDaily]=await Promise.all([
-    db.from("daily_updates").select("result_date").order("result_date",{ascending:false}).limit(1),
-    db.from("daily_collaborator").select("date").order("date",{ascending:false}).limit(1)
-  ]);
-  const latestData=String([lastUpdate.data?.[0]?.result_date,lastDaily.data?.[0]?.date,BASELINE].filter(Boolean).sort().at(-1)||BASELINE);
+  const latestData=await latestD1Date();
   const state=await getState(["common_base","meta_schedule","supervisor_share_official","fca_regional_context"]);
   const [closed,previous]=await Promise.all([
     fcaWeekMetrics(closedWeekStart,closedWeekEnd,state),
@@ -1849,11 +1853,7 @@ Deno.serve(async(req)=>{
       const state=await getState(["common_base","annual_store_actuals_2026","supervisor_share_official"]);
       const base=state.common_base||{},bs=base?.stores?.[st]?.p||{};
 
-      const [lastCollab,lastUpdate]=await Promise.all([
-        db.from("daily_collaborator").select("date").order("date",{ascending:false}).limit(1),
-        db.from("daily_updates").select("result_date").order("result_date",{ascending:false}).limit(1)
-      ]);
-      const endDate=String([lastCollab.data?.[0]?.date,lastUpdate.data?.[0]?.result_date,BASELINE].filter(Boolean).sort().at(-1)||BASELINE);
+      const endDate=await latestD1Date();
       let startDate=endDate;
       if(period==="week"){const d=new Date(endDate+"T12:00:00Z"),dow=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()-dow+1);startDate=d.toISOString().slice(0,10)}
       else if(period==="month")startDate=endDate.slice(0,7)+"-01";
@@ -1887,8 +1887,10 @@ Deno.serve(async(req)=>{
       // sem duplicar datas já presentes no Tabelão.
       for(const up of futureUps||[]){
         const d=String(up.result_date);
-        if(d<startDate||d>endDate||String(up.management_mode||"daily")!=="daily"||byDate.has(d))continue;
+        if(d<startDate||d>endDate||String(up.management_mode||"daily")!=="daily")continue;
         const r=rowFor(up);if(!r)continue;
+        // Gerencial/Lojas is authoritative for each closed day; Tabelão remains
+        // authoritative for individual collaborators and historical fallback.
         byDate.set(d,{c:n(r.c),a:n(r.a),o:Math.trunc(n(r.o))});
       }
 
@@ -1961,8 +1963,7 @@ Deno.serve(async(req)=>{
       const personMeta=await db.from("collaborators").select("matricula,nome,store_code,cargo").eq("matricula",personId).maybeSingle();
       if(personMeta.error)throw personMeta.error;
 
-      const lr=await db.from("daily_collaborator").select("date").order("date",{ascending:false}).limit(1);
-      const latest=String(lr.data?.[0]?.date||BASELINE);
+      const latest=await latestD1Date();
       let start=latest;
       if(period==="week"){
         const d=new Date(latest+"T12:00:00Z"),dow=d.getUTCDay()||7;
@@ -2327,11 +2328,7 @@ Deno.serve(async(req)=>{
       const matricula=String(body.matricula||""),period=PERIODS.includes(String(body.period||"month"))?String(body.period||"month"):"month",month=String(body.month||"");
       const actorCtx=await actorContext(matricula);if(!actorCtx||(!actorCtx.lead&&!actorCtx.admin))return json({error:"Acesso exclusivo para supervisores e gestores."},403);
       const state=await getState(["common_base"]);const base=state.common_base||{},campaignStart="2026-08-01";
-      const [lastDaily,lastUpdate]=await Promise.all([
-        db.from("daily_collaborator").select("date").order("date",{ascending:false}).limit(1),
-        db.from("daily_updates").select("result_date").order("result_date",{ascending:false}).limit(1)
-      ]);
-      const latest=String([lastDaily.data?.[0]?.date,lastUpdate.data?.[0]?.result_date,BASELINE].filter(Boolean).sort().at(-1)||BASELINE);
+      const latest=await latestD1Date();
       let startDate=campaignStart,endDate=latest;
       if(period==="day"){startDate=latest;endDate=latest}
       else if(period==="week"){const d=new Date(latest+"T12:00:00Z"),dow=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()-dow+1);startDate=d.toISOString().slice(0,10);if(startDate<campaignStart)startDate=campaignStart}
@@ -3137,11 +3134,7 @@ Deno.serve(async(req)=>{
       if(!actorCtx||(!actorCtx.lead&&!actorCtx.admin))return json({error:"Acesso exclusivo para supervisores e gestores."},403);
       if(!/^\d+$/.test(matricula)||!REGIONAL.has(requestedStore))return json({error:"Parâmetros inválidos."},400);
 
-      const [latestUpdate,latestDaily]=await Promise.all([
-        db.from("daily_updates").select("result_date").order("result_date",{ascending:false}).limit(1),
-        db.from("daily_collaborator").select("date").order("date",{ascending:false}).limit(1)
-      ]);
-      const latest=String([latestUpdate.data?.[0]?.result_date,latestDaily.data?.[0]?.date,BASELINE].filter(Boolean).sort().at(-1)||BASELINE);
+      const latest=await latestD1Date();
       const requestedRef=String(body.reference_date||body.asof||body.end_date||body.date||"").slice(0,10);
       let endDate=/^\d{4}-\d{2}-\d{2}$/.test(requestedRef)?requestedRef:latest;
       if(endDate>latest)endDate=latest;
@@ -3248,8 +3241,7 @@ Deno.serve(async(req)=>{
       const matricula=String(body.matricula||"").trim(), month=String(body.month||""), period=PERIODS.includes(String(body.period||"month"))?String(body.period||"month"):"month", requestedStore=String(body.store||"").padStart(3,"0");
       const actorCtx=await actorContext(matricula);if(!actorCtx)return json({error:"Acesso não autorizado."},403);if(!actorCtx.admin&&!actorCtx.lead&&requestedStore!==actorCtx.st)return json({error:"Ranking de filial restrito à sua filial."},403);
       if(!/^\d+$/.test(matricula))return json({error:"Parâmetros inválidos."},400);
-      const latestRow=await db.from("daily_collaborator").select("date").order("date",{ascending:false}).limit(1);
-      const latest=String(latestRow.data?.[0]?.date||BASELINE);
+      const latest=await latestD1Date();
       let startDate=latest,endDate=latest,ym=latest.slice(0,7);
       if(period==="week"){
         const d=new Date(latest+"T12:00:00Z"),dow=d.getUTCDay()||7;d.setUTCDate(d.getUTCDate()-dow+1);startDate=d.toISOString().slice(0,10);
