@@ -68,6 +68,10 @@ export async function shareAlertImage(file,phone,closing=false){
  */
 export function canNativeFileShare(){
  if(typeof navigator==='undefined'||typeof File==='undefined')return false;
+ // No Windows/desktop priorizar WhatsApp no contato certo + PNG salvo.
+ // O Web Share nativo de desktops nem sempre oferece seleção de destinatário.
+ const mobile=typeof navigator.userAgentData?.mobile==='boolean'?navigator.userAgentData.mobile:/Android|iPhone|iPad|iPod/i.test(String(navigator.userAgent||''));
+ if(!mobile)return false;
  if(typeof navigator.share!=='function'||typeof navigator.canShare!=='function')return false;
  try{
   const probe=new File(['png'],'alerta.png',{type:'image/png'});
