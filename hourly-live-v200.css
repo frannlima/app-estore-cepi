@@ -179,3 +179,9 @@
 .hourImportQueueV225:not([hidden]){margin-top:14px}
 .hourImportQueueV225 .hourPriorityHeadV225 strong{font-size:15px}
 @media(max-width:700px){.hourPriorityQueueV225{padding:10px}.hourPriorityKpisV225{max-width:none;flex-basis:100%}.hourPriorityStoresV225{grid-template-columns:1fr}.hourPriorityPersonV225{flex-wrap:wrap}.hourPriorityActionsV225{width:100%;justify-content:stretch}.hourPriorityActionsV225 .btn{flex:1 1 122px;font-size:12px}.hourPriorityKpisV225 span{font-size:10px}}
+
+/* Hora a Hora v227 — ação única para card PNG + legenda personalizada */
+.hourPriorityActionsV225 .hourPrioritySendV227{display:inline-flex;align-items:center;justify-content:center;min-width:126px;font-weight:850;background:#173F35;color:#fff}
+.hourPriorityActionsV225 .hourPrioritySendV227:disabled{opacity:.65;cursor:progress}
+.hourPriorityResponseV225 a{display:inline-block;font-weight:800;color:#124c40;text-decoration:underline;margin-top:5px}
+@media(max-width:700px){.hourPriorityActionsV225 .hourPrioritySendV227{width:100%;min-height:42px}}
