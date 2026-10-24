@@ -1775,15 +1775,18 @@ Deno.serve(async(req)=>{
     if(body.action==="hourly_submit"){
       const matricula=String(body.matricula||""), store_code=String(body.store_code||""), result_date=String(body.result_date||"");
       const captured=n(body.captured), store_sales=n(body.store_sales), orders=Math.trunc(n(body.orders));
+      const noNewSales=body.confirm_no_sales===true;
       if(!REGIONAL.has(store_code)||!/^\d{4}-\d{2}-\d{2}$/.test(result_date)||captured<0||store_sales<0||orders<0)return json({error:"Dados inválidos."},400);
+      if(noNewSales&&(captured!==0||orders!==0||store_sales!==0||result_date!==fortalezaToday()))return json({error:"Confirmação sem novas vendas permitida somente para hoje, sem valores de captação ou pedidos."},400);
       const users=await allUserState(); let me:any=null; for(const st of Object.keys(users)){const u=(users[st]?.users||[]).find((x:any)=>String(x.id)===matricula);if(u){me=u;break;}}
       const isAdmin=await adminAllowed(matricula); if(!me&&!isAdmin)return json({error:"Matrícula não localizada."},404);
       if(!isAdmin && (!me?.lead || String(me.st)!==store_code))return json({error:"Somente o supervisor da filial pode atualizar o Hora a Hora."},403);
-      const {data:recent}=await db.from("hourly_estore").select("id,captured,orders,created_at").eq("result_date",result_date).eq("store_code",store_code).eq("matricula",matricula).eq("status","active").order("created_at",{ascending:false}).limit(1);
-      const dup=recent?.[0] && n(recent[0].captured)===captured && Math.trunc(n(recent[0].orders))===orders && (Date.now()-new Date(recent[0].created_at).getTime())<120000;
+      const {data:recent}=await db.from("hourly_estore").select("id,captured,orders,created_at,entry_kind").eq("result_date",result_date).eq("store_code",store_code).eq("matricula",matricula).eq("status","active").order("created_at",{ascending:false}).limit(1);
+      const dup=recent?.[0] && n(recent[0].captured)===captured && Math.trunc(n(recent[0].orders))===orders && (Date.now()-new Date(recent[0].created_at).getTime())<120000 && (noNewSales?recent[0].entry_kind==="no_sales_update":recent[0].entry_kind!=="no_sales_update");
+      if(noNewSales&&dup)return json({ok:true,already_confirmed:true});
       if(dup && !body.confirm_duplicate)return json({error:"Possível lançamento duplicado. Confirme para registrar novamente.",duplicate:true},409);
-      const {data,error}=await db.from("hourly_estore").insert({result_date,store_code,matricula,captured,store_sales,orders,source:isAdmin?"admin":"store",status:"active",entry_kind:"incremental",actor_name:String(me?.name||""),actor_role:String(me?.role||"Administrador")}).select().single();
-      if(error)throw error; return json({ok:true,row:data});
+      const {data,error}=await db.from("hourly_estore").insert({result_date,store_code,matricula,captured,store_sales,orders,source:isAdmin?"admin":"store",status:"active",entry_kind:noNewSales?"no_sales_update":"incremental",note:noNewSales?"Parcial confirmada sem novos pedidos; não altera captação":null,actor_name:String(me?.name||""),actor_role:String(me?.role||"Administrador")}).select().single();
+      if(error)throw error; return json({ok:true,row:data,checkin:noNewSales});
     }
     if(body.action==="hourly_manage"){
       const matricula=String(body.matricula||""), id=String(body.id||""), op=String(body.op||"");
@@ -2437,14 +2440,20 @@ Deno.serve(async(req)=>{
         const rows=byStore[st]||[], metaRow=state.meta_schedule?.[result_date]?.[st]||{};
         const metaValue=n(metaRow.metaEstore), storeTarget=n(metaRow.metaVenda), ticket=historicalTicketFromState(state,st), orderTarget=metaValue>0?Math.ceil(metaValue/ticket):0;
         const captured=rows.reduce((q:any,r:any)=>q+n(r.captured),0), orders=rows.reduce((q:any,r:any)=>q+Math.trunc(n(r.orders)),0), last=rows[rows.length-1]||null;
+        const directRows=rows.filter((r:any)=>r.source!=="print_whatsapp_revisado"),lastDirect=directRows.at(-1)||null;
+        const capturedDirect=directRows.reduce((q:number,r:any)=>q+n(r.captured),0);
+        const capturedImported=rows.filter((r:any)=>r.source==="print_whatsapp_revisado").reduce((q:number,r:any)=>q+n(r.captured),0);
         const flash:any=flashByStore.get(st);
         const hasFlash=flash&&Number.isFinite(Number(flash.total_flash))&&Number(flash.total_flash)>0;
         const storeSales=hasFlash?Number(flash.total_flash):null;
         return {st,captured,storeSales,storeTarget,orders,metaValue,orderTarget,
           att:metaValue?captured/metaValue:0,share:storeSales!==null?captured/storeSales:null,
           shareSource:storeSales!==null?"flash":"aguardando_flash",flashCollectedAt:flash?.collected_at||null,flashSourceTime:flash?.source_time||null,
-          updated_at:last?.created_at||null,matricula:matricula==="0000000"?(last?"DEMO":null):(last?.matricula||null),
-          updated_by:last?(matricula==="0000000"?"Equipe Loja "+st:(nameMap[String(last.matricula)]||String(last.matricula))):null,updates:rows.length};
+          updated_at:lastDirect?.created_at||null,matricula:matricula==="0000000"?(lastDirect?"DEMO":null):(lastDirect?.matricula||null),
+          updated_by:lastDirect?(matricula==="0000000"?"Equipe Loja "+st:(nameMap[String(lastDirect.matricula)]||String(lastDirect.matricula))):null,
+          last_consolidated_at:last?.created_at||null,last_entry_kind:lastDirect?.entry_kind||null,
+          captured_direct:+capturedDirect.toFixed(2),captured_imported:+capturedImported.toFixed(2),
+          updates:rows.length,store_updates:directRows.length};
       });
       const history=(data||[]).map((r:any)=>({...r,updated_by_name:matricula==="0000000"?"Equipe Loja "+String(r.store_code||""):(nameMap[String(r.updated_by||r.matricula)]||String(r.updated_by||r.matricula)),matricula:matricula==="0000000"?"DEMO":r.matricula,updated_by:matricula==="0000000"?"DEMO":r.updated_by}));
       const covered=stores.filter((r:any)=>r.storeSales!==null);
