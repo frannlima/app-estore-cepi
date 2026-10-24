@@ -27,6 +27,7 @@ jobs:
         run: |
           node --check hourly-live-v200.js
           node --check hourly-alert-queue-v225.mjs
+          node --check alert-card-share.mjs
           node --check alert-center.js
           node --check alert-center-core.mjs
           node --test tests/alert-center.test.mjs tests/hourly-alert-queue-v225.test.mjs
