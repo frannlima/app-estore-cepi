@@ -1,13 +1,12 @@
 export const STORES=['073','084','108','113','138','142','146','175','177','222','238','258','262','314','318','344','350','552'];
-export const LABELS={missing:'Sem venda no print',stale:'Venda informada há mais de 1h',zero:'Venda zero no print',group_sale:'Venda no grupo: atualizar app',ok:'Venda recente / informada',unknown:'A conferir'};
+export const LABELS={missing:'Sem parcial informada',stale:'Parcial da loja atrasada',zero:'Sem venda informada',group_sale:'Consolidado lançado • aguarda loja',ok:'Parcial atualizada',unknown:'A conferir'};
 export function clock(now=new Date()){
  const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(now).map(x=>[x.type,x.value]));
  return {date:`${p.year}-${p.month}-${p.day}`,time:`${p.hour}:${p.minute}`,hour:Number(p.hour)};
 }
-// O horário só pode ser inferido do histórico de prints validados ou do input real do app.
+// O consolidado aumenta a venda, mas somente a loja confirma que atualizou sua parcial.
 export function evaluateAlert({st,group,history=[],captured=0,updated_at=null,now=new Date(),date}){
- const local=clock(now);
- const today=date||local.date;
+ const local=clock(now),today=date||local.date;
  const ordered=[...history].sort((a,b)=>String(a.check_time).localeCompare(String(b.check_time)));
  let signature=null,lastSaleChange=null,previousStatus=null;
  for(const p of ordered){
@@ -17,21 +16,26 @@ export function evaluateAlert({st,group,history=[],captured=0,updated_at=null,no
   if(status==='sale'&&(previousStatus!=='sale'||signature!==nextSignature))lastSaleChange=p.check_time;
   signature=nextSignature;previousStatus=status;
  }
- const stamp=t=>t?new Date(today+'T'+t+':00-03:00').getTime():0;
- let lastEvidence=stamp(lastSaleChange);
- // Contabilizar apenas input com venda efetivamente positiva, nunca registro zero.
- if(Number(captured)>0&&updated_at){
-  const appTs=new Date(updated_at).getTime();
-  if(Number.isFinite(appTs))lastEvidence=Math.max(lastEvidence,appTs);
+ const inputTs=updated_at?new Date(updated_at).getTime():NaN;
+ const hasStoreInput=Number.isFinite(inputTs);
+ const age=hasStoreInput?Math.max(0,Math.floor((now.getTime()-inputTs)/60000)):null;
+ let condition='unknown',eligible=false,alert_reason='Parcial não classificada; conferir o relatório antes de alertar';
+ if(hasStoreInput&&age<60){
+  condition='ok';
+  alert_reason=Number(captured)>0?'Venda contabilizada; loja atualizou a parcial há menos de 60 minutos':'Parcial sem novas vendas confirmada pela loja há menos de 60 minutos';
+ }else if(hasStoreInput){
+  condition='stale';eligible=true;
+  alert_reason=Number(captured)>0?'Venda contabilizada; supervisor precisa atualizar a parcial':'Sem novo lançamento; confirmar situação atual da loja';
+ }else if(group==='sale'||Number(captured)>0){
+  condition='group_sale';eligible=true;
+  alert_reason='Venda já incluída no consolidado; aguardando confirmação de parcial do supervisor (não duplicar)';
+ }else if(group==='zero'){
+  condition='zero';eligible=true;alert_reason='Sem venda no consolidado nem lançamento da loja';
+ }else if(group==='missing'){
+  condition='missing';eligible=true;alert_reason='Nenhum lançamento da filial na parcial validada';
  }
- const age=lastEvidence?Math.max(0,Math.floor((now.getTime()-lastEvidence)/60000)):null;
- const noSale=group==='missing'||group==='zero';
- const staleSale=group==='sale'&&age!==null&&age>=60;
- const eligible=noSale||staleSale;
- const condition=group==='zero'?'zero':group==='missing'?'missing':staleSale?'stale':'ok';
  const closing=local.hour===21&&eligible;
- return {eligible,condition,closing,minutes_since_sale:age,last_sale_change_time:lastSaleChange,
-  alert_reason:noSale?'Não há venda informada no último print':staleSale?'Venda do print sem atualização comprovada há pelo menos 60 minutos':group==='sale'?'Venda do print ainda dentro da janela de 60 minutos':'Print ainda não classificado'};
+ return {eligible,condition,closing,minutes_since_sale:age,last_sale_change_time:lastSaleChange,alert_reason};
 }
 export function classify(row,group,now=new Date()){
  return evaluateAlert({st:row.st,group,history:row.history||[],captured:row.captured,updated_at:row.updated_at,now,date:row.date}).condition;
@@ -65,6 +69,6 @@ export function recipientBlock(contact,person){
 export function message({name,st,meta,orders,condition,date,time}){
  const first=String(name||'liderança').trim().split(/\s+/)[0];
  const target=Number(meta)>0?Number(meta).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'A confirmar no app';
- const situation={missing:'Parcial ainda não informada nesta verificação.',stale:'Parcial do app precisa de atualização.',zero:'Parcial informada com venda zero.',group_sale:'Venda informada no grupo ainda não registrada no app.'}[condition]||'Validar atualização da parcial.';
- return `📊 eSTORE CONNECT | VAMOS AVANÇAR JUNTOS\n\nOlá, ${first}! Cada atendimento traz uma oportunidade de aproximar sua filial da meta. Queremos apoiar você na mobilização do time.\n\n🏬 Filial: ${st}\n🎯 Meta eStore do dia: ${target}\n🛍️ Desafio do dia: ${orders>0?orders+' pedidos':'A confirmar no app'}\n📍 Situação identificada: ${situation}\n🕒 Verificação: ${date.split('-').reverse().join('/')} às ${time}\n\n📲 Já realizou vendas? Atualize a parcial: Menu → Hora a Hora → sua filial → informe o valor incremental e a quantidade de pedidos → Registrar.\nhttps://frannlima.github.io/app-estore-cepi/?menu=hourly\n\n🤝 Ainda não distribuiu a meta? Metas → informe o HC disponível → Salvar HC → Ratear igualmente (ou ajuste em Meta) → Compartilhar meta. Envie o card à equipe para que cada pessoa conheça seu desafio.\n\nSe houver algum impedimento, sinalize para alinharmos o apoio necessário. Conte com a gente. Vamos juntos avançar!`;
+ const situation={missing:'A loja ainda não informou a parcial.',stale:'Existe lançamento, mas o supervisor precisa atualizar a parcial.',zero:'Não há vendas registradas; informe ou confirme a parcial.',group_sale:'A venda já está contabilizada no consolidado; falta confirmação da loja.'}[condition]||'Validar atualização da parcial.';
+ return `📊 eSTORE CONNECT | VAMOS AVANÇAR JUNTOS\n\nOlá, ${first}! Cada atendimento traz uma oportunidade de aproximar sua filial da meta. Queremos apoiar você na mobilização do time.\n\n🏬 Filial: ${st}\n🎯 Meta eStore do dia: ${target}\n🛍️ Desafio do dia: ${orders>0?orders+' pedidos':'A confirmar no app'}\n📍 Situação identificada: ${situation}\n🕒 Verificação: ${date.split('-').reverse().join('/')} às ${time}\n\n📲 Já realizou vendas? Atualize a parcial: Menu → Hora a Hora → sua filial → informe somente novos pedidos ou use Confirmar sem novas vendas. Nunca lance outra vez valores já incluídos no consolidado.\nhttps://frannlima.github.io/app-estore-cepi/?menu=hourly\n\n🤝 Ainda não distribuiu a meta? Metas → informe o HC disponível → Salvar HC → Ratear igualmente (ou ajuste em Meta) → Compartilhar meta. Envie o card à equipe para que cada pessoa conheça seu desafio.\n\nSe houver algum impedimento, sinalize para alinharmos o apoio necessário. Conte com a gente. Vamos juntos avançar!`;
 }
