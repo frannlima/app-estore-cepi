@@ -5,7 +5,8 @@
 <div id="result" class="stat" role="status">Aguardando validação.</div></section>
 <section class="card"><h2>1. Vincular este Android</h2><p>Abra pelo Chrome do Android e toque abaixo. O sistema vai gerar o token FCM e cadastrá-lo diretamente na base privada, sem copiar ou colar códigos.</p><button id="register">📱 Vincular meu Android</button><p id="android" class="muted"><small>Este botão só funciona no Chrome do Android com notificações permitidas.</small></p></section>
 <section class="card"><h2>2. Enviar teste remoto</h2><p>Envio exclusivo ao dispositivo cadastrado para o administrador da filial 108. Sem campanhas, tópicos ou listas de supervisores.</p><button id="test">🔔 Enviar teste remoto para meu Android</button><div class="warn"><strong>Proteção:</strong> limite de 1 teste por minuto e 12 testes a cada 24 horas. Recebimento depende da permissão do Android. A aceitação do Firebase não prova entrega.</div></section>
-<section class="card"><h2>3. Estado da automação</h2><p><strong>Alertas automáticos de lojas: desativados.</strong> A configuração técnica está preparada para homologação, mas não fará disparos sem implantação das regras e autorização.</p><p><a href="../teste-alerta/?v=5">Abrir diagnóstico no Android</a> · <a href="../">Voltar ao eStore</a></p></section>
+<section class="card"><h2>3. Radar de pendências eStore</h2><p class="muted">Resultado operacional das duas últimas parciais consolidadas por filial. A lista é para acompanhamento: <strong>nenhum alerta é enviado por esta consulta.</strong></p><button id="pending" class="outline">📊 Consultar lojas em atraso</button><div id="pendingResult" class="stat" role="status">Nenhuma consulta realizada.</div><p><small>Flash: monitoramento remoto ainda não homologado. Alertas Flash não serão disparados a partir dos dados do eStore.</small></p></section>
+<section class="card"><h2>4. Estado da automação</h2><p><strong>Alertas automáticos de lojas: desativados.</strong> A configuração técnica está preparada para homologação, mas não fará disparos sem implantação das regras e autorização.</p><p><a href="../teste-alerta/?v=5">Abrir diagnóstico no Android</a> · <a href="../">Voltar ao eStore</a></p></section>
 </main><script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
 import {getMessaging,getToken,isSupported} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-messaging.js";
@@ -45,6 +46,19 @@ document.getElementById("register").onclick=e=>act(e.currentTarget,async()=>{
   const app=initializeApp(firebaseConfig);const token=await getToken(getMessaging(app),{vapidKey,serviceWorkerRegistration:reg});
   if(!token)throw Error("O Firebase não forneceu um token.");
   const r=await call("register",{token});if(r)status("✅ Android vinculado à matrícula 2457695. O token não foi exibido nem publicado.");
+});
+document.getElementById("pending").onclick=e=>act(e.currentTarget,async()=>{
+  const target=document.getElementById("pendingResult");target.textContent="Consultando últimas parciais…";
+  const d=await call("pending");
+  if(!d){target.textContent="Não foi possível consultar as pendências.";return;}
+  const pending=(d.records||[]).filter(x=>x.pending);
+  const active=(d.records||[]).filter(x=>!x.pending);
+  target.textContent="Filiais em alerta: "+pending.length+" / "+d.total_stores+
+    "\\nÚltima hora consolidada: "+(d.latest_hour_checked||"não informada")+
+    "\\nEm atraso: "+(pending.length?pending.map(x=>"L"+x.store_code+" ("+x.previous_hour+"h/"+x.latest_hour+"h)").join(", "):"nenhuma confirmada")+
+    "\\nOutras filiais: "+active.length+
+    "\\nFlash: "+(d.flash_records_today?"dados parciais; integração não homologada":"sem sincronização confirmada")+
+    "\\nEnvio automático: BLOQUEADO";
 });
 document.getElementById("test").onclick=e=>act(e.currentTarget,async()=>{
   status("Solicitando envio de teste ao Firebase…");
