@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v229-clickable-alert';
-const BUILD='v229-clickable-alert';
+const CACHE='estore-cepi-shell-v230-direct-send';
+const BUILD='v230-direct-send';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
