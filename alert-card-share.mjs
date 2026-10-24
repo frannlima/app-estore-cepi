@@ -30,7 +30,7 @@ export async function createAlertImage(contact,row){
  rect(50,486,980,166,'#FFE7E7');g.strokeStyle=red;g.lineWidth=4;g.strokeRect(50,486,980,166);
  line(row.closing?'⚠ FECHAMENTO 21H — INFORME A VENDA':row.condition==='stale'?'⚠ VENDA DESATUALIZADA':'⚠ ATENÇÃO — SEM ATUALIZAÇÃO',80,552,37,red,true);
  const since=row.condition==='stale'?row.last_sale_change_time:row.first_check_time;
- line(row.closing?'Informe o total captado hoje e os pedidos.':
+ line(row.closing?'Informe a captação do dia ou confirme sem novas vendas.':
   Number(row.missing_partials)>0?Number(row.missing_partials)+' parciais sem input de venda':
   since?'Venda e parcial desde as '+since:'Venda e parcial ainda não registradas',80,612,35,red,true);
  rect(50,679,980,165,'#E9EBEA');
@@ -38,9 +38,9 @@ export async function createAlertImage(contact,row){
  line('META DE PEDIDOS',630,733,32,dark,true);line(String(row.orders)+' pedidos',630,806,52,dark,true);
  rect(50,874,980,192,'#fff');
  line(row.closing?'AÇÃO DE FECHAMENTO':'AÇÃO IMEDIATA',80,936,44,red,true);
- wrap(row.closing?'Informe o valor eStore captado no dia e os pedidos. Sem vendas? Registre zero.':'Mobilizar o time, analisar o speed de atendimento e intensificar a captação.',80,991,920,35,dark,false,45);
- line('REGISTRE A VENDA',55,1130,37,dark,true);
- wrap('Menu → Hora a Hora → Sua filial → Registrar',55,1181,965,32,dark,false,45);
+ wrap(row.closing?'Informe a venda eStore do dia ou confirme sem novos pedidos.':'Atualize a parcial, mobilize a equipe e confirme se houve novos pedidos.',80,991,920,35,dark,false,45);
+ line('ATUALIZE SUA PARCIAL',55,1130,37,dark,true);
+ wrap('Menu → Hora a Hora → Registrar ou Confirmar sem novas vendas',55,1181,965,30,dark,false,43);
  line('frannlima.github.io/app-estore-cepi/?menu=hourly',55,1241,29,'#1458A5',true);
  rect(40,1280,1000,125,red);
  line(row.closing?'FECHAMENTO eSTORE | 21H':'A PRÓXIMA HORA PODE MUDAR O JOGO!',73,1330,38,'#fff',true);
@@ -57,4 +57,57 @@ export async function shareAlertImage(file,phone,closing=false){
  const objectURL=URL.createObjectURL(file),a=document.createElement('a');a.href=objectURL;a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(objectURL),60000);
  // O WhatsApp Web não admite pré-anexar um arquivo via wa.me; nunca enviar texto no lugar do PNG.
  return 'PNG baixado. Anexe a imagem ao WhatsApp com a legenda '+(closing?'Fechamento 21h: informe a venda eStore captada hoje. ':'')+HOURLY_LINK+'. O link dentro do PNG não é clicável.';
+}
+
+
+/**
+ * Compartilhamento assistido. Navegadores não permitem selecionar um destinatário
+ * do WhatsApp e anexar a imagem programaticamente via wa.me.
+ * Ao usar native share, a pessoa escolhe o destinatário e confirma o envio.
+ * No fallback desktop: PNG baixado + conversa aberta com a legenda pronta.
+ */
+export function canNativeFileShare(){
+ if(typeof navigator==='undefined'||typeof File==='undefined')return false;
+ if(typeof navigator.share!=='function'||typeof navigator.canShare!=='function')return false;
+ try{
+  const probe=new File(['png'],'alerta.png',{type:'image/png'});
+  return Boolean(navigator.canShare({files:[probe]}));
+ }catch(_){return false}
+}
+export function recipientWhatsAppUrl(phone,caption){
+ const digits=String(phone||'').replace(/\D/g,'');
+ if(!/^55[1-9]\d9\d{8}$/.test(digits))throw new Error('WhatsApp do supervisor não validado.');
+ return 'https://wa.me/'+digits+'?text='+encodeURIComponent(String(caption||''));
+}
+export async function sharePreparedAlert({file,caption,phone,store,name,preopenedWindow=null}){
+ if(!file||file.type!=='image/png')throw new Error('O card PNG não foi gerado corretamente.');
+ const url=recipientWhatsAppUrl(phone,caption);
+ if(canNativeFileShare()){
+  try{
+   if(navigator.canShare({files:[file]})){
+    await navigator.share({
+     files:[file],
+     title:'ALERTA eSTORE | FILIAL '+String(store||''),
+     text:String(caption||'')
+    });
+    // A API nativa não comprova entrega nem destino escolhido.
+    return {mode:'native',chatOpened:false,url};
+   }
+  }catch(e){
+   // Cancelar a folha de compartilhamento não deve baixar nem abrir outro destino.
+   if(e?.name==='AbortError')throw e;
+   // Falha de compatibilidade ou ativação: oferecer fallback manual.
+  }
+ }
+ const objectURL=URL.createObjectURL(file);
+ const link=document.createElement('a');
+ link.href=objectURL;link.download=file.name||('alerta-estore-'+String(store||'filial')+'.png');
+ document.body.append(link);link.click();link.remove();
+ setTimeout(()=>URL.revokeObjectURL(objectURL),60000);
+ let chatOpened=false;
+ if(preopenedWindow&&!preopenedWindow.closed){
+  try{preopenedWindow.location.replace(url);chatOpened=true}catch(_){/* exibir link manual */}
+ }
+ try{if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(String(caption||''));}catch(_){}
+ return {mode:'manual',chatOpened,url};
 }
