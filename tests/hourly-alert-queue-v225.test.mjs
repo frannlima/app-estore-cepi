@@ -69,5 +69,7 @@ test('send button wires a real click handler and shows feedback next to the supe
  assert.match(target.innerHTML,/Enviar alerta/);
  assert.match(target.innerHTML,/data-qa-inline/);
  assert.doesNotMatch(target.innerHTML,/data-qa-check/);
+ assert.match(target.innerHTML,/supervisores elegíveis já estão aptos/i);
+ assert.doesNotMatch(target.innerHTML,/confirme individualmente/i);
  assert.equal(typeof handlers.click,'function');
 });
