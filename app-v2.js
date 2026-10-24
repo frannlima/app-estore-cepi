@@ -1560,7 +1560,22 @@ function rankInfoV28(){
 rankInfoV13=rankInfoV28;
 function eDayDataV28(){const x=personV28(),details=[];for(const [d,rows] of latestDailyRowsV28(PER)){if(new Date(d+'T12:00:00').getDay()!==1)continue;const a=rows.filter(r=>normMatV27(r?.id??r?.matricula)===normMatV27(U?.u?.id)).reduce((s,r)=>s+rowNumsV28(r).a,0);if(a>0)details.push({d,approved:a,commission:+(a*.10).toFixed(2)})}const eCommission=details.reduce((s,r)=>s+r.commission,0);return {approved:Number(x.a||0),commission:Number(x.com||0),eApproved:details.reduce((s,r)=>s+r.approved,0),eCommission,regularCommission:Math.max(0,Number(x.com||0)-eCommission),details}}
 eDayDataV3=eDayDataV28;
-const _goV28=go;go=function(v){if(U?.u?.id&&['home','result','store','ranking','metas','metasv4'].includes(v)){loadContentV3().then(()=>{try{_goV28(v)}catch(e){console.error('V28 render',e)}}).catch(()=>{});}return _goV28(v)};
+const _goV28=go;
+go=function(v){
+ if(U?.u?.id&&['home','result','store','ranking','metas','metasv4'].includes(v)){
+   const actor=String(U.u.id);
+   // "Minha Filial" must refresh the authoritative daily management snapshot,
+   // not just the supplemental delta feed. Never overwrite persisted sales here.
+   const task=v==='store'
+     ? Promise.all([refreshSessionV6(actor),loadContentV3()])
+     : loadContentV3();
+   task.then(()=>{
+     if(CUR!==v||String(U?.u?.id||'')!==actor)return;
+     try{_goV28(v)}catch(e){console.error('V28 render',e)}
+   }).catch(e=>console.warn('Atualização dos dados da filial indisponível:',e));
+ }
+ return _goV28(v);
+};
 
 
 /* ===== V29 2026-09-25: contrato definitivo de fontes dos relatórios =====
