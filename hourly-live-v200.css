@@ -139,3 +139,10 @@
 
 /* Share regional calculado apenas com venda Flash por filial. */
 .hourV200FlashSource{font-size:11px;color:#335d50;background:#ecf5ed;border:1px solid #c9ddcc;border-radius:10px;padding:9px 11px;margin:8px 0 12px;line-height:1.45;font-weight:750}
+
+/* Hora a Hora v209: distinguir atualização atrasada de venda zerada */
+.hourStatusV198.stale,.hourV200Status.stale{background:#fff0cc;color:#805315;font-weight:800}
+.hourCheckinCardV209{margin-top:12px}
+.hourCheckinCardV209 .hourNewHeadV198{margin-bottom:9px}
+#hourCheckinFeedbackV209{display:block;margin-top:8px;min-height:16px;line-height:1.35}
+@media(max-width:600px){.hourCheckinCardV209 .btn{width:100%;white-space:normal}}
