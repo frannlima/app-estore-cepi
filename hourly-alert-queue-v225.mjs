@@ -82,7 +82,7 @@ export function renderPriorityQueue({target,data,contacts,groupStatuses={},at=ne
   '<div class="hourPriorityHeadV225"><div><strong>🚨 Alertas prontos | Lojas sem venda informada</strong><small>Resultado '+fmtDate(data.result_date)+' • '+today.time+' • Contatos validados dos supervisores</small></div>'+
   '<div class="hourPriorityKpisV225"><span><b>'+selling+'</b> com venda</span><span><b>'+pending.length+'</b> sem venda</span><span><b>'+available+'</b> contatos aptos</span></div></div>'+
   (dated?(pending.length?'<div class="hourPriorityStoresV225">'+cards+'</div>':'<p class="hourPriorityHintV225">Nenhuma loja exige alerta por ausência de venda neste momento.</p>'):'<p class="hourPriorityHintV225">Referência histórica: a lista de contatos é liberada somente para o dia atual.</p>')+
-  '<p class="hourPriorityFootV225">Antes de preparar cada alerta, confirme individualmente que o supervisor está em expediente e autorizado a receber a mensagem.</p>'+
+  '<p class="hourPriorityFootV225">Os supervisores elegíveis já estão aptos nesta parcial: basta tocar em Enviar alerta. Contatos não validados ou afastados permanecem bloqueados.</p>'+
   '<p class="hourPriorityFootV225">Um botão prepara o card PNG com a legenda personalizada. No celular, escolha o WhatsApp e confira o supervisor correto e a legenda antes de enviar. No computador, o PNG será baixado e a conversa correta será aberta com o texto pronto; anexe o PNG manualmente. Nenhum alerta é enviado automaticamente.</p>'+
   '<p class="hourPriorityResponseV225" data-qa-response aria-live="polite" role="status"></p></section>';
  const msg=target.querySelector('[data-qa-response]');
@@ -106,9 +106,7 @@ export function renderPriorityQueue({target,data,contacts,groupStatuses={},at=ne
   button.addEventListener('click',async()=>{
    notify(button,'Botão acionado. Verificando o supervisor e a filial…');
    const obj=validate(button);if(!obj)return;
-   // A confirmação é solicitada AO LADO DO SUPERVISOR, sem depender de checkbox no fim da lista.
-   const approved=window.confirm('Enviar alerta para '+obj.person.name+' (filial '+obj.st+')?\n\nConfirme que está em expediente e autorizou receber a mensagem.\n\nO WhatsApp exigirá sua confirmação final de envio.');
-   if(!approved){notify(button,'Preparação cancelada; nenhuma mensagem foi enviada.');return}
+   // Supervisores elegíveis são liberados automaticamente na parcial; sem confirmação extra no app.
    const originalLabel=button.textContent;
    const phone=String(obj.person.phone).replace(/\D/g,'');
    let chatWindow=null;
