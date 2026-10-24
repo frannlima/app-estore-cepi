@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v223-card-filial';
-const BUILD='v223-card-filial';
+const CACHE='estore-cepi-shell-v224-hourly-checkin';
+const BUILD='v224-hourly-checkin';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
