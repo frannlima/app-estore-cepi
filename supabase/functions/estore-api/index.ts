@@ -621,7 +621,14 @@ function sheetRows(file:File){
     return XLSX.utils.sheet_to_json(ws,{defval:null,raw:true}) as any[];
   });
 }
-function pick(r:any,...keys:string[]){ for(const k of keys) if(r[k]!==undefined)return r[k]; return null; }
+function normalizedHeader(k:any){return String(k??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"");}
+function pick(r:any,...keys:string[]){
+  for(const k of keys)if(r[k]!==undefined&&r[k]!==null)return r[k];
+  const wanted=new Set(keys.map(normalizedHeader));
+  for(const [k,v] of Object.entries(r||{}))if(v!==null&&v!==undefined&&wanted.has(normalizedHeader(k)))return v;
+  return null;
+}
+function isCePiRegion(v:any){return String(v??"").normalize("NFKC").toUpperCase().replace(/\s+/g,"").replace(/[^A-Z]/g,"")==="CEPI";}
 
 async function adminAllowed(matricula:string){ return String(matricula||"").trim()==="2457695"; }
 async function demoSourceMatricula(){
@@ -1525,6 +1532,15 @@ Deno.serve(async(req)=>{
       const f1=form.get("collaborators"), f2=form.get("management");
       if(!(f1 instanceof File)||!(f2 instanceof File)||!requested)return json({error:"Informe a data e os dois relatórios."},400);
       const [cr,mr]=await Promise.all([sheetRows(f1),sheetRows(f2)]);
+      // Input diagnostics: verify the Power BI exports before persisting any daily totals.
+      const diagnostics={
+        requested, collaborator_rows:cr.length,management_rows:mr.length,
+        collaborator_dates:[...new Set(cr.map((r:any)=>isoDate(pick(r,"Data Criação Pedido","Data Criacao Pedido","Data"))).filter(Boolean))].slice(0,12),
+        collaborator_region_rows:cr.filter((r:any)=>isCePiRegion(pick(r,"Regional"))).length,
+        management_region_rows:mr.filter((r:any)=>isCePiRegion(pick(r,"Regional"))).length,
+        collaborator_columns:Object.keys(cr[0]||{}).slice(0,25),
+        management_columns:Object.keys(mr[0]||{}).slice(0,25)
+      };
       const deliveryKeys=["Tipo Entrega","Tipo da Entrega","Modalidade Entrega","Modalidade de Entrega"];
       const hasDeliveryTypeColumn=(cr||[]).some((r:any)=>deliveryKeys.some(k=>Object.prototype.hasOwnProperty.call(r||{},k)));
       const deliveryTypeOf=(r:any)=>String(pick(r,...deliveryKeys)||"").trim();
@@ -1535,7 +1551,7 @@ Deno.serve(async(req)=>{
         const hd=isoDate(pick(r,"Data Criação Pedido","Data Criacao Pedido","Data")),
               hloja=String(pick(r,"Loja")||""),hst=stCode(hloja),
               hid=String(pick(r,"Matrícula","Matricula")||"").replace(/\.0$/,"").trim();
-        if(!hd||!hid||!REGIONAL.has(hst)||String(pick(r,"Regional")||"").trim()!=="CE + PI")continue;
+        if(!hd||!hid||!REGIONAL.has(hst)||!isCePiRegion(pick(r,"Regional")))continue;
         const delivery=deliveryTypeOf(r),isBopis=isBopisDelivery(delivery),approved=n(pick(r,"Aprovado"));
         const k=hd+"|"+hid+"|"+hst,
               q=histMap.get(k)||{date:hd,matricula:hid,store_code:hst,regional:"CE + PI",cargo:String(pick(r,"Cargo")||""),captured:0,approved:0,billed:0,rupture:0,commission:0,orders:0,items:0,bopisApproved:0,bopisCaptured:0,bopisOrders:0,commissionableApproved:0,deliveryTypes:new Set<string>()};
@@ -1562,7 +1578,7 @@ Deno.serve(async(req)=>{
         const d=isoDate(pick(r,"Data Criação Pedido","Data Criacao Pedido","Data"));
         if(d!==requested)continue;
         const loja=String(pick(r,"Loja")||""),st=stCode(loja),id=String(pick(r,"Matrícula","Matricula")||"").replace(/\.0$/,"").trim(),regional=String(pick(r,"Regional")||"").trim();
-        if(!id||!REGIONAL.has(st)||regional!=="CE + PI")continue;
+        if(!id||!REGIONAL.has(st)||!isCePiRegion(regional))continue;
         const approved=n(pick(r,"Aprovado")),delivery=deliveryTypeOf(r),isBopis=isBopisDelivery(delivery);
         const k=st+"|"+id,q=collabMap.get(k)||{id,name:String(pick(r,"Nome","Colaborador","Nome Colaborador","Nome Vendedor","Vendedor")||"").trim(),regional,st,loja,c:0,a:0,o:0,com:0,bopis_a:0,bopis_c:0,bopis_o:0,commissionable_a:0,commission_verified:hasDeliveryTypeColumn};
         q.c+=n(pick(r,"Captação","Captacao"));q.a+=approved;q.o+=Math.trunc(n(pick(r,"Qtd Pedidos","Qtde Pedidos"))||1);
@@ -1578,11 +1594,14 @@ Deno.serve(async(req)=>{
       const collab=[...collabMap.values()].map((q:any)=>({...q,c:+q.c.toFixed(2),a:+q.a.toFixed(2),bopis_a:q.commission_verified?+q.bopis_a.toFixed(2):null,bopis_c:q.commission_verified?+q.bopis_c.toFixed(2):null,bopis_o:q.commission_verified?Math.trunc(q.bopis_o):null,commissionable_a:q.commission_verified?+q.commissionable_a.toFixed(2):null,com:q.commission_verified?+(q.commissionable_a*.03).toFixed(2):+q.com.toFixed(2)}));
       const management:any[]=[];
       for(const r of mr){
-        if(String(pick(r,"Regional")||"").trim()!=="CE + PI")continue;
+        if(!isCePiRegion(pick(r,"Regional")))continue;
         const loja=String(pick(r,"Loja")||""); if(loja==="Total")continue; const st=stCode(loja); if(!REGIONAL.has(st))continue;
         management.push({st,c:n(pick(r,"Captação","Captacao")),a:n(pick(r,"Aprovado")),o:n(pick(r,"Qtde Pedidos","Qtd Pedidos")),share:n(pick(r,"Share Loja %")),f:n(pick(r,"Faturamento")),meta1:n(pick(r,"Meta (1%)"))});
       }
-      if(!collab.length||!management.length)return json({error:"Não encontrei registros válidos para a data informada nos dois arquivos.",collaborators:collab.length,management:management.length},400);
+      if(!collab.length||!management.length)return json({
+        error:"Importação não concluída: "+(!collab.length?"nenhum pedido válido de "+requested+" para CE+PI no relatório por colaborador. ":"")+(!management.length?"nenhuma filial CE+PI reconhecida no relatório gerencial.":""),
+        collaborators:collab.length,management:management.length,diagnostics
+      },400);
       const collabCaptured=collab.reduce((s:any,r:any)=>s+n(r.c),0),managementCaptured=management.reduce((s:any,r:any)=>s+n(r.c),0);
       const managementMode=(managementCaptured>50000&&collabCaptured>0&&managementCaptured>collabCaptured*5)?"cumulative_ytd":"daily";
       const {error}=await db.from("daily_updates").upsert({result_date:requested,collaborators:collab,management,management_mode:managementMode,imported_by:matricula,imported_at:new Date().toISOString()},{onConflict:"result_date"});
