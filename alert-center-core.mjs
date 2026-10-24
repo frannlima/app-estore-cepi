@@ -19,16 +19,16 @@ export function evaluateAlert({st,group,history=[],captured=0,updated_at=null,no
  const inputTs=updated_at?new Date(updated_at).getTime():NaN;
  const hasStoreInput=Number.isFinite(inputTs);
  const age=hasStoreInput?Math.max(0,Math.floor((now.getTime()-inputTs)/60000)):null;
+ const printTs=lastSaleChange?new Date(today+'T'+lastSaleChange+':00-03:00').getTime():NaN;
+ const printAge=Number.isFinite(printTs)?Math.max(0,Math.floor((now.getTime()-printTs)/60000)):null;
  let condition='unknown',eligible=false,alert_reason='Parcial não classificada; conferir o relatório antes de alertar';
  if(hasStoreInput&&age<60){
   condition='ok';
   alert_reason=Number(captured)>0?'Venda contabilizada; loja atualizou a parcial há menos de 60 minutos':'Parcial sem novas vendas confirmada pela loja há menos de 60 minutos';
  }else if(hasStoreInput){
-  condition='stale';eligible=true;
-  alert_reason=Number(captured)>0?'Venda contabilizada; supervisor precisa atualizar a parcial':'Sem novo lançamento; confirmar situação atual da loja';
+  condition='stale';eligible=!(group==='sale'&&printAge!==null&&printAge<60);
+  alert_reason=eligible?(Number(captured)>0?'Venda contabilizada; supervisor precisa atualizar a parcial':'Sem novo lançamento; confirmar situação atual da loja'):'Venda recente no consolidado; supervisor com parcial atrasada, alerta aguardando 60 minutos';
  }else if(group==='sale'||Number(captured)>0){
-  const printTs=lastSaleChange?new Date(today+'T'+lastSaleChange+':00-03:00').getTime():NaN;
-  const printAge=Number.isFinite(printTs)?Math.max(0,Math.floor((now.getTime()-printTs)/60000)):null;
   condition='group_sale';eligible=printAge===null||printAge>=60;
   alert_reason=eligible?'Venda contabilizada no consolidado há pelo menos 60 minutos; aguardando a loja confirmar a parcial':'Venda do consolidado informada há menos de 60 minutos; aguardando a loja';
  }else if(group==='zero'){
