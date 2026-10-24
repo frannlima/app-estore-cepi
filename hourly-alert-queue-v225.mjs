@@ -3,6 +3,7 @@
 import {createAlertImage,shareAlertImage} from './alert-card-share.mjs';
 const LINK='https://frannlima.github.io/app-estore-cepi/?menu=hourly';
 const STREETS=new Set(['084','113','146']);
+const STORES=new Set(['073','084','108','113','138','142','146','175','177','222','238','258','262','314','318','344','350','552']);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const clock=(now=new Date())=>{
@@ -17,7 +18,7 @@ export function pendingNoSale(stores,referenceDate,at=new Date(),groupStatuses={
  if(referenceDate!==today)return[];
  return (stores||[]).filter(r=>{
   const st=String(r.st||'').padStart(3,'0');
-  if(!/^\d{3}$/.test(st)||!(Number(r.metaValue)>0)||Number(r.captured||0)>0)return false;
+  if(!STORES.has(st)||!(Number(r.metaValue)>0)||Number(r.captured||0)>0)return false;
   if(groupStatuses[st]==='sale')return false;
   const updated=r.updated_at?Date.parse(r.updated_at):NaN;
   return !Number.isFinite(updated)||at.getTime()-updated>=60*60*1000;
