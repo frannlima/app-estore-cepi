@@ -731,7 +731,7 @@ console.info('[eStore] Card Hora a Hora regional v198');
   const STREETS=new Set(['084','113','146']);
   const API_DATE_ZONE='America/Fortaleza';
   const EVERY=15*60*1000;
-  let loading=false,lastStore='',lastDate='',latest=null,shakeTimeout=0,sampleTimeout=0;
+  let loading=false,latest=null,shakeTimeout=0,sampleTimeout=0;
   const el=id=>document.getElementById(id);
   function timestamp(){
     const o=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{
@@ -743,7 +743,7 @@ console.info('[eStore] Card Hora a Hora regional v198');
   function identity(){
     const u=typeof U!=='undefined'?U?.u:null;
     const store=String(u?.st||u?.store_code||'').padStart(3,'0');
-    return u?.id&&u.id!=='0000000'&&/^\\d{3}$/.test(store)?{id:String(u.id),store}:null;
+    return u?.id&&u.id!=='0000000'&&/^\d{3}$/.test(store)?{id:String(u.id),store}:null;
   }
   function operating(t,store){
     const street=STREETS.has(store),opening=street?480:600,closing=street?1080:1320;
