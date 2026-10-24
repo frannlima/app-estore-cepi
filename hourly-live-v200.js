@@ -69,18 +69,23 @@ function missingCount(r,ref){
 }
 function status(r,j){
  const ref=reference(j),update=Boolean(r.updated_at),sales=Number(r.captured||0),miss=missingCount(r,ref);
- if(groupStatusesDate===j?.result_date&&groupStatuses[String(r.st).padStart(3,'0')]==='sale'&&!update)return{code:'course',label:'Em curso • informada no grupo',miss:0};
- if(!update)return{code:'missing',label:miss+' parciais sem input de venda',miss};
- if(sales>0&&miss<=1)return{code:'spinning',label:'Girando ponteiro',miss:0};
- if(miss>=2)return{code:'missing',label:miss+' parciais sem input de venda',miss};
- return{code:'course',label:'Em curso',miss:0};
+ const checkin=r.last_entry_kind==='no_sales_update',imported=Number(r.captured_imported||0)>0;
+ if(!update){
+  if(sales>0)return{code:'missing',label:'Venda consolidada • aguardando parcial da loja',miss:Math.max(1,miss)};
+  if(groupStatusesDate===j?.result_date&&groupStatuses[String(r.st).padStart(3,'0')]==='sale')return{code:'missing',label:'Venda no grupo • aguardando parcial da loja',miss:Math.max(1,miss)};
+  return{code:'missing',label:'Sem parcial da loja'+(miss>0?' • '+miss+' intervalos':''),miss};
+ }
+ if(miss>=2)return{code:'stale',label:miss+' parciais sem atualização • '+(sales>0?'venda registrada':'sem vendas confirmadas'),miss};
+ if(checkin)return{code:'course',label:sales>0?'Sem novos pedidos • parcial confirmada':'Sem vendas • parcial confirmada',miss:0};
+ if(sales>0)return{code:'spinning',label:imported?'Girando ponteiro • inclui consolidado':'Girando ponteiro',miss:0};
+ return{code:'course',label:'Em curso • sem venda registrada',miss:0};
 }
 function noInput(j){
- return(j?.stores||[]).filter(r=>status(r,j).code==='missing').map(r=>String(r.st).padStart(3,'0'));
+ return(j?.stores||[]).filter(r=>['missing','stale'].includes(status(r,j).code)).map(r=>String(r.st).padStart(3,'0'));
 }
 function statusCounts(j){
- const all=j?.stores||[];
- return{spinning:all.filter(r=>status(r,j).code==='spinning').length,course:all.filter(r=>status(r,j).code==='course').length,missing:noInput(j).length};
+ const codes=(j?.stores||[]).map(r=>status(r,j).code);
+ return{spinning:codes.filter(x=>x==='spinning').length,course:codes.filter(x=>x==='course').length,missing:codes.filter(x=>x==='missing').length,stale:codes.filter(x=>x==='stale').length};
 }
 function parse(text){
  const found=new Map(),lines=String(text||'').replace(/\r/g,'').split(/\n/);
@@ -119,7 +124,8 @@ function parse(text){
 }
 window.hourlyParsedPrintV198=parse;
 function seedMarkup(){
- return '<section class="card hourImportCardV198"><div class="hourNewHeadV198"><div><b>📋 Consolidar vendas do WhatsApp</b><small>Cole a mensagem completa do grupo, confira o total por filial e salve. Print opcional.</small></div></div>'+
+ return '<section class="card hourCheckinCardV209"><div class="hourNewHeadV198"><div><b>✅ Atualizar parcial da minha loja</b><small>Sem novos pedidos? Confirme a parcial sem somar valores ou pedidos ao resultado.</small></div></div><button type="button" class="btn alt" onclick="hourlyConfirmNoSalesV209(this)">Confirmar sem novas vendas</button><small class="hourSmallV198" id="hourCheckinFeedbackV209" aria-live="polite"></small></section>'+
+ '<section class="card hourImportCardV198"><div class="hourNewHeadV198"><div><b>📋 Consolidar vendas do WhatsApp</b><small>Cole a mensagem completa do grupo, confira o total por filial e salve. Print opcional.</small></div></div>'+
  (isMain()?'<button type="button" class="btn" onclick="hourPrintOpenV198()">Colar mensagem / importar print</button><span class="hourSmallV198">Somente administrador; exige senha e revisão de cada lançamento.</span>':'<p class="muted">A importação regional é feita pelo administrador. Sua filial continua atualizando pelo formulário acima.</p>')+
  '</section><section class="card hourAlertsCardV198" id="hourAlertsSectionV198"><div class="hourNewHeadV198"><div><b>🚨 Mobilização | Lojas sem input</b><small>Sem atualização não significa venda zerada. Acompanhe pendências por parcial.</small></div></div><div id="hourRadarV198" class="hourRadarV198">Carregando situação...</div>'+
  (isMain()?'<div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="btn alt" onclick="hourAlertDirectoryV198()">Ver supervisores e preparar alertas no WhatsApp</button><button type="button" class="btn ghost" onclick="openAlertCenter()">Gerenciar parciais e contatos</button></div>':'<p class="hourSmallV198">Alertas com contatos são restritos ao administrador.</p>')+
@@ -138,13 +144,13 @@ function decorateScreen(){
    '<td>'+Number(r.orders||0)+' / '+Number(r.orderTarget||0)+'</td>'+
    '<td>'+fmtPercent(r.att)+'</td><td>'+fmtPercent(r.share)+'</td>'+
    '<td class="'+(dev>=0?'devPosV6':'devNegV6')+'">'+(dev>0?'▲ ':'▼ ')+moneyBR(dev)+'</td>'+
-   '<td><span class="hourStatusV198 '+st.code+'">'+(st.code==='spinning'?'🟢':st.code==='course'?'🟠':'🔴')+' '+esc(st.label)+'</span></td></tr>';
+   '<td><span class="hourStatusV198 '+st.code+'">'+(st.code==='spinning'?'🟢':st.code==='course'?'🟠':st.code==='stale'?'🟡':'🔴')+' '+esc(st.label)+'</span></td></tr>';
   }).join('')+'</tbody>';
  }
  const old=root.querySelector('.hourAlertV6');if(old)old.remove();
  const nf=noInput(j),counts=statusCounts(j);
- if(radar)radar.innerHTML='<div class="hourRadarCountersV198"><span>🟢 Girando ponteiro <b>'+counts.spinning+'</b></span><span>🟠 Em curso <b>'+counts.course+'</b></span><span>🔴 Sem input <b>'+counts.missing+'</b></span></div>'+
- '<p><b>Filiais pendentes:</b> '+(nf.length?nf.map(x=>'L'+x).join(' • '):'Nenhuma')+'</p><small>Contagem por intervalo desde o último lançamento. Mensagens do grupo não são lidas automaticamente: importe o print para considerar as vendas. Após validar a Central, as lojas com venda confirmada no grupo ficam fora dos alertas.</small>';
+ if(radar)radar.innerHTML='<div class="hourRadarCountersV198"><span>🟢 Girando ponteiro <b>'+counts.spinning+'</b></span><span>🟠 Em curso <b>'+counts.course+'</b></span><span>🟡 Parcial atrasada <b>'+counts.stale+'</b></span><span>🔴 Sem parcial <b>'+counts.missing+'</b></span></div>'+
+ '<p><b>Filiais que precisam atualizar a parcial:</b> '+(nf.length?nf.map(x=>'L'+x).join(' • '):'Nenhuma')+'</p><small>Vendas de loja e consolidado são contabilizadas. O radar acompanha a atualização feita pelo supervisor, sem confundir atraso com ausência de venda.</small>';
  if(supervisors)showDirectory();
 }
 function caption(j){
@@ -240,6 +246,21 @@ function showDirectory(){
  });
 }
 window.hourAlertDirectoryV198=async function(){const host=document.getElementById('hourSupervisorListV198');try{if(host)host.innerHTML='<p class="muted">Consultando contatos protegidos...</p>';await directory();showDirectory();}catch(e){if(host)host.textContent=String(e.message||e)}};
+window.hourlyConfirmNoSalesV209=async function(button){
+ const u=user(),st=String(u?.st||'').padStart(3,'0'),today=clock().date;
+ const feedback=document.getElementById('hourCheckinFeedbackV209');
+ if(!u?.id||u.id==='0000000'||!STORES.includes(st)){if(feedback)feedback.textContent='A confirmação exige supervisor logado e filial identificada.';return}
+ if(!window.confirm('Confirmar que a filial '+st+' não teve novos pedidos desde a última parcial? O total permanece inalterado.'))return;
+ if(button?.disabled)return;
+ button.disabled=true;if(feedback)feedback.textContent='Registrando a confirmação...';
+ try{
+  const out=await api({action:'hourly_submit',matricula:String(u.id),store_code:st,result_date:today,captured:0,orders:0,store_sales:0,confirm_no_sales:true});
+  if(!out?.ok||out?.error)throw Error(out?.error||'Não foi possível confirmar.');
+  await loadHourly();
+  if(feedback)feedback.textContent=out.already_confirmed?'✅ Esta parcial já foi confirmada.':'✅ Parcial confirmada. Captação e pedidos preservados.';
+ }catch(e){if(feedback)feedback.textContent='Não foi possível confirmar: '+String(e.message||e)}
+ finally{button.disabled=false}
+};
 function showModal(){
  document.getElementById('hourPrintModalV198')?.remove();
  const modal=document.createElement('div');
