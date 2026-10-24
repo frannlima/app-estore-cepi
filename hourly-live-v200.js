@@ -721,3 +721,162 @@ console.info('[eStore] Card Hora a Hora regional v198');
  };
  console.info('[eStore] Hora a Hora do aplicativo ativo • v200');
 })();
+
+/* eStore CE+PI | Lembrete visual por falta de duas parciais da filial.
+   Não gera vendas, não altera metas e não dispara WhatsApp/push automaticamente. */
+(function(){
+  'use strict';
+  if(window.__estoreVisualAlertV1)return;
+  window.__estoreVisualAlertV1=true;
+  const STREETS=new Set(['084','113','146']);
+  const API_DATE_ZONE='America/Fortaleza';
+  const EVERY=15*60*1000;
+  let loading=false,lastStore='',lastDate='',latest=null,shakeTimeout=0,sampleTimeout=0;
+  const el=id=>document.getElementById(id);
+  function timestamp(){
+    const o=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{
+      timeZone:API_DATE_ZONE,year:'numeric',month:'2-digit',day:'2-digit',
+      hour:'2-digit',minute:'2-digit',weekday:'short',hourCycle:'h23'
+    }).formatToParts(new Date()).map(x=>[x.type,x.value]));
+    return {date:o.year+'-'+o.month+'-'+o.day,minute:(Number(o.hour)%24)*60+Number(o.minute),weekday:o.weekday};
+  }
+  function identity(){
+    const u=typeof U!=='undefined'?U?.u:null;
+    const store=String(u?.st||u?.store_code||'').padStart(3,'0');
+    return u?.id&&u.id!=='0000000'&&/^\\d{3}$/.test(store)?{id:String(u.id),store}:null;
+  }
+  function operating(t,store){
+    const street=STREETS.has(store),opening=street?480:600,closing=street?1080:1320;
+    return t.minute>=opening&&t.minute<closing&&!(street&&t.weekday==='Sun')?{opening,closing}:null;
+  }
+  const elapsed=n=>Math.floor(n/60)+'h '+String(n%60).padStart(2,'0')+'min';
+  const key=(store,date)=>'estore_visual_alert_'+store+'_'+date;
+  function saved(k){try{return JSON.parse(localStorage.getItem(k)||'{}')||{}}catch(_){return{}}}
+  function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(_){}}
+  function ensure(){
+    let node=el('estoreVisualDelayAlert');
+    if(node)return node;
+    const style=document.createElement('style');
+    style.textContent=`
+      #estoreVisualDelayAlert[hidden]{display:none!important}
+      #estoreVisualDelayAlert{position:fixed;right:20px;bottom:24px;z-index:99999;box-sizing:border-box;
+        width:min(490px,calc(100vw - 40px));padding:18px;background:#fff5f6;color:#8a1e35;
+        border:3px solid #c52e41;border-radius:18px;box-shadow:0 18px 54px #87172d5c;font-family:inherit}
+      #estoreVisualDelayAlert strong{display:block;font-size:16px;line-height:1.3;margin-bottom:7px}
+      #estoreVisualDelayAlert p{font-size:13px;line-height:1.5;margin:0 0 13px}
+      #estoreVisualDelayAlert .estore-delay-actions{display:flex;flex-wrap:wrap;gap:8px}
+      #estoreVisualDelayAlert button{border:1px solid #d6a0aa;border-radius:10px;padding:10px 12px;cursor:pointer;font-weight:750}
+      #estoreVisualDelayAlert [data-do=update]{background:#b91f39;color:white}
+      #estoreVisualDelayAlert [data-do=snooze]{background:white;color:#8a1e35}
+      @keyframes estore-visual-tremor{0%,100%{transform:translate3d(0,0,0)}
+        7%,21%,35%,49%,63%,77%,91%{transform:translate3d(-7px,0,0)}
+        14%,28%,42%,56%,70%,84%{transform:translate3d(7px,0,0)}}
+      @keyframes estore-visual-flash{0%,100%{opacity:0}10%,90%{opacity:1}}
+      @media(min-width:900px) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+        body.estore-visual-shaking{animation:estore-visual-tremor 2s ease-in-out 1!important;will-change:transform}
+        body.estore-visual-shaking:after{content:"";position:fixed;inset:0;z-index:100000;
+          pointer-events:none;box-sizing:border-box;border:6px solid #c52e41;
+          animation:estore-visual-flash 2s linear 1}}
+      @media(max-width:700px){#estoreVisualDelayAlert{right:10px;bottom:80px;width:calc(100vw - 20px)}}
+      @media(prefers-reduced-motion:reduce){body.estore-visual-shaking{animation:none!important}}
+    `;
+    document.head.appendChild(style);
+    node=document.createElement('aside');
+    node.id='estoreVisualDelayAlert';node.hidden=true;
+    node.setAttribute('role','status');node.setAttribute('aria-live','polite');
+    node.innerHTML='<strong id="estoreVisualDelayTitle"></strong><p id="estoreVisualDelayMessage"></p>'+
+      '<div class="estore-delay-actions"><button type="button" data-do="update">ATUALIZAR PARCIAL AGORA</button>'+
+      '<button type="button" data-do="snooze">Lembrar em 10 minutos</button></div>';
+    node.querySelector('[data-do=update]').addEventListener('click',()=>{
+      clearShake();
+      if(typeof go==='function')go('hourly');
+      else location.href='./?menu=hourly';
+    });
+    node.querySelector('[data-do=snooze]').addEventListener('click',()=>{
+      if(latest)save(key(latest.store,latest.date),{...saved(key(latest.store,latest.date)),snoozeUntil:Date.now()+600000});
+      hide();
+    });
+    document.body.appendChild(node);
+    return node;
+  }
+  function clearShake(){
+    if(shakeTimeout){clearTimeout(shakeTimeout);shakeTimeout=0}
+    document.body.classList.remove('estore-visual-shaking');
+  }
+  function hide(){
+    const node=el('estoreVisualDelayAlert');
+    if(node)node.hidden=true;
+    clearShake();
+    document.title=document.title.replace(/^🔴 PARCIAL eSTORE ATRASADA • /,'');
+  }
+  function canShake(){
+    return document.visibilityState==='visible' &&
+      matchMedia('(min-width: 900px) and (pointer: fine) and (prefers-reduced-motion: no-preference)').matches &&
+      !document.activeElement?.matches('input,textarea,select,[contenteditable=true]') &&
+      ![...document.querySelectorAll('[role=dialog]')].some(n=>n.getClientRects().length>0);
+  }
+  function render(){
+    const node=ensure();
+    if(!latest?.overdue){hide();return}
+    const state=saved(key(latest.store,latest.date));
+    if(Number(state.snoozeUntil||0)>Date.now()){hide();return}
+    node.hidden=false;
+    el('estoreVisualDelayTitle').textContent='⚠ PARCIAL eSTORE ATRASADA • LOJA '+latest.store;
+    el('estoreVisualDelayMessage').textContent=latest.message;
+    if(!canShake())return;
+    const token=latest.store+'|'+latest.date+'|'+latest.stamp;
+    if(state.shakeToken===token&&Date.now()-Number(state.shookAt||0)<EVERY)return;
+    save(key(latest.store,latest.date),{...state,shakeToken:token,shookAt:Date.now()});
+    clearShake();
+    void document.body.offsetWidth;
+    document.body.classList.add('estore-visual-shaking');
+    shakeTimeout=setTimeout(clearShake,2000);
+  }
+  async function check(){
+    if(loading)return;
+    const user=identity(),now=timestamp(),hours=user?operating(now,user.store):null;
+    if(!user||!hours){latest=null;hide();return}
+    loading=true;
+    try{
+      const data=await api({action:'hourly_get',matricula:user.id,result_date:now.date});
+      if(user.store!==identity()?.store||now.date!==timestamp().date)return;
+      const row=(data?.stores||[]).find(r=>String(r.st).padStart(3,'0')===user.store);
+      if(!row||!(Number(row.metaValue)>0)){latest=null;hide();return}
+      let minute=hours.opening,valid=false,stamp='';
+      if(row.updated_at){
+        const at=new Date(row.updated_at),local=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{
+          timeZone:API_DATE_ZONE,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'
+        }).formatToParts(at).map(x=>[x.type,x.value]));
+        const sameDate=local.year+'-'+local.month+'-'+local.day===now.date;
+        if(sameDate&&at.getTime()<=Date.now()){
+          minute=Math.max(hours.opening,(Number(local.hour)%24)*60+Number(local.minute));valid=true;stamp=row.updated_at;
+        }
+      }
+      const minutes=Math.max(0,now.minute-minute);
+      const status=typeof window.hourlyStatusV198==='function'?window.hourlyStatusV198(row,data):null;
+      const missed=status&&Number.isFinite(Number(status.miss))?Number(status.miss):Math.floor(minutes/60);
+      const overdue=missed>=2&&(status?['missing','stale'].includes(status.code):true);
+      latest={store:user.store,date:now.date,stamp,overdue,minutes,
+        message:(valid?'Última parcial há ':'Sem primeira parcial há ')+elapsed(minutes)+
+          '. São '+missed+' parciais pendentes. Registre a venda ou confirme que não houve novos pedidos.'};
+      render();
+    }catch(error){console.warn('[eStore] Consulta do alerta visual indisponível:',error?.message||error)}
+    finally{loading=false}
+  }
+  window.testarTremorEstore=function(){
+    const user=identity();if(!user)return;
+    const today=timestamp().date;
+    latest={store:user.store,date:today,stamp:'teste',overdue:true,
+      message:'Simulação de alerta. Nenhum valor ou pedido será alterado.'};
+    const k=key(user.store,today),old=saved(k);save(k,{...old,shakeToken:'',shookAt:0,snoozeUntil:0});
+    render();
+    clearTimeout(sampleTimeout);
+    sampleTimeout=setTimeout(()=>{save(k,old);latest=null;hide();check()},8000);
+  };
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)clearShake();else check()});
+  window.addEventListener('storage',event=>{if(event.key?.includes('estore_hourly_changed'))check()});
+  window.addEventListener('focus',check);
+  setInterval(()=>{if(!document.hidden)check()},120000);
+  setInterval(render,30000);
+  setTimeout(check,3500);
+})();
