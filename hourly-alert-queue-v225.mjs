@@ -1,6 +1,6 @@
 // eStore CE+PI — fila de mobilização após consolidar a parcial do WhatsApp.
 // O WhatsApp exige a confirmação de envio pelo usuário; abrir a conversa NÃO é entrega.
-import {createAlertImage,shareAlertImage} from './alert-card-share.mjs';
+import {createAlertImage,sharePreparedAlert,canNativeFileShare} from './alert-card-share.mjs';
 const LINK='https://frannlima.github.io/app-estore-cepi/?menu=hourly';
 const STREETS=new Set(['084','113','146']);
 const STORES=new Set(['073','084','108','113','138','142','146','175','177','222','238','258','262','314','318','344','350','552']);
@@ -30,7 +30,7 @@ function reason(row,group){
  if(row.updated_at)return['Parcial anterior sem venda','A confirmação da filial está atrasada há mais de uma hora.'];
  return ['Sem informação de venda','Nenhuma captação registrada até esta consulta.'];
 }
-function message(row,person,date,group,now){
+export function alertMessage(row,person,date,group,now){
  const [label]=reason(row,group);
  const first=String(person.name||'Supervisor').trim().split(/\s+/)[0];
  return [
@@ -71,7 +71,7 @@ export function renderPriorityQueue({target,data,contacts,groupStatuses={},at=ne
    const ready=!!p.phone&&!p.onLeave&&validPhone(p.phone)&&openHour(st,today.hour);
    const explanation=p.onLeave?'Férias ou afastamento: bloqueado':!p.phone?'Contato/consentimento pendente':!openHour(st,today.hour)?'Fora do horário de contato':'Contato validado';
    return '<div class="hourPriorityPersonV225"><div class="hourPriorityIdentityV225"><b>'+esc(p.name)+'</b><small>'+esc(p.role)+'</small><small>'+esc(explanation)+'</small></div>'+
-   (ready?'<div class="hourPriorityActionsV225"><button type="button" class="btn" data-qa-wa="'+esc(st)+'" data-qa-p="'+index+'">WhatsApp direto ↗</button><button type="button" class="btn ghost" data-qa-card="'+esc(st)+'" data-qa-p="'+index+'">Card PNG</button></div>':
+   (ready?'<div class="hourPriorityActionsV225"><button type="button" class="btn hourPrioritySendV227" data-qa-send="'+esc(st)+'" data-qa-p="'+index+'">📲 Enviar alerta</button></div>':
    '<span class="hourPriorityLockedV225">Indisponível</span>')+'</div>';
   }).join(''):'<p class="hourPriorityHintV225">Não há supervisor com contato validado para esta loja.</p>';
   return '<article class="hourPriorityStoreV225"><header><div><strong>L'+esc(st)+'</strong><b>'+esc(label)+'</b></div><span>'+money(row.captured)+'</span></header>'+
@@ -83,36 +83,59 @@ export function renderPriorityQueue({target,data,contacts,groupStatuses={},at=ne
   '<div class="hourPriorityKpisV225"><span><b>'+selling+'</b> com venda</span><span><b>'+pending.length+'</b> sem venda</span><span><b>'+available+'</b> contatos aptos</span></div></div>'+
   (dated?(pending.length?'<div class="hourPriorityStoresV225">'+cards+'</div>':'<p class="hourPriorityHintV225">Nenhuma loja exige alerta por ausência de venda neste momento.</p>'):'<p class="hourPriorityHintV225">Referência histórica: a lista de contatos é liberada somente para o dia atual.</p>')+
   '<label class="hourPriorityConfirmV225"><input type="checkbox" data-qa-check> Confirmei que o supervisor está em expediente e autorizado a receber esta mensagem.</label>'+
-  '<p class="hourPriorityFootV225">WhatsApp direto abre a conversa certa e preenche a mensagem; confirme o envio no WhatsApp. O Card PNG utiliza o compartilhamento do aparelho ou exige anexar o arquivo. O app não envia automaticamente.</p>'+
+  '<p class="hourPriorityFootV225">Um botão prepara o card PNG com a legenda personalizada. No celular, escolha o WhatsApp e confira o supervisor correto e a legenda antes de enviar. No computador, o PNG será baixado e a conversa correta será aberta com o texto pronto; anexe o PNG manualmente. Nenhum alerta é enviado automaticamente.</p>'+
   '<p class="hourPriorityResponseV225" data-qa-response aria-live="polite" role="status"></p></section>';
  const msg=target.querySelector('[data-qa-response]');
  const validate=button=>{
   if(!target.querySelector('[data-qa-check]')?.checked){msg.textContent='Confirme expediente e autorização antes de preparar o alerta.';return null}
-  const st=button.dataset.qaWa||button.dataset.qaCard;
+  const st=button.dataset.qaSend;
   const row=pending.find(r=>r.st===st),person=contacts.find(c=>c.st===st)?.people?.[Number(button.dataset.qaP)];
   if(!row||Number(row.captured||0)>0){msg.textContent='Filial já possui venda registrada. Atualize o painel.';return null}
   if(!person?.phone||person.onLeave||!validPhone(person.phone)||!openHour(st,clock().hour)){msg.textContent='Contato indisponível ou fora do horário de alerta.';return null}
   return {row,person,st};
  };
- target.querySelectorAll('[data-qa-wa]').forEach(btn=>btn.onclick=()=>{
+ target.querySelectorAll('[data-qa-send]').forEach(btn=>btn.onclick=async()=>{
   const obj=validate(btn);if(!obj)return;
-  const phone=obj.person.phone.replace(/\D/g,'');
-  const url='https://wa.me/'+phone+'?text='+encodeURIComponent(message(obj.row,obj.person,data.result_date,groupStatuses[obj.st]||'unknown',new Date()));
-  const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';document.body.append(a);a.click();a.remove();
-  btn.textContent='Reabrir WhatsApp ↗';
-  msg.textContent='Conversa de '+obj.person.name+' (L'+obj.st+') aberta/preparada. O envio precisa ser confirmado dentro do WhatsApp.';
- });
- target.querySelectorAll('[data-qa-card]').forEach(btn=>btn.onclick=async()=>{
-  const obj=validate(btn);if(!obj)return;
-  btn.disabled=true;msg.textContent='Gerando card para L'+obj.st+'...';
+  const selectedData=data;
+  const originalLabel=btn.textContent,phone=String(obj.person.phone||'').replace(/\D/g,'');
+  const shareSupported=canNativeFileShare();
+  // O desktop reserva a aba durante o clique para evitar bloqueio de popup após renderizar o PNG.
+  const chatWindow=!shareSupported?window.open('about:blank','_blank'):null;
+  const contactName=String(obj.person.name||'Supervisor');
+  const caption=alertMessage(obj.row,obj.person,selectedData.result_date,groupStatuses[obj.st]||'unknown',new Date());
+  btn.disabled=true;btn.textContent='Preparando alerta…';
+  msg.textContent='Gerando card PNG + mensagem para '+contactName+' (L'+obj.st+')…';
   try{
-   const time=obj.row.updated_at?new Date(obj.row.updated_at).toLocaleTimeString('pt-BR',{timeZone:'America/Fortaleza',hour:'2-digit',minute:'2-digit'}):null;
-   const file=await createAlertImage({person:{nome:obj.person.name},name_original:obj.person.name,store_code_original:obj.st},
-    {st:obj.st,meta:Number(obj.row.metaValue),orders:Number(obj.row.orderTarget),condition:'missing',
-     first_check_time:time,last_sale_change_time:time,closing:clock().hour===21,link:LINK});
-   msg.textContent=(await shareAlertImage(file,obj.person.phone,clock().hour===21))+' Destinatário previsto: '+obj.person.name+' (L'+obj.st+').';
-  }catch(e){msg.textContent='Card não compartilhado: '+String(e?.message||e)}
-  finally{btn.disabled=false}
+   const lastTime=obj.row.updated_at?new Date(obj.row.updated_at).toLocaleTimeString('pt-BR',{timeZone:'America/Fortaleza',hour:'2-digit',minute:'2-digit'}):null;
+   const kind=groupStatuses[obj.st]==='zero'?'zero':'missing';
+   const file=await createAlertImage(
+     {person:{nome:contactName},name_original:contactName,store_code_original:obj.st},
+     {st:obj.st,meta:Number(obj.row.metaValue),orders:Number(obj.row.orderTarget),
+      condition:kind,first_check_time:lastTime,last_sale_change_time:lastTime,
+      closing:clock().hour===21,link:LINK}
+   );
+   const result=await sharePreparedAlert({
+    file,caption,phone,store:obj.st,name:contactName,preopenedWindow:chatWindow
+   });
+   if(result.mode==='native'){
+    // O compartilhamento nativo não informa qual destinatário foi realmente escolhido.
+    msg.textContent='Card e legenda preparados no compartilhamento. Confira que o destino é '+contactName+' (L'+obj.st+') e confirme a legenda no WhatsApp. O app não confirma entrega.';
+   }else{
+    msg.textContent='Card PNG baixado e mensagem preparada para '+contactName+'. '+(result.chatOpened?'A conversa do WhatsApp foi aberta.':'Use o link abaixo para abrir a conversa.')+' Anexe o PNG na conversa e confirme o envio. A imagem não é anexada automaticamente.';
+    if(!result.chatOpened&&result.url){
+     const a=document.createElement('a');a.href=result.url;a.target='_blank';a.rel='noopener noreferrer';
+     a.textContent='Abrir WhatsApp de '+contactName+' ↗';
+     const holder=document.createElement('span');holder.append(' ');holder.append(a);msg.append(holder);
+    }
+   }
+  }catch(e){
+   if(chatWindow&&!chatWindow.closed)chatWindow.close();
+   if(e?.name==='AbortError'){msg.textContent='Compartilhamento cancelado. Nenhum envio foi confirmado.';}
+   else{msg.textContent='Não foi possível preparar o alerta: '+String(e?.message||e)+'. Nenhum envio foi confirmado.';}
+  }finally{
+   btn.disabled=false;btn.textContent=originalLabel;
+  }
  });
+
  return {total:pending.length,eligible:available};
 }
