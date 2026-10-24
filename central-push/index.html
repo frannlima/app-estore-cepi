@@ -1,0 +1,46 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#173f35"><title>Central Push Administrativa | eStore CEPI</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#f1f4f2;color:#183f35;font:15px/1.5 system-ui,-apple-system,Arial,sans-serif}main{max-width:680px;margin:26px auto;padding:14px}.card{background:#fff;border-radius:19px;padding:22px;box-shadow:0 8px 30px #173f3510;margin-bottom:14px}h1{font-size:1.5rem;line-height:1.25;margin:0 0 8px}h2{font-size:1.08rem;margin:0 0 6px}.muted{color:#526b61}.pill{display:inline-block;border-radius:20px;background:#e4ece6;padding:4px 10px;font-size:.77rem;font-weight:700}label{display:block;font-size:.9rem;font-weight:700;margin-top:16px}input{width:100%;border:1px solid #b6c9bf;padding:14px;border-radius:10px;font-size:1rem;background:white}button{background:#174334;color:white;border:0;border-radius:11px;padding:14px 16px;font-size:1rem;font-weight:650;cursor:pointer;margin-top:10px;width:100%}button.outline{background:white;color:#174334;border:1px solid #174334}button:disabled{opacity:.48;cursor:not-allowed}.warn{background:#fff7e8;border:1px solid #ecd2a4;padding:11px;border-radius:10px}.stat{border-radius:10px;background:#f2f6f3;padding:13px;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:12px}small{font-size:.77rem}a{color:#174334}ul{padding-left:20px}</style></head><body><main>
+<section class="card"><span class="pill">PILOTO RESTRITO • MATRÍCULA 2457695</span><h1>🔔 Central Push | eStore CEPI</h1><p class="muted">Cadastro do Android e teste remoto com segurança. O envio automático às lojas permanece desligado.</p><label for="password">Senha administrativa do eStore</label><input id="password" type="password" autocomplete="off" placeholder="Informe a senha do Administrativo" required><p><small>A senha é validada pelo Supabase e não fica salva no navegador.</small></p>
+<button id="status">Consultar estado da central</button>
+<div id="result" class="stat" role="status">Aguardando validação.</div></section>
+<section class="card"><h2>1. Vincular este Android</h2><p>Abra pelo Chrome do Android e toque abaixo. O sistema vai gerar o token FCM e cadastrá-lo diretamente na base privada, sem copiar ou colar códigos.</p><button id="register">📱 Vincular meu Android</button><p id="android" class="muted"><small>Este botão só funciona no Chrome do Android com notificações permitidas.</small></p></section>
+<section class="card"><h2>2. Enviar teste remoto</h2><p>Envio exclusivo ao dispositivo cadastrado para o administrador da filial 108. Sem campanhas, tópicos ou listas de supervisores.</p><button id="test">🔔 Enviar teste remoto para meu Android</button><div class="warn"><strong>Proteção:</strong> limite de 1 teste por minuto e 12 testes a cada 24 horas. Recebimento depende da permissão do Android. A aceitação do Firebase não prova entrega.</div></section>
+<section class="card"><h2>3. Estado da automação</h2><p><strong>Alertas automáticos de lojas: desativados.</strong> A configuração técnica está preparada para homologação, mas não fará disparos sem implantação das regras e autorização.</p><p><a href="../teste-alerta/?v=5">Abrir diagnóstico no Android</a> · <a href="../">Voltar ao eStore</a></p></section>
+</main><script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import {getMessaging,getToken,isSupported} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-messaging.js";
+const firebaseConfig={apiKey:"AIzaSyDMz5OGUlk81e7545iNpQWON_JWAIDeCE4",authDomain:"estore-cepi.firebaseapp.com",projectId:"estore-cepi",storageBucket:"estore-cepi.firebasestorage.app",messagingSenderId:"308440439164",appId:"1:308440439164:web:65b39d57384fb1805c6cf9"};
+const vapidKey="BPzAce5uLvF3PUgsq5fiMd3C-3cTOKCrvS00PliPt8ngTgRWYJbD1j2FLsOoByz9TLQzPm0fBpPYzWQ2rZ-EC2Y";
+const api="https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-push-pilot";
+const result=document.getElementById("result");
+const password=document.getElementById("password");
+function status(s){result.textContent=s;}
+async function call(action,extra={}){
+  const pass=password.value;
+  if(!pass){status("Informe sua senha administrativa para continuar.");password.focus();return null;}
+  const r=await fetch(api,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action,matricula:"2457695",password:pass,...extra})});
+  const data=await r.json();
+  if(!data.ok){const labels={ADMIN_AUTH_REQUIRED:"Matrícula ou senha administrativa inválida.",PROVIDER_NOT_CONFIGURED:"Envio por servidor pendente: configure FIREBASE_SERVICE_ACCOUNT_JSON no Supabase (somente Secrets).",NO_REGISTERED_DEVICE:"Nenhum Android está cadastrado. Vincule seu dispositivo primeiro.",FCM_TOKEN_EXPIRED:"O token FCM expirou; cadastre novamente o Android.",FCM_PERMISSION_DENIED:"Sem permissão do Google para o serviço de envio FCM.",RATE_LIMIT_ONE_PER_MINUTE:"Aguarde pelo menos um minuto entre testes.",DAILY_LIMIT_REACHED:"Limite de testes do dia atingido.",FCM_SEND_REJECTED:"Firebase rejeitou a solicitação de envio.",PROVIDER_OAUTH_FAILED:"Não foi possível autenticar o serviço no Google."};
+   throw Error(labels[data.error]||("Falha: "+data.error));
+  }
+  return data;
+}
+async function act(button,fn){button.disabled=true;try{await fn();}catch(e){status("⚠️ "+(e?.message||String(e)));}finally{button.disabled=false;}}
+const summary=d=>"Dispositivo: "+(d.device_registered?"✅ vinculado":"não cadastrado")+"\nServiço remoto: "+(d.provider_configured?"✅ configurado":"⚠️ credencial de serviço pendente")+"\nAutomação regional: "+(d.automatic_enabled?"ativada":"DESATIVADA")+"\nÚltimas tentativas: "+(d.attempts?.length?d.attempts.map(x=>x.requested_at+" — "+x.kind+" — "+x.state+(x.error_category?" ("+x.error_category+")":"")).join("\n"):"nenhuma");
+document.getElementById("status").onclick=e=>act(e.currentTarget,async()=>{status("Consultando…");const d=await call("status");if(d)status(summary(d));});
+document.getElementById("register").onclick=e=>act(e.currentTarget,async()=>{
+  if(!/Android/i.test(navigator.userAgent)||!/Chrome\//.test(navigator.userAgent)||/SamsungBrowser\//.test(navigator.userAgent))throw Error("Abra esta central diretamente no Google Chrome do Android.");
+  if(!isSecureContext||!('serviceWorker'in navigator)||!(await isSupported()))throw Error("FCM não está disponível neste navegador.");
+  const permission=await Notification.requestPermission();if(permission!=="granted")throw Error("Autorize notificações no Chrome.");
+  status("Obtendo token FCM com segurança…");
+  const reg=await navigator.serviceWorker.register("../teste-alerta/sw.js",{scope:"../teste-alerta/"});await navigator.serviceWorker.ready;
+  const app=initializeApp(firebaseConfig);const token=await getToken(getMessaging(app),{vapidKey,serviceWorkerRegistration:reg});
+  if(!token)throw Error("O Firebase não forneceu um token.");
+  const r=await call("register",{token});if(r)status("✅ Android vinculado à matrícula 2457695. O token não foi exibido nem publicado.");
+});
+document.getElementById("test").onclick=e=>act(e.currentTarget,async()=>{
+  status("Solicitando envio de teste ao Firebase…");
+  const d=await call("test");
+  if(d)status("✅ Firebase aceitou o envio para seu Android. Confirme o recebimento no celular, mesmo com o navegador em segundo plano.\nID de mensagem: "+d.message_id);
+});
+</script></body></html>
