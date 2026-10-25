@@ -428,13 +428,14 @@ function showAdmin(){
  const period=EX.period==="month"?"month":"week";
  slot.innerHTML='<section class="execAdminV1 execImportSimplifiedV3" id="execBenchmarkAdminV1">'+
  '<h3>Importação oficial | Semana e Mês</h3>'+
- '<p class="execHelpV1">D-1 é alimentado automaticamente pelo gerencial. Para semana ou mês, selecione o período do print e anexe a imagem. Não é necessário digitar ou confirmar os valores.</p>'+
+ '<p class="execHelpV1">D-1 é alimentado automaticamente pelo gerencial. Para semana ou mês, importe o Excel oficial (.xlsx), ou use o print como alternativa. Não é necessário digitar ou confirmar os valores.</p>'+
  '<div class="execImportPeriodV3"><div class="execFieldV1"><label for="exIn_period">Período</label><select id="exIn_period" onchange="execBenchmarkPeriodChangedV3()"><option value="week">Semana</option><option value="month">Mês</option></select></div>'+
  '<div class="execImportDatesV3"><div id="exDateRangeV3" class="execDateRangeV3"><div class="execFieldV1"><label for="exIn_start_date">De</label><input id="exIn_start_date" type="date"></div>'+
  '<div class="execFieldV1"><label for="exIn_end_date">Até</label><input id="exIn_end_date" type="date"></div></div>'+
  '<small id="exDateHintV3" class="execHelpV1"></small></div></div>'+
+ '<label class="execUploadMainV3" for="exExcelFileV1"><span class="execUploadIconV3">▤</span><span><strong>Importar Excel oficial</strong><small>Planilha .xlsx ou .xls · Totais CE+PI e Empresa</small></span><input id="exExcelFileV1" type="file" accept=".xlsx,.xls" onchange="execReadExcelV1(event)" hidden></label>'+ 
  '<label class="execUploadMainV3" for="exPrintFileV1"><span class="execUploadIconV3">▣</span><span><strong>Anexar print oficial</strong><small>Leitura e registro automáticos · PNG/JPG/WEBP até 8 MB</small></span><input id="exPrintFileV1" accept="image/*" type="file" onchange="execReadPrintV1(event)" hidden></label>'+
- '<div id="exOcrStatusV1" class="execReadStatusV3" role="status" aria-live="polite">Informe as datas e anexe o print com as linhas CE+PI e Empresa.</div>'+
+ '<div id="exOcrStatusV1" class="execReadStatusV3" role="status" aria-live="polite">Selecione o período e importe Excel ou print.</div>'+
  '<details id="exOriginalPrintV3" class="execOriginalPrintV3" hidden><summary>Ver print utilizado</summary><img id="exOriginalImageV3" alt="Print de resultado" loading="lazy"></details>'+
  '<div class="execImportActionsV3"><button type="button" class="execActionV1" style="background:#e2e5df;color:#173F35" onclick="document.getElementById(\'execAdminSlotV1\').innerHTML=\'\'">Fechar</button></div></section>';
  document.getElementById("exIn_period").value=period;
@@ -482,6 +483,38 @@ function ocrParse(text){
   return {captured,approved,orders,share};
  }
  return {company:collect(companyName),regional:collect(regionName),lines:lines.length};
+}
+
+async function readExcel(ev){
+ const file=ev?.target?.files?.[0],status=document.getElementById("exOcrStatusV1");
+ if(!file)return;
+ try{
+ const period=document.getElementById("exIn_period")?.value,start=document.getElementById("exIn_start_date")?.value,end=document.getElementById("exIn_end_date")?.value,y=previousBusinessDate();
+ if(!["week","month"].includes(period)||!start||!end||start>end||end>y||(period==="week"&&isoWeek(start)!==isoWeek(end))||(period==="month"&&start.slice(0,7)!==end.slice(0,7)))throw Error("Datas inválidas: escolha um intervalo da mesma semana ou mês até D-1.");
+ if(!/\.(xlsx|xls)$/i.test(file.name)||file.size>15e6)throw Error("Arquivo deve ser Excel (.xlsx ou .xls) de até 15 MB.");
+ if(status){status.className="execReadStatusV3";status.textContent="Conferindo totais do Excel oficial...";}
+ const xl=await loadLib("https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js","XLSX"),wb=xl.read(await file.arrayBuffer(),{type:"array"});
+ const norm=v=>String(v??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/\s+/g," ").trim();
+ let match;
+ for(const sheet of wb.SheetNames){
+ const rows=xl.utils.sheet_to_json(wb.Sheets[sheet],{header:1,defval:null,raw:true});
+ const h=rows.findIndex(r=>norm(r?.[0])==="REGIONAL"&&norm(r?.[1])==="LOJA"&&r.some(v=>norm(v)==="CAPTACAO"));
+ if(h<0)continue;
+ const cols=rows[h].map(norm),ind=["REGIONAL","LOJA","CAPTACAO","APROVADO","QTDE PEDIDOS","SHARE LOJA %"].map(x=>cols.indexOf(x));
+ if(ind.some(i=>i<0))continue;
+ const [ir,il,ic,ia,io,ish]=ind,data=rows.slice(h+1);
+ const regional=data.find(r=>/^(CE\s*\+\s*PI|CEPI)$/.test(norm(r?.[ir]))&&norm(r?.[il])==="TOTAL");
+ const company=data.find(r=>norm(r?.[ir])==="TOTAL"&&!norm(r?.[il]));
+ if(regional&&company){match={regional,company,ic,ia,io,ish};break;}
+ }
+ if(!match)throw Error("Subtotal CE + PI, total Empresa ou cabeçalho oficial ausente. Nada foi gravado.");
+ const {regional,company,ic,ia,io,ish}=match,num=(r,i)=>typeof r[i]==="number"?r[i]:numeric(r[i]);
+ const cc=num(company,ic),rc=num(regional,ic),cs=num(company,ish),rs=num(regional,ish),co=num(company,io),ro=num(regional,io);
+ if([cc,rc,cs,rs,co,ro].some(v=>v==null||!Number.isFinite(v))||cc<=0||rc<0||rc>cc||cs<0||cs>.05||rs<0||rs>.05||!Number.isInteger(co)||!Number.isInteger(ro)||ro>co)throw Error("Captação, pedidos ou share inconsistentes. Nenhum valor salvo.");
+ await saveBenchmark({period,start_date:start,end_date:end,company_captured:cc,company_approved:num(company,ia),company_orders:co,company_share:cs,regional_captured:rc,regional_orders:ro,regional_share:rs});
+ if(status?.isConnected){status.className="execReadStatusV3 success";status.textContent="✅ Excel oficial de "+dia(start)+" a "+dia(end)+" importado. Totais consolidados atualizados.";}
+ }catch(err){if(status){status.className="execReadStatusV3 warning";status.textContent=String(err.message||err);}}
+ finally{if(ev?.target)ev.target.value="";}
 }
 async function readPrint(ev){
  const file=ev?.target?.files?.[0],status=document.getElementById("exOcrStatusV1");
@@ -793,6 +826,7 @@ w.execBenchmarkReviewV3=benchmarkReviewV3;
 w.execShowAdminV1=showAdmin;
 w.execSaveBenchmarkV1=saveBenchmark;
 w.execReadPrintV1=readPrint;
+w.execReadExcelV1=readExcel;
 w.execShareV1=shareCard;
 w.execShareCaptionV1=caption;
 w.execToggleStoresV2=toggleStores;
