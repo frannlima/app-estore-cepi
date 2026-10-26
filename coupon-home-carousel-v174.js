@@ -102,6 +102,60 @@ function checkDay(){
   try{window.homeSlideV34?.(0)}catch(_){}
  }
 }
+
+/* CE+PI | integração da vitrine com o bloco Cupons e benefícios | v175 */
+function secondaryPromoCard175(p){
+ const rule=p.until?'Até '+pretty(p.until):'Sujeito a disponibilidade';
+ const disclaimer=p.kind==='retira'
+  ?'Modalidade Retira/BOPIS: não comissionável; fora da venda eStore.'
+  :'Cupom de outro canal: confirmar elegibilidade na sacola do eStore.';
+ return '<article class="ecpSecondaryCard175">'+
+  '<div class="ecpSecondaryCode175"><strong>'+escapeHtml(p.code||p.offer)+'</strong><small>'+escapeHtml(p.offer)+'</small></div>'+
+  '<div class="ecpSecondaryInfo175"><b>'+escapeHtml(p.title)+'</b><p>'+escapeHtml(p.detail)+'</p>'+
+  '<small>'+escapeHtml(p.channel)+' • '+escapeHtml(rule)+'</small>'+
+  '<em>'+escapeHtml(disclaimer)+'</em></div></article>';
+}
+function syncCouponPanels175(){
+ const active=PROMOS.filter(p=>p.kind!=='estore'&&current(p));
+ const stamp=today()+'|'+active.map(p=>p.id).join(',');
+ const headings=[...document.querySelectorAll('h1,h2,h3,h4,h5,h6,.ccTitleV38,[class*="Title"],[class*="title"],strong,b')]
+  .filter(n=>n.textContent.trim().toLocaleLowerCase('pt-BR')==='cupons e benefícios');
+ for(const heading of headings){
+  let container=heading.parentElement;
+  for(let depth=0;container&&depth<9;depth++,container=container.parentElement){
+   const text=container.textContent||'';
+   if(text.length>14000)break;
+   if(!text.includes('ESTORE10')||!text.includes('ESTORE20'))continue;
+   // Quando a tela já usa o catálogo atualizado, não acrescentar uma lista duplicada.
+   if(text.includes('Outras ofertas vigentes'))break;
+   const existing=container.querySelector('.ecpLinkedCoupons175');
+   if(existing&&existing.dataset.ecpStamp===stamp)break;
+   if(existing)existing.remove();
+   const cards=active.map(secondaryPromoCard175).join('');
+   const html='<section class="ecpLinkedCoupons175" data-ecp-stamp="'+escapeHtml(stamp)+'" aria-label="Cupons e promoções vigentes">'+
+     '<h3>Outras ofertas vigentes</h3>'+
+     '<p class="ecpSecondaryLead175">Confira os destaques do carrossel. Benefícios de outros canais não têm aplicação garantida no eStore.</p>'+
+     (cards?'<div class="ecpSecondaryGrid175">'+cards+'</div>':'<p>Nenhuma outra oferta está dentro da validade hoje.</p>')+
+     '<a class="ecpSecondaryRules175" href="'+escapeHtml(SOURCE)+'" target="_blank" rel="noopener noreferrer">Consultar regulamentos oficiais ↗</a>'+
+     '</section>';
+   container.insertAdjacentHTML('beforeend',html);
+   break;
+  }
+ }
+}
+let couponSyncPending175=false;
+function scheduleCouponSync175(){
+ if(couponSyncPending175)return;
+ couponSyncPending175=true;
+ setTimeout(()=>{couponSyncPending175=false;syncCouponPanels175();},180);
+}
+function observeCouponViews175(){
+ if(!document.body||document.body.dataset.ecpCouponsObserver175)return;
+ document.body.dataset.ecpCouponsObserver175='1';
+ new MutationObserver(scheduleCouponSync175).observe(document.body,{childList:true,subtree:true});
+ scheduleCouponSync175();
+}
+
 function bootstrap(){
  if(typeof window.initHomeV34==='function'&&!window.initHomeV34.__ecp174){
   const original=window.initHomeV34;
@@ -114,8 +168,9 @@ function bootstrap(){
   wrap.__ecp174=true;window.homeSlideV34=homeSlideV34=wrap;
  }
  install();
+ observeCouponViews175();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bootstrap,{once:true});else bootstrap();
 [400,1200,3000].forEach(t=>setTimeout(bootstrap,t));
-setInterval(()=>{checkDay();if(document.getElementById('campaignHeroV34'))install();},60000);
+setInterval(()=>{checkDay();if(document.getElementById('campaignHeroV34'))install();scheduleCouponSync175();},60000);
 })();
