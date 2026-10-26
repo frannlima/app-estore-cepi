@@ -34,3 +34,22 @@
  #campaignHeroV34 .ecpMain174 h2{margin:7px 0!important}
 }
 @media(prefers-reduced-motion:reduce){#campaignHeroV34 .ecpPromoPhoto174{transition:none!important}}
+
+
+/* Menus de cupons: as duas ofertas fixas continuam no topo; demais seguem a vigência da Home. */
+.ecpLinkedCoupons175{margin:18px 0 0;padding:18px 0 2px;border-top:1px solid #dfdfd4;width:100%;min-width:0;box-sizing:border-box;color:#183f34}
+.ecpLinkedCoupons175 h3{font-size:clamp(18px,4.5vw,23px);line-height:1.25;margin:0 0 8px;font-weight:850;color:#173f35}
+.ecpLinkedCoupons175 .ecpSecondaryLead175{font-size:13px;line-height:1.5;margin:0 0 14px;color:#52625b}
+.ecpSecondaryGrid175{display:grid;grid-template-columns:1fr;gap:10px}
+.ecpSecondaryCard175{display:grid;grid-template-columns:minmax(110px,39%) minmax(0,61%);border-radius:18px;overflow:hidden;background:#f6edd9;border:1px solid #eee7d9;min-width:0;box-shadow:0 3px 9px #173f3510}
+.ecpSecondaryCode175{display:flex;flex-direction:column;justify-content:center;gap:3px;background:#184538;color:#fff;padding:16px 10px;min-width:0;overflow-wrap:anywhere}
+.ecpSecondaryCode175 strong{font-weight:900;font-size:clamp(15px,4.5vw,21px);line-height:1.13;overflow-wrap:anywhere}
+.ecpSecondaryCode175 small{font-size:12px;color:#f5d889;font-weight:800}
+.ecpSecondaryInfo175{padding:12px 13px;display:flex;flex-direction:column;justify-content:center;gap:6px;min-width:0}
+.ecpSecondaryInfo175 b{font-size:13px;line-height:1.25;color:#173f35}
+.ecpSecondaryInfo175 p{font-size:12px!important;line-height:1.4!important;color:#3f5148!important;margin:0!important}
+.ecpSecondaryInfo175 small{font-size:11px;color:#596960;font-weight:750;line-height:1.35}
+.ecpSecondaryInfo175 em{font-size:10px;color:#79643a;font-style:normal;line-height:1.35}
+.ecpSecondaryRules175{display:inline-block;color:#173f35;text-decoration:underline;font-size:12px;font-weight:750;margin:15px 0 2px}
+@media(min-width:780px){.ecpSecondaryGrid175{grid-template-columns:repeat(2,minmax(0,1fr))}.ecpSecondaryCode175 strong{font-size:18px}}
+@media(max-width:360px){.ecpSecondaryCard175{grid-template-columns:minmax(98px,38%) minmax(0,62%)}.ecpSecondaryCode175{padding:12px 8px}.ecpSecondaryCode175 strong{font-size:15px}.ecpSecondaryInfo175{padding:10px}.ecpSecondaryInfo175 p{font-size:11px!important}}
