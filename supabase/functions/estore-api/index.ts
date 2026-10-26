@@ -748,6 +748,12 @@ async function fcaWeekMetrics(start:string,end:string,state:any){
   if(weeklyHistoryError)throw weeklyHistoryError;
   const weeklyHistoryMap=new Map((weeklyHistory||[]).filter((x:any)=>REGIONAL.has(String(x.store_code))).map((x:any)=>[String(x.store_code),x]));
   const weeklyRegional=(weeklyHistory||[]).find((x:any)=>String(x.store_code)==="REGIONAL")||null;
+  // Fonte única: benchmark gerencial homologado do mesmo intervalo. Nunca reutilizar snapshot anterior.
+  const {data:benchmarkRows,error:benchmarkError}=await db.from("estore_executive_benchmark")
+    .select("period,start_date,end_date,regional_captured,regional_orders,regional_share")
+    .eq("period","week").eq("start_date",start).eq("end_date",end).limit(1);
+  if(benchmarkError)throw benchmarkError;
+  const officialBenchmark:any=(benchmarkRows||[])[0]||null;
 
   const baselineWeek=weekStartOf(BASELINE);
   if(start===baselineWeek && start<=BASELINE && end>=BASELINE){
@@ -881,6 +887,17 @@ async function fcaWeekMetrics(start:string,end:string,state:any){
     regionalCaptured=n(weeklyRegional.captured);
     regionalOrders=Math.trunc(n(weeklyRegional.orders));
     regionalShare=n(weeklyRegional.share);
+  }
+  // Mesma fonte oficial do Painel Executivo para o intervalo EXATO de importação.
+  // O benchmark substitui somente o consolidado regional; os dados individuais
+  // continuam auditáveis e não são fabricados a partir de um total agregado.
+  if(officialBenchmark){
+    const cap=Number(officialBenchmark.regional_captured);
+    const orders=Number(officialBenchmark.regional_orders);
+    const share=Number(officialBenchmark.regional_share);
+    if(Number.isFinite(cap)&&cap>=0)regionalCaptured=cap;
+    if(Number.isFinite(orders)&&orders>=0)regionalOrders=Math.trunc(orders);
+    if(Number.isFinite(share)&&share>=0&&share<=0.05)regionalShare=share;
   }
   return {
     start,end,stores:rows,
@@ -1019,6 +1036,116 @@ async function fcaWeeklyData(matricula:string){
       supervisors:supervisorByStore.get(st)||[],source:cur.source||closed.source
     });
   }
+
+  // FCA_BREVE_SEMANAL_V240: dados oficiais por filial, frentes, reincidência e dias sem venda.
+  // Nunca considerar ausência de dados como zero, nem somar percentuais de bases diferentes.
+  const {data:briefHistory,error:briefHistoryError}=await db.from("estore_weekly_history")
+    .select("week_start,store_code,share,orders,captured,ticket")
+    .gte("week_start",addIsoDays(closedWeekStart,-84))
+    .lte("week_start",closedWeekStart)
+    .order("week_start",{ascending:true});
+  if(briefHistoryError)throw briefHistoryError;
+  const historyByWeek=new Map<string,Map<string,any>>();
+  for(const row of briefHistory||[]){
+    const week=String(row.week_start),st=String(row.store_code).padStart(3,"0");
+    if(!REGIONAL.has(st))continue;
+    if(!historyByWeek.has(week))historyByWeek.set(week,new Map());
+    historyByWeek.get(week)!.set(st,row);
+  }
+  const priorTop5=new Map<string,Set<string>>();
+  for(const [week,weekRows] of historyByWeek){
+    const prior=historyByWeek.get(addIsoDays(week,-7));
+    if(!prior)continue;
+    const comparable=[...REGIONAL].map(st=>{
+      const a=weekRows.get(st),b=prior.get(st);
+      return a&&b&&n(b.share)>0&&Number.isFinite(Number(a.share))&&Number.isFinite(Number(b.share))
+        ? {st,delta:n(a.share)-n(b.share)}:null;
+    }).filter((v:any)=>v!==null);
+    if(comparable.length<18)continue;
+    priorTop5.set(week,new Set(comparable.filter((v:any)=>v.delta<0)
+      .sort((a:any,b:any)=>a.delta-b.delta||a.st.localeCompare(b.st))
+      .slice(0,5).map((v:any)=>v.st)));
+  }
+  const prevSales=new Map<string,Set<string>>(),prevSeenStores=new Set<string>();
+  for(let from=0;;from+=500){
+    const {data:chunk,error}=await db.from("daily_collaborator")
+      .select("matricula,store_code,captured")
+      .gte("date",previousWeekStart).lte("date",previousWeekEnd)
+      .range(from,from+499);
+    if(error)throw error;
+    for(const r of chunk||[]){
+      const st=String(r.store_code||"").padStart(3,"0"),id=String(r.matricula||"").trim();
+      if(!REGIONAL.has(st)||!id)continue;
+      prevSeenStores.add(st);
+      if(n(r.captured)<=0)continue;
+      if(!prevSales.has(st))prevSales.set(st,new Set());
+      prevSales.get(st)!.add(id);
+    }
+    if(!chunk||chunk.length<500)break;
+  }
+  const {data:briefDaily,error:briefDailyError}=await db.from("daily_updates")
+    .select("result_date,management,management_mode")
+    .gte("result_date",closedWeekStart).lte("result_date",closedWeekEnd)
+    .order("result_date",{ascending:true});
+  if(briefDailyError)throw briefDailyError;
+  const dailyByStore=new Map<string,Map<string,{captured:number,meta:number}>>();
+  for(const day of briefDaily||[]){
+    if(String(day.management_mode||"daily")!=="daily")continue;
+    for(const r of day.management||[]){
+      const st=String(r.st||"").padStart(3,"0");
+      if(!REGIONAL.has(st))continue;
+      if(!dailyByStore.has(st))dailyByStore.set(st,new Map());
+      // meta1 é a meta financeira eStore importada do gerencial diário.
+      dailyByStore.get(st)!.set(String(day.result_date),{captured:n(r.c),meta:n(r.meta1)});
+    }
+  }
+  const personById=new Map((people||[]).map((p:any)=>[String(p.matricula),p]));
+  function briefArea(id:string){
+    const role=String(personById.get(id)?.cargo||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+    return /caixa|atendimento|balcao|balcoes|servic|solucoes|credi|financeir|administrativ/.test(role)
+      ?"caixa_atendimento":"operacoes";
+  }
+  for(const x of stores){
+    const roster=[...(rosterByStore.get(x.st)||new Set<string>())],sold=soldByStore.get(x.st)||new Set<string>();
+    const grouped={operacoes:[] as string[],caixa_atendimento:[] as string[]};
+    for(const id of roster)grouped[briefArea(id) as "operacoes"|"caixa_atendimento"].push(id);
+    const groupStats=(ids:string[])=>{
+      const total=ids.length,active=ids.filter(id=>sold.has(id)).length,zero=total-active;
+      return {total,active,zero,rate:total?+(zero/total).toFixed(10):null};
+    };
+    x.dispersion_by_front={operacoes:groupStats(grouped.operacoes),caixa_atendimento:groupStats(grouped.caixa_atendimento)};
+    x.active_sellers=roster.filter(id=>sold.has(id)).length;
+    x.zero_sellers=x.zeros;
+    const priorOrders=historyByWeek.get(previousWeekStart)?.get(x.st);
+    x.previous_orders=priorOrders?Math.trunc(n(priorOrders.orders)):null;
+    x.orders_delta=x.previous_orders===null?null:x.orders-x.previous_orders;
+    const prevSold=prevSales.get(x.st)||new Set<string>();
+    const confirmedPrev=prevSeenStores.has(x.st)||(priorOrders&&Math.trunc(n(priorOrders.orders))===0);
+    x.previous_zero_sellers=confirmedPrev?Math.max(0,roster.length-roster.filter(id=>prevSold.has(id)).length):null;
+    x.zero_sellers_delta=x.previous_zero_sellers===null?null:x.zero_sellers-x.previous_zero_sellers;
+    const available=dailyByStore.get(x.st)||new Map<string,{captured:number,meta:number}>();
+    const operationalDates=Array.from({length:7},(_,i)=>addIsoDays(closedWeekStart,i))
+      .filter(date=>!(["084","113","146"].includes(x.st)&&new Date(date+"T12:00:00Z").getUTCDay()===0));
+    const evidence=operationalDates.flatMap(date=>{const r=available.get(date);return r?[{date,...r}]:[]});
+    const zeroDays=evidence.filter(r=>r.captured===0&&r.meta>0).sort((a,b)=>b.meta-a.meta||a.date.localeCompare(b.date));
+    x.zero_days=evidence.length===operationalDates.length?zeroDays.length:null;
+    x.zero_days_observed=evidence.length;
+    x.zero_days_expected=operationalDates.length;
+    x.biggest_zero_day=x.zero_days!==null?(zeroDays[0]?.date||null):null;
+    x.biggest_zero_meta=x.zero_days!==null?(zeroDays[0]?.meta||null):null;
+    let cursor=previousWeekStart,previousStreak=0,historyVerified=true;
+    for(let i=0;i<10;i++){
+      const top=priorTop5.get(cursor);
+      if(!top){historyVerified=false;break}
+      if(!top.has(x.st))break;
+      previousStreak++;
+      cursor=addIsoDays(cursor,-7);
+    }
+    x.priority_consecutive_weeks=1+previousStreak;
+    x.priority_history_verified=historyVerified||previousStreak>0;
+    x.priority_history_limit=previousStreak>=10;
+  }
+
   const regionalCaptured=stores.reduce((s,x)=>s+n(x.captured),0);
   const regionalRoster=stores.reduce((s,x)=>s+n(x.total),0),regionalZeros=stores.reduce((s,x)=>s+n(x.zeros),0);
   const criticalZeroCollaborators=stores.reduce((s,x)=>s+n(x.zero_over3),0);
