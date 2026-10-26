@@ -1152,7 +1152,9 @@ async function fcaWeeklyData(matricula:string){
   const regionalDispersion=regionalRoster>0?regionalZeros/regionalRoster:0;
   for(const x of stores)x.participation=regionalCaptured>0?n(x.captured)/regionalCaptured:0;
 
-  const dataReady=latestData>=closedWeekEnd;
+  // Gerencial semanal homologado também encerra o período: não exigir novo D-1 no domingo.
+  const officialWeeklyClose=Number(closed.coverage?.weekly_history_stores||0)>=18&&Number(previous.coverage?.weekly_history_stores||0)>=18&&!!closed.coverage?.regional_share_official&&!!previous.coverage?.regional_share_official;
+  const dataReady=latestData>=closedWeekEnd||officialWeeklyClose;
   const comparableCount=stores.filter(x=>x.has_verified_compare).length;
   // Não exigir que o share tenha sido importado manualmente quando há 7 dias de
   // gerencial com denominadores válidos. Exigir cobertura quase total evita falso Top 5.
