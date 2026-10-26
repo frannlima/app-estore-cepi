@@ -54,3 +54,11 @@
 }
 @media(max-width:355px){.fcaBriefButtonsV240{grid-template-columns:1fr}.fcaBriefMetricV240 em{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.fcaBriefOverlayV240{scroll-behavior:auto}}
+
+
+/* A lista compacta mantém o CTA visível sem cortar indicadores em telas estreitas. */
+.fcaMiniRankV61 .fcaRankLineV61:has(.fcaSendBriefV240){grid-template-columns:27px minmax(0,1fr) auto;row-gap:8px}
+.fcaMiniRankV61 .fcaRankLineV61 .fcaSendBriefV240{grid-column:2/-1;justify-self:end;font-size:10px!important;white-space:nowrap;min-width:125px;padding:7px 9px!important}
+.fcaPriorityTopV61 .fcaRecurrenceV240{grid-column:2/3;justify-self:start;grid-row:2}
+.fcaPriorityTopV61 .fcaStatusV61{grid-column:3;grid-row:1}
+@media(max-width:410px){.fcaPriorityTopV61 h3{font-size:12px}.fcaMiniRankV61 .fcaRankLineV61 .fcaSendBriefV240{padding:6px 10px!important;min-width:118px}}
