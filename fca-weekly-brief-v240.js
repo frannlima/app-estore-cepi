@@ -260,8 +260,8 @@ window.fcaOpenBriefV240=function(st){
 };
 let deepLinkUsed=false;
 function deepLink(){
- const qs=new URLSearchParams(location.search),st=qs.get("fca_store"),wk=qs.get("fca_week");
- if(deepLinkUsed||!st||!wk||!/^\d{3}$/.test(st)||!/^\d{4}-\d{2}-\d{2}$/.test(wk))return;
+ const qs=new URLSearchParams(location.search),st=qs.get("fca_store"),wk=qs.get("fca_week"),direct=qs.get("fca")==="priority";
+ if(deepLinkUsed||(!direct&&(!st||!wk||!/^\d{3}$/.test(st)||!/^\d{4}-\d{2}-\d{2}$/.test(wk))))return;
  if(typeof U!=="undefined"&&U?.u&&typeof go==="function"&&document.getElementById("view")){
   deepLinkUsed=true;go("fca");
  }
