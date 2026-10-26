@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v242-fca-direct';
-const BUILD='v242-fca-direct';
+const CACHE='estore-cepi-shell-v243-fca-visible';
+const BUILD='v243-fca-visible';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
