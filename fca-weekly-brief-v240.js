@@ -255,6 +255,8 @@ window.fcaOpenBriefV240=function(st){
  root.addEventListener("change",function(ev){if(ev.target.matches('input[name="fcaBriefPersonV240"]')){selected=ev.target.value;updateMessage();}});
  escapeHandler=ev=>{if(ev.key==="Escape")close()};document.addEventListener("keydown",escapeHandler);
  root.querySelector(".fcaBriefDialogV240")?.scrollTo(0,0);
+ // O botão Enviar FCA já consulta diretamente os contatos autorizados da filial.
+ if(d.ctx?.admin===true&&String(d.ctx.id)!=="0000000")getContacts();
 };
 let deepLinkUsed=false;
 function deepLink(){
