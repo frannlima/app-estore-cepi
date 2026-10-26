@@ -3146,10 +3146,60 @@ window.deletePopupV72=async function(id){
     '</div></section>';
   }
   function main75(){return hero75()+info75()+prizePanel75()+'<button class="share75" onclick="shareCampaign75()">↗ <b>Compartilhar campanha</b></button>'}
+  // Exibir no menu o mesmo catálogo vigente do carrossel inicial (sem novo input).
+  let lastCouponDay75='';
+  const couponIsoDay75=()=>{
+    const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Fortaleza',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+    const v=t=>parts.find(p=>p.type===t)?.value||'';
+    return [v('year'),v('month'),v('day')].join('-');
+  };
   function coupon75(){
-    const a=coupons75();
-    return '<section class="simplePanel75"><h3>Cupons e benefícios</h3>'+(a.length?a.map(x=>'<article class="coupon75"><div><b>'+esc75(x.code||x.title||'CUPOM')+'</b><span>'+esc75(x.title||'')+'</span></div><p>'+esc75(x.description||x.text||'')+'</p></article>').join(''):'<p class="empty75">Nenhum cupom ativo neste período.</p>')+'</section>';
+    const day=couponIsoDay75();
+    lastCouponDay75=day;
+    const fixed=[
+      {code:'ESTORE10',title:'10% de desconto',description:'10% de desconto para compras recorrentes pelo eStore. Não cumulativo.',channel:'eStore',kind:'estore'},
+      {code:'ESTORE20',title:'20% na primeira compra pelo App',description:'20% de desconto na primeira compra pelo App Riachuelo. Não cumulativo.',channel:'eStore',kind:'estore'}
+    ];
+    const allPromos=Array.isArray(window.ESTORE_PROMOS_CATALOG_V174?.promos)?window.ESTORE_PROMOS_CATALOG_V174.promos:[];
+    const within=p=>(!p.from||String(p.from).slice(0,10)<=day)&&(!p.until||String(p.until).slice(0,10)>=day);
+    const promotions=allPromos.filter(p=>p.kind!=='estore'&&within(p)).map(p=>({
+      code:p.code||p.offer,title:p.title,description:p.detail,offer:p.offer,channel:p.channel,
+      until:p.until||'',kind:p.kind||'official',noCode:!p.code
+    }));
+    const seen=new Set([...fixed,...promotions].map(p=>String(p.code||'').toUpperCase()));
+    const admin=coupons75().filter(p=>{
+      const code=String(p.code||p.title||'').toUpperCase();
+      if(seen.has(code))return false;
+      seen.add(code);
+      return true;
+    }).map(p=>({...p,until:String(p.end_at||p.end||'').slice(0,10),channel:'Oferta cadastrada no app',kind:'admin'}));
+    const render=p=>{
+      const isEstore=p.kind==='estore';
+      const category=p.kind==='retira'?'Fora da venda eStore':isEstore?'Cupom fixo eStore':p.kind==='admin'?'Informação cadastrada no app':'Validar canal eStore';
+      const expiry=p.until?'<small>Vigência até '+esc75(date75(p.until))+'</small>':'';
+      const channel=p.channel?'<small>'+esc75(p.channel)+'</small>':'';
+      const restriction=p.kind==='retira'
+        ?'Não comissionável; pedidos Retira/BOPIS não integram a venda eStore.'
+        :isEstore?'Sujeito à elegibilidade no fechamento do pedido.'
+        :'Oferta de outro canal. Confira no carrinho se é aceita no eStore.';
+      return '<article class="coupon75 couponUnifiedCard75'+(isEstore?' couponFixed75':' couponExtra75')+'">'+
+        '<div><b>'+esc75(p.code||p.title||'OFERTA')+'</b><span>'+esc75(p.offer||p.title||'')+'</span><small>'+esc75(category)+'</small></div>'+
+        '<section class="couponUnifiedInfo75"><strong>'+esc75(p.title||'')+'</strong><p>'+esc75(p.description||p.text||'')+'</p>'+
+        channel+expiry+'<em>'+esc75(restriction)+'</em></section></article>';
+    };
+    return '<section class="simplePanel75 couponUnified75" data-coupon-day="'+esc75(day)+'">'+
+      '<h3>Cupons e benefícios</h3><h4>Cupons fixos eStore</h4>'+
+      fixed.map(render).join('')+
+      '<h4>Outros cupons e ofertas vigentes</h4>'+
+      '<p class="couponExplanation75">Ofertas do carrossel inicial, sujeitas a estoque, validade e regras do canal de compra.</p>'+
+      ([...promotions,...admin].length?[...promotions,...admin].map(render).join(''):'<p class="empty75">Nenhuma outra oferta dentro da validade nesta data.</p>')+
+      '<a class="couponOfficialLink75" href="https://blog.riachuelo.com.br/promocoes-e-regulamentos/" target="_blank" rel="noopener noreferrer">Ver regulamentos oficiais ↗</a></section>';
   }
+  setInterval(()=>{
+    if(TAB75==='coupons'&&document.querySelector('.campaignPage75 .couponUnified75')&&lastCouponDay75!==couponIsoDay75()){
+      if(typeof go==='function')go('campaigns');
+    }
+  },60000);
   function prizes75(){return prizePanel75()+'<button class="share75" onclick="shareCampaign75()">↗ <b>Compartilhar campanha</b></button>'}
   function sell75(){
     const t=[['01','Amplie as possibilidades','Quando não tiver tamanho, cor ou produto, use o eStore para não perder a venda.'],['02','Apresente os benefícios','Reforce frete grátis, parcelamento e cupons ativos.'],['03','Use o App com o cliente','Pesquise o produto e conduza a compra de forma simples.'],['04','Transforme objeção em solução','Prazo, variedade e disponibilidade podem fechar a venda.']];
@@ -6575,8 +6625,8 @@ window.uploadHistoricalTicketsV97=async function(){
 <script src="./campaign-partial-v158.js?build=v170"></script>
 <script src="./campaign-integration-v168.js?build=v168"></script>
 <!-- CUPONS-OFICIAIS-ESTORE-CARROSSEL-V174 -->
-<link rel="stylesheet" href="./coupon-home-carousel-v174.css?build=v174">
-<script src="./coupon-home-carousel-v174.js?build=v174"></script>
+<link rel="stylesheet" href="./coupon-home-carousel-v174.css?build=v176">
+<script src="./coupon-home-carousel-v174.js?build=v176"></script>
 <link rel="stylesheet" href="./alert-center.css?build=20261020"><script type="module" src="./alert-center.js?build=v201"></script>
 <script src="./executive-panel-v1.js?build=v188"></script>
 <!-- HORA-A-HORA-LIVE-V200: carregamento direto, independente do Service Worker -->
