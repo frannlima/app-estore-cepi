@@ -21,6 +21,7 @@ const PROMOS=[
 {id:'combo',offer:'COMBOS',title:'Mais peças, mais economia',detail:'Itens selecionados: 3 por R$ 119,99; 2 por R$ 139,99; ou 2 por R$ 199,99.',until:'2027-01-31',channel:'Site e App • itens selecionados',badge:'PROMOÇÃO'},
 {id:'segunda',offer:'50% NA 2ª PEÇA',title:'Monte uma combinação',detail:'Desconto na peça de menor valor entre itens selecionados; limite total do pedido de 40%.',until:'2027-02-01',channel:'Site e App • itens selecionados',badge:'PROMOÇÃO'}
 ];
+window.ESTORE_PROMOS_CATALOG_V174={promos:PROMOS,source:SOURCE};
 const escapeHtml=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Fortaleza',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
 const pretty=d=>d?d.slice(8)+'/'+d.slice(5,7)+'/'+d.slice(0,4):'Sem data fixa';
