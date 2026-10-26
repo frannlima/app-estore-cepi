@@ -1993,9 +1993,14 @@ function couponCardV38(x){
   return '<div class="ccCouponV38"><div class="ccCouponCodeV38"><b>'+code+'</b><span>'+title+'</span></div><div class="ccCouponRulesV38"><span>● '+desc+'</span><span>● Não acumula com outros cupons</span>'+(x.end_at?'<small>Válido até '+new Date(x.end_at+'T12:00:00').toLocaleDateString('pt-BR')+'</small>':'')+'</div></div>';
 }
 function couponsV38(){
-  const a=activeCouponsV38();
+  const fixed=[{code:'ESTORE20',title:'20% na primeira compra pelo App',description:'Benefício fixo eStore • sujeito à elegibilidade no fechamento.'},{code:'ESTORE10',title:'10% para compras recorrentes',description:'Benefício fixo eStore • sujeito à elegibilidade no fechamento.'}];
+  const today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Fortaleza',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  const catalog=window.ESTORE_PROMOS_CATALOG_V174?.promos||[];
+  const valid=p=>(!p.from||p.from<=today)&&(!p.until||p.until>=today);
+  const extras=catalog.filter(p=>p.kind!=='estore'&&valid(p)).map(p=>({code:p.code||p.title,title:p.offer+' • '+p.title,description:p.detail+' | '+p.channel+(p.kind==='retira'?' • Não comissionável; não utilizar como venda eStore.':' • Confirmar elegibilidade no canal eStore.'),end_at:p.until||undefined}));
+  const a=[...fixed,...extras,...activeCouponsV38().filter(x=>!fixed.some(f=>f.code===x.code)&&!extras.some(e=>e.code===x.code))];
   return '<div class="ccTitleV38">Cupons e benefícios</div>'+
-    (a.length?a.map(couponCardV38).join(''):'<div class="ccEmptyV38"><b>Nenhum cupom ativo.</b><span>Os cupons aparecem conforme a vigência definida no ADM.</span></div>')+
+    '<div class="ccTitleV38">Cupons fixos eStore</div>'+a.slice(0,2).map(couponCardV38).join('')+'<div class="ccTitleV38">Outras ofertas vigentes • conferir elegibilidade</div>'+ (a.length>2?a.slice(2).map(couponCardV38).join(''):'<div class="ccEmptyV38"><b>Nenhum cupom ativo.</b><span>Os cupons aparecem conforme a vigência definida no ADM.</span></div>')+
     '<div class="ccTitleV38">Regras importantes</div>'+
     '<div class="ccRulesGridV38"><div><b>🚚</b><span>Frete grátis</span></div><div><b>▭</b><span>10x sem juros</span></div><div><b>♧</b><span>Não acumula cupons</span></div><div><b>▥</b><span>Não vender pelo eStore o que há em loja</span></div></div>'+
     '<div class="ccSellBannerV38"><div><b>Mais possibilidades para o seu cliente</b><span>Quando não tiver o produto em loja, ofereça pelo eStore.</span><button onclick="setCcTabV38(\'sell\')">Acesse e venda</button></div><div>🛒</div></div>'+
