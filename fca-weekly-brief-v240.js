@@ -153,11 +153,11 @@ function wrapText(ctx,value,maxWidth){
  for(const w of words){const next=line?line+" "+w:w;if(ctx.measureText(next).width<=maxWidth)line=next;else{if(line)out.push(line);line=w}}
  if(line)out.push(line);return out;
 }
-function makeCard(x,d){
+async function makeCard(x,d){
  const cv=document.createElement("canvas"),ctx=cv.getContext("2d");
  cv.width=1080;cv.height=1530;
  const G="#173F35",P="#F7F5EF",GOLD="#F5C264",BEIGE="#FFF9ED",RED="#C43B32";
- function rect(px,py,w,h,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(px,py,w,h,r);ctx.fill()}
+ function rect(px,py,w,h,r,color){ctx.fillStyle=color;ctx.beginPath();if(ctx.roundRect)ctx.roundRect(px,py,w,h,r);else ctx.rect(px,py,w,h);ctx.fill()}
  function t(value,px,py,size,color=G,bold=false){ctx.fillStyle=color;ctx.font=(bold?"bold ":"")+size+"px Arial, sans-serif";ctx.fillText(String(value),px,py)}
  function box(label,value,delta,xx,yy,wide=false){
   rect(xx,yy,wide?984:474,178,23,BEIGE);
@@ -168,7 +168,11 @@ function makeCard(x,d){
   lines.forEach((line,k)=>t(line,xx+24,yy+131+k*22,18,negative(delta)?RED:"#465D56"));
  }
  ctx.fillStyle=P;ctx.fillRect(0,0,1080,1530);
- rect(24,24,1032,175,28,G);t("eStore CE+PI   •   FCA SEMANAL",58,85,31,GOLD,true);
+ rect(24,24,1032,175,28,G);
+ const logo=new Image();logo.src=new URL("./assets/riachuelo-logo-horizontal-oficial-white-v133.svg",location.href).href;
+ try{await logo.decode()}catch(_){}
+ if(logo.complete&&logo.naturalWidth){ctx.drawImage(logo,58,47,234,37);}else{t("Riachuelo",58,83,27,"#FFFFFF",true);}
+ t("eStore CE+PI   •   FCA SEMANAL",355,85,28,GOLD,true);
  t("Filial "+stCode(x.st)+" — "+nameStore(x),58,139,32,"#FFFFFF",true);
  t("Sem. "+d.weekNumber+" vs "+d.previousWeekNumber+"  •  "+prettyDay(d.weekStart)+" a "+prettyDay(d.weekEnd),58,177,20,"#DFEDE7");
  if(recurring(x)){rect(35,215,1010,62,16,"#FFE7C0");t(recurring(x),53,254,22,"#9D3C25",true)}
@@ -199,7 +203,7 @@ async function nativeShare(){
  if(sending||!readyForSend())return;
  sending=true;notice("Preparando dashboard FCA para compartilhar...");
  try{
-  const x=current,d=data(),person=currentContact(),message=makeText(x,d,person),canvas=makeCard(x,d);
+  const x=current,d=data(),person=currentContact(),message=makeText(x,d,person),canvas=await makeCard(x,d);
   const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png"));
   if(!blob)throw Error("Não foi possível gerar a imagem.");
   const file=new File([blob],"FCA_L"+stCode(x.st)+"_SEM"+d.weekNumber+".png",{type:"image/png"});
@@ -226,9 +230,9 @@ async function copyMessage(){
  if(!current)return;
  try{await navigator.clipboard.writeText(makeText(current,data(),currentContact()));notice("Mensagem FCA copiada.")}catch(e){notice("Não foi possível copiar automaticamente.");}
 }
-function previewCard(){
+async function previewCard(){
  if(!current)return;
- const canvas=makeCard(current,data());const root=document.getElementById("fcaBriefNoticeV240");
+ const canvas=await makeCard(current,data());const root=document.getElementById("fcaBriefNoticeV240");
  if(root){root.innerHTML='<p>Prévia do card dashboard:</p><img alt="Card FCA da filial" style="max-width:100%;height:auto;border-radius:12px" src="'+canvas.toDataURL("image/png")+'">';}
 }
 window.fcaOpenBriefV240=function(st){
