@@ -126,11 +126,11 @@ function syncCouponPanels175(){
    const text=container.textContent||'';
    if(text.length>14000)break;
    if(!text.includes('ESTORE10')||!text.includes('ESTORE20'))continue;
-   // Quando a tela já usa o catálogo atualizado, não acrescentar uma lista duplicada.
-   if(text.includes('Outras ofertas vigentes'))break;
+   // Atualizar ofertas vencidas mesmo quando o usuário mantém esta tela aberta.
    const existing=container.querySelector('.ecpLinkedCoupons175');
    if(existing&&existing.dataset.ecpStamp===stamp)break;
    if(existing)existing.remove();
+   else if(text.includes('Outras ofertas vigentes'))break;
    const cards=active.map(secondaryPromoCard175).join('');
    const html='<section class="ecpLinkedCoupons175" data-ecp-stamp="'+escapeHtml(stamp)+'" aria-label="Cupons e promoções vigentes">'+
      '<h3>Outras ofertas vigentes</h3>'+
