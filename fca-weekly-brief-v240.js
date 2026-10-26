@@ -42,10 +42,17 @@ function recurring(x){
  const w=num(x.priority_consecutive_weeks);
  return w!==null&&w>=2&&x.priority_history_verified!==false?"📡 "+count(w)+"ª semana consecutiva entre as priorizadas por retração do share.":"";
 }
+// Saudação dinâmica, baseada no horário local de Fortaleza no momento do compartilhamento.
+function greetingFcaV244(now=new Date()){
+ const hour=Number(new Intl.DateTimeFormat("en-GB",{
+  timeZone:"America/Fortaleza",hour:"2-digit",hourCycle:"h23"
+ }).format(now));
+ return hour>=5&&hour<12?"Bom dia":hour>=12&&hour<18?"Boa tarde":"Boa noite";
+}
 function makeText(x,d,person){
  const greet=person?String(person.name||"").trim().split(/\s+/)[0]:"";
  const op=x.dispersion_by_front?.operacoes||{},ca=x.dispersion_by_front?.caixa_atendimento||{};
- const first="Bom dia"+(greet?", "+greet:"")+"! Espero que esteja bem.";
+ const first=greetingFcaV244()+(greet?", "+greet:"")+"! Espero que esteja bem.";
  const lines=[
  "*FCA eSTORE | FILIAL "+stCode(x.st)+" • SEMANA "+String(d.weekNumber||"")+"*",
  "",
@@ -88,7 +95,7 @@ function modalHtml(x,d){
  (noHistory?'<p class="fcaBriefWarningV240">Share semanal ainda não homologado. Não enviar FCA sem comparação validada.</p>':'')+
  '<section class="fcaBriefStatsV240"><h3>Dashboard operacional da semana</h3><div class="fcaBriefGridV240">'+sum.map(kpiHtml).join('')+'</div>'+
  '<p class="fcaBriefFootnoteV240">Operações e Caixa/Atendimento usam percentuais calculados sobre o HC elegível de cada frente. A soma dos percentuais não representa o índice geral.</p></section>'+
- '<section class="fcaBriefTextAreaV240"><h3>Mensagem ao supervisor</h3><p>Bom dia! Espero que esteja bem. O resumo abaixo será personalizado com o nome do supervisor selecionado.</p><pre id="fcaBriefMessageV240">'+esc(makeText(x,d,null))+'</pre></section>'+
+ '<section class="fcaBriefTextAreaV240"><h3>Mensagem ao supervisor</h3><p>'+esc(greetingFcaV244())+'! Espero que esteja bem. O resumo abaixo será personalizado com o nome do supervisor selecionado.</p><pre id="fcaBriefMessageV240">'+esc(makeText(x,d,null))+'</pre></section>'+
  '<section class="fcaBriefContactsV240"><h3>Enviar FCA ao supervisor responsável</h3>'+
  '<p>O contato será usado somente quando cadastro, matrícula, telefone e autorização estiverem confirmados. Não existe disparo automático.</p>'+
  '<button class="fcaBriefPrimaryV240" type="button" data-fca-action="contacts">Consultar supervisores validados</button>'+
@@ -143,6 +150,7 @@ function updateMessage(){
  if(area&&current)area.textContent=makeText(current,data(),currentContact());
 }
 function readyForSend(){
+ updateMessage();
  if(!current||!data()?.comparisonReady||!current.has_verified_compare){notice("Não é possível enviar antes da comparação semanal homologada.");return false}
  if(!currentContact()){notice("Selecione um contato validado. Se a lista estiver vazia, atualize a Central de Alertas.");return false}
  if(!document.getElementById("fcaBriefConfirmV240")?.checked){notice("Confirme o expediente e a autorização antes do compartilhamento.");return false}
@@ -280,4 +288,5 @@ window.addEventListener("estore:fca-loaded",function(){
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",deepLink,{once:true});
 else deepLink();
 setInterval(deepLink,1800);
+setInterval(()=>{if(current&&document.getElementById("fcaBriefMessageV240"))updateMessage()},30000);
 })();
