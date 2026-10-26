@@ -1,0 +1,56 @@
+/* FCA semanal • Dashboard e compartilhamento por filial • V240 */
+.fcaPriorityActionsV61{display:flex;align-items:center;flex-wrap:wrap;gap:9px}
+.fcaPriorityActionsV61 .fcaSendBriefV240{border:1px solid #176746!important;background:linear-gradient(135deg,#13824e,#0b6541)!important;color:#fff!important;font-weight:850!important;min-width:140px}
+.fcaRecurrenceV240{display:inline-flex!important;align-items:center;gap:5px;margin-top:7px;padding:5px 10px;border-radius:999px;background:#fff3d7;color:#8b4c00;font-weight:850;font-size:11px;max-width:100%}
+.fcaRecurrenceV240.third{background:#fae6e5;color:#a4342e}
+.fcaBriefOverlayV240{position:fixed;inset:0;z-index:65000;overflow:auto;background:#041b17bb;backdrop-filter:blur(5px);padding:16px 10px max(32px,env(safe-area-inset-bottom));display:flex;justify-content:center;align-items:flex-start}
+.fcaBriefDialogV240{background:#f8f7f3;color:#173F35;width:min(790px,100%);border-radius:23px;box-shadow:0 25px 90px #00180f70;overflow:auto;max-height:calc(100dvh - 40px);padding-bottom:18px;box-sizing:border-box}
+.fcaBriefToolbarV240{position:sticky;top:0;z-index:5;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 18px;background:#fff;border-bottom:1px solid #e7e5dc}
+.fcaBriefToolbarV240 strong{font-size:15px;font-weight:900;letter-spacing:.01em}
+.fcaBriefToolbarV240 button{border:0;border-radius:50%;background:#e7ede8;color:#173f35;font-weight:850;font-size:26px;line-height:1;width:36px;height:36px;cursor:pointer}
+.fcaBriefHeadV240{background:linear-gradient(135deg,#173f35,#0c3029);color:#fff;padding:21px 19px 23px}
+.fcaBriefHeadV240>span{font-size:11px;font-weight:850;color:#f7c968;letter-spacing:.08em}
+.fcaBriefHeadV240 h2{margin:10px 0!important;font-size:clamp(22px,6vw,29px)!important;line-height:1.15!important;color:#fff!important}
+.fcaBriefHeadV240 p{font-size:13px!important;color:#dce9e3!important;margin:0!important;line-height:1.5!important}
+.fcaBriefRadarV240{border:1px solid #ffd993;background:#fff1d626;color:#ffd68a;border-radius:12px;font-size:13px;font-weight:850;margin-top:14px;padding:10px 12px}
+.fcaBriefWarningV240{margin:12px!important;padding:12px;background:#fff3e8;color:#9b3b29;border-radius:12px;font-size:13px}
+.fcaBriefStatsV240,.fcaBriefTextAreaV240,.fcaBriefContactsV240{margin:14px 14px 0;padding:15px;border-radius:18px;background:#fff;box-shadow:0 4px 16px #173F3509}
+.fcaBriefStatsV240 h3,.fcaBriefTextAreaV240 h3,.fcaBriefContactsV240 h3{font-size:17px;color:#173f35;font-weight:850;line-height:1.3;margin:0 0 13px}
+.fcaBriefGridV240{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.fcaBriefMetricV240{display:flex;flex-direction:column;gap:4px;min-width:0;padding:13px 12px;border-radius:14px;background:#f7f0e3;box-sizing:border-box}
+.fcaBriefMetricV240 small{font-size:11px;line-height:1.25;color:#536a60}
+.fcaBriefMetricV240 strong{font-size:clamp(17px,4.6vw,25px);font-weight:950;line-height:1.1;color:#173f35;overflow-wrap:anywhere}
+.fcaBriefMetricV240 span{font-size:10px;color:#6c766a;line-height:1.3}
+.fcaBriefMetricV240 em{font-size:11px;font-weight:850;font-style:normal;color:#9b3b29;line-height:1.4;overflow-wrap:anywhere}
+.fcaBriefMetricV240.fcaBriefWideV240{grid-column:1/-1}
+.fcaBriefFootnoteV240{font-size:11px;line-height:1.45;margin:12px 0 0;color:#677870}
+.fcaBriefTextAreaV240>p,.fcaBriefContactsV240>p{font-size:12px;line-height:1.45;color:#607268;margin:0 0 12px}
+.fcaBriefTextAreaV240 pre{font:13px/1.55 Arial,Helvetica,sans-serif;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;padding:14px;border:1px solid #cfe5d4;border-radius:13px;background:#edf8f0;color:#203b31}
+.fcaBriefContactsV240 button{cursor:pointer}
+.fcaBriefPrimaryV240{width:100%;min-height:43px;padding:12px;border:0;border-radius:11px;background:#173f35;color:#fff;font-size:13px;font-weight:850}
+#fcaBriefPeopleV240{display:grid;gap:8px;margin:12px 0}
+.fcaBriefPersonV240{display:flex;align-items:center;gap:9px;padding:10px 12px;background:#f8f4eb;border:1px solid #e2e3d9;border-radius:12px;cursor:pointer}
+.fcaBriefPersonV240 input{accent-color:#176d47;width:17px;height:17px}
+.fcaBriefPersonV240 span{display:grid;gap:3px}.fcaBriefPersonV240 b{font-size:13px;color:#173f35}.fcaBriefPersonV240 small{font-size:11px;color:#65756c}
+.fcaBriefDutyV240{display:flex;align-items:flex-start;gap:8px;margin:12px 0;font-size:12px;font-weight:650;line-height:1.45;color:#334f42}
+.fcaBriefDutyV240 input{width:18px;height:18px;flex-shrink:0;accent-color:#176d47}
+.fcaBriefButtonsV240{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.fcaBriefButtonsV240 button{min-height:48px;border:1px solid #cad9ce;border-radius:11px;background:#f6f6ef;color:#173f35;font-weight:850;font-size:12px;padding:9px}
+.fcaBriefButtonsV240 button:first-child{background:#1b6e49;color:#fff;border-color:#1b6e49}
+.fcaBriefButtonsV240 button:nth-child(2){background:#0f5737;color:#fff;border-color:#0f5737}
+.fcaBriefButtonsV240 button:disabled{opacity:.45;cursor:not-allowed}
+.fcaBriefHelpV240{background:#fff9eb;padding:10px;border-radius:10px;margin-top:12px!important;font-size:11px!important;line-height:1.5!important;color:#786243!important}
+#fcaBriefNoticeV240{font-size:12px;font-weight:700;margin-top:9px;line-height:1.5;color:#173f35}
+#fcaBriefNoticeV240 img{display:block;margin:10px auto}
+@media(max-width:430px){
+ .fcaPriorityActionsV61{justify-content:stretch}.fcaPriorityActionsV61 .fcaSendBriefV240{flex:1}
+ .fcaBriefOverlayV240{padding:5px 4px max(18px,env(safe-area-inset-bottom))}
+ .fcaBriefDialogV240{max-height:calc(100dvh - 10px);border-radius:18px}
+ .fcaBriefHeadV240{padding:17px 14px}
+ .fcaBriefStatsV240,.fcaBriefTextAreaV240,.fcaBriefContactsV240{margin:9px;padding:12px}
+ .fcaBriefMetricV240{padding:10px 9px}
+ .fcaBriefGridV240{gap:7px}
+ .fcaBriefTextAreaV240 pre{font-size:12px}
+}
+@media(max-width:355px){.fcaBriefButtonsV240{grid-template-columns:1fr}.fcaBriefMetricV240 em{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.fcaBriefOverlayV240{scroll-behavior:auto}}
