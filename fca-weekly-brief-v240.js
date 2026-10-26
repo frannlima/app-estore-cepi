@@ -24,7 +24,7 @@ const urlFor=(st,d)=>{const u=new URL("./",location.href);u.search="";u.hash="";
 const negative=x=>num(x)!==null&&num(x)<0;
 const change=(v,type)=>type==="money"?diffMoney(v):type==="pp"?diffPp(v):diffCount(v);
 const nameStore=x=>String(x.name||("Filial "+stCode(x.st))).replace(/^\d{3}\s*[-–•]\s*/,"");
-let current=null,contacts=[],selected=null,adminPassword="",sending=false;
+let current=null,contacts=[],selected=null,adminPassword="",sending=false,escapeHandler=null;
 
 function summary(x,d){
  const areas=x.dispersion_by_front||{},op=areas.operacoes||{},ca=areas.caixa_atendimento||{};
@@ -104,7 +104,7 @@ function modalHtml(x,d){
  '</section></div></div>';
 }
 function notice(t){const v=document.getElementById("fcaBriefNoticeV240");if(v)v.textContent=t;}
-function close(){document.querySelector(".fcaBriefOverlayV240")?.remove();current=null;contacts=[];selected=null;adminPassword="";sending=false;}
+function close(){if(escapeHandler){document.removeEventListener("keydown",escapeHandler);escapeHandler=null;}document.querySelector(".fcaBriefOverlayV240")?.remove();current=null;contacts=[];selected=null;adminPassword="";sending=false;}
 function currentContact(){return contacts.find(p=>String(p.id)===String(selected))||null;}
 function validated(c,st){
  const phone=String(c.phone_suggested_e164||"").replace(/\D/g,"");
@@ -122,10 +122,13 @@ async function getContacts(){
  if(!pwd){pwd=window.prompt("Informe a senha administrativa para consultar os contatos validados:")||"";if(!pwd)return notice("Consulta de contatos cancelada.");}
  notice("Consultando diretório protegido...");
  try{
-  const date=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Fortaleza",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+  const parts=new Intl.DateTimeFormat("en-US",{timeZone:"America/Fortaleza",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+  const fld=t=>parts.find(p=>p.type===t)?.value||"";
+  const date=[fld("year"),fld("month"),fld("day")].join("-");
   const r=await fetch(CONTACT_API,{method:"POST",headers:{"Content-Type":"application/json"},cache:"no-store",
    body:JSON.stringify({action:"dashboard",matricula:String(d.ctx.id),password:pwd,date})});
   const j=await r.json();if(!r.ok||!j.ok)throw Error(j.error||"Consulta não autorizada.");
+  if(current!==x)return;
   adminPassword=pwd;
   contacts=(j.contacts||[]).filter(c=>validated(c,stCode(x.st))).map(c=>({...c,phone:String(c.phone_suggested_e164).replace(/\D/g,""),name:String(c.person?.nome||c.name_original||"Supervisor")}));
   const root=document.getElementById("fcaBriefPeopleV240");
@@ -246,7 +249,7 @@ window.fcaOpenBriefV240=function(st){
   else if(action==="preview")previewCard();
  });
  root.addEventListener("change",function(ev){if(ev.target.matches('input[name="fcaBriefPersonV240"]')){selected=ev.target.value;updateMessage();}});
- document.addEventListener("keydown",function key(ev){if(ev.key==="Escape"){document.removeEventListener("keydown",key);close()}},{once:true});
+ escapeHandler=ev=>{if(ev.key==="Escape")close()};document.addEventListener("keydown",escapeHandler);
  root.querySelector(".fcaBriefDialogV240")?.scrollTo(0,0);
 };
 let deepLinkUsed=false;
