@@ -1307,21 +1307,19 @@ async function shareStoreResultV40(options={}){
             resolve({mode:'native'});return;
           }catch(e){if(e?.name==='AbortError'){resolve({mode:'cancelled'});return;}}
         }
+        if(external&&!options.downloadOnly){
+          // O navegador desktop NÃO anexa PNG por link wa.me.
+          // Entregar ambos os arquivos ao modal, sem abrir conversa só com texto.
+          const phone=String(options.phone||'').replace(/\D/g,'');
+          const validPhone=/^55[1-9]\d9\d{8}$/.test(phone);
+          const waUrl='https://wa.me/'+(validPhone?phone:'');
+          resolve({mode:'manual',file,caption,waUrl});return;
+        }
         try{await navigator.clipboard?.writeText(caption)}catch(_){}
         const objectURL=URL.createObjectURL(b),a=document.createElement('a');
         a.href=objectURL;a.download=file.name;document.body.append(a);a.click();a.remove();
         setTimeout(()=>URL.revokeObjectURL(objectURL),60000);
         if(options.downloadOnly){resolve({mode:'saved'});return;}
-        if(external){
-          const phone=String(options.phone||'').replace(/\D/g,'');
-          const validPhone=/^55[1-9]\d9\d{8}$/.test(phone);
-          const waUrl='https://wa.me/'+(validPhone?phone:'')+'?text='+encodeURIComponent(caption);
-          let opened=false;
-          if(options.chatWindow&&!options.chatWindow.closed){
-            try{options.chatWindow.location.replace(waUrl);opened=true}catch(_){}
-          }
-          resolve({mode:'manual',opened,waUrl});return;
-        }
         alert('Card HD gerado. A legenda foi copiada para compartilhar.');
         resolve({mode:'saved'});
       }catch(e){reject(e);}
