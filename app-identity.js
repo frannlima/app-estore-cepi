@@ -19,7 +19,7 @@
   const text=approved?'O App eStore CE+PI tem um novo endereço. Ao acessá-lo, poderá ser necessário entrar novamente com sua matrícula, reinstalar o app e autorizar as notificações. Confira seus registros antes de remover a instalação antiga.':'Estamos preparando um novo endereço para o App eStore CE+PI. Continue usando este acesso. Após a mudança, poderá ser necessário entrar novamente, reinstalar o app e autorizar as notificações. Não reinstale agora; o novo link será informado aqui.';
   for(const parent of [document.querySelector('#login .loginbox'),document.querySelector('#shell main.wrap')]){
    if(!parent)continue;
-   const box=document.createElement('details');box.className='estoreTransitionNotice';
+   const box=document.createElement('details');box.className='estoreTransitionNotice';box.open=true;
    box.style.cssText='margin:12px 0;padding:12px;border:1px solid #c8d7cf;border-radius:12px;background:#edf5f0;color:#173f35;font-size:13px;line-height:1.5;text-align:left';
    box.innerHTML='<summary style="cursor:pointer;font-weight:800">Endereço do app: informações importantes</summary>';
    const p=document.createElement('p');p.textContent=text;box.appendChild(p);
