@@ -53,7 +53,7 @@ const localHour=stamp=>{try{return Number(new Intl.DateTimeFormat('en-GB',{timeZ
 const isMain=()=>typeof admV3==='function'&&admV3()&&user()?.id!=='0000000';
 let adminPassword='',supervisors=null,groupStatuses={},groupStatusesDate='',parsed=[],fileRef=null,rawText='',busy=false;
 let alertTemplateV198=null,priorityQueueV225=null;
-const queueImportV225=import('./hourly-alert-queue-v225.mjs?build=v230').then(m=>{priorityQueueV225=m;if(supervisors&&curr())showDirectory();return m}).catch(e=>{console.warn('[eStore] Fila de contatos indisponível',e);return null});
+const queueImportV225=import('./hourly-alert-queue-v225.mjs?build=v247').then(m=>{priorityQueueV225=m;if(supervisors&&curr())showDirectory();return m}).catch(e=>{console.warn('[eStore] Fila de contatos indisponível',e);return null});
 import('./alert-center-core.mjs').then(m=>{alertTemplateV198=typeof m.message==='function'?m.message:null}).catch(()=>{});
 function reference(j){
  const t=clock(),selected=String(j?.result_date||t.date);
@@ -249,7 +249,7 @@ function showLegacyDirectory(){
   if(person.onLeave&&!window.confirm('A base de RH registra férias para '+person.name+'. Ela já retornou e está em expediente, autorizada a receber este alerta?')){notice.textContent='Envio não iniciado: supervisora consta em férias na base de RH.';return;}
   button.disabled=true;notice.textContent='Gerando card de alerta da filial L'+st+'...';
   try{
-   const lib=await import('./alert-card-share.mjs?build=v205');
+   const lib=await import('./alert-card-share.mjs?build=v247');
    const current=status(row,j),lastTime=row.updated_at?
      new Date(row.updated_at).toLocaleTimeString('pt-BR',{timeZone:'America/Fortaleza',hour:'2-digit',minute:'2-digit'}):null;
    const png=await lib.createAlertImage(
