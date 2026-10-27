@@ -13,53 +13,29 @@ const R={data:null,loading:false};
 function admin(){try{return typeof U!=="undefined"&&U?.u?.id==="2457695"&&!!U?.admin&&!ID("app")?.classList.contains("hide")}catch(_){return false}}
 function status(t,error=false){const el=ID("dcStatus");if(el){el.textContent=t;el.style.color=error?"#9c3030":"#345c4d"}}
 function caption(p,data){
- const intro="Bom dia, *"+String(p.name||"Supervisão").trim().split(/\s+/)[0]+"*! Espero que esteja bem.";
- const stats="📊 *eStore D-1 | L"+p.store+" • "+br(data.reference_date)+"*\n💰 Venda captada: *"+money(p.captured)+"*\n🛍️ Pedidos: *"+p.orders+"*\n📈 Share: *"+pct(p.share)+"*";
- const tone=p.category==="zero"?"🚨 *RADAR DE ATENÇÃO* — Ontem encerramos sem venda eStore registrada na filial. Hoje temos uma nova oportunidade de fazer uma entrega diferente. Conte com meu apoio!":
- p.category==="excellent"?"👏 *Parabéns pela entrega!* A filial alcançou share acima de 0,30%. Excelente contribuição! Vamos sustentar esse ritmo e inspirar o time.":
- "🤝 Obrigado pela contribuição de ontem! Cada venda fortalece CEPI e o resultado da empresa. Vamos continuar colocando em prática que *Talento é Conquista*.";
- return [intro,"",stats,"",tone,"","🎯 *Metas eStore da filial hoje • "+br(data.goal_date)+"*","💰 *Meta de vendas:* "+money(p.goal),"🛍️ *Meta de pedidos:* "+p.goal_orders+" pedidos","",
- "👥 Faça o rateio conforme a equipe disponível: *App → Metas → Distribuição diária por HC → Salvar*.","🔗 "+p.rateio_url,"",
- "📍 Mais detalhes: *Minha Filial*","🔗 "+p.detail_url,"",
- "Fico à disposição para apoiar, caso precise. Vamos girar o ponteiro! 🚀"].join("\n");
+ const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'America/Fortaleza',hour:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).map(x=>[x.type,x.value]));
+ const hour=Number(parts.hour);
+ const greeting=hour>=5&&hour<12?'Bom dia':hour>=12&&hour<18?'Boa tarde':'Boa noite';
+ const name=String(p.name||'Supervisão').trim().split(/\s+/)[0];
+ const intro=greeting+', *'+name+'*! Espero que esteja bem! 👋';
+ const tone=p.category==='zero'
+   ?'🚨 *Radar de atenção:* ontem a filial encerrou sem venda eStore registrada. Hoje podemos mudar esse resultado!'
+   :p.category==='excellent'
+   ?'👏 *Parabéns pela entrega de ontem!* A filial L'+p.store+' alcançou *'+pct(p.share)+' de share*. Vamos manter esse ritmo!'
+   :'🤝 *Obrigado pela contribuição de ontem!* Cada venda faz diferença. Vamos avançar hoje!';
+ return [
+   intro,'',tone,'',
+   '🎯 *Desafio de hoje:*',
+   '💰 Meta: *'+money(p.goal)+'*',
+   '🛍️ Pedidos: *'+p.goal_orders+'*','',
+   '👥 Distribua a meta com o time: *Metas → Distribuição diária por HC*.','',
+   '📊 Mais detalhes do D-1: *Minha Filial → Dia*.',
+   '🔗 https://frannlima.github.io/app-estore-cepi/','',
+   'Conte comigo para apoiar! 🚀'
+ ].join('\n');
 }
-function createCard(p,d){
- const c=document.createElement("canvas");c.width=1080;c.height=1110;
- const g=c.getContext("2d");if(!g)throw Error("Falha na geração do card.");
- const dark="#173F35",cream="#F8F6F0",orange="#DE7C00";
- function bg(x,y,w,h,color){g.fillStyle=color;g.fillRect(x,y,w,h)}
- function line(s,x,y,size,color=dark,bold=false,maxWidth){
-  g.font=(bold?"700 ":"500 ")+size+"px Larsseit,Arial,sans-serif";g.fillStyle=color;
-  g.fillText(s,x,y,maxWidth);
- }
- bg(0,0,1080,1110,cream);bg(0,0,1080,217,dark);bg(0,0,280,9,orange);
- line("APP eSTORE | CE+PI",48,59,29,"#E8BD79",true);
- line("MINHA FILIAL | D-1",48,125,53,"white",true);
- line("L"+p.store+" • "+br(d.reference_date),48,188,33,"white",true);
- function cell(x,y,title,value){
-  bg(x,y,474,166,"white");
-  line(title,x+20,y+45,26,"#617269",true,430);
-  line(String(value),x+20,y+110,40,dark,true,430);
- }
- cell(46,255,"VENDA CAPTADA D-1",money(p.captured));
- cell(557,255,"SHARE D-1",pct(p.share));
- cell(46,447,"PEDIDOS D-1",p.orders);
- cell(557,447,"META DE VENDAS HOJE",money(p.goal));
- bg(46,643,988,154,"#E5EEE8");
- line("META DE PEDIDOS HOJE • "+br(d.goal_date),66,695,29,dark,true,925);
- line(String(p.goal_orders)+" PEDIDOS",66,763,49,dark,true,910);
- const zero=p.category==="zero";
- bg(46,822,988,121,zero?"#FEE5E1":"#E4F0E8");
- line(zero?"RADAR DE ATENÇÃO":p.category==="excellent"?"PARABÉNS PELA ENTREGA!":"SUA CONTRIBUIÇÃO CONTA",64,891,38,zero?"#A52A2A":dark,true,920);
- bg(0,977,1080,133,dark);
- line("RATEIE A META DE HOJE COM SUA EQUIPE",46,1030,31,"#E8BD79",true,965);
- line("App eStore CEPI → Metas → Distribuição diária por HC",46,1080,27,"white",false,990);
- return window.RiachueloBrandCards?.decorateCanvas?.(c)||c;
-}
-function fileCard(p,d){return new Promise((resolve,reject)=>{
- const canvas=createCard(p,d);
- canvas.toBlob(b=>b?resolve(new File([b],"eStore-D1-L"+p.store+".png",{type:"image/png"})):reject(Error("PNG indisponível")),"image/png");
-})}
+
+
 function render(){
  const d=R.data;if(!d)return;
  const counts=d.counts||{},locked=!d.complete;
@@ -106,64 +82,62 @@ function render(){
  ID("dcBody").querySelectorAll("[data-card]").forEach(b=>b.addEventListener("click",()=>downloadCard(Number(b.dataset.card),b)));
  ID("dcBody").querySelectorAll("[data-send]").forEach(b=>b.addEventListener("click",()=>share(Number(b.dataset.send),b)));
 }
-function downloadFile(file){
- const url=URL.createObjectURL(file),a=document.createElement("a");
- a.href=url;a.download=file.name;document.body.append(a);a.click();a.remove();
- setTimeout(()=>URL.revokeObjectURL(url),60000);
-}
 function canPrepare(p,d){return !!(d?.complete&&p?.ready&&p?.active_store)}
+async function prepareMyFilialCard(p,d,options={}){
+ if(typeof shareStoreResultV40!=='function')throw Error('O painel Minha Filial ainda está carregando. Reabra o comunicado.');
+ return shareStoreResultV40({
+   store:p.store,period:'day',referenceDate:d.reference_date,
+   expectedCaptured:p.captured,expectedOrders:p.orders,
+   caption:caption(p,d),phone:p.phone,...options
+ });
+}
 async function downloadCard(index,button){
  const d=R.data,p=d?.supervisors?.[index];
- if(!canPrepare(p,d)){status("D-1 e metas oficiais precisam estar completos para gerar o card.",true);return;}
- const previous=button.textContent;button.disabled=true;button.textContent="Gerando card...";
+ if(!canPrepare(p,d)){status('Complete o D-1 oficial antes de gerar o card.',true);return;}
+ const old=button.textContent;button.disabled=true;button.textContent='Preparando card...';
  try{
-  const file=await fileCard(p,d);
-  downloadFile(file);
-  status("Card D-1 da filial L"+p.store+" salvo. O arquivo não foi enviado.");
- }catch(e){status(String(e?.message||"Falha ao gerar card."),true)}
- finally{button.disabled=false;button.textContent=previous;}
+  const result=await prepareMyFilialCard(p,d,{downloadOnly:true});
+  if(result?.mode==='saved')status('Card original Minha Filial → Dia salvo para L'+p.store+'. Nenhuma mensagem foi enviada.');
+  else status('Não foi possível salvar o card; atualize os dados e tente novamente.',true);
+ }catch(e){status(String(e?.message||'Falha ao gerar card.'),true)}
+ finally{button.disabled=false;button.textContent=old}
 }
 async function share(index,button){
  const d=R.data,p=d?.supervisors?.[index];
- if(!canPrepare(p,d)){status("D-1 e metas oficiais precisam estar completos antes do envio.",true);return;}
- const digits=String(p.phone||"").replace(/\D/g,"");
- const hasValidatedPhone=/^55[1-9]\d9\d{8}$/.test(digits);
- const mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||"");
- const message=caption(p,d);
- const waUrl="https://wa.me/"+(hasValidatedPhone?digits:"")+"?text="+encodeURIComponent(message);
- // Reservar a aba enquanto ainda estamos no gesto do usuário (desktop).
+ if(!canPrepare(p,d)){status('D-1 e metas oficiais precisam estar completos antes do compartilhamento.',true);return;}
+ const mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');
+ // Reservar aba no gesto do clique antes de consultar resultado e ranking oficiais.
  let chat=null;
- if(!mobile){
-  try{chat=window.open("about:blank","_blank");}catch(_){}
- }
- const previous=button.textContent;button.disabled=true;button.textContent="Preparando...";
+ if(!mobile){try{chat=window.open('about:blank','_blank')}catch(_){}}
+ const old=button.textContent;button.disabled=true;button.textContent='Preparando resultado...';
  try{
-  const file=await fileCard(p,d);
-  if(mobile&&typeof navigator.share==="function"&&navigator.canShare?.({files:[file]})){
-   try{
-    await navigator.share({files:[file],text:message,title:"App eStore CE+PI • D-1 L"+p.store});
-    status("Compartilhamento aberto: selecione o WhatsApp Business, escolha "+p.name+" (L"+p.store+") e confira a imagem e a legenda. O envio não é automático.");
-    return;
-   }catch(e){if(e?.name==="AbortError"){status("Compartilhamento cancelado. Nenhuma mensagem enviada.");return}}
+  const result=await prepareMyFilialCard(p,d,{chatWindow:chat});
+  if(result?.mode==='native'){
+   if(chat&&!chat.closed)chat.close();
+   status('Card oficial Minha Filial e legenda preparados. Escolha o WhatsApp Business, confirme o supervisor e envie.');
+  }else if(result?.mode==='cancelled'){
+   if(chat&&!chat.closed)chat.close();
+   status('Compartilhamento cancelado. Nenhuma mensagem enviada.');
+  }else if(result?.mode==='manual'){
+   if(result.opened){
+    status('WhatsApp aberto com a legenda. Anexe o PNG do Resumo da Filial, confira '+p.name+' e confirme o envio.');
+   }else{
+    if(chat&&!chat.closed)chat.close();
+    status('PNG salvo. Use o link a seguir para abrir o WhatsApp; anexe a imagem e confirme o destinatário.');
+    const a=document.createElement('a');a.href=result.waUrl;a.target='_blank';a.rel='noopener noreferrer';
+    a.textContent='Abrir WhatsApp de '+p.name+' ↗';
+    ID('dcStatus')?.append(document.createTextNode(' '),a);
+   }
+  }else{
+   if(chat&&!chat.closed)chat.close();
+   status('Não foi possível concluir o compartilhamento. Nenhuma mensagem enviada.',true);
   }
-  // WhatsApp Web permite preencher a conversa, mas NÃO pré-anexa o PNG.
-  downloadFile(file);
-  try{await navigator.clipboard?.writeText(message)}catch(_){}
-  let opened=false;
-  if(chat&&!chat.closed){try{chat.location.replace(waUrl);opened=true}catch(_){}}
-  if(!opened){
-   const a=document.createElement("a");a.href=waUrl;a.target="_blank";a.rel="noopener noreferrer";
-   a.textContent="Abrir conversa do supervisor no WhatsApp";
-   status("Card salvo. Use o link para abrir a conversa e anexe o PNG manualmente. O envio depende da sua confirmação.");
-   ID("dcStatus")?.append(document.createTextNode(" "),a);
-   return;
-  }
-  status((hasValidatedPhone?"Conversa de "+p.name+" aberta.":"WhatsApp aberto para escolher "+p.name+".")+" O PNG foi baixado: anexe o card e confirme o envio.");
  }catch(e){
-  if(chat&&!chat.closed)try{chat.close()}catch(_){}
-  status(String(e?.message||"Falha ao preparar o card."),true);
- }finally{button.disabled=false;button.textContent=previous;}
+  if(chat&&!chat.closed)chat.close();
+  status(String(e?.message||'Falha ao compartilhar card da filial.'),true);
+ }finally{button.disabled=false;button.textContent=old;}
 }
+
 async function load(){
  if(R.loading)return;
  R.loading=true;ID("dcBody").textContent="Consultando D-1, metas e supervisores...";
