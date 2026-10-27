@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v252-d1-whatsapp-buttons';
-const BUILD='v252-d1-whatsapp-buttons';
+const CACHE='estore-cepi-shell-v253-d1-whatsapp-manual';
+const BUILD='v253-d1-whatsapp-manual';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
