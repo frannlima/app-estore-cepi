@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v253-d1-whatsapp-manual';
-const BUILD='v253-d1-whatsapp-manual';
+const CACHE='estore-cepi-shell-v254-d1-filial-card';
+const BUILD='v254-d1-filial-card';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
