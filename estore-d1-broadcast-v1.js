@@ -69,13 +69,13 @@ function render(){
   const reason=!p.active_store?"Loja fora da base ativa de resultados":
     locked?"D-1 oficial ainda incompleto — envio bloqueado":
     !p.ready?"Sem D-1 oficial ou meta do dia":
-    !p.phone?"Telefone do supervisor não validado: é possível gerar o card":"Contato habilitado • compartilhamento sujeito à confirmação";
+    !p.phone?"Sem telefone vinculado: selecione o supervisor manualmente no WhatsApp Business":"Contato validado • envio sujeito à sua confirmação";
   const kind=p.category==="zero"?"🚨 Radar":p.category==="excellent"?"🏆 Acima de 0,30%":p.category==="contribution"?"🤝 Contribuição":"Aguardando D-1";
   const canPrepare=!locked&&p.ready&&p.active_store;
-  const canSend=canPrepare&&!!p.phone;
+  const canSend=canPrepare;
   const sendHelp=locked?"Complete o D-1 antes de preparar qualquer comunicado":
     !p.active_store?"Filial fora do escopo ativo":
-    !p.ready?"Aguardando D-1 e metas oficiais":"Telefone do supervisor não validado";
+    !p.ready?"Aguardando D-1 e metas oficiais":"Compartilhamento manual; confirme o destinatário";
   return '<article class="dcPerson"><div class="dcName"><b>'+esc(p.name)+'</b><b>L'+esc(p.store)+'</b></div>'+
    '<small>'+esc(kind)+' • '+esc(reason)+'</small>'+
    (p.ready?'<p>Captado: '+esc(money(p.captured))+' • Share: '+esc(pct(p.share))+' • Meta vendas hoje: '+esc(money(p.goal))+' • Meta pedidos hoje: '+esc(p.goal_orders)+'</p>':'')+
@@ -126,12 +126,11 @@ async function downloadCard(index,button){
 async function share(index,button){
  const d=R.data,p=d?.supervisors?.[index];
  if(!canPrepare(p,d)){status("D-1 e metas oficiais precisam estar completos antes do envio.",true);return;}
- if(!p.phone){status("Confirme o número do WhatsApp Business do supervisor antes de compartilhar.",true);return;}
- const digits=String(p.phone).replace(/\D/g,"");
- if(!/^55[1-9]\d9\d{8}$/.test(digits)){status("Telefone do supervisor inválido ou sem DDD: envio bloqueado.",true);return;}
+ const digits=String(p.phone||"").replace(/\D/g,"");
+ const hasValidatedPhone=/^55[1-9]\d9\d{8}$/.test(digits);
  const mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||"");
  const message=caption(p,d);
- const waUrl="https://wa.me/"+digits+"?text="+encodeURIComponent(message);
+ const waUrl="https://wa.me/"+(hasValidatedPhone?digits:"")+"?text="+encodeURIComponent(message);
  // Reservar a aba enquanto ainda estamos no gesto do usuário (desktop).
  let chat=null;
  if(!mobile){
@@ -143,7 +142,7 @@ async function share(index,button){
   if(mobile&&typeof navigator.share==="function"&&navigator.canShare?.({files:[file]})){
    try{
     await navigator.share({files:[file],text:message,title:"App eStore CE+PI • D-1 L"+p.store});
-    status("Compartilhamento aberto: selecione o WhatsApp Business e confira "+p.name+" (L"+p.store+"), a imagem e a legenda. O aplicativo não confirma o envio.");
+    status("Compartilhamento aberto: selecione o WhatsApp Business, escolha "+p.name+" (L"+p.store+") e confira a imagem e a legenda. O envio não é automático.");
     return;
    }catch(e){if(e?.name==="AbortError"){status("Compartilhamento cancelado. Nenhuma mensagem enviada.");return}}
   }
@@ -159,7 +158,7 @@ async function share(index,button){
    ID("dcStatus")?.append(document.createTextNode(" "),a);
    return;
   }
-  status("Conversa de "+p.name+" aberta com a legenda pronta. O PNG foi baixado: anexe o card e confirme o envio no WhatsApp.");
+  status((hasValidatedPhone?"Conversa de "+p.name+" aberta.":"WhatsApp aberto para escolher "+p.name+".")+" O PNG foi baixado: anexe o card e confirme o envio.");
  }catch(e){
   if(chat&&!chat.closed)try{chat.close()}catch(_){}
   status(String(e?.message||"Falha ao preparar o card."),true);
