@@ -1,4 +1,4 @@
-/* eStore Connect CEPI — Comunicados D-1 aos supervisores.
+/* App eStore CE+PI — Comunicados D-1 aos supervisores.
    Geracao em massa de fila e legendas; nenhum envio automatico. */
 (function(){
 "use strict";
@@ -33,7 +33,7 @@ function createCard(p,d){
   g.fillText(s,x,y,maxWidth);
  }
  bg(0,0,1080,1110,cream);bg(0,0,1080,217,dark);bg(0,0,280,9,orange);
- line("eSTORE CONNECT | CEPI",48,59,29,"#E8BD79",true);
+ line("APP eSTORE | CE+PI",48,59,29,"#E8BD79",true);
  line("MINHA FILIAL | D-1",48,125,53,"white",true);
  line("L"+p.store+" • "+br(d.reference_date),48,188,33,"white",true);
  function cell(x,y,title,value){
@@ -62,20 +62,27 @@ function fileCard(p,d){return new Promise((resolve,reject)=>{
 })}
 function render(){
  const d=R.data;if(!d)return;
- const counts=d.counts,locked=!d.complete;
+ const counts=d.counts||{},locked=!d.complete;
  const note=locked?"⚠️ D-1 "+br(d.reference_date)+" ainda não foi carregado completamente. Comunicação bloqueada para não usar dados antigos.":
   "Resultado oficial de "+br(d.reference_date)+" confirmado. Confira a lista e prepare os comunicados.";
  const cards=d.supervisors.map((p,i)=>{
   const reason=!p.active_store?"Loja fora da base ativa de resultados":
+    locked?"D-1 oficial ainda incompleto — envio bloqueado":
     !p.ready?"Sem D-1 oficial ou meta do dia":
-    !p.phone?"Contato sem validação de envio: card e legenda disponíveis":"Contato habilitado • compartilhar com confirmação";
+    !p.phone?"Telefone do supervisor não validado: é possível gerar o card":"Contato habilitado • compartilhamento sujeito à confirmação";
   const kind=p.category==="zero"?"🚨 Radar":p.category==="excellent"?"🏆 Acima de 0,30%":p.category==="contribution"?"🤝 Contribuição":"Aguardando D-1";
+  const canPrepare=!locked&&p.ready&&p.active_store;
+  const canSend=canPrepare&&!!p.phone;
+  const sendHelp=locked?"Complete o D-1 antes de preparar qualquer comunicado":
+    !p.active_store?"Filial fora do escopo ativo":
+    !p.ready?"Aguardando D-1 e metas oficiais":"Telefone do supervisor não validado";
   return '<article class="dcPerson"><div class="dcName"><b>'+esc(p.name)+'</b><b>L'+esc(p.store)+'</b></div>'+
    '<small>'+esc(kind)+' • '+esc(reason)+'</small>'+
    (p.ready?'<p>Captado: '+esc(money(p.captured))+' • Share: '+esc(pct(p.share))+' • Meta vendas hoje: '+esc(money(p.goal))+' • Meta pedidos hoje: '+esc(p.goal_orders)+'</p>':'')+
-   '<div class="dcBtns"><button data-view="'+i+'" '+(!p.ready?"disabled":"")+'>Ver legenda</button>'+
-   '<button data-copy="'+i+'" '+(!p.ready?"disabled":"")+'>Copiar mensagem</button>'+
-   '<button class="dcMain" data-card="'+i+'" '+(!p.ready?"disabled":"")+'>'+(p.phone?"Card + WhatsApp":"Gerar card")+'</button></div></article>';
+   '<div class="dcBtns"><button data-view="'+i+'" '+(!canPrepare?"disabled":"")+'>Ver legenda</button>'+
+   '<button data-copy="'+i+'" '+(!canPrepare?"disabled":"")+'>Copiar mensagem</button>'+
+   '<button data-card="'+i+'" '+(!canPrepare?"disabled":"")+'>Gerar card</button>'+
+   '<button class="dcMain dcSend" data-send="'+i+'" '+(!canSend?'disabled title="'+esc(sendHelp)+'"':'title="Preparar card PNG e mensagem para compartilhar com este supervisor"')+'>📲 Enviar card WhatsApp</button></div></article>';
  }).join("");
  ID("dcBody").innerHTML='<p class="dcNote">'+esc(note)+'</p>'+
   '<div class="dcCount"><span><b>'+counts.total+'</b> supervisores</span><span><b>'+counts.prepared+'</b> prontos com dados</span><span><b>'+counts.contact_verified+'</b> contatos liberados</span><span><b>'+counts.outside_active_scope+'</b> fora do escopo ativo</span></div>'+
@@ -96,28 +103,68 @@ function render(){
   try{await navigator.clipboard.writeText(caption(p,d));status("Mensagem de "+p.name+" copiada.");}
   catch(_){status("Cópia indisponível.",true)}
  }));
- ID("dcBody").querySelectorAll("[data-card]").forEach(b=>b.addEventListener("click",()=>share(Number(b.dataset.card),b)));
+ ID("dcBody").querySelectorAll("[data-card]").forEach(b=>b.addEventListener("click",()=>downloadCard(Number(b.dataset.card),b)));
+ ID("dcBody").querySelectorAll("[data-send]").forEach(b=>b.addEventListener("click",()=>share(Number(b.dataset.send),b)));
+}
+function downloadFile(file){
+ const url=URL.createObjectURL(file),a=document.createElement("a");
+ a.href=url;a.download=file.name;document.body.append(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+function canPrepare(p,d){return !!(d?.complete&&p?.ready&&p?.active_store)}
+async function downloadCard(index,button){
+ const d=R.data,p=d?.supervisors?.[index];
+ if(!canPrepare(p,d)){status("D-1 e metas oficiais precisam estar completos para gerar o card.",true);return;}
+ const previous=button.textContent;button.disabled=true;button.textContent="Gerando card...";
+ try{
+  const file=await fileCard(p,d);
+  downloadFile(file);
+  status("Card D-1 da filial L"+p.store+" salvo. O arquivo não foi enviado.");
+ }catch(e){status(String(e?.message||"Falha ao gerar card."),true)}
+ finally{button.disabled=false;button.textContent=previous;}
 }
 async function share(index,button){
- const d=R.data,p=d?.supervisors?.[index];if(!p?.ready)return;
- const old=button.textContent;button.disabled=true;button.textContent="Gerando card...";
+ const d=R.data,p=d?.supervisors?.[index];
+ if(!canPrepare(p,d)){status("D-1 e metas oficiais precisam estar completos antes do envio.",true);return;}
+ if(!p.phone){status("Confirme o número do WhatsApp Business do supervisor antes de compartilhar.",true);return;}
+ const digits=String(p.phone).replace(/\D/g,"");
+ if(!/^55[1-9]\d9\d{8}$/.test(digits)){status("Telefone do supervisor inválido ou sem DDD: envio bloqueado.",true);return;}
+ const mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||"");
+ const message=caption(p,d);
+ const waUrl="https://wa.me/"+digits+"?text="+encodeURIComponent(message);
+ // Reservar a aba enquanto ainda estamos no gesto do usuário (desktop).
+ let chat=null;
+ if(!mobile){
+  try{chat=window.open("about:blank","_blank");}catch(_){}
+ }
+ const previous=button.textContent;button.disabled=true;button.textContent="Preparando...";
  try{
-  const message=caption(p,d),file=await fileCard(p,d);
-  if(typeof navigator.share==="function"&&navigator.canShare?.({files:[file]})&&/Android|iPhone|iPad/i.test(navigator.userAgent||"")){
+  const file=await fileCard(p,d);
+  if(mobile&&typeof navigator.share==="function"&&navigator.canShare?.({files:[file]})){
    try{
-    await navigator.share({files:[file],text:message,title:"eStore D-1 L"+p.store});
-    status("Card e mensagem preparados no compartilhamento do celular. Confirme o supervisor; envio não verificado.");
+    await navigator.share({files:[file],text:message,title:"App eStore CE+PI • D-1 L"+p.store});
+    status("Compartilhamento aberto: selecione o WhatsApp Business e confira "+p.name+" (L"+p.store+"), a imagem e a legenda. O aplicativo não confirma o envio.");
     return;
-   }catch(e){if(e?.name==="AbortError"){status("Compartilhamento cancelado.");return}}
+   }catch(e){if(e?.name==="AbortError"){status("Compartilhamento cancelado. Nenhuma mensagem enviada.");return}}
   }
-  const url=URL.createObjectURL(file),a=document.createElement("a");
-  a.href=url;a.download=file.name;document.body.append(a);a.click();a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),60000);
-  try{await navigator.clipboard.writeText(message)}catch(_){}
-  if(p.phone)window.open("https://wa.me/"+p.phone+"?text="+encodeURIComponent(message),"_blank","noopener,noreferrer");
-  status(p.phone?"Card baixado e conversa aberta. Anexe o PNG e confirme o envio.":"Card baixado. Contato pendente; legenda disponível para copiar.");
- }catch(e){status(e.message||"Falha ao gerar card.",true)}
- finally{button.disabled=false;button.textContent=old}
+  // WhatsApp Web permite preencher a conversa, mas NÃO pré-anexa o PNG.
+  downloadFile(file);
+  try{await navigator.clipboard?.writeText(message)}catch(_){}
+  let opened=false;
+  if(chat&&!chat.closed){try{chat.location.replace(waUrl);opened=true}catch(_){}}
+  if(!opened){
+   const a=document.createElement("a");a.href=waUrl;a.target="_blank";a.rel="noopener noreferrer";
+   a.textContent="Abrir conversa do supervisor no WhatsApp";
+   const box=ID("dcStatus");box?.append(document.createTextNode(" "));
+   box?.append(a);
+   status("Card salvo; clique no link disponível para abrir a conversa e anexe o PNG manualmente. A entrega não é confirmada.");
+   return;
+  }
+  status("Conversa de "+p.name+" aberta com a legenda pronta. O PNG foi baixado: anexe o card e confirme o envio no WhatsApp.");
+ }catch(e){
+  if(chat&&!chat.closed)try{chat.close()}catch(_){}
+  status(String(e?.message||"Falha ao preparar o card."),true);
+ }finally{button.disabled=false;button.textContent=previous;}
 }
 async function load(){
  if(R.loading)return;
