@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v245-identity-transition';
-const BUILD='v245-identity-transition';
+const CACHE='estore-cepi-shell-v246-whatsapp-manual';
+const BUILD='v246-whatsapp-manual';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
