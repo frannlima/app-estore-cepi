@@ -30,3 +30,14 @@
  }
  if(typeof document!=='undefined'){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount()}
 })(globalThis);
+
+/* Central de Ajuda WhatsApp Business */
+(function(){
+  if(typeof document==="undefined" || document.getElementById("ec-support-script"))return;
+  const el=document.createElement("script");
+  el.id="ec-support-script";
+  el.src=new URL("./support-widget-v1.js?v=1", document.currentScript && document.currentScript.src || location.href).href;
+  el.dataset.app="estore";
+  el.defer=true;
+  document.head.appendChild(el);
+})();
