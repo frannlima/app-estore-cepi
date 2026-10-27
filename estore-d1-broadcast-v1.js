@@ -18,32 +18,42 @@ function caption(p,data){
  const tone=p.category==="zero"?"🚨 *RADAR DE ATENÇÃO* — Ontem encerramos sem venda eStore registrada na filial. Hoje temos uma nova oportunidade de fazer uma entrega diferente. Conte com meu apoio!":
  p.category==="excellent"?"👏 *Parabéns pela entrega!* A filial alcançou share acima de 0,30%. Excelente contribuição! Vamos sustentar esse ritmo e inspirar o time.":
  "🤝 Obrigado pela contribuição de ontem! Cada venda fortalece CEPI e o resultado da empresa. Vamos continuar colocando em prática que *Talento é Conquista*.";
- return [intro,"",stats,"",tone,"","🎯 *Meta da operação hoje • "+br(data.goal_date)+"*","Meta eStore: *"+money(p.goal)+"* | *"+p.goal_orders+" pedidos*","",
+ return [intro,"",stats,"",tone,"","🎯 *Metas eStore da filial hoje • "+br(data.goal_date)+"*","💰 *Meta de vendas:* "+money(p.goal),"🛍️ *Meta de pedidos:* "+p.goal_orders+" pedidos","",
  "👥 Faça o rateio conforme a equipe disponível: *App → Metas → Distribuição diária por HC → Salvar*.","🔗 "+p.rateio_url,"",
  "📍 Mais detalhes: *Minha Filial*","🔗 "+p.detail_url,"",
  "Fico à disposição para apoiar, caso precise. Vamos girar o ponteiro! 🚀"].join("\n");
 }
 function createCard(p,d){
- const c=document.createElement("canvas");c.width=1080;c.height=940;
+ const c=document.createElement("canvas");c.width=1080;c.height=1110;
  const g=c.getContext("2d");if(!g)throw Error("Falha na geração do card.");
  const dark="#173F35",cream="#F8F6F0",orange="#DE7C00";
  function bg(x,y,w,h,color){g.fillStyle=color;g.fillRect(x,y,w,h)}
- function line(s,x,y,size,color=dark,bold=false){
-  g.font=(bold?"700 ":"500 ")+size+"px Larsseit,Arial,sans-serif";g.fillStyle=color;g.fillText(s,x,y);
+ function line(s,x,y,size,color=dark,bold=false,maxWidth){
+  g.font=(bold?"700 ":"500 ")+size+"px Larsseit,Arial,sans-serif";g.fillStyle=color;
+  g.fillText(s,x,y,maxWidth);
  }
- bg(0,0,1080,940,cream);bg(0,0,1080,217,dark);bg(0,0,280,9,orange);
+ bg(0,0,1080,1110,cream);bg(0,0,1080,217,dark);bg(0,0,280,9,orange);
  line("eSTORE CONNECT | CEPI",48,59,29,"#E8BD79",true);
  line("MINHA FILIAL | D-1",48,125,53,"white",true);
  line("L"+p.store+" • "+br(d.reference_date),48,188,33,"white",true);
- function cell(x,y,title,value){bg(x,y,474,166,"white");line(title,x+20,y+45,26,"#617269",true);line(String(value),x+20,y+110,40,dark,true)}
- cell(46,255,"CAPTAÇÃO",money(p.captured));cell(557,255,"SHARE",pct(p.share));
- cell(46,447,"PEDIDOS",p.orders);cell(557,447,"META DE HOJE",money(p.goal));
+ function cell(x,y,title,value){
+  bg(x,y,474,166,"white");
+  line(title,x+20,y+45,26,"#617269",true,430);
+  line(String(value),x+20,y+110,40,dark,true,430);
+ }
+ cell(46,255,"VENDA CAPTADA D-1",money(p.captured));
+ cell(557,255,"SHARE D-1",pct(p.share));
+ cell(46,447,"PEDIDOS D-1",p.orders);
+ cell(557,447,"META DE VENDAS HOJE",money(p.goal));
+ bg(46,643,988,154,"#E5EEE8");
+ line("META DE PEDIDOS HOJE • "+br(d.goal_date),66,695,29,dark,true,925);
+ line(String(p.goal_orders)+" PEDIDOS",66,763,49,dark,true,910);
  const zero=p.category==="zero";
- bg(45,647,990,117,zero?"#FEE5E1":"#E4F0E8");
- line(zero?"RADAR DE ATENÇÃO":p.category==="excellent"?"PARABÉNS PELA ENTREGA!":"SUA CONTRIBUIÇÃO CONTA",64,713,39,zero?"#A52A2A":dark,true);
- bg(0,807,1080,133,dark);
- line("HOJE: "+p.goal_orders+" PEDIDOS • DISTRIBUA A META POR HC",46,862,31,"#E8BD79",true);
- line("App eStore CEPI → Metas → Rateio por HC",46,913,27,"white");
+ bg(46,822,988,121,zero?"#FEE5E1":"#E4F0E8");
+ line(zero?"RADAR DE ATENÇÃO":p.category==="excellent"?"PARABÉNS PELA ENTREGA!":"SUA CONTRIBUIÇÃO CONTA",64,891,38,zero?"#A52A2A":dark,true,920);
+ bg(0,977,1080,133,dark);
+ line("RATEIE A META DE HOJE COM SUA EQUIPE",46,1030,31,"#E8BD79",true,965);
+ line("App eStore CEPI → Metas → Distribuição diária por HC",46,1080,27,"white",false,990);
  return window.RiachueloBrandCards?.decorateCanvas?.(c)||c;
 }
 function fileCard(p,d){return new Promise((resolve,reject)=>{
@@ -62,7 +72,7 @@ function render(){
   const kind=p.category==="zero"?"🚨 Radar":p.category==="excellent"?"🏆 Acima de 0,30%":p.category==="contribution"?"🤝 Contribuição":"Aguardando D-1";
   return '<article class="dcPerson"><div class="dcName"><b>'+esc(p.name)+'</b><b>L'+esc(p.store)+'</b></div>'+
    '<small>'+esc(kind)+' • '+esc(reason)+'</small>'+
-   (p.ready?'<p>Captado: '+esc(money(p.captured))+' • Share: '+esc(pct(p.share))+' • Meta hoje: '+esc(money(p.goal))+'</p>':'')+
+   (p.ready?'<p>Captado: '+esc(money(p.captured))+' • Share: '+esc(pct(p.share))+' • Meta vendas hoje: '+esc(money(p.goal))+' • Meta pedidos hoje: '+esc(p.goal_orders)+'</p>':'')+
    '<div class="dcBtns"><button data-view="'+i+'" '+(!p.ready?"disabled":"")+'>Ver legenda</button>'+
    '<button data-copy="'+i+'" '+(!p.ready?"disabled":"")+'>Copiar mensagem</button>'+
    '<button class="dcMain" data-card="'+i+'" '+(!p.ready?"disabled":"")+'>'+(p.phone?"Card + WhatsApp":"Gerar card")+'</button></div></article>';
