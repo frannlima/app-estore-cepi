@@ -1157,17 +1157,57 @@ function storeDayStatusV40(hist,target,asof){
 }
 
 
-async function shareStoreResultV40(){
+async function shareStoreResultV40(options={}){
  try{
-  let st=String(U.u.st),key=st+'|'+PER,x=STORE_PERIOD_CACHE[key];if(!x)return alert('Resultado da filial ainda não carregado.');
-  let mt=window.META_PERIOD_TARGETS?.[st]?.[PER],fallback=COMMON?.stores?.[st]?.p?.[PER]?.ee,meta=Number.isFinite(+mt)?+mt:(Number.isFinite(+fallback)?+fallback:0),ticket=storeTicketV40(st),orderTarget=meta?Math.max(1,Math.ceil(meta/ticket)):0,saleGap=(+x.c||0)-meta,orderGap=(+x.o||0)-orderTarget,att=meta?(+x.c||0)/meta:0,orderAtt=orderTarget?(+x.o||0)/orderTarget:0,hist=Array.isArray(x.hi)?x.hi:[],status=storeDayStatusDataV40(hist,meta,x.asof);
-  let team=await api({action:'team_period',matricula:U.u.id,period:PER,store:st}),
+  const external=!!options.store;
+  const st=String(options.store||U.u.st).padStart(3,'0');
+  const periodKey=external?'day':PER;
+  const key=st+'|'+periodKey;
+  let x=STORE_PERIOD_CACHE[key],dailyMeta=null;
+  if(external){
+    if(!isMasterAdmin())throw Error('Comunicação D-1 restrita ao administrador.');
+    const ref=String(options.referenceDate||'');
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(ref))throw Error('Data D-1 inválida.');
+    // Mesmas fontes oficiais usadas em Minha Filial; não alterar a sessão nem a filial logada.
+    const [sr,targets]=await Promise.all([
+      api({action:'store_period',matricula:U.u.id,period:'day',store:st}),
+      api({action:'meta_assign_get',matricula:U.u.id,st,date:ref})
+    ]);
+    if(String(sr.endDate||'').slice(0,10)!==ref)throw Error('Minha Filial ainda não consolidou o dia '+ref+' para a L'+st+'.');
+    if(!Number.isFinite(Number(sr.captured))||!Number.isFinite(Number(sr.orders))||!Number.isFinite(Number(sr.share)))
+      throw Error('Resultado D-1 indisponível para a filial L'+st+'.');
+    if(Math.abs(Number(sr.captured)-Number(options.expectedCaptured))>0.011||
+       Number(sr.orders)!==Number(options.expectedOrders))
+      throw Error('O resultado D-1 da filial L'+st+' difere do painel Minha Filial. Atualize as bases antes de compartilhar.');
+    dailyMeta=Number(targets?.targets?.day);
+    if(!Number.isFinite(dailyMeta)||dailyMeta<=0)throw Error('Meta D-1 indisponível na base Minha Filial.');
+    x={c:Number(sr.captured),a:Number(sr.approved||0),o:Number(sr.orders),share:Number(sr.share),
+       hi:Array.isArray(sr.history)?sr.history:[],asof:ref};
+  }
+  if(!x){if(external)throw Error('Resultado D-1 ainda não carregado.');return alert('Resultado da filial ainda não carregado.');}
+  let mt=external?dailyMeta:window.META_PERIOD_TARGETS?.[st]?.[periodKey],
+      fallback=COMMON?.stores?.[st]?.p?.[periodKey]?.ee,
+      meta=Number.isFinite(+mt)?+mt:(Number.isFinite(+fallback)?+fallback:0),
+      ticket=storeTicketV40(st),orderTarget=meta?Math.max(1,Math.ceil(meta/ticket)):0,
+      saleGap=(+x.c||0)-meta,orderGap=(+x.o||0)-orderTarget,
+      att=meta?(+x.c||0)/meta:0,orderAtt=orderTarget?(+x.o||0)/orderTarget:0,
+      hist=Array.isArray(x.hi)?x.hi:[],status=storeDayStatusDataV40(hist,meta,x.asof);
+  let team=await api({action:'team_period',matricula:U.u.id,period:periodKey,store:st,reference_date:external?options.referenceDate:undefined}),
       rows=((team.store||{}).rows||[]).filter(r=>(+r.c||0)>0).sort((a,b)=>(+b.c||0)-(+a.c||0)),
       topRows=rows.slice(0,10),
       storeName=String(COMMON?.stores?.[st]?.name||('Filial '+st)),
-      period=storePeriodLabelV40(PER),
+      period=storePeriodLabelV40(periodKey),
       asof=String(x.asof||COMMON?.asof||''),
-      periodRef=PER==='day'?(asof?fmtChartDate(asof):'Dia anterior'):PER==='week'?'Semana até '+fmtChartDate(asof):PER==='month'?new Date((asof||'2026-09-01')+'T12:00:00').toLocaleDateString('pt-BR',{month:'long',year:'numeric'}):'Ano';
+      periodRef=periodKey==='day'?(asof?fmtChartDate(asof):'Dia anterior'):periodKey==='week'?'Semana até '+fmtChartDate(asof):periodKey==='month'?new Date((asof||'2026-09-01')+'T12:00:00').toLocaleDateString('pt-BR',{month:'long',year:'numeric'}):'Ano';
+
+  if(external){
+    if(String(team.referenceDate||team.endDate||'').slice(0,10)!==options.referenceDate)
+      throw Error('O ranking da equipe não corresponde ao D-1 solicitado.');
+    // Uma divergência entre o Tabelão e o Gestão/Lojas precisa ser evidenciada, não mascarada.
+    const teamCaptured=rows.reduce((sum,r)=>sum+(Number(r.c)||0),0);
+    if(Math.abs(teamCaptured-Number(x.c))>0.05)
+      throw Error('Dados dos colaboradores e do resultado gerencial divergentes para L'+st+'.');
+  }
 
   let best=[...hist].sort((a,b)=>(+b[1]||0)-(+a[1]||0)).slice(0,3),
       attention=status.filter(z=>z.status==='att'||z.status==='zero'),
@@ -1233,10 +1273,10 @@ async function shareStoreResultV40(){
 
   y=910;
   rr(55,y,970,154,18,BE);
-  txt('DESTAQUES DO PERÍODO',80,y+34,18,'700',G);
+  txt('DESTAQUES DO periodKeyÍODO',80,y+34,18,'700',G);
   let bestTxt=best.length?best.map(b=>fmtChartDate(b[0])+' '+money(b[1])).join(' • '):'Sem histórico diário';
   txt(fitText('Melhores dias: '+bestTxt,880,'700 13px Arial, sans-serif'),80,y+64,13,'700',G);
-  if(PER==='month'){
+  if(periodKey==='month'){
     txt('Dias de atenção: '+attention.length+'  •  possíveis zerados: '+zeroDays,80,y+92,13,'700',attention.length?RED:G);
     txt('Participação: '+rows.length+' colaboradores com venda no período.',80,y+120,13,'400',G);
   }else{
@@ -1245,7 +1285,7 @@ async function shareStoreResultV40(){
 
   txt('Atualizado até '+(asof?fmtChartDate(asof):'—'),1025,H-30,12,'400',S,'right');
 
-  let caption=[
+  let caption=options.caption||[
     '📊 *RESULTADO DA FILIAL | '+period.toUpperCase()+'*',
     '🏬 *'+st+' — '+storeName+'*',
     '',
@@ -1256,20 +1296,38 @@ async function shareStoreResultV40(){
     '📦 *Desvio pedidos:* '+(orderGap>=0?'+ ':'')+num(orderGap)
   ].join('\n');
 
-  cv.toBlob(async b=>{
-    if(!b)return;
-    let file=new File([b],'Resultado_Filial_'+st+'_'+PER+'_'+(asof||'periodo')+'_HD.png',{type:'image/png'});
-    try{
-      if(navigator.canShare&&navigator.canShare({files:[file]})){
-        await navigator.share({title:'Resultado da Filial '+st,text:caption,files:[file]});
-        return
-      }
-    }catch(e){if(e?.name==='AbortError')return}
-    try{await navigator.clipboard.writeText(caption)}catch(e){}
-    let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500);
-    alert('Card HD gerado. A legenda foi copiada para compartilhar.')
-  },'image/png')
- }catch(e){console.error(e);alert(e.message||'Não foi possível gerar o card da filial.')}
+  return await new Promise((resolve,reject)=>{
+    cv.toBlob(async b=>{
+      if(!b){reject(Error('Não foi possível gerar o card da filial.'));return;}
+      const file=new File([b],'Resultado_Filial_'+st+'_'+periodKey+'_'+(asof||'periodo')+'_HD.png',{type:'image/png'});
+      try{
+        if(!options.downloadOnly&&navigator.canShare?.({files:[file]})&&typeof navigator.share==='function'){
+          try{
+            await navigator.share({title:'Resultado da Filial '+st,text:caption,files:[file]});
+            resolve({mode:'native'});return;
+          }catch(e){if(e?.name==='AbortError'){resolve({mode:'cancelled'});return;}}
+        }
+        try{await navigator.clipboard?.writeText(caption)}catch(_){}
+        const objectURL=URL.createObjectURL(b),a=document.createElement('a');
+        a.href=objectURL;a.download=file.name;document.body.append(a);a.click();a.remove();
+        setTimeout(()=>URL.revokeObjectURL(objectURL),60000);
+        if(options.downloadOnly){resolve({mode:'saved'});return;}
+        if(external){
+          const phone=String(options.phone||'').replace(/\D/g,'');
+          const validPhone=/^55[1-9]\d9\d{8}$/.test(phone);
+          const waUrl='https://wa.me/'+(validPhone?phone:'')+'?text='+encodeURIComponent(caption);
+          let opened=false;
+          if(options.chatWindow&&!options.chatWindow.closed){
+            try{options.chatWindow.location.replace(waUrl);opened=true}catch(_){}
+          }
+          resolve({mode:'manual',opened,waUrl});return;
+        }
+        alert('Card HD gerado. A legenda foi copiada para compartilhar.');
+        resolve({mode:'saved'});
+      }catch(e){reject(e);}
+    },'image/png');
+  });
+ }catch(e){console.error(e);if(options.store)throw e;alert(e.message||'Não foi possível gerar o card da filial.')}
 }
 let TEAM_FILTER='all',TEAM_SCOPE='store';
 function team(){if(!isLead())return '<div class=notice>Acesso exclusivo para gestores/supervisores.</div>';let regional=TEAM_SCOPE==='regional',all=regional?Object.entries(COMMON?.stores||{}).map(([st,v])=>{let p=v?.p?.[PER]||{};return{id:st,name:'Filial '+st,st,c:+p.c||0,a:+p.a||0,o:+p.o||0}}):[...teamList()];all.sort((x,y)=>(+y.c||0)-(+x.c||0));let sellers=all.filter(x=>(+x.c||0)>0),zeros=all.filter(x=>(+x.c||0)<=0),total=all.length,active=sellers.length,zc=zeros.length,approved=sellers.reduce((v,x)=>v+(+x.a||0),0),captured=sellers.reduce((v,x)=>v+(+x.c||0),0),avg=active?captured/active:0,potential=avg*zc,base=captured||0,impact=base?potential/base*100:0,a=TEAM_FILTER==='sold'?sellers:TEAM_FILTER==='zero'?zeros:all,period=({day:'Hoje',week:'Semana',month:'Mês',year:'Ano'})[PER];let rows=a.map((u,i)=>{let zero=(+u.c||0)<=0,part=base?(+u.c||0)/base*100:0,label=regional?'Filial '+esc(u.st):esc(preferredName(u.id,u.name)),sub=regional?(num(u.o)+' pedidos • '+money(u.a)+' aprovado • '+part.toFixed(1).replace('.',',')+'% part.'):(esc(u.id)+' • '+num(u.o)+' pedidos • '+money(u.a)+' aprovado • '+part.toFixed(1).replace('.',',')+'% part.');return '<div class="teamrow '+(zero?'zeroRow':'')+'">'+(regional?'<div class=avatar>'+esc(u.st)+'</div>':photo(u.id,preferredName(u.id,u.name)))+'<div style="flex:1"><b>'+(zero?'—':(i+1)+'º')+' '+label+'</b><div class=muted>'+sub+'</div></div><span class="statusTag '+(zero?'zero':'sold')+'">'+(zero?'Zerada':'Com venda')+'</span></div>'}).join('');return '<div class=card><div class=title>Meu Time</div><div class=muted>'+(regional?'Visão Regional CE+PI por lojas':'Acompanhe o desempenho da sua equipe no eStore')+'</div><div class=scopeSwitch><button class="'+(!regional?'on':'')+'" onclick="TEAM_SCOPE=\'store\';TEAM_FILTER=\'all\';go(\'team\')">Minha Filial</button><button class="'+(regional?'on':'')+'" onclick="TEAM_SCOPE=\'regional\';TEAM_FILTER=\'all\';go(\'team\')">Regional CE+PI</button></div>'+tabs()+'<div class=teamFilters><button class="'+(TEAM_FILTER==='all'?'on':'')+'" onclick="TEAM_FILTER=\'all\';go(\'team\')">Todos ('+total+')</button><button class="'+(TEAM_FILTER==='sold'?'on':'')+'" onclick="TEAM_FILTER=\'sold\';go(\'team\')">✓ Com venda ('+active+')</button><button class="'+(TEAM_FILTER==='zero'?'zeroOn':'')+'" onclick="TEAM_FILTER=\'zero\';go(\'team\')">⊗ Zerados ('+zc+')</button></div><div class=teamKpis><div class=kpi><span>'+(regional?'Lojas':'Time total')+'</span><b>'+total+'</b><small>'+(regional?'operações CE+PI':'colaboradores')+'</small></div><div class=kpi><span>Com venda</span><b>'+active+' ('+(total?Math.round(active/total*100):0)+'%)</b></div><div class="kpi danger"><span>Zerados</span><b>'+zc+' ('+(total?Math.round(zc/total*100):0)+'%)</b></div><div class=kpi><span>Venda aprovada</span><b>'+money(approved)+'</b></div><div class=kpi><span>Média por '+(regional?'loja ativa':'colaborador com venda')+'</span><b>'+money(avg)+'</b></div><div class=kpi><span>Potencial com os zerados</span><b>'+money(potential)+'</b><small>+'+impact.toFixed(1).replace('.',',')+'% sobre o resultado atual</small></div></div><div class=teamInsight>💡 Se '+(regional?'as <b>'+zc+' lojas zeradas</b>':'os <b>'+zc+' colaboradores zerados</b>')+' atingissem a média '+(regional?'das lojas ativas':'do time')+', poderíamos gerar <b>+ '+money(potential)+'</b> no período '+period.toLowerCase()+'.</div><div class=teamReportBar><button class="btn teamPdfBtn" onclick="generateTeamPDF()">📄 Gerar relatório em PDF</button><div class=muted>O relatório considera a visão, o período e o filtro selecionados acima.</div></div><div class=title style="margin-top:22px">'+(regional?'Lojas da Regional':'Lista de colaboradores')+'</div>'+rows+'</div>'}
