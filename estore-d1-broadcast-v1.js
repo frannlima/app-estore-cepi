@@ -155,9 +155,8 @@ async function share(index,button){
   if(!opened){
    const a=document.createElement("a");a.href=waUrl;a.target="_blank";a.rel="noopener noreferrer";
    a.textContent="Abrir conversa do supervisor no WhatsApp";
-   const box=ID("dcStatus");box?.append(document.createTextNode(" "));
-   box?.append(a);
-   status("Card salvo; clique no link disponível para abrir a conversa e anexe o PNG manualmente. A entrega não é confirmada.");
+   status("Card salvo. Use o link para abrir a conversa e anexe o PNG manualmente. O envio depende da sua confirmação.");
+   ID("dcStatus")?.append(document.createTextNode(" "),a);
    return;
   }
   status("Conversa de "+p.name+" aberta com a legenda pronta. O PNG foi baixado: anexe o card e confirme o envio no WhatsApp.");
