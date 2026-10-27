@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v255-d1-legenda-limpa';
-const BUILD='v255-d1-legenda-limpa';
+const CACHE='estore-cepi-shell-v256-d1-card-anexo';
+const BUILD='v256-d1-card-anexo';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
