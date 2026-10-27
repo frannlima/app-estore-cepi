@@ -47,7 +47,7 @@
  if(typeof document==="undefined"||document.getElementById("estore-d1-daily-script"))return;
  const script=document.createElement("script");
  script.id="estore-d1-daily-script";
- script.src=new URL("./estore-d1-broadcast-v1.js?v=1",document.currentScript?.src||location.href).href;
+ script.src=new URL("./estore-d1-broadcast-v1.js?v=2",document.currentScript?.src||location.href).href;
  script.defer=true;
  document.head.appendChild(script);
 })();
