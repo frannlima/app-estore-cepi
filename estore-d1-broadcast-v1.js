@@ -57,7 +57,7 @@ function render(){
    '<div class="dcBtns"><button data-view="'+i+'" '+(!canPrepare?"disabled":"")+'>Ver legenda</button>'+
    '<button data-copy="'+i+'" '+(!canPrepare?"disabled":"")+'>Copiar mensagem</button>'+
    '<button data-card="'+i+'" '+(!canPrepare?"disabled":"")+'>Gerar card</button>'+
-   '<button class="dcMain dcSend" data-send="'+i+'" '+(!canSend?'disabled title="'+esc(sendHelp)+'"':'title="Preparar card PNG e mensagem para compartilhar com este supervisor"')+'>📲 Enviar card WhatsApp</button></div></article>';
+   '<button class="dcMain dcSend" data-send="'+i+'" '+(!canSend?'disabled title="'+esc(sendHelp)+'"':'title="Preparar card PNG e mensagem para compartilhar com este supervisor"')+'>📲 Preparar card + WhatsApp</button></div></article>';
  }).join("");
  ID("dcBody").innerHTML='<p class="dcNote">'+esc(note)+'</p>'+
   '<div class="dcCount"><span><b>'+counts.total+'</b> supervisores</span><span><b>'+counts.prepared+'</b> prontos com dados</span><span><b>'+counts.contact_verified+'</b> contatos liberados</span><span><b>'+counts.outside_active_scope+'</b> fora do escopo ativo</span></div>'+
@@ -101,40 +101,92 @@ async function downloadCard(index,button){
  }catch(e){status(String(e?.message||'Falha ao gerar card.'),true)}
  finally{button.disabled=false;button.textContent=old}
 }
+function showPreparedShare(result,person){
+ const previous=ID('dcShareOverlay');
+ if(previous)previous.remove();
+ if(!ID('dcShareStyle')){
+   const style=document.createElement('style');style.id='dcShareStyle';
+   style.textContent=[
+     '#dcShareOverlay{position:fixed;inset:0;z-index:2147481800;background:#0a241edb;display:flex;justify-content:center;align-items:center;padding:12px;box-sizing:border-box}',
+     '#dcShareDialog{background:#faf8f3;color:#173f35;border-radius:16px;width:min(640px,100%);max-height:94dvh;overflow:auto;padding:17px;font:14px/1.45 Arial,sans-serif;box-sizing:border-box;box-shadow:0 15px 50px #0006}',
+     '#dcShareDialog h3{margin:0 0 8px;font-size:18px}#dcShareDialog p{margin:7px 0 12px}',
+     '#dcShareDialog img{width:min(100%,330px);max-height:36dvh;object-fit:contain;background:#fff;border:1px solid #d3ddd4;border-radius:9px;display:block;margin:8px auto}',
+     '#dcShareDialog .dcShareSteps{background:#ebeee7;border-radius:10px;padding:10px 14px;margin:12px 0}',
+     '#dcShareDialog .dcShareActions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}',
+     '#dcShareDialog button{cursor:pointer;padding:10px 13px;border-radius:8px;border:1px solid #9fb7a6;background:#fff;color:#173f35;font-weight:700}',
+     '#dcShareDialog button.dcSharePrimary{background:#173f35;color:#fff}',
+     '#dcShareDialog .dcShareStatus{min-height:20px;font-size:12px;color:#285a45}#dcShareDialog small{display:block;color:#61786d}'
+   ].join('');
+   document.head.append(style);
+ }
+ const url=URL.createObjectURL(result.file);
+ const overlay=document.createElement('div');
+ overlay.id='dcShareOverlay';
+ overlay.innerHTML='<section id="dcShareDialog" role="dialog" aria-modal="true" aria-label="Compartilhar card D-1 pelo WhatsApp">'+
+ '<h3>Card + legenda prontos para o WhatsApp</h3>'+
+ '<p id="dcShareRecipient"></p>'+
+ '<img id="dcShareImage" alt="Prévia do card oficial da filial no período D-1">'+
+ '<div class="dcShareSteps"><b>Para enviar o card junto com a legenda no computador:</b>'+
+ '<ol><li>Baixe o PNG.</li><li>Abra o WhatsApp Business e confira o supervisor correto.</li>'+
+ '<li>Use o clipe para anexar a imagem; cole a legenda na descrição da foto.</li>'+
+ '<li>Confira imagem e legenda e confirme Enviar.</li></ol></div>'+
+ '<div class="dcShareActions">'+
+ '<button type="button" id="dcShareDownload">1. Baixar card PNG</button>'+
+ '<button type="button" id="dcShareCopy">2. Copiar legenda</button>'+
+ '<button type="button" class="dcSharePrimary" id="dcShareOpen">3. Abrir WhatsApp</button>'+
+ '<button type="button" id="dcShareClose">Fechar</button></div>'+
+ '<small>O link do WhatsApp preenche apenas texto. Nesta etapa, o PNG é anexado manualmente; nenhum envio é automático.</small>'+
+ '<p class="dcShareStatus" id="dcShareInfo" role="status" aria-live="polite"></p></section>';
+ document.body.append(overlay);
+ ID('dcShareRecipient').textContent='Destinatário: '+person.name+' | Filial L'+person.store;
+ ID('dcShareImage').src=url;
+ const info=msg=>{const v=ID('dcShareInfo');if(v)v.textContent=msg};
+ const close=()=>{
+   document.removeEventListener('keydown',onKey);
+   URL.revokeObjectURL(url);
+   overlay.remove();
+ };
+ const onKey=e=>{if(e.key==='Escape')close()};
+ document.addEventListener('keydown',onKey);
+ overlay.addEventListener('click',e=>{if(e.target===overlay)close()});
+ ID('dcShareClose').addEventListener('click',close);
+ ID('dcShareDownload').addEventListener('click',()=>{
+   const a=document.createElement('a');a.href=url;a.download=result.file.name;
+   document.body.append(a);a.click();a.remove();
+   info('Card salvo. Agora copie a legenda e anexe o PNG na conversa antes de enviar.');
+ });
+ ID('dcShareCopy').addEventListener('click',async()=>{
+   try{await navigator.clipboard.writeText(result.caption);info('Legenda copiada. Cole no campo de descrição da imagem no WhatsApp.')}
+   catch(_){info('Cópia automática indisponível. Use o botão Ver legenda no comunicado.')}
+ });
+ ID('dcShareOpen').addEventListener('click',()=>{
+   // Abrir a conversa sem texto evita disparar mensagem sem imagem por engano.
+   const a=document.createElement('a');a.href=result.waUrl;
+   a.target='_blank';a.rel='noopener noreferrer';
+   document.body.append(a);a.click();a.remove();
+   info('Anexe o PNG e cole a legenda na foto. Somente depois confirme Enviar.');
+ });
+ ID('dcShareDownload').focus();
+}
 async function share(index,button){
  const d=R.data,p=d?.supervisors?.[index];
  if(!canPrepare(p,d)){status('D-1 e metas oficiais precisam estar completos antes do compartilhamento.',true);return;}
- const mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');
- // Reservar aba no gesto do clique antes de consultar resultado e ranking oficiais.
- let chat=null;
- if(!mobile){try{chat=window.open('about:blank','_blank')}catch(_){}}
- const old=button.textContent;button.disabled=true;button.textContent='Preparando resultado...';
+ const old=button.textContent;
+ button.disabled=true;button.textContent='Preparando resultado...';
  try{
-  const result=await prepareMyFilialCard(p,d,{chatWindow:chat});
+  const result=await prepareMyFilialCard(p,d);
   if(result?.mode==='native'){
-   if(chat&&!chat.closed)chat.close();
-   status('Card oficial Minha Filial e legenda preparados. Escolha o WhatsApp Business, confirme o supervisor e envie.');
+   status('Compartilhamento aberto: confira se o WhatsApp Business mostra o card e a legenda antes de enviar.');
   }else if(result?.mode==='cancelled'){
-   if(chat&&!chat.closed)chat.close();
    status('Compartilhamento cancelado. Nenhuma mensagem enviada.');
   }else if(result?.mode==='manual'){
-   if(result.opened){
-    status('WhatsApp aberto com a legenda. Anexe o PNG do Resumo da Filial, confira '+p.name+' e confirme o envio.');
-   }else{
-    if(chat&&!chat.closed)chat.close();
-    status('PNG salvo. Use o link a seguir para abrir o WhatsApp; anexe a imagem e confirme o destinatário.');
-    const a=document.createElement('a');a.href=result.waUrl;a.target='_blank';a.rel='noopener noreferrer';
-    a.textContent='Abrir WhatsApp de '+p.name+' ↗';
-    ID('dcStatus')?.append(document.createTextNode(' '),a);
-   }
+   showPreparedShare(result,p);
+   status('Card oficial e legenda prontos. Siga as etapas na janela para anexar os dois no WhatsApp.');
   }else{
-   if(chat&&!chat.closed)chat.close();
-   status('Não foi possível concluir o compartilhamento. Nenhuma mensagem enviada.',true);
+   status('Não foi possível preparar o compartilhamento completo.',true);
   }
- }catch(e){
-  if(chat&&!chat.closed)chat.close();
-  status(String(e?.message||'Falha ao compartilhar card da filial.'),true);
- }finally{button.disabled=false;button.textContent=old;}
+ }catch(e){status(String(e?.message||'Falha ao compartilhar card da filial.'),true)}
+ finally{button.disabled=false;button.textContent=old;}
 }
 
 async function load(){
