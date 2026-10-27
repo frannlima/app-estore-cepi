@@ -129,7 +129,7 @@ function seedMarkup(){
  '<section class="card hourImportCardV198"><div class="hourNewHeadV198"><div><b>📋 Consolidar vendas do WhatsApp</b><small>Cole a mensagem, confira as vendas e salve. A mesma parcial alimentará a Central de Alertas.</small></div></div>'+
  (isMain()?'<button type="button" class="btn" onclick="hourPrintOpenV198()">Colar mensagem / importar print</button><span class="hourSmallV198">Somente administrador; exige senha e revisão de cada lançamento.</span>':'<p class="muted">A importação regional é feita pelo administrador. Sua filial continua atualizando pelo formulário acima.</p>')+
  '</section><section class="card hourAlertsCardV198" id="hourAlertsSectionV198"><div class="hourNewHeadV198"><div><b>🚨 Mobilização | Filiais sem venda informada</b><small>Após consolidar, a lista de supervisores elegíveis aparece automaticamente abaixo. Sem informação não significa venda zero confirmada.</small></div></div><div id="hourRadarV198" class="hourRadarV198">Carregando situação...</div>'+
- (isMain()?'<div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="btn alt" onclick="hourAlertDirectoryV198()">Ver supervisores e preparar alertas no WhatsApp</button><button type="button" class="btn ghost" onclick="openAlertCenter()">Gerenciar parciais e contatos</button></div>':'<p class="hourSmallV198">Alertas com contatos são restritos ao administrador.</p>')+
+ (isMain()?'<div style="display:flex;flex-wrap:wrap;gap:8px"><button type="button" class="btn alt" onclick="hourAlertDirectoryV198()">Ver supervisores e preparar alertas no WhatsApp</button><button type="button" class="btn ghost" onclick="openAlertCenter()">Gerenciar parciais e contatos</button><button type="button" class="btn alt" onclick="hourlyWhatsAppTextV246()">📲 Mensagem WhatsApp Business</button></div>':'<p class="hourSmallV198">Alertas com contatos são restritos ao administrador.</p>')+
  '<div id="hourSupervisorListV198"></div></section>';
 }
 function decorateScreen(){
@@ -187,6 +187,25 @@ function caption(j){
  ];
  return lines.join('\n');
 }
+// Compartilhamento gratuito assistido: mensagem da parcial, sem anexos e sem envio automático.
+window.hourlyWhatsAppTextV246=function(){
+ const data=curr();
+ if(!data||!(data.stores||[]).length){
+   window.alert('Carregue a parcial do Hora a Hora antes de preparar a mensagem.');
+   return;
+ }
+ const message=caption(data);
+ if(!message.trim()){
+   window.alert('Não há informações para compartilhar.');
+   return;
+ }
+ const link=document.createElement('a');
+ link.href='https://wa.me/?text='+encodeURIComponent(message);
+ link.target='_blank';
+ link.rel='noopener noreferrer';
+ document.body.append(link);link.click();link.remove();
+ // O WhatsApp Business do aparelho só recebe o texto mediante seleção do usuário.
+};
 async function directory(){
  if(!isMain())throw Error('Acesso restrito ao administrador.');
  if(!adminPassword){const s=window.prompt('Senha administrativa para consultar supervisores e contatos:');if(!s)return;adminPassword=s}
@@ -202,7 +221,7 @@ async function directory(){
 function alertMessage(row,person){
  const first=String(person.name||'Liderança').split(' ')[0],d=curr()?.result_date||clock().date;
  if(alertTemplateV198){const msg=alertTemplateV198({name:person.name,st:row.st,meta:row.metaValue,orders:row.orderTarget,condition:'missing',date:d,time:clock().time});return clock().hour===21?msg+'\n\n⏰ Fechamento: informe a captação eStore acumulada do dia no Hora a Hora.':msg;}
- return '🚨 *ALERTA eSTORE CONNECT | HORA A HORA*\n\nOlá, '+first+'! Precisamos atualizar a captação da *filial '+row.st+'*.\n\n🎯 *Meta eStore:* '+moneyBR(row.metaValue)+'\n🛍️ *Meta de pedidos:* '+Number(row.orderTarget||0)+'\n⏱️ *Situação:* '+status(row,curr()).label+'\n📅 *Parcial:* '+dateBR(d)+'\n\n📲 Já teve vendas? Atualize o Hora a Hora: '+APP_URL+'\n\nCaso exista alguma dificuldade, sinalize para alinharmos o apoio. Contamos com você!';
+ return '🚨 *ALERTA APP eSTORE CE+PI | HORA A HORA*\n\nOlá, '+first+'! Precisamos atualizar a captação da *filial '+row.st+'*.\n\n🎯 *Meta eStore:* '+moneyBR(row.metaValue)+'\n🛍️ *Meta de pedidos:* '+Number(row.orderTarget||0)+'\n⏱️ *Situação:* '+status(row,curr()).label+'\n📅 *Parcial:* '+dateBR(d)+'\n\n📲 Já teve vendas? Atualize o Hora a Hora: '+APP_URL+'\n\nCaso exista alguma dificuldade, sinalize para alinharmos o apoio. Contamos com você!';
 }
 function showLegacyDirectory(){
  const target=document.getElementById('hourSupervisorListV198'),j=curr();
@@ -239,7 +258,7 @@ function showLegacyDirectory(){
      closing:clock().hour===21,first_check_time:lastTime,last_sale_change_time:lastTime,
      missing_partials:current.miss,link:APP_URL}
    );
-   const message=await lib.shareAlertImage(png,person.phone,clock().hour===21);
+   const message=await lib.shareAlertImage(png,person.phone,clock().hour===21,alertMessage(row,person));
    notice.textContent=message+' Destinatário: '+person.name+' (L'+st+').';
   }catch(err){
    notice.textContent='Não foi possível gerar ou compartilhar o card: '+String(err?.message||err);
