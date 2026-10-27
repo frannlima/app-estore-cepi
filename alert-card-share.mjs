@@ -49,14 +49,46 @@ export async function createAlertImage(contact,row){
  return new File([blob],'alerta-estore-filial-'+row.st+'.png',{type:'image/png'});
 }
 export const HOURLY_LINK=(globalThis.EstoreIdentity?.url('?menu=hourly')||'https://frannlima.github.io/app-estore-cepi/?menu=hourly');
-export async function shareAlertImage(file,phone,closing=false){
+/**
+ * Legenda personalizada para o compartilhamento GRATUITO do Android.
+ * O destinatário deve ser escolhido e o envio confirmado no WhatsApp Business.
+ */
+export function buildAlertCaption(contact,row){
+ if(!row||!contact)throw new Error('Contato e parcial são necessários para preparar a mensagem.');
+ const hour=Number(new Intl.DateTimeFormat('pt-BR',{hour:'2-digit',hour12:false,timeZone:'America/Fortaleza'}).format(new Date()));
+ const greeting=hour>=5&&hour<12?'Bom dia':hour>=12&&hour<18?'Boa tarde':'Boa noite';
+ const name=String(contact.person?.nome||contact.name_original||'liderança').trim().split(/\s+/)[0];
+ const store=String(row.st||contact.store_code_original||'').trim();
+ const condition=row.condition==='stale'?'Parcial sem atualização há mais de 60 minutos':
+   row.condition==='group_sale'?'Venda no consolidado, aguardando confirmação no Hora a Hora':
+   row.condition==='zero'?'Sem venda informada nesta parcial':
+   row.condition==='missing'?'Parcial de venda não informada':'Atualização de venda pendente';
+ const expectedMoney=Number(row.meta)>0?Number(row.meta).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}):'a conferir';
+ const orders=Number(row.orders)>0?Math.round(Number(row.orders))+' pedidos':'a conferir';
+ const detail=row.closing
+   ?'Por favor, registre a venda captada e a quantidade total de pedidos do dia, mesmo que o resultado seja zero.'
+   :'Por favor, confira o resultado da filial e atualize a venda e a quantidade de pedidos no Hora a Hora.';
+ return [
+   greeting+', '+name+'! Espero que esteja bem.',
+   '🚨 *ALERTA eSTORE CEPI | FILIAL '+store+'*',
+   '*Situação:* '+(row.closing?'Fechamento do dia — ': '')+condition+'.',
+   '🎯 *Meta de venda eStore:* '+expectedMoney+'\n🛍️ *Meta de pedidos:* '+orders,
+   detail,
+   '📲 *Atualização:* App eStore CEPI → Hora a Hora\n'+HOURLY_LINK,
+   'Fico à disposição para apoiar, caso precise de suporte.\n\n🚀 Vamos girar o ponteiro!'
+ ].join('\n\n');
+}
+export async function shareAlertImage(file,phone,closing=false,caption=''){
+ const message=String(caption||'').trim()||((closing?'📌 FECHAMENTO 21H: informe o valor total da venda eStore captada hoje na loja e a quantidade de pedidos. Se não vendeu, registre zero.\n':'📲 Atualize sua venda e pedidos no Hora a Hora:\n')+HOURLY_LINK);
  if(navigator.canShare?.({files:[file]}) && typeof navigator.share==='function'){
-  await navigator.share({files:[file],title:'Alerta eStore Connect',text:(closing?'📌 FECHAMENTO 21H: informe o valor total da venda eStore captada hoje na loja e a quantidade de pedidos. Se não vendeu, registre zero.\n':'📲 Atualize sua venda e pedidos no Hora a Hora:\n')+HOURLY_LINK});
-  return 'Card PNG compartilhado. O link Hora a Hora foi incluído no texto do compartilhamento quando suportado pelo WhatsApp; confirme a legenda antes de enviar.';
+  await navigator.share({files:[file],title:'Alerta eStore Connect',text:message});
+  return 'Card e mensagem preparados no compartilhamento nativo. Confirme o WhatsApp Business, o destinatário, a legenda e o envio; a entrega não é verificada pelo aplicativo.';
  }
  const objectURL=URL.createObjectURL(file),a=document.createElement('a');a.href=objectURL;a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(objectURL),60000);
  // O WhatsApp Web não admite pré-anexar um arquivo via wa.me; nunca enviar texto no lugar do PNG.
- return 'PNG baixado. Anexe a imagem ao WhatsApp com a legenda '+(closing?'Fechamento 21h: informe a venda eStore captada hoje. ':'')+HOURLY_LINK+'. O link dentro do PNG não é clicável.';
+ let copied=false;
+ try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(message);copied=true;}}catch(_){}
+ return copied?'Card PNG salvo e mensagem copiada. Abra o WhatsApp Business, selecione o contato, anexe o PNG e cole a legenda. O envio depende de confirmação.':'Card PNG salvo. Abra o WhatsApp Business, anexe o PNG e inclua a mensagem. O envio depende de confirmação.';
 }
 
 
