@@ -1301,7 +1301,7 @@ async function shareStoreResultV40(options={}){
       if(!b){reject(Error('Não foi possível gerar o card da filial.'));return;}
       const file=new File([b],'Resultado_Filial_'+st+'_'+periodKey+'_'+(asof||'periodo')+'_HD.png',{type:'image/png'});
       try{
-        if(!options.downloadOnly&&navigator.canShare?.({files:[file]})&&typeof navigator.share==='function'){
+        if(!options.downloadOnly&&/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'')&&navigator.canShare?.({files:[file]})&&typeof navigator.share==='function'){
           try{
             await navigator.share({title:'Resultado da Filial '+st,text:caption,files:[file]});
             resolve({mode:'native'});return;
