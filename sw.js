@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v251-d1-sales-orders-goals';
-const BUILD='v251-d1-sales-orders-goals';
+const CACHE='estore-cepi-shell-v252-d1-whatsapp-buttons';
+const BUILD='v252-d1-whatsapp-buttons';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
