@@ -1,5 +1,5 @@
 // Lote assistido: gerar um PNG por filial; exige confirmação manual de cada envio no WhatsApp.
-import {createAlertImage,shareAlertImage} from './alert-card-share.mjs';
+import {createAlertImage,shareAlertImage,buildAlertCaption} from './alert-card-share.mjs';
 const selected=new Map();
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const eligibleRow=r=>!!r?.partial_id&&r.active===true&&r.eligible===true&&Number(r.meta)>0&&Number(r.orders)>0&&['missing','zero','sale','unknown'].includes(r.group_status);
@@ -68,7 +68,7 @@ function runBatch(items,notify){
    action.disabled=true;
    try{
     const file=await createAlertImage(x.contact,x.row);
-    const result=await shareAlertImage(file,x.contact.phone_suggested_e164.replace(/\D/g,''),Boolean(x.row.closing));
+    const result=await shareAlertImage(file,x.contact.phone_suggested_e164.replace(/\D/g,''),Boolean(x.row.closing),buildAlertCaption(x.contact,x.row));
     shared++;
     dialog.querySelector('#acBatchMessage').textContent=result;
     action.disabled=false;action.textContent='Continuar para a próxima filial';
