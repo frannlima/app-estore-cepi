@@ -33,11 +33,13 @@ function reason(row,group){
 export function alertMessage(row,person,date,group,now){
  const [label]=reason(row,group);
  const first=String(person.name||'Supervisor').trim().split(/\s+/)[0];
+ const hour=clock(now).hour;
+ const greeting=hour>=5&&hour<12?'Bom dia':hour>=12&&hour<18?'Boa tarde':'Boa noite';
  return [
   '🚨 *ALERTA eSTORE | CE+PI*',
   '📅 '+fmtDate(date)+' • '+clock(now).time,
   '',
-  'Olá, *'+first+'*! Precisamos atualizar o resultado da *filial '+row.st+'*.',
+  greeting+', *'+first+'*! Espero que esteja bem. Precisamos atualizar o resultado da *filial '+row.st+'*.',
   '',
   '🎯 *Meta eStore:* '+money(row.metaValue),
   '🛍️ *Meta de pedidos:* '+Number(row.orderTarget||0),
@@ -50,6 +52,10 @@ export function alertMessage(row,person,date,group,now){
   '',
   '*Menu → Hora a Hora → Registrar incremento / Confirmar sem novas vendas*',
   LINK,
+  '',
+  'Fico à disposição para apoiar, caso precise de suporte.',
+  '',
+  '🚀 Vamos girar o ponteiro!',
   '',
   '_Moda que inspira o Brasil_'
  ].join('\n');
@@ -71,7 +77,7 @@ export function renderPriorityQueue({target,data,contacts,groupStatuses={},at=ne
    const ready=!!p.phone&&!p.onLeave&&validPhone(p.phone)&&openHour(st,today.hour);
    const explanation=p.onLeave?'Férias ou afastamento: bloqueado':!p.phone?'Contato/consentimento pendente':!openHour(st,today.hour)?'Fora do horário de contato':'Contato validado';
    return '<div class="hourPriorityPersonV225"><div class="hourPriorityIdentityV225"><b>'+esc(p.name)+'</b><small>'+esc(p.role)+'</small><small>'+esc(explanation)+'</small></div>'+
-   (ready?'<div class="hourPriorityActionsV225"><button type="button" class="btn hourPrioritySendV227" data-qa-send="'+esc(st)+'" data-qa-p="'+index+'">📲 Enviar alerta</button></div>':
+   (ready?'<div class="hourPriorityActionsV225"><button type="button" class="btn hourPrioritySendV227" data-qa-send="'+esc(st)+'" data-qa-p="'+index+'">📲 WhatsApp Business</button></div>':
    '<span class="hourPriorityLockedV225">Indisponível</span>')+'<small class="hourPriorityInlineV229" role="status" aria-live="polite" data-qa-inline></small></div>';
   }).join(''):'<p class="hourPriorityHintV225">Não há supervisor com contato validado para esta loja.</p>';
   return '<article class="hourPriorityStoreV225"><header><div><strong>L'+esc(st)+'</strong><b>'+esc(label)+'</b></div><span>'+money(row.captured)+'</span></header>'+
@@ -83,7 +89,7 @@ export function renderPriorityQueue({target,data,contacts,groupStatuses={},at=ne
   '<div class="hourPriorityKpisV225"><span><b>'+selling+'</b> com venda</span><span><b>'+pending.length+'</b> sem venda</span><span><b>'+available+'</b> contatos aptos</span></div></div>'+
   (dated?(pending.length?'<div class="hourPriorityStoresV225">'+cards+'</div>':'<p class="hourPriorityHintV225">Nenhuma loja exige alerta por ausência de venda neste momento.</p>'):'<p class="hourPriorityHintV225">Referência histórica: a lista de contatos é liberada somente para o dia atual.</p>')+
   '<p class="hourPriorityFootV225">Os supervisores elegíveis já estão aptos nesta parcial: basta tocar em Enviar alerta. Contatos não validados ou afastados permanecem bloqueados.</p>'+
-  '<p class="hourPriorityFootV225">Um botão prepara o card PNG com a legenda personalizada. No celular, escolha o WhatsApp e confira o supervisor correto e a legenda antes de enviar. No computador, o PNG será baixado e a conversa correta será aberta com o texto pronto; anexe o PNG manualmente. Nenhum alerta é enviado automaticamente.</p>'+
+  '<p class="hourPriorityFootV225">Um botão prepara o card PNG com a legenda personalizada. No celular, escolha o WhatsApp Business e confira o supervisor correto e a legenda antes de enviar. No computador, o PNG será baixado e a conversa correta será aberta com o texto pronto; anexe o PNG manualmente. Nenhum alerta é enviado automaticamente.</p>'+
   '<p class="hourPriorityResponseV225" data-qa-response aria-live="polite" role="status"></p></section>';
  const msg=target.querySelector('[data-qa-response]');
  const statusAt=button=>button?.closest?.('.hourPriorityPersonV225')?.querySelector?.('[data-qa-inline]')||msg;
@@ -133,7 +139,7 @@ export function renderPriorityQueue({target,data,contacts,groupStatuses={},at=ne
      file,caption,phone,store:obj.st,name:obj.person.name,preopenedWindow:chatWindow
     });
     if(shared.mode==='native'){
-     notify(button,'Card e legenda preparados. Selecione o WhatsApp, confira '+obj.person.name+' e toque em Enviar. A entrega não é confirmada pelo app.');
+     notify(button,'Card e legenda preparados. Selecione o WhatsApp Business, confira '+obj.person.name+' e toque em Enviar. A entrega não é confirmada pelo app.');
     }else{
      notify(button,'PNG baixado e mensagem pronta para '+obj.person.name+'. Anexe a imagem na conversa e confirme Enviar.');
      if(!shared.chatOpened&&shared.url){
