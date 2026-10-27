@@ -69,7 +69,7 @@ self.addEventListener('fetch',event=>{
   const url=new URL(req.url);
   if(url.origin!==self.location.origin) return;
 
-  if(url.pathname.endsWith('/parcial.html')){
+  if(url.pathname.endsWith('/parcial.html')||url.pathname.endsWith('/sobre-o-app.html')){
     // Painel autônomo: preservar o HTML completo, sem scripts legados injetados.
     event.respondWith(fetch(new Request(req,{cache:'no-store'})).catch(async()=>{
       const cache=await caches.open(CACHE);return (await cache.match(req))||Response.error();
