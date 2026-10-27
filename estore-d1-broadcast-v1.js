@@ -17,24 +17,23 @@ function caption(p,data){
  const hour=Number(parts.hour);
  const greeting=hour>=5&&hour<12?'Bom dia':hour>=12&&hour<18?'Boa tarde':'Boa noite';
  const name=String(p.name||'Supervisão').trim().split(/\s+/)[0];
- const intro=greeting+', *'+name+'*! Espero que esteja bem! 👋';
+ const intro=greeting+', *'+name+'*! Espero que esteja bem!';
  const tone=p.category==='zero'
-   ?'🚨 *Radar de atenção:* ontem a filial encerrou sem venda eStore registrada. Hoje podemos mudar esse resultado!'
+   ?'*Radar de atenção:* ontem a filial encerrou sem venda eStore registrada. Hoje temos a oportunidade de mudar esse resultado.'
    :p.category==='excellent'
-   ?'👏 *Parabéns pela entrega de ontem!* A filial L'+p.store+' alcançou *'+pct(p.share)+' de share*. Vamos manter esse ritmo!'
-   :'🤝 *Obrigado pela contribuição de ontem!* Cada venda faz diferença. Vamos avançar hoje!';
+   ?'*Parabéns pela entrega de ontem!* A filial L'+p.store+' alcançou *'+pct(p.share)+' de share*. Vamos manter esse ritmo!'
+   :'*Obrigado pela contribuição de ontem!* Cada venda faz diferença. Vamos avançar hoje!';
  return [
    intro,'',tone,'',
-   '🎯 *Desafio de hoje:*',
-   '💰 Meta: *'+money(p.goal)+'*',
-   '🛍️ Pedidos: *'+p.goal_orders+'*','',
-   '👥 Distribua a meta com o time: *Metas → Distribuição diária por HC*.','',
-   '📊 Mais detalhes do D-1: *Minha Filial → Dia*.',
-   '🔗 https://frannlima.github.io/app-estore-cepi/','',
-   'Conte comigo para apoiar! 🚀'
+   '*Desafio de hoje*',
+   'Meta financeira: *'+money(p.goal)+'*',
+   'Meta de pedidos: *'+p.goal_orders+'*','',
+   'Distribua a meta com o time em *Metas > Distribuição diária por HC*.','',
+   'Confira mais detalhes em *Minha Filial > Dia*.',
+   'https://frannlima.github.io/app-estore-cepi/','',
+   'Conte comigo para apoiar!'
  ].join('\n');
 }
-
 
 function render(){
  const d=R.data;if(!d)return;
