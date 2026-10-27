@@ -178,7 +178,7 @@
    if(typeof window.shareCanvas==="function"&&window.shareCanvas!==wrappedShare&&!window.shareCanvas.__goal215){
      const orig=window.shareCanvas,fn=function(canvas,text,...rest){
        const label=labels[current]||"Início",route=permitted.has(current)?current:"home";
-       const footer="\n\n📲 Acesse o App eStore CE+PI\n📍 Menu → "+label+"\n🔗 https://frannlima.github.io/app-estore-cepi/?view="+route;
+       const footer="\n\n📲 Acesse o App eStore CE+PI\n📍 Menu → "+label+"\n🔗 "+EstoreIdentity.url("?view="+route);
        const content=String(text||"");
        return orig.call(this,canvas,content.includes("📲 Acompanhe no App eStore CE+PI")||content.includes("📲 Acesse o App eStore CE+PI")?content:content+footer,...rest);
      };
@@ -219,13 +219,13 @@
  }
  function footer(text){
    const base=String(text||"").trimEnd();
-   if(base.includes("frannlima.github.io/app-estore-cepi/"))return base;
+   if(base.includes(EstoreIdentity.url())||base.includes("frannlima.github.io/app-estore-cepi/"))return EstoreIdentity.normalize(base);
    const v=route();
-   return base+"\n\n📲 Acesse o App eStore CE+PI\n📍 Menu → "+paths[v]+"\n🔗 https://frannlima.github.io/app-estore-cepi/?view="+v;
+   return base+"\n\n📲 Acesse o App eStore CE+PI\n📍 Menu → "+paths[v]+"\n🔗 "+EstoreIdentity.url("?view="+v);
  }
  const enhanced=function(payload){
    if(!payload||typeof payload!=="object")return before.call(navigator,payload);
-   return before.call(navigator,{...payload,text:footer(payload.text||payload.title||"")});
+   return before.call(navigator,{...payload,text:payload.url?EstoreIdentity.normalize(payload.text||payload.title||""):footer(EstoreIdentity.normalize(payload.text||payload.title||"")),...(payload.url?{url:EstoreIdentity.normalize(payload.url)}:{})});
  };
  enhanced.__estoreFooter215=true;
  try{navigator.share=enhanced}catch(_){}

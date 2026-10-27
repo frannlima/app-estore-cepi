@@ -1,0 +1,952 @@
+commit,data_autoria_com_fuso,autor_registrado,descricao
+ec44a81c0e4623594428602ee790c4957b4f75ba,2026-09-19T00:59:18-03:00,frannlima,Inicializa publicação do App eStore
+1b253d07aea9fe41c35cd43d1bff3dff6b0b8283,2026-09-19T01:06:26-03:00,frannlima,Publica App eStore CE+PI
+ed20b9d27578fcb1484ddb97055f2c0114b12329,2026-09-19T01:06:33-03:00,frannlima,Configura publicação no GitHub Pages
+edef2b10e945c912a43e4d6ec329fd818b470026,2026-09-19T01:31:41-03:00,frannlima,Reexecuta publicação no GitHub Pages
+43ade50be617263548b0453a55abbcb1e3d9986c,2026-09-19T01:33:02-03:00,frannlima,Publica versão v3 aprovada do App eStore CE+PI
+0f34c0f085bd37a1149b939c68496fccd1a2e5bc,2026-09-19T01:34:58-03:00,frannlima,Ajusta pódio de supervisores e campanhas na aba Aprenda
+8a58e9dbfb40239c945b97a1911fd66ee9c6a759,2026-09-19T01:42:51-03:00,frannlima,Corrige acesso ao Administrativo e adiciona opção Sair
+742839cda8027a25dd62f9f114bf40e553d612c0,2026-09-19T12:13:09-03:00,frannlima,Conecta atualização diária ao banco persistente Supabase
+674f9c85a0e1e76ff42700582ef61d5d74fff968,2026-09-19T12:37:08-03:00,frannlima,Sincroniza data consolidada da tela de login com o banco
+da30f95d07ed4c0e3749612bbf1da83b5b4329f7,2026-09-20T00:21:11-03:00,frannlima,Corrige meta anual e ativa atualização de metas no Administrativo
+82b1a874f974785578604bfdaaaf699b10103b03,2026-09-20T00:40:19-03:00,frannlima,Corrige share anual e exibe meses nos destaques do ano
+d072bc90c231cafa296d1e6aa2fc904bfce1d026,2026-09-20T00:41:09-03:00,frannlima,Atualiza destaques anuais por mês
+5def68e88fd2d9bf5f1e252c9d1e5170ebcf8e9b,2026-09-20T02:24:08-03:00,frannlima,feat: estilos da nova interface eStore
+23a652978cccad7b01fcdb4b36bdc2912a7bd72e,2026-09-20T02:24:55-03:00,frannlima,feat: nova navegacao e areas por perfil
+5a83b565e79d05efcede48bfba64d0210a224e89,2026-09-20T02:25:06-03:00,frannlima,feat: aplicar nova interface eStore CE+PI
+ddefca47bc305faab3e6835f83837743ff444927,2026-09-20T07:02:32-03:00,frannlima,"feat: alinhar interface ao modelo aprovado com eDay, ranking e dashboards"
+56500412bc82a683880cfa0a2046ecd8014f0a3f,2026-09-20T07:03:15-03:00,frannlima,style: alinhar visual ao modelo aprovado com dashboards e performance
+a82b3e542c85283303a9ab2765c6be5796267d46,2026-09-20T07:03:29-03:00,frannlima,chore: atualizar cache da interface v3
+a8feb7df75dfbdd63e122fe8b8b7a4fbd621b9e1,2026-09-20T07:59:37-03:00,frannlima,fix: aplicar ajustes finais de comissao pool ranking regras perfil e home
+64f447607d62734fc41a9d0db56fc9f61cf9584e,2026-09-20T08:01:43-03:00,frannlima,style: adicionar imagem oficial e ajustes visuais finais
+9e0865759ef667817b5eb6d8613a23328819d500,2026-09-20T08:02:03-03:00,frannlima,chore: atualizar cache dos ajustes finais
+759dfec1d79663d77c5e4db616a56e337dbd9b82,2026-09-20T08:02:22-03:00,frannlima,fix: padronizar coluna Ranking nas tabelas
+5b8b69f10cf2e065f8d971c8751ce82806b974a4,2026-09-20T08:02:35-03:00,frannlima,chore: publicar revisão final dos ajustes
+437073b61064140e81fa91e9d9c41edc95ff4077,2026-09-20T08:30:43-03:00,frannlima,feat: metas por periodo distribuicao HC compartilhamento e midia ADM
+5f1137e259d61e1dad1ca4bbe761eff48b9b8cc7,2026-09-20T08:31:04-03:00,frannlima,style: telas de metas HC compartilhamento e gestao de midia
+d66fd4870014a9fe8cd385ff1641412335264d7e,2026-09-20T08:31:23-03:00,frannlima,feat: exibir cards institucionais em campanhas e informacoes
+c08c1f038a431af306c7cfb857e1cdaad745b70e,2026-09-20T08:31:36-03:00,frannlima,chore: publicar metas compartilhamento e midia institucional
+144ba2b7be20e665b49a3e6944a3f5985fb62f21,2026-09-20T08:32:42-03:00,frannlima,fix: ajustar leitura de metas da filial e data diaria HC
+82a22eb3c0daf70e27022bf91a73287291c74ee0,2026-09-20T08:32:55-03:00,frannlima,chore: publicar ajustes de metas HC e compartilhamento
+4ec63cdaefb28d70a709c8caad4361f4dbdc17ee,2026-09-20T11:23:05-03:00,frannlima,feat: fotos em ranking pool executivo suporte e hora a hora CEPI
+ddcf61edac7541d600208d77371eed796ebc795b,2026-09-20T11:23:31-03:00,frannlima,style: fotos ranking suporte hora a hora e pool executivo
+26996544e462560f9d6c746839054de264b56bc4,2026-09-20T11:24:05-03:00,frannlima,chore: publicar suporte hora a hora e fotos compartilhadas
+2ac61fde8bae45fe092b1d2b896b1dce14428575,2026-09-20T12:20:08-03:00,frannlima,fix: carregar perfil admin e resultados mais recentes direto do backend
+1f734f75446a713e9c7d57538377c8734748dcaf,2026-09-20T12:20:22-03:00,frannlima,fix: permitir rolagem do menu lateral e exibir administrativo e sair
+2c49bacc6086515e87a70d896778e88d1bff2058,2026-09-20T12:20:33-03:00,frannlima,chore: publicar correção de sessão admin e menu
+048d8a423667fdaa877bfdba60c32feeebdc4823,2026-09-20T12:42:06-03:00,frannlima,fix: corrigir CORS no login removendo header cache-control
+fd8c5ba30024d2697b34746f3569a9ad6c938516,2026-09-20T12:42:26-03:00,frannlima,chore: publicar correção do login
+cf9c8881575da153bb66e056eeab62a9e5a3574a,2026-09-20T13:14:15-03:00,frannlima,Corrige login com fallback para base local de colaboradores
+fa9895f8f3300cf62522b7c975a71fd74c270460,2026-09-20T13:17:37-03:00,frannlima,Atualiza versão do app-v2 para invalidar cache do login
+39f8312c9a0dc65b1164ba3b7084d29c9ab59926,2026-09-20T14:57:16-03:00,frannlima,Ajusta share Hora a Hora para meta geral de vendas da loja
+22a52867dea4fab1224b207315b7fbbb70ec3b89,2026-09-20T14:57:23-03:00,frannlima,Publica v12 com novo cálculo de share Hora a Hora
+5cbb0c8d44e7113bd239fd874f1aed92c5ca1efb,2026-09-21T00:23:55-03:00,frannlima,"V13: nova home por perfil, reconhecimento, comissão e hora a hora incremental"
+32d1da6dfa3d3bbd176c3332e67cd838c8ebb4e4,2026-09-21T00:24:07-03:00,frannlima,V13: estilos da nova experiência por perfil
+48a4646555c3df74596d6a7c1b27afc0c049c7de,2026-09-21T00:24:33-03:00,frannlima,Publica V13 do App eStore CE+PI
+84ae96608d28511539cd749b08151dbfea098f08,2026-09-21T00:40:28-03:00,frannlima,"V14: notificações, histórico editável Hora a Hora e suporte identificado"
+5a1621043bfc8eeb50d6d613d01905bec33089bf,2026-09-21T00:40:54-03:00,frannlima,V14: corrige roteamento das novas áreas
+d29bad9c911e94ee1b3f816363f7aded8b524425,2026-09-21T00:41:09-03:00,frannlima,V14: estilos de notificações e auditoria Hora a Hora
+8da1fe9489376538c60596f5b6eb7c02d3337ee0,2026-09-21T00:41:18-03:00,frannlima,Publica V14 do App eStore CE+PI
+f5c2c09a4d9bd3373a3d6bca72a38bc8b7e4b343,2026-09-21T00:44:13-03:00,frannlima,V15: eDay administrável e card Hora a Hora para compartilhamento
+4f2e8ad5de6ec4586e0ce87e203294e80ff8d93c,2026-09-21T00:44:24-03:00,frannlima,V15: estilo do controle eDay
+7bb6350ae091183dd88913ca6bfd651b6ef068c0,2026-09-21T00:44:33-03:00,frannlima,Publica V15 do App eStore CE+PI
+47be3577b61e24d34b45bbd031685ae19e82f2e2,2026-09-21T00:52:44-03:00,frannlima,V16: rankings de Pool e supervisores com alerta Hora a Hora
+1a344c2975476bfed0c4fbc83f2feb4e2722bab3,2026-09-21T00:52:53-03:00,frannlima,V16: estilos rankings e alertas Hora a Hora
+382ba20c69385e58dbee424cfdf361fd535eb298,2026-09-21T00:53:09-03:00,frannlima,Publica V16 do App eStore CE+PI
+b4495b57b5caaef567496b22705fafc0e18b23b4,2026-09-21T01:05:28-03:00,frannlima,V17: fechamento Hora a Hora e mensagem de meta não distribuída
+e9e81e770b9c2442da08236ab72f94b302a7a73c,2026-09-21T01:05:42-03:00,frannlima,V17: estilos fechamento e metas
+c0b8acfddeea7e585019325822f0ee00b00f5ec2,2026-09-21T01:05:57-03:00,frannlima,Publica V17 do App eStore CE+PI
+7261b7e9dbf31ce7dd7170c997d031f5d9c289a6,2026-09-21T11:19:21-03:00,frannlima,V18 metas individuais por colaborador
+13491317aa0721ad403c7b5961470b8e97fd015f,2026-09-21T11:19:33-03:00,frannlima,V18 estilos metas individuais
+a16d9615189bee74520f46f1d344eeeb36b20246,2026-09-21T11:19:52-03:00,frannlima,Publica V18 App eStore CEPI
+b25ca9d0b36937c5b7f84408ed2cd21c37ee4838,2026-09-21T11:26:31-03:00,frannlima,Hotfix publicação: bundle V18 incorporado no index
+ce3bc76913b2edc0c7a78217fdca02ac6650c8d1,2026-09-21T11:44:52-03:00,frannlima,Consolida App eStore CEPI em arquitetura única
+2b31a89cf58ebd547116a9626b74649100f00fa8,2026-09-21T11:45:33-03:00,frannlima,Endurece autorização administrativa e notificações
+a38e56d88622df38be14a4bf4075aa54bcebbad0,2026-09-21T11:46:15-03:00,frannlima,Força publicação GitHub Pages da versão consolidada
+3a129d0d045ab0fe7143c4f2e5550c42128a8132,2026-09-21T12:22:35-03:00,frannlima,Completa Hora a Hora e contador de notificações
+3e07d40e456e5948932f2cc732006a77aa574359,2026-09-21T13:28:07-03:00,frannlima,Ativa leitura de notificações no sino
+524835f1a12f9d66ab605744901127d962e78b97,2026-09-21T13:28:40-03:00,frannlima,Adiciona compartilhamento do Hora a Hora
+1709afc86a565262f933b2bd648f96af2d5fd3df,2026-09-21T13:33:50-03:00,frannlima,Exibe rankings Pool de lojas e supervisores
+0f23254704e979b03a5ca4df97269edede23aa3e,2026-09-21T13:37:59-03:00,frannlima,Simplifica dashboard regional Hora a Hora
+71c55564f34346a4d0dd4363db20f61fc64770e0,2026-09-21T13:47:03-03:00,frannlima,Restaura central ADM com inputs de resultados e metas
+505d0a83322af209c370f3435bf8f6ecc8cb502f,2026-09-21T13:47:56-03:00,frannlima,Corrige sintaxe da Central Administrativa
+2c1091b2b191a2b4531c201d50da5cd6e64e8ffb,2026-09-21T13:48:54-03:00,frannlima,Estabiliza navegação da Central ADM
+0ff63ced7478ea5edce415207cd1ad2e44b51632,2026-09-21T14:00:48-03:00,frannlima,Torna Pool dinâmico e individualiza ranking de supervisores
+7fce1f73e03ae808ea88878dbc87d507c7b4b7ad,2026-09-21T14:14:42-03:00,frannlima,"Evolui metas com rateio, compromisso e comissão"
+df98980e4447f84810231654673b01cfc39a667e,2026-09-21T14:18:37-03:00,frannlima,Adiciona desvio e gráfico de desempenho em Minha Filial
+f7188e6337889ee3b8d25485ecc8777b69596e3c,2026-09-21T14:26:46-03:00,frannlima,Usa HC real diário no rateio de metas
+b6f93bafead0f9a039f5b7080c3a8af807b712b9,2026-09-21T14:39:46-03:00,frannlima,Adiciona cards compartilháveis Top 10 Regional e Filial
+97f2099aafafdba7d9e328904379ca70391bbeab,2026-09-21T15:02:59-03:00,frannlima,Restaura campanha Giftty Card e dicas eStore
+892d84062272541cbbcfa46ab9abb10cc0d5538a,2026-09-21T15:19:02-03:00,frannlima,Evolui ranking mensal e cards Top 10 com fotos
+7c8ca9a9645e9666ef6ba1149c4c7d4c872ead71,2026-09-21T15:39:41-03:00,frannlima,Adiciona mês histórico na comissão e ranking Pool ADM
+7fe1476c0b9a7616c0242c2a73408fa6f892d786,2026-09-21T17:07:51-03:00,frannlima,Integra seletor mensal ao ranking e mantém compartilhamento
+2af1a6bb88fdd19b2618c62b6d667984eaecab74,2026-09-21T17:10:40-03:00,frannlima,Corrige seletor Mês integrado ao ranking
+7394a629c64a6f65b5342b5b3527fc892299fcd4,2026-09-21T17:14:30-03:00,frannlima,Corrige ranking mensal e adiciona popup de destaques
+a5d1dcefdadc26c2d7685110ad4f2fd18025a0ab,2026-09-21T17:19:21-03:00,frannlima,Mantém ranking visível e adiciona destaque permanente na home
+9c128b93586a091e0b9fa0f4ef7b1439f3e8666e,2026-09-21T17:26:01-03:00,frannlima,Corrige destaques e evita compartilhar ranking vazio
+80db64e56cb64c70046061727008dc0b9179c056,2026-09-21T17:36:30-03:00,frannlima,Integra seletor mensal na tela de comissionamento
+39c7e21ff5cc42662acda9eb3abdbf91ad7c8740,2026-09-21T18:37:21-03:00,frannlima,Permite foto e nome de preferência no perfil
+ebf4d677c65dd033dd7ee503e34f48fd8523cb9f,2026-09-21T18:47:10-03:00,frannlima,Aplica nome preferido e foto em todo o app
+e5d50f4a72902eccc09c78728a36f9f00aba9b7d,2026-09-21T18:52:48-03:00,frannlima,Persiste nome preferido ao reabrir o app
+0dda6da505e01b36a7f9ef954f1c7cfc42b3b04b,2026-09-21T19:03:45-03:00,frannlima,Habilita anexos no chat de suporte
+b41ebde01b9382c98c8dbe68bcfb2ef4a0f81dfd,2026-09-21T19:21:27-03:00,frannlima,Redesenha Meu Resultado com ranking e reconhecimento
+f186339a5a714d3f4d6a56a98b1b737543aa4092,2026-09-21T19:46:06-03:00,frannlima,Reestrutura Metas com desafio ritmo e simulacao
+a59fb9c7dbdcc2c268c107bd709aced42a1932e7,2026-09-21T20:10:32-03:00,frannlima,Adiciona cards de destaques e compartilhamento no ranking
+8de0d57330c41167fce3ef5a450a4d6145eda6b9,2026-09-21T20:29:46-03:00,frannlima,Carrega ranking mensal da filial ao abrir Ranking
+4deb94a6545a5840e8cb237827010425c106396d,2026-09-21T20:40:52-03:00,frannlima,Atualiza dados dinâmicos do usuário no login
+34fa0391a6af347bfad83c20401887c1f23d13b6,2026-09-21T20:45:13-03:00,frannlima,Corrige hidratação dinâmica do dashboard no login
+8088edba28811c84dc7ce8959d208bbc4774d932,2026-09-21T21:04:22-03:00,frannlima,Redesenha Meu Time com filtros e análise de dispersão
+d24d327c2cc5cc4e59a384739a158d218e81d5a6,2026-09-21T21:18:24-03:00,frannlima,Adiciona relatório PDF na tela Meu Time
+c40f7063d85d8d84239769dc6695a572c2c91d0e,2026-09-21T21:26:05-03:00,frannlima,Adiciona visão regional por lojas e logo no relatório Meu Time
+ab9a1df9e7e13eaee9a65f0fba8f24c16b017457,2026-09-21T21:30:18-03:00,frannlima,Corrige erro de sintaxe na visão regional Meu Time
+bbcac36e85dd27b52b0cd5b6b56f8750991951cf,2026-09-21T21:32:48-03:00,frannlima,Hotfix: destravar login e carregar APIs auxiliares após autenticação
+722f4db9e4ba83d0f553eec561db83c8370ffdcf,2026-09-21T21:40:25-03:00,frannlima,Meu Time: seleção multiloja e relatório de colaboradores por filial
+3a60d86e2f6191f32e618cca42a4374ca08dba06,2026-09-21T21:43:15-03:00,frannlima,Corrige exibição de colaboradores zerados no Meu Time regional
+81216a2439bdc6ef5834dae5a535badce7bb9726,2026-09-21T21:45:31-03:00,frannlima,Hotfix crítico: restaura HTML da página inicial removendo bloco injetado fora do script
+2bf4e5dff33c4806fa252b1bdac8404c6b0fc20c,2026-09-21T21:47:07-03:00,frannlima,Hotfix login: abrir app imediatamente sem aguardar APIs remotas
+6c8d2245a30de6100ce3eda89ba1027384a608bd,2026-09-21T21:49:05-03:00,frannlima,Login robusto: timeout local e fallback pela API
+3712b5c4d10f25da3c4811e93a4cb25d08f3a7d7,2026-09-21T21:50:13-03:00,frannlima,Diagnóstico login: força abertura do shell e exibe erro de renderização
+9c7aabb77f4101581af77928145b796fa324ea5d,2026-09-21T21:52:29-03:00,frannlima,Corrige acionamento do botão Entrar em navegadores móveis
+eab1296d1c6b196b33d5710a8e7242122a9d8c0a,2026-09-21T21:54:13-03:00,frannlima,Hotfix diagnóstico: handler de login independente no final do HTML
+2060d8d33550af3807a86eda829eea84fd73f139,2026-09-21T21:56:06-03:00,frannlima,Corrige sintaxe JavaScript quebrada no gerador PDF Meu Time
+3d7fd4f8e3fa63c8d5f87c894f469794d153630f,2026-09-21T21:57:40-03:00,frannlima,Hotfix crítico: remove tag script literal que encerrava JavaScript principal
+07165200df520b2e992f0b4dfd4dbb229412b51d,2026-09-21T21:59:34-03:00,frannlima,Corrige fechamento da string HTML no gerador PDF
+1347df8ae212ca1890822e6728e4ad65f4b4f624,2026-09-21T22:09:05-03:00,frannlima,Meu Time regional: seleção de lojas e colaboradores por filtro
+525b2005a53de9f044e0821bfb42829294b84346,2026-09-21T22:13:16-03:00,frannlima,Corrige rolagem móvel e tremor na tela Meu Time regional
+28d5e472125f582c485f664a0002d1ffe26ddbca,2026-09-21T22:16:37-03:00,frannlima,Corrige salto de rolagem ao selecionar lojas no filtro regional
+cba035d29a7d4587e41ad219c9332940607fa7a6,2026-09-21T22:19:27-03:00,frannlima,Corrige loop de rerenderização que causava tremor e bloqueio de scroll regional
+cc927851fe20858a73f432049942e405dd1ee643,2026-09-21T22:31:08-03:00,frannlima,Compacta Meu Time regional e adiciona exportação de dashboard Excel
+c8982a6b604db24afd251e400f5bd0f52a810dd0,2026-09-21T22:36:04-03:00,frannlima,Compacta seletor de filiais regional em bloco recolhível
+ded8995aae1c5d052fbe470fd58d1716e1640b44,2026-09-21T22:55:34-03:00,frannlima,Corrige Meu Time com visão regional compacta e exportação Excel
+4bfb187249ea4953048bdbbe7c860d3ed0699917,2026-09-21T22:55:42-03:00,frannlima,Ajusta layout compacto da visão regional Meu Time
+4b10aac44c87fb309ceb13ab23f589a3496beeb9,2026-09-21T22:59:40-03:00,frannlima,Corrige dados regionais do Meu Time e melhora dashboard Excel
+21180ad1d10b0a17ea408c29eda9e94964d11612,2026-09-21T23:04:07-03:00,frannlima,Corrige mes regional e remove merge indevido da filial local
+456d63216a60977bee2ae335fee58478b4f826bf,2026-09-21T23:05:33-03:00,frannlima,Corrige erro de sintaxe que impedia carregamento do JavaScript
+f915ba3fbf27c34a1118cfc2fb1c64df4090bae3,2026-09-21T23:07:17-03:00,frannlima,Restaura versão estável do app após regressão de JavaScript
+88899fbed384d40b015c702d4f3dbdc692f184b9,2026-09-21T23:38:13-03:00,frannlima,"Admin: gestão de colaboradores, perfis e acessos temporários"
+d8d4d20d2c95843c317ef64b210d3b322375ab29,2026-09-21T23:53:24-03:00,frannlima,"Admin: editor de campanhas, informações, eDay e biblioteca de imagens"
+5de99a61337291bab6af64d71d59e16aedeb6aa9,2026-09-22T00:12:47-03:00,frannlima,Campanhas: permitir anexar imagem ou card diretamente
+2ae8d312d2ffd838dbe0dfd24efbfc1a650e8298,2026-09-22T00:23:53-03:00,frannlima,Ranking mensal: impedir recarga em loop e tremor da tela
+51e2db06e973ed8985a1bdfbfcfbc80210109c8b,2026-09-22T00:47:12-03:00,frannlima,Ranking anual: usar histórico acumulado por matrícula
+6d9b2deb8281d0ef0040802cd81c79c3034d4459,2026-09-22T01:17:25-03:00,frannlima,Pool: limitar incentivo a partir de agosto e atualizar períodos
+3ed9b9fe570fc7c4161bce180343b33372931edc,2026-09-22T01:44:36-03:00,frannlima,Fix Minha Filial to use live dashboard store metrics
+c11a5bab42a3c19d47981aab1e49c5d2c5b136d4,2026-09-22T01:49:27-03:00,frannlima,Fix live dashboard response path for Minha Filial
+c223dd1241f4dcb1815ceb30e792dc7645b88bcf,2026-09-22T01:53:40-03:00,frannlima,Remover filtro Ano das telas operacionais
+de9b1c9193d28d77766a9fa704bc74a6948f1234,2026-09-22T02:00:41-03:00,frannlima,Corrigir Pool mensal e limitar seletor à vigência da campanha
+0fc2f79b54c21fb5b8d8803e454857f8e2664054,2026-09-22T02:07:54-03:00,frannlima,Corrigir posição filial e incluir comissão eDay no resultado
+32a95aee29eb1243957955fedb8c4fe640ef4185,2026-09-22T02:42:18-03:00,frannlima,Aplicar dashboard profissional Hora a Hora regional
+ceaf8cbca4a40c0213f8510a045057e24a641181,2026-09-22T02:48:48-03:00,frannlima,Gerar card imagem Hora a Hora para WhatsApp
+b001e3a6f300f00ede24b50ce19ed51feafd379b,2026-09-22T02:54:52-03:00,frannlima,Ajustar card Hora a Hora ao dashboard aprovado
+705938a5a95a170fd7862240cd2d093ba863e6fd,2026-09-22T03:08:43-03:00,frannlima,fix(hourly): use official Riachuelo logo asset in shared dashboard
+314a26693d96dc42f29e62a4594474c8693996ae,2026-09-22T03:54:33-03:00,frannlima,Aplicar interface premium aprovada na tela inicial e menu
+d49e7c8050427d7016366e75b0d69e558d2eb86b,2026-09-22T03:54:37-03:00,frannlima,Atualizar home e menu lateral para layout premium mobile
+5f2cdda8d8e0dcf8d55c6908bb5dd48ea7532fc8,2026-09-22T03:57:05-03:00,frannlima,Aplicar interface premium diretamente no index publicado
+f239e145eb257e438adac53fa5a0858c058e3014,2026-09-22T04:00:15-03:00,frannlima,Forçar interface aprovada na renderização ativa do app
+d07a1aa7733f5fd8a9dfe5398581fab1f8342d3d,2026-09-22T04:01:55-03:00,frannlima,Restaurar login removendo patches de interface que quebraram JavaScript
+a8694af353dc6d80a1ecfc63468099d3367c2857,2026-09-22T04:03:33-03:00,frannlima,Corrigir fluxo de login e fallback no navegador móvel
+85aaa78e19697bcfef06cd7ec49de9d3d06e9375,2026-09-22T04:06:05-03:00,frannlima,Aplicar layout premium aprovado na home sem alterar autenticação
+7a3132fd5877cd27bd5f56329c69978296f3a9cf,2026-09-22T04:09:24-03:00,frannlima,Forçar nova publicação da interface premium
+51a3ec3d7ab59432dd9412dfbef63f3822e25e74,2026-09-22T04:16:11-03:00,frannlima,Remover selo de desempenho do menu Vendas
+7e1308510d73160114bd6d53d77ba7e46d283600,2026-09-22T04:29:40-03:00,frannlima,Aplicar identidade de moda Riachuelo na tela de acesso
+d0b480b97c7baeb347a3ba4d0d6f6b6aaa2f10b8,2026-09-22T04:36:53-03:00,frannlima,Usar imagem de referência Riachuelo na tela inicial
+76e15868ab02c265cfc4e0accbdb012899f4bd26,2026-09-22T13:35:54-03:00,frannlima,Ajustar menu Metas para meta eStore e pedidos
+9478d037df79736fa3bfca3d086248711918dd16,2026-09-22T13:41:20-03:00,frannlima,Corrigir meta de pedidos por período selecionado
+a1904b8e41c65a6721e700170ed6487dfa222ab8,2026-09-22T13:53:39-03:00,frannlima,Aplicar ticket médio YTD por loja na meta de pedidos
+f33f1108e9b18f7845884767850ad7c9bd4b4b7d,2026-09-22T13:59:29-03:00,frannlima,Melhorar distribuição e legibilidade dos cards de metas
+4878c2cb9045ba9a0c134820fe6149b57fbbfc10,2026-09-22T14:02:31-03:00,frannlima,Forçar largura e hierarquia visual dos cards de metas
+5e45e988fec78d65d24058d58eeab3ed1a9ae94e,2026-09-22T14:05:58-03:00,frannlima,Restaurar login removendo patch visual que afetou inicialização
+4ca3366b30091f470c2e03a9a34b3f14ef154914,2026-09-22T14:08:42-03:00,frannlima,Remover override visual de metas e restaurar inicialização
+6673d41933b70f9a249f2e54deca966353eccbf4,2026-09-22T14:34:53-03:00,frannlima,Aplicar mensagens inteligentes por ranking campanha e pool
+3b10327c309b52b5407fb1a040edd0a5355a2c74,2026-09-22T14:51:46-03:00,frannlima,Substituir tipografia do popup pelo logo vertical oficial Riachuelo
+0d208cdf47f5289135222843f874bfe36178a006,2026-09-22T15:05:36-03:00,frannlima,Atualizar meta de pedidos Hora a Hora pelo ticket YTD e ocultar testes excluídos
+3f0fe1cf085e3a75a4bc90a85b9d36d03b8db841,2026-09-22T15:20:33-03:00,frannlima,Melhorar central de notificações com agendamento e públicos
+c02a7d7d12acc894f48aaf638b3af219cb0ce41a,2026-09-22T15:28:51-03:00,frannlima,Redesenhar Hora a Hora com foco visual em lojas zeradas
+05a8411a7157087fae7a4e78282faac1f29815a0,2026-09-22T15:55:38-03:00,frannlima,Restaurar inicialização após ajuste Hora a Hora
+7bd1e44ab2902459c9e76bb84bdcc88a7ca2fc28,2026-09-22T16:07:44-03:00,frannlima,Remover patch Hora a Hora que bloqueou inicialização
+85421e677b82343667a3fce8cd0ca704b51ee0c1,2026-09-22T16:20:48-03:00,frannlima,Corrige erro de sintaxe que bloqueava login
+65803b254edad7dd26e40c4fd554dada9033e13a,2026-09-22T16:21:45-03:00,frannlima,Corrige fallback de login e remove mensagem enganosa de inicialização
+cd78206e59155cdb19f6515bec7df0f5f22dbdac,2026-09-22T16:28:19-03:00,frannlima,Redesenha dashboard Hora a Hora com identidade Riachuelo e visão completa das lojas
+73f5d09a7378868b750c744a8a58414b0e358e34,2026-09-22T16:36:28-03:00,frannlima,Inclui legenda automática de WhatsApp no compartilhamento Hora a Hora
+d67069a551ae153ab6cc1a56f30a25f4f19a5898,2026-09-22T16:41:41-03:00,frannlima,Corrige quebras de linha e formatação da legenda Hora a Hora para WhatsApp
+2e4d05d6a0d7f6b24b21c188d815369724ad1edd,2026-09-22T17:18:55-03:00,frannlima,Prioriza dashboard atualizado no login e esclarece data do resultado no input
+aa1e219ab0fae7a7b66173bb0bf96121f5ba7773,2026-09-22T17:26:55-03:00,frannlima,Corrige leitura do dashboard dinâmico no login
+cefd1c7a2b785bae6f66c4988ccef04f4cd15c24,2026-09-22T17:44:55-03:00,frannlima,Documenta regra de origem: gerencial para lojas e colaborador para resultados individuais
+00abc6137425f68ded38aa3900b800458593bfb9,2026-09-22T17:57:48-03:00,frannlima,Corrige ranking Dia Semana Mês Ano com fonte de colaborador e remove posições de zerados
+3026c69f667ddfff1e077514f22a2309321ae5d0,2026-09-22T17:59:56-03:00,frannlima,Evita ranking cacheado na tela e usa somente vendedores com venda nos cards
+b1851f22020cbdfabd20ed96329a24bfa54c8a5d,2026-09-22T18:34:12-03:00,frannlima,"Adiciona navegação aprimorada, modo visitante e mural Conexão eStore"
+c88d25a2fd1f7a10b666ba1d263e4570dc10cb7d,2026-09-22T18:45:32-03:00,frannlima,Adiciona manifesto PWA do App eStore CE+PI
+f5073a71c2934629ed92446162dc974a2aca9134,2026-09-22T18:45:41-03:00,frannlima,Adiciona ícone do App eStore CE+PI
+4e9638ae8f458013135848be65317d533b05c497,2026-09-22T18:45:49-03:00,frannlima,Adiciona service worker para instalação do App
+eb51a77f4f99591d743f00eb55d102c1582f4b7c,2026-09-22T18:46:00-03:00,frannlima,"Transforma App em PWA, mantém sessão e adiciona compartilhamento do link"
+1e8b3ecf11124b6b6a3ad2b73c731edaf6afc5bc,2026-09-22T19:00:39-03:00,frannlima,Torna modo demonstração resiliente com fallback local
+73da79b4b48f4e2f7e086d4bffd30aba552425f7,2026-09-22T21:15:16-03:00,frannlima,Corrige nome da filial usando cadastro oficial da loja
+fb551e8b828f7f2594675c3249cc2967d2185ed9,2026-09-22T21:52:38-03:00,frannlima,Atualiza dashboard Hora a Hora e compartilhamento WhatsApp
+f47ffa0117f155488431df2e7740565a5bc4479e,2026-09-22T21:52:52-03:00,frannlima,Estiliza Hora a Hora para leitura mobile executiva
+68da9074e323bf32a177083f2e13f1e9237bccb4,2026-09-22T21:55:50-03:00,frannlima,Aplica novo Hora a Hora no arquivo ativo do GitHub Pages
+d73c3f37d71a911cca4b032830e1d97f716c988b,2026-09-22T22:03:23-03:00,frannlima,Inclui Share e Desvio e títulos em negrito na legenda Hora a Hora
+a52043f78f6c1173fd2d53ba3ed26b3b4138c3fa,2026-09-22T22:07:24-03:00,frannlima,Corrige erro sintático que bloqueava carregamento do App
+956c3e96718eba2fc7e1449cc8756592a8f90fdf,2026-09-23T07:52:28-03:00,frannlima,Adiciona compartilhamento de Meta do Dia no rateio
+0286ba7cd3d4d170a2ef83d030b975914978e9ce,2026-09-23T07:58:23-03:00,frannlima,Corrige quebras de linha da legenda Meta eStore
+fe1ed87c38778038af84a41db2551d26b34c7649,2026-09-23T08:02:19-03:00,frannlima,Corrige meta diária de pedidos e exibe no rateio
+a5121b8250d6c18f1d5f055c3fbb075f9c974150,2026-09-23T22:41:43-03:00,frannlima,Fix admin support inbox and replies
+4cc98527a04af3be7b75083a33a85fa45c9dda82,2026-09-23T22:55:18-03:00,frannlima,Add likes and comments to Conexao eStore
+25925efe7761820cadfdcd6f5c529b30fd749720,2026-09-23T23:41:05-03:00,frannlima,Atualiza Minha Filial com D-1 visível e visão anual
+21b9bfdaf03bc400a5d031d0dfc001c006964ba4,2026-09-24T00:17:27-03:00,frannlima,Corrige Minha Filial para metas acumuladas até D-1
+77b25f9a0f9811d2dbf339cbda91f34ec64307ff,2026-09-24T00:32:13-03:00,frannlima,Corrige metas por período e ticket médio anual
+07a0e7f912e6b487b885620034b1b9cdeab06211,2026-09-24T01:04:09-03:00,frannlima,Reestrutura Meu Time com dashboard de venda captada
+9905f975ff4a0dc7ceb34ed83e7a01cd4cf07674,2026-09-24T02:11:27-03:00,frannlima,Aprimora navegação com voltar e ícones 3D
+05c2376e08bcf8630f2639138a633b0e9b3a6a15,2026-09-24T02:21:21-03:00,frannlima,Aplica ícones no menu lateral e botão Voltar inferior
+3be8e83fae4b1938fc40f257971ef5bdecbb2dc0,2026-09-24T02:26:34-03:00,frannlima,Corrige meta por período em Minha Filial
+6ee1371d2052c971cfcf77cbc326ad35992038b2,2026-09-24T02:33:53-03:00,frannlima,Restringe Pool a perfis de liderança e consolida regra vigente
+7a0a361b138f52f062ea37f710761721754769b6,2026-09-24T02:41:42-03:00,frannlima,Remove visão anual do Pool de Comissão
+02440587de8b258862a57d1beb789603bb98a6cb,2026-09-24T10:55:22-03:00,frannlima,Corrige refresh após importação administrativa
+680d3252d4e0cd55426569c9b5bf5ffa4c3e8df7,2026-09-24T12:23:26-03:00,frannlima,Redesenha Meu Time e ativa dashboard e compartilhamento
+13725972223bef2fb5d176a1e301a4f4a755d9a8,2026-09-24T12:23:59-03:00,frannlima,Estiliza dashboard Meu Time na identidade Riachuelo
+a90da258a8c25949a5bd5dc2a851ba93d4680e26,2026-09-24T12:56:06-03:00,frannlima,Corrige carregamento do Meu Time e força assets V2 no app
+88f0418799a85e0273ba6a1997771bb7a66ea3c7,2026-09-24T13:07:10-03:00,frannlima,Restaura carregamento estável do App após falha no login
+911d5b698165dff66bbfa5bf9f10c5a44c399fd1,2026-09-24T13:10:34-03:00,frannlima,Corrige botões Dashboard e Compartilhar do Meu Time
+121e834e7a42d62f92b8cb626f3d887cd0bce4a0,2026-09-24T13:24:33-03:00,frannlima,Cria dashboard regional Meu Time por filial e potencial dos zerados
+533b7a270c90a39ac08d5edb96fdd981f7444cac,2026-09-24T14:02:10-03:00,frannlima,Melhora dashboard regional Meu Time com formatação condicional
+daf2236952eadeb530c25c0b3048a5930e1f2b27,2026-09-24T18:21:16-03:00,frannlima,Dashboard regional Meu Time com potencial e formatação condicional
+a8a21c5825f3c3cd4a4476311d6202ee3d4c9a36,2026-09-24T18:23:43-03:00,frannlima,Aprimora painel regional Meu Time e card compartilhável
+008926452e554d7e4ed529e1ee6898ec2852244d,2026-09-24T23:45:54-03:00,frannlima,Hotfix: vincular resultados individuais à matrícula e atualizar cargas automaticamente
+0d92c7d582f908f940a00fd1d2ad111db26a3bc0,2026-09-24T23:59:20-03:00,frannlima,Corrige fonte única por matrícula e consolidação da filial
+6582af40e913fb9b86c14dc48f206e1582ee677c,2026-09-25T00:13:12-03:00,frannlima,Corrige fontes: filial por Gestão e colaborador por matrícula
+ea75d74944a2a44572bcd7ca6b10e7181cd416f0,2026-09-25T00:26:12-03:00,frannlima,Aplica eDay 10% desde agosto e reforça integridade das fontes
+46d9def6b76b050c483ca652e224ec978fef8afb,2026-09-25T00:56:21-03:00,frannlima,Adiciona gestão da base mestre de colaboradores
+1b1026df7dc3535ca81464b199fda8762e467866,2026-09-25T01:05:44-03:00,frannlima,Unifica fontes oficiais em ranking time e relatorios
+119ddebc2c639c3e172b50e2499e2e6a22bd4761,2026-09-25T01:13:48-03:00,frannlima,Separa Pool de comissão individual e aplica regra por filial
+433e609fa3cea216c9fbed4e5a3115fb0c9b6295,2026-09-25T01:44:41-03:00,frannlima,Carrega correções V29-V33 no app publicado
+dd2b2cafda3ff83a6daaf79ed560c26c992f6b26,2026-09-25T01:47:56-03:00,frannlima,Corrige bootstrap do app-v2 no GitHub Pages
+67e806568a198d61d0a0871a19b0c2a2abaf3f2f,2026-09-25T01:55:49-03:00,frannlima,Evita conflito global no bootstrap V34
+b6ec9f93b5881301048ea1447df2951c87a66692,2026-09-25T01:55:56-03:00,frannlima,Move app-v2 para o final real da página
+c7f6b2a62615855181d7b616743bd99cf3556cb3,2026-09-25T01:58:15-03:00,frannlima,Corrige acesso seguro ao endpoint no bootstrap
+6faa4cb4de472e14ae5c2b948ade3b968421bbde,2026-09-25T01:58:23-03:00,frannlima,Atualiza bootstrap publicado para V36
+abede2b9586f5a1b7148ee3e4c497269800dd0b3,2026-09-25T02:00:07-03:00,frannlima,Restaura inicialização estável do app
+536fdc30a06d63fe8634229bc23e9f2e02de6a4d,2026-09-25T02:02:09-03:00,frannlima,Restaura exatamente index estável antes da homologação
+1e2ba1fef008e374424b792902239a3f85191edf,2026-09-25T02:05:41-03:00,frannlima,Corrige login de emergência sem depender de window.login
+5b26aedb9f19486d233eb6ec68e956c67b581d40,2026-09-25T02:05:47-03:00,frannlima,Renova cache e força navegação atual no GitHub Pages
+8291086bcd2c6edbcef595c055b9ea709eee7164,2026-09-25T02:18:43-03:00,frannlima,Corrige Minha Filial e Meu Resultado pelas fontes oficiais
+06587a3ba5faf90059043edc3f5ff4eade0ed17d,2026-09-25T02:59:09-03:00,frannlima,Adiciona logo horizontal oficial Riachuelo
+fcb8170e7bc105c23758306d73ce340aee643c4f,2026-09-25T02:59:25-03:00,frannlima,Ajusta card Meu Time com logo oficial e corrige sobreposição
+2a3ea40646ada53473ff247c6d37a3f2b0c8b6ea,2026-09-25T03:20:29-03:00,frannlima,Atualiza card compartilhável Meu Time conforme modelo aprovado
+e978d62048e409d3a4f2f1c0a4d2298f2e4cdcae,2026-09-25T10:11:04-03:00,frannlima,Aplica logo horizontal oficial no card Meu Time
+105ae564de51b0e2d6456441b13f608a1c96fe9c,2026-09-25T10:40:07-03:00,frannlima,Atualiza card de meta com Esquadrão do Cliente e valores Riachuelo
+addfd71bca0bece7252a57809da15306a55f4316,2026-09-25T10:49:24-03:00,frannlima,Corrige imagem Esquadrão do Cliente no card de meta
+3293df902a3eec0d61274202ef821f5ccc4738ed,2026-09-25T10:53:53-03:00,frannlima,Corrige carregamento da imagem no card de meta
+4a2bf8f8167fac3a1fc6868ef4ebe9cc95094594,2026-09-26T02:46:48-03:00,frannlima,Atualiza home mobile com campanha Pool Jeans e ícones 3D
+02ba3d70b2d85427b3166caecc1f14c8afd4b5da,2026-09-26T03:05:56-03:00,frannlima,Atualiza Home com campanha real e destaques dinâmicos
+2d41bcde8d2d194ecd8f289d55492c59af9aeeb1,2026-09-26T03:15:51-03:00,frannlima,Atualiza carrossel da Home com fotos aprovadas da campanha
+9155bff75bf991918e5f1fa457fd1266d8847e4d,2026-09-26T11:33:27-03:00,frannlima,Fix baseline 25/09 and incremental period totals
+e46646d9c47c4dc8d11e31a5190d4e4462f343e3,2026-09-26T16:22:16-03:00,frannlima,Improve shared Hora a Hora dashboard visual
+8c574a562f8c3deed2a51bcd8147e49bae971703,2026-09-26T16:22:26-03:00,frannlima,Refresh app cache after dashboard visual update
+e0b0327de4c7b09f106f751b2db07b9365a56073,2026-09-27T00:55:58-03:00,frannlima,fix: usar base oficial no login e limpar caches de período
+60ea99ddd6306834faf87cc7eb10de039b2b392d,2026-09-27T00:56:05-03:00,frannlima,chore: renovar cache do app após consolidação de dados
+b55f67dc57dfb7ebbf3237e35a50da1ef39b8b4f,2026-09-27T02:19:05-03:00,frannlima,security: alinhar frontend às permissões da API v96
+bde6964bb09838adb8f9fa4310e580bd1d8ce879,2026-09-27T02:19:12-03:00,frannlima,chore: renovar cache após hardening de segurança
+e918dc59e862c5285d28706182ff02c6103d753b,2026-09-27T12:51:42-03:00,frannlima,feat: alinhar card de metas e compartilhar cupons ativos
+ed0567e18e7216c37ff55bbee52f4dcd1c14b898,2026-09-27T12:51:55-03:00,frannlima,chore: renovar cache do card de metas
+5145fed41fe4bac35284ad67632a1e722d57d198,2026-09-27T13:33:50-03:00,frannlima,feat: painel profissional e compartilhamento Minha Filial
+0ca7b47c631653be81c8ce4d6be8173a269b0995,2026-09-27T13:34:33-03:00,frannlima,fix: refinar painel Minha Filial e acesso ao compartilhamento
+3dffa13d4840320c4d2b42a96f380ce94eb6cb97,2026-09-27T13:34:42-03:00,frannlima,chore: renovar cache do Minha Filial
+8cb69077b4dacefcc1f7f598d5436689b166eeaa,2026-09-27T14:01:01-03:00,frannlima,fix: evitar sobreposição no captado e remover oportunidade do card
+2af7c026e555f877dac2f9afdd8c229477f26337,2026-09-27T14:01:14-03:00,frannlima,chore: renovar cache após ajuste Minha Filial
+3109882dddd8d36915d938ff7e8e706ecb8e8656,2026-09-27T14:39:26-03:00,frannlima,fix: aumentar resolução do card da filial e simplificar legenda
+94794a55c44cec007508fec0dc43b061031a9cda,2026-09-27T14:39:39-03:00,frannlima,chore: renovar cache do card da filial em alta resolução
+d0976a0e522b0617d9dc455500a2ccb828cdad1c,2026-09-27T14:44:25-03:00,frannlima,fix: card filial HD 3x e participantes em duas colunas
+a626e427f12c957e84e15de6fd5002fa09d207e8,2026-09-27T14:44:36-03:00,frannlima,chore: renovar cache do card filial HD
+ae61acbc79d1fad2576e714096ecef868e4edb7d,2026-09-27T15:07:43-03:00,frannlima,fix: reduzir card filial para Top 10 e melhorar definição
+e89235fa72b8674e8517434e55b8ddce38fad38b,2026-09-27T15:07:57-03:00,frannlima,chore: renovar cache do card filial compacto
+54f2c3dad4f2ea6a0350c0f85910df1f5c35a97f,2026-09-27T17:03:28-03:00,frannlima,feat: aplicar ícones Riachuelo na navegação principal
+0a7e8c4ee00a1f12ecbd9f7b2ab31342bfd75a5b,2026-09-27T17:14:27-03:00,frannlima,fix: corrigir histórico Hora a Hora e excluir lojas sem meta
+2c57ea9ce786fd68eebf648de86fcd3f7f327840,2026-09-27T17:14:49-03:00,frannlima,chore: renovar cache após correção Hora a Hora
+3f85194f8c1de799182526ddf5b40c19a5c2c2ba,2026-09-27T17:16:47-03:00,frannlima,fix: corrigir sintaxe da legenda Hora a Hora
+0979b8db4c27c7aea9ce09fa57adac598778078b,2026-09-27T17:44:49-03:00,frannlima,feat: aplicar painel regional premium no Hora a Hora
+8c2f6366315eadc018b20eb2d189425b54c86776,2026-09-27T17:45:03-03:00,frannlima,chore: renovar cache do painel regional
+7bcdec69de7de2ed88a04eee6bf36b0cc35c1afd,2026-09-27T18:42:06-03:00,frannlima,feat: transformar Conexão eStore em feed com capa oficial Riachuelo
+26f6635f7457c2fafd9e0e26c50d29b979683093,2026-09-27T18:42:31-03:00,frannlima,chore: renovar cache do feed Conexão eStore
+4c1249ce9f448215e0440c6dae5bf5ceda38cc9e,2026-09-27T19:39:48-03:00,frannlima,fix: separar foto e texto na capa Conexão eStore
+d6280225f821bce1b0614fe21aac19679b75965e,2026-09-27T19:40:32-03:00,frannlima,chore: renovar cache após correção da capa da comunidade
+2fd4cc58b6497bea85e89c7ab98c967db52eb867,2026-09-27T19:56:34-03:00,frannlima,feat: gerenciador ADM de imagens por área do app
+4df64bb34f9c09a1070a720303005b2ede7ec879,2026-09-27T19:57:37-03:00,frannlima,chore: renovar cache do gerenciador de imagens
+d976e389dbd7b303db9f1cc6ad59902fad3b432e,2026-09-27T20:48:53-03:00,frannlima,feat: adicionar Supervisores Destaques à Home
+bcaf5b0eb24d7005afe3c28c1ed5a414734ced7e,2026-09-27T20:49:54-03:00,frannlima,chore: renovar cache Supervisores Destaques
+16613c1f3d761d64844908554d1a1f1a99d8dece,2026-09-27T21:51:33-03:00,frannlima,feat: ranking Supervisores Destaques por loja e card compartilhável
+d820fb11975a3cff08f7b9c47119ef455332ecf1,2026-09-27T21:51:49-03:00,frannlima,chore: renovar cache Supervisores Destaques v48
+a785e91b3322df7507d68da7fedbaa64842d6cfd,2026-09-27T22:16:04-03:00,frannlima,Ajusta Supervisores Destaques e destaque da dispersão
+f82679b3e2cdc4de69e89cffd0fcf36a90ea843b,2026-09-27T22:34:27-03:00,frannlima,Atualiza legenda de compartilhamento Supervisores Destaques
+0eae0b587b981b9e5f691f5be000a4e46b34a5b6,2026-09-27T22:37:01-03:00,frannlima,Corrige erro de sintaxe no compartilhamento Supervisores Destaques
+4b2ad1723c10cde2a6a231030a7748c25cf8f331,2026-09-27T22:37:14-03:00,frannlima,Atualiza cache do app após correção de login
+ee05e8898584f6c1dd0dd42938172abdf9b0ba98,2026-09-27T22:41:00-03:00,frannlima,Inclui fotos dos supervisores nos rankings e compartilhamento
+fc2f1424dceb09770ff51dcf57a159aa24267017,2026-09-27T22:41:13-03:00,frannlima,Atualiza cache para fotos dos Supervisores Destaques
+25303eb8f0a9bd8f0bb5e82ecf4778d48272059e,2026-09-27T22:51:52-03:00,frannlima,Adiciona Sobre o App e centraliza autoria no menu
+080db9505bb5f857a598554258899decb032219d,2026-09-27T22:52:26-03:00,frannlima,Atualiza cache para Sobre o App
+8c6dcc088f7ad21e0a11d355840e79a899878d2f,2026-09-28T02:25:41-03:00,frannlima,Cria Ritual eStore diário para supervisores e relatório regional
+9f4baf0c4bc600927c20d869af00c4a2ecdeb54c,2026-09-28T02:26:02-03:00,frannlima,Atualiza cache para Ritual eStore
+6d38b98af06bca9be70664a80923249b61889d1d,2026-09-28T02:27:47-03:00,frannlima,Corrige sintaxe e validação do Ritual eStore
+203d171883eb4b51665c0bfd0e56dbf69e2192e4,2026-09-28T02:28:38-03:00,frannlima,Atualiza cache do Ritual eStore
+516817796957dc035d87644315ef8735ac984431,2026-09-28T13:11:30-03:00,frannlima,Adiciona FCA semanal e painel de performance regional
+af2cac1cec2dbdc86b8304c4dca390b7620fa9ea,2026-09-28T13:12:11-03:00,frannlima,Atualiza cache para FCA Semanal
+1e3b8f49f01cac220086340687ac10c04f1d6657,2026-09-28T13:37:26-03:00,frannlima,Libera modo visitante completo em somente leitura
+462b7af8f9a0b61ae6640b7632f12cbf2b2040a8,2026-09-28T13:37:49-03:00,frannlima,Atualiza cache do modo visitante completo
+b503134915757e735b036abaf04f6775bda00494,2026-09-29T17:57:49-03:00,frannlima,Evolui FCA semanal por retração de share e resumo executivo
+3e722a562ac7732c1d6d4e854be0527a297182a7,2026-09-29T17:59:05-03:00,frannlima,Atualiza cache da FCA semanal v61
+b37e3cf38901207e15dcf8adf58c4b5e9ced83c8,2026-09-30T08:48:35-03:00,frannlima,"FCA: evitar falso ranking sem share semanal, mostrar histórico e importação oficial segura"
+c18c3dca416c0465fd7bcd55f3f130bc787c6ef9,2026-09-30T08:49:03-03:00,frannlima,Atualiza cache PWA após correção FCA semanal
+16002605ae63a032ef7f18f46c969130e38b8424,2026-09-30T11:26:58-03:00,frannlima,feat(fca): exibir comparativo preliminar de captação sem confundir com share
+305b0fa25a2e7f1731304cbf677782f315339ad4,2026-09-30T18:40:55-03:00,frannlima,feat: comparativo semanal e FCA estratégico
+96bda238eb957eab0e723166507cddb947ad9e8e,2026-09-30T18:41:06-03:00,frannlima,chore: renovar cache após comparativo semanal FCA
+a2b823d6b40bef76cc31bf602789cb5803782dd8,2026-10-01T17:17:29-03:00,frannlima,feat: preservar e exibir histórico mensal de comissão
+c6651d22ea1f024a25d10c8a3663cb3684eb3a22,2026-10-01T17:17:41-03:00,frannlima,chore: renovar cache para histórico mensal de comissão
+bc96bb0290200f1233169f3214df94aa15d02645,2026-10-01T17:18:02-03:00,frannlima,fix: carregar estilos do histórico mensal sem quebrar o script
+6a62fa254be4034f78a256a0e77e5412efd3d8b9,2026-10-01T17:41:47-03:00,frannlima,feat: adicionar arte eStore no Volume Máximo
+eba33364ac8dbb2fab9c889f92db46919fc8aefe,2026-10-01T17:43:57-03:00,frannlima,"feat: campanha Outubro na home, Conexão eStore e pop-up sonoro"
+d7b572c8fc2fb619cb993a1372cd71c56fba581a,2026-10-01T17:44:04-03:00,frannlima,chore: renovar cache e incluir campanha de outubro
+7c495157fa9131194b97693d36b4a81ff5630ec6,2026-10-01T17:48:05-03:00,frannlima,feat: adicionar atalho Conexão eStore na home
+dc3200451a394ec165b99a8dcba217ac0b3a746f,2026-10-01T17:48:12-03:00,frannlima,chore: renovar cache após atalho Conexão eStore
+4ca4e5230e4728b75bd369c77a8cb5bf2bd07197,2026-10-01T19:15:02-03:00,frannlima,feat: Cupons e Campanhas interativo com gestão de vigência
+89c3a3fab50d6cd74cfae99c96fbb3536a4d14ff,2026-10-01T19:15:20-03:00,frannlima,fix: remover pop-up antigo de campanha em qualquer momento do login
+9426030522adf79bedd719cdf3d7995c48032dfc,2026-10-01T19:15:27-03:00,frannlima,chore: renovar cache para novo menu de campanhas
+dc2cb2a08ba6d8428f58dada64de6e720515e190,2026-10-01T19:15:57-03:00,frannlima,feat: campanha ativa dinâmica conforme vigência definida no ADM
+36619cebf6b8d3b8c9d9be2f66f5fa042129cf0a,2026-10-01T19:16:05-03:00,frannlima,chore: renovar cache após campanha dinâmica
+d89d34748ffc08fd710d10b5711f760b38a4e2fe,2026-10-01T19:29:53-03:00,frannlima,fix: substituir campanha antiga e renovar Cupons e Campanhas
+cb87afbdfe6aed93d6855fffbbd799085074410a,2026-10-01T19:30:03-03:00,frannlima,chore: atualizar cache após correção do index principal
+02fbe06fdcdd3cb6cb7c6373e45e7e2c92af0d43,2026-10-01T20:45:43-03:00,frannlima,feat: pop-up outubro com prêmios reais e gestão de comunicados
+64ad435aa436e5c7ed5021083aa4f8cdd30cdfc2,2026-10-01T20:45:58-03:00,frannlima,chore: renovar cache do pop-up com prêmios reais
+e6da5a355a8f5eb03350732bd92ed59c99beaf0f,2026-10-01T20:47:48-03:00,frannlima,fix: usar imagens oficiais em todos os prêmios da campanha
+d9461053165af23f0ec8f1c46ee3cb33fb0c1a7a,2026-10-01T20:48:02-03:00,frannlima,chore: renovar cache após imagens oficiais dos prêmios
+d04b864b6be6f4964f7c1eaefb1dbb7553b17345,2026-10-01T21:09:03-03:00,frannlima,feat: aplicar campanha aprovada focada em premiação dos colaboradores
+1da72313497c20fe5e0115de4222f9a1f8f3a1bb,2026-10-01T21:09:17-03:00,frannlima,chore: renovar cache para layout aprovado da campanha
+11f0df3574a7d41dbc7c43032c518e5314d4250f,2026-10-01T22:23:54-03:00,frannlima,fix: forçar atualização imediata do PWA para v68
+f9cee02a42fb56a5d17e8be0067f2610a0c21a0f,2026-10-01T22:24:06-03:00,frannlima,chore: atualizar start_url do PWA para build v68
+ee50a39c64b1f0fd7330e3c62a0c387bb4cf0263,2026-10-01T22:24:23-03:00,frannlima,fix: ativar v68 e recarregar clientes automaticamente
+296347245142a47f7b58620d9a5c7034b6814888,2026-10-01T23:51:04-03:00,frannlima,feat: adicionar card visual da campanha para compartilhamento
+2fb3cae1679203a0f833ac486799b81ab062b339,2026-10-01T23:52:45-03:00,frannlima,"fix: aplicar layout aprovado, popup prioritário e compartilhamento em card"
+2bc5d65cda40d76b8bc8e5a1dc4852536d2757d3,2026-10-01T23:52:56-03:00,frannlima,chore: renovar cache para campanha aprovada v69
+2b83cb0541e936d8f4b99eaacc4fc46419ed5847,2026-10-01T23:53:12-03:00,frannlima,chore: atualizar PWA para build v69
+93c7c410c8ff11272ed1e122f237b6a147a62c83,2026-10-01T23:56:05-03:00,frannlima,"fix: usar card aprovado no menu, feed e compartilhamento"
+8e385dbeff51c80f58731e3e7efec7e3941d915c,2026-10-01T23:56:20-03:00,frannlima,chore: atualizar cache do card aprovado para v70
+2bbeebeabd86d1472b713dcae014aecceaf246d7,2026-10-01T23:56:37-03:00,frannlima,chore: atualizar PWA para build v70
+a5d40dc2611d4a8b05daed5a4f94d46bc9beb976,2026-10-02T00:18:16-03:00,frannlima,fix: restaurar campanha completa e corrigir imagens dos prêmios
+4f3c6dabea5a4fdd2995639c10fcc4f628bb2e70,2026-10-02T00:18:32-03:00,frannlima,chore: atualizar cache para campanha corrigida v71
+087b7be842d4950d2cf7343e47704dcb239119cf,2026-10-02T00:18:50-03:00,frannlima,chore: atualizar PWA para build v71
+16751c9d10258557eb1ee48185b01d3764e523ce,2026-10-02T01:32:41-03:00,frannlima,feat: aplicar logo oficial e mecânica correta no menu Campanhas
+6424aa9ed3ddcf0e6fe970b5ac24c928b5f1154c,2026-10-02T01:32:57-03:00,frannlima,chore: atualizar cache do menu Campanhas v72
+130bd4507727c76d85d0fd6a58361146f0ea1561,2026-10-02T01:33:21-03:00,frannlima,chore: atualizar PWA para build v72
+5a749f00984782d4a891f95db70ea450c11aec93,2026-10-02T02:15:27-03:00,frannlima,feat: destacar e agrupar celular e fone no card da campanha
+2767c96026f703510134ba6bbe0514b67509a79a,2026-10-02T02:15:51-03:00,frannlima,chore: renovar cache para card campanha v73
+3c37aa74646d7ee27b02b4fbbcb856ca5d68fb9d,2026-10-02T02:16:09-03:00,frannlima,chore: atualizar PWA para build v73
+79f146727bd32a0faba8ece19ad51197f483a432,2026-10-02T03:26:44-03:00,frannlima,fix: corrigir somente logo Riachuelo no card da campanha
+d84794e5be6e142000ae6ba4599930edfe8d9112,2026-10-02T03:27:10-03:00,frannlima,fix: aplicar logo oficial no card compartilhável da campanha
+2ea5d3248cd87814bf78105054e4ca65dc7813fc,2026-10-02T03:27:22-03:00,frannlima,chore: atualizar cache para card campanha v74
+25d6717107950a0ad46dd964464d6b1a037789ea,2026-10-02T03:27:35-03:00,frannlima,chore: atualizar PWA para build v74
+53f13ad1d65f65df91d9d055aed617b1485f0691,2026-10-02T03:27:56-03:00,frannlima,fix: corrige logo Riachuelo e aplica novo card de campanha no compartilhamento
+7ddc3edb4bdf8d411c8736e644f1f8c2fcf14231,2026-10-02T03:28:02-03:00,frannlima,chore: atualiza cache do app para card de campanha v76
+645e02ed6743683ab08cbba2bfee0bcd1300b159,2026-10-02T03:30:15-03:00,frannlima,fix: adicionar logo Riachuelo com tipografia oficial ao card
+09f0ce5d255710f646b1b4e771a23820f8d2877e,2026-10-02T03:30:18-03:00,frannlima,fix: usar logo Riachuelo oficial no card de campanha
+6e700eaca9d2decedc6e18f0694fdf0f14007f5a,2026-10-02T03:30:24-03:00,frannlima,fix: aplicar logo oficial no menu Campanhas e compartilhamento
+872e2aa99f7444acc31683e2bfc196e7c2fee15a,2026-10-02T03:30:27-03:00,frannlima,chore: atualizar PWA para logo campanha v75
+039103a3a359feabd4a08cf13775a0d6e07df4dc,2026-10-02T03:38:41-03:00,frannlima,Fix campaign popup reliability and daily display
+1b85e6733ef141120592f66dddbb3a76a36e2ec7,2026-10-02T03:39:00-03:00,frannlima,Bump app shell cache for campaign popup fix
+c519ce62bc46f2e93f2de2ff4ae384c0f51ab31e,2026-10-02T03:39:50-03:00,frannlima,fix: corrigir card superior e destravar compartilhamento da campanha
+f5951a2853f00222303000d5df961abc2b82d8e5,2026-10-02T03:39:55-03:00,frannlima,chore: publicar correções campanha build v77
+05836868045461b98ca143dbcd1d37530663eaa3,2026-10-02T03:45:29-03:00,frannlima,fix: restaurar script principal e login do App
+c8db8e2e398af91643d756358a4f95146c06e0b4,2026-10-02T03:46:38-03:00,frannlima,fix: restaurar acesso e corrigir campanha mobile e compartilhamento
+975af038b8864c933f6b0b4dc58eee88183efa10,2026-10-02T03:46:45-03:00,frannlima,chore: publicar recuperação do app build v78
+4edfdea4b42fa270c365b32d73cf4053aa0a4194,2026-10-02T03:47:27-03:00,frannlima,chore: ativar cache PWA build v78
+8c59dc997968e8f54ede6434c7323c868805fc0a,2026-10-02T03:52:56-03:00,frannlima,fix: restaurar login e mover ajustes da campanha para fora do script principal
+e0d1c9345f654534f5a953dba8f1d77109f7cd80,2026-10-02T03:53:04-03:00,frannlima,chore: atualizar cache PWA para build v79
+ae0f761bb4e1210d8b61961db8eb5dc201494941,2026-10-02T03:54:30-03:00,frannlima,fix: restaurar núcleo estável e isolar correções da campanha v79
+9b5bf55cd580880b334defb9347fd16b76d1972b,2026-10-02T15:22:58-03:00,frannlima,feat: isolar estilos da campanha build v80
+006ff6d7aea433c737a37adfc089a688cbd92778,2026-10-02T15:23:03-03:00,frannlima,feat: isolar comportamento da campanha build v80
+4e1e4e13e626562a653a0949c86dbe8b265ae41e,2026-10-02T15:23:10-03:00,frannlima,fix: restaurar núcleo íntegro e carregar campanha fora do script build v80
+2bafcc5fce33306321d1be267c30d722026ed20a,2026-10-02T15:23:26-03:00,frannlima,chore: ativar cache PWA build v80
+09aabb55279a72cadb29e33389cd71974f2c61c9,2026-10-02T15:23:53-03:00,frannlima,fix: restaurar versão estável do App antes das alterações de campanha
+7b396d0fcf7d58b35931b9af0bb6abf92e039c43,2026-10-02T15:25:47-03:00,frannlima,fix: renovar cache da versão estável do App build v81
+a637de2a95ad330cf5092c8cbffa6680474a6d70,2026-10-02T16:00:41-03:00,frannlima,Aplicar banner e popup da campanha eStore com logo oficial
+01da1aea173d9753bc87309ddab0bce8e9aef9b7,2026-10-02T16:00:44-03:00,frannlima,Atualizar cache do app para campanha v82
+f4c5c7a9cfb5960ad38541d97192a841a2a2a7a9,2026-10-02T16:07:52-03:00,frannlima,Corrigir campanha no app publicado: banner e popup v83
+e01987a899cd86ac81da2708fa1096a8cbcbb561,2026-10-02T16:07:56-03:00,frannlima,Forçar atualização do GitHub Pages para v83
+225ef007d30c38ee97eeff7006cd2701418a7d4d,2026-10-02T16:19:29-03:00,frannlima,Adicionar banner da campanha autocontido
+9995a1170782ede4a60e2d7a2f774456586fc8ff,2026-10-02T16:20:16-03:00,frannlima,"Corrigir renderização do banner, pop-up e compartilhamento da campanha v84"
+cb1fbe075d205aeb65d092942417e014fabe375e,2026-10-02T16:20:22-03:00,frannlima,Atualizar cache do app para campanha v84
+7af0559aa32f9a8c14fa0a9b05387e468bc621d4,2026-10-02T16:54:46-03:00,frannlima,Aplicar popup aprovado com logo oficial e imagens dos prêmios v85
+c5856d33712bb7ce4b4ca4e17ee32586c8248bd8,2026-10-02T16:54:52-03:00,frannlima,Atualizar cache do app para popup campanha v85
+56be3f66ef4b1e110cd09cf273c93ee9bc28db3d,2026-10-02T18:21:11-03:00,frannlima,Adicionar novo banner do popup da campanha de outubro
+5d979d9fcbc8509e6d393406a5b3417621ee0c80,2026-10-02T18:21:27-03:00,frannlima,Aplicar novo banner no popup da campanha
+15d25e6082c3679ad313e391511666e4f6279149,2026-10-02T18:21:35-03:00,frannlima,Atualizar cache para novo popup da campanha
+5ccf1fcc46186f8e5c5476c5248e4c63d3855d77,2026-10-02T18:27:44-03:00,frannlima,Corrigir popup da campanha e aplicar layout v87 com celular em destaque
+47ee0371c8b15f1446e950d2fa8b26eb2a187a4f,2026-10-02T18:27:53-03:00,frannlima,Atualizar cache PWA para popup v87
+9ca53b56ad2b24848d913096bc7aa3a32de13a06,2026-10-02T18:32:33-03:00,frannlima,Remover logos Riachuelo do popup da campanha
+7e93d066e720897351fb678054864a7252f8f63a,2026-10-02T18:32:40-03:00,frannlima,Atualizar cache PWA para popup sem logo v88
+c302f5b43041105930a1231155a4f7835e98404f,2026-10-02T18:41:09-03:00,frannlima,Aplicar popup final da campanha para todos os acessos v89
+86ade8fbef721925f0637b296fd9fa6b3ce12179,2026-10-02T18:41:19-03:00,frannlima,Atualizar cache PWA para popup final v89
+ed21ed0176cb19552b4b4e354d097cf863641b19,2026-10-02T18:51:04-03:00,frannlima,Definir novo banner compartilhável no menu Campanha v90
+095efd82625c2e6ced0ee5448f20e369a560eb5f,2026-10-02T18:51:14-03:00,frannlima,Atualizar cache PWA para banner compartilhável v90
+f210c641e5000cadb215bc11989095cb7c028503,2026-10-02T19:02:48-03:00,frannlima,Aplicar banner da campanha no menu Campanhas v91
+faafb57c514620f06991889517e07560b18cc5ce,2026-10-02T19:03:04-03:00,frannlima,Atualizar cache PWA para banner campanha v91
+89fb5891ed07e4f0c8a7d4f88a45f19c088ece3f,2026-10-02T19:09:51-03:00,frannlima,Adicionar compartilhamento do ranking diário v92
+74be53a8425c142a3e4a17e9624cfbb716ca3cc0,2026-10-02T19:10:07-03:00,frannlima,Atualizar cache PWA para ranking diário v92
+5294d49db8fd8c516514987edbb6bb4961ad0e2b,2026-10-02T19:16:43-03:00,frannlima,Corrigir períodos e enquadramento dos cards de ranking v93
+9e79dceaa9015eeb7328662b99ee951ace78bade,2026-10-02T19:16:57-03:00,frannlima,Atualizar cache PWA para ranking v93
+6642c795b67c100d1ba0c05518533397cd245fad,2026-10-02T20:00:05-03:00,frannlima,Incorporar Raio-X semanal ao Ritual eStore v94
+23a56b448d5f30641ef60a29af9fb9211463adff,2026-10-02T20:00:26-03:00,frannlima,Atualizar cache PWA para Ritual Raio-X v94
+1a3cf1662e4b9de4e8b1d50cd2b6c7ad98e8710a,2026-10-02T20:37:55-03:00,frannlima,Adicionar visão regional ADM ao Raio-X do Ritual v95
+fc01b46eb34c4fa9c691ec491c9c0df3bea35dd4,2026-10-02T20:38:17-03:00,frannlima,Atualizar cache PWA para visão regional do Ritual v95
+ba48229e04dcd791a1443cd64bf28a6495ca8402,2026-10-02T22:00:21-03:00,frannlima,Aplicar panorama parcial compartilhável FCA sem bloco de mobilização v96
+d2e9143870d8c780f97c7693219b77cca593065b,2026-10-02T22:00:33-03:00,frannlima,Atualizar cache PWA para panorama FCA v96
+dbe6cab4a19d1bb7ace564059704766ef90e6510,2026-10-02T22:34:52-03:00,frannlima,Adicionar Mídias do App e gestão do ticket médio histórico v97
+52d177c850e769a15bd297669cfdbd8eea16c4c2,2026-10-02T22:34:57-03:00,frannlima,Atualizar cache do App para v97
+71d1237427decbba18cda568d52ce67080d818e9,2026-10-02T23:54:07-03:00,frannlima,Alinhar KPIs e colunas do panorama FCA v98
+f91057b4a5b132244024a4611eb48972c04b36e2,2026-10-02T23:54:13-03:00,frannlima,Atualizar cache do App para v98
+9702cd89f45dc15409f9ac85c2ae8536d5c07d5e,2026-10-03T00:54:07-03:00,frannlima,Adicionar gerador executivo PowerPoint eStore no ADM v99
+2c89a2a6561aa644c811304e5930017eea8f1076,2026-10-03T00:54:11-03:00,frannlima,Atualizar cache do App para apresentação eStore v99
+772c29123203814d183213d1d18e39f6ba40a689,2026-10-03T02:08:32-03:00,frannlima,"Corrigir capa, alinhamento e tela do gerador de apresentação v100"
+72cfb797784f286acacc51e3fae82c0cc9923442,2026-10-03T02:08:36-03:00,frannlima,Atualizar cache para apresentação eStore v100
+af10022696da1d44e48e2a6a8cb27741410b97ce,2026-10-03T02:28:23-03:00,frannlima,Adicionar gerador profissional de apresentação eStore v101
+97f55d8b66c40cce434175dd7a46ccea82d2eff3,2026-10-03T02:28:37-03:00,frannlima,Injetar gerador profissional de apresentação eStore v101
+6290dc801962925d099f6b00a3adc919ce17fc81,2026-10-03T03:09:14-03:00,frannlima,Aplicar painel horizontal aprovado no menu Apresentação eStore v102
+7b94738fb7171ab0b0b2fc4f32a616051f2479f6,2026-10-03T03:09:40-03:00,frannlima,Atualizar App para painel horizontal eStore v102
+295ecb9121d5a54044570935168c7f4b5b5b420c,2026-10-03T03:16:42-03:00,frannlima,Adicionar opção Card Horizontal no menu Apresentação eStore v103
+ae8ce434efa30dbe667bcfd4ca672e4c41e75778,2026-10-03T03:17:05-03:00,frannlima,Publicar opção Card Horizontal no menu Apresentação eStore v103
+31ff6e6e3de820941091b1c7c464b99383731368,2026-10-03T03:27:05-03:00,frannlima,Adicionar compartilhamento de meta de pedidos no Hora a Hora v104
+8f7d2e2f3b0ca95bc818dda9ca818dcc27a32091,2026-10-03T03:27:24-03:00,frannlima,Publicar meta de pedidos WhatsApp no Hora a Hora v104
+81d91c2d99ff9aa686cdd3cc27c77558a4e9bca0,2026-10-04T01:14:15-03:00,frannlima,Ajusta logo oficial e layout do rodapé do card eStore
+b0171bb226820757f8190d17a49e597d8d7b6aaa,2026-10-04T01:14:18-03:00,frannlima,Atualiza cache do card apresentação eStore
+59a19b63b77e48143bc7f693edbac8cb4f719c67,2026-10-04T01:35:13-03:00,frannlima,Ranking de supervisores por share da filial e nomes elegíveis
+e9ccc49c03c6a63fad6d732c7dda65581bb9b0ad,2026-10-04T01:35:15-03:00,frannlima,Atualiza cache para ranking de supervisores por share
+a5e9b9d5490edd77c9d3a47982081028e9408bed,2026-10-04T01:47:15-03:00,frannlima,Refina card executivo eStore e enquadramento do pódio
+71ea3cde739e892fc8b5972da768e625ae053447,2026-10-04T01:47:17-03:00,frannlima,Atualiza cache do card executivo eStore v107
+f096893ef631f6b1248b7152d0e1cb03de9b30e6,2026-10-04T02:19:43-03:00,frannlima,Meu Time: cockpit executivo e evolução de dispersão
+9fc287de05d0449dea193777555a2c1cc77a0155,2026-10-04T02:19:56-03:00,frannlima,Atualiza cache para Meu Time cockpit v108
+c87e0def25df5b504b7aab015c8d54d4b04e237a,2026-10-04T02:20:15-03:00,frannlima,Força app-v2 v108 no shell
+9bb62bc3bffb80789ced5ef83a4c63efaae782f1,2026-10-04T02:28:52-03:00,frannlima,"Meu Time v109: cockpit, evolução e compartilhamento executivo"
+54a067425c808fb43e909fde11e44fe25e78d60e,2026-10-04T02:29:04-03:00,frannlima,Carrega hotfix Meu Time v109 no app publicado
+8aa4a9de95a4dbe3421e203206306af6d8b84e6e,2026-10-04T02:30:02-03:00,frannlima,Carrega Meu Time v109 diretamente no app publicado
+6ef83c2422ebcd5ae7ba762027ff3a018e2ff11a,2026-10-04T02:44:19-03:00,frannlima,Meu Time v110: evolução oficial em % e p.p.
+92775d12ad891298bb8b5144296a68e3a5ee7536,2026-10-04T02:44:47-03:00,frannlima,Carrega Meu Time v110 com evolução oficial
+2cd04e4326b618d5b35b1d2052d6b3288455a883,2026-10-04T02:44:52-03:00,frannlima,Atualiza shell para Meu Time v110
+589d80a26fcf179915f3e27a00836075fff27ffb,2026-10-04T02:47:18-03:00,frannlima,"Meu Time v111: mostra dispersão anterior, atual, % e p.p."
+0a2a53918d178ed9a631af996956c1442ca26ac7,2026-10-04T02:48:13-03:00,frannlima,Atualiza Meu Time para v111
+815d6b3fdf18f0b3109f8e6a1f0ba9b6f476b5a8,2026-10-04T02:48:19-03:00,frannlima,Atualiza cache do Meu Time v111
+dcc47e67ec224b9efdb279645bf500d2c41d720b,2026-10-04T02:58:15-03:00,frannlima,Meu Time v112: remove leitura executiva da legenda
+725eba7ab1d3c435425e67cbf4873e29ec08ff2d,2026-10-04T02:58:28-03:00,frannlima,Carrega Meu Time v112
+552dd5fdfa3c160fb4c51945f923e2a06b34395f,2026-10-04T02:58:35-03:00,frannlima,Atualiza cache do Meu Time v112
+df2939b6eb0f2295307125ca148ef5577c119570,2026-10-04T03:26:26-03:00,frannlima,Meu Time v113: dashboard executivo de dispersão da filial
+52a326b091ef7cbc75dd480148facca907dd984c,2026-10-04T03:26:57-03:00,frannlima,Carrega dashboard de dispersão da filial v113
+339fb50f4540d9f293068f378e450430ad0cd457,2026-10-04T03:27:01-03:00,frannlima,Atualiza cache para dispersão da filial v113
+d4263ba0cb81a9819887d2ca50d365ce002406c9,2026-10-04T03:41:38-03:00,frannlima,Comissão v114: elegibilidade por modalidade contratual
+0742a63e1954afcb8f4471fa1168e6dbbec6819f,2026-10-04T03:42:16-03:00,frannlima,Carrega elegibilidade de comissão v114
+3b2af04ef1da2f57043caeea4a7ce4c4a2a9a21a,2026-10-04T03:42:21-03:00,frannlima,Atualiza cache para elegibilidade de comissão v114
+20d1f1e6a7323b6aab09f55522300cdea9f6f5ec,2026-10-04T04:14:35-03:00,frannlima,Comissão v115: exclui BOPIS do individual e Pool
+6a98cdce6b7405d395d68c858df6b483aee28ff8,2026-10-04T04:15:03-03:00,frannlima,Carrega regra BOPIS de comissão v115
+9fe37950e7d79ea178dd16913f3ff212acf6bb77,2026-10-04T04:15:11-03:00,frannlima,Atualiza cache para regra BOPIS v115
+2dde67708461ca6860a6079e07091e9121b0989c,2026-10-04T04:32:05-03:00,frannlima,Meu Time v116: adiciona alça retrátil na lista da equipe
+2f98715d8930eb300e53cb2c03a5f66bec0b1619,2026-10-04T04:32:35-03:00,frannlima,Carrega alça retrátil Meu Time v116
+63703f2c90594bc0bd35e3ef5721a4dc4b4522b1,2026-10-04T04:32:45-03:00,frannlima,Atualiza cache para alça retrátil v116
+89120889ea738aeb717fbb74211f5333ab2e2273,2026-10-04T11:41:26-03:00,frannlima,Meu Time v117: dispersão regional por áreas
+0c4f9bc1bda482ba78249fa8e80d8c0980894662,2026-10-04T11:43:44-03:00,frannlima,"BOPIS v117: dashboard ADM, busca e alerta no Meu Resultado"
+50586ea3dd1bd8fbcd06aa16073fc6f5cb55d94d,2026-10-04T11:44:26-03:00,frannlima,Carrega dispersão por áreas e Central BOPIS v117
+371d76917360fbc6b7bdf89707a7a8f01f0ce3ef,2026-10-04T11:44:38-03:00,frannlima,Atualiza cache para funcionalidades v117
+8e51d7aea3d7505ddbf64141c64aa23c90fa7778,2026-10-04T12:56:08-03:00,frannlima,feat: add campaign beat sound and animated menu effects
+c8b229d05453fb49a446ef8af7d6bf69dc19eb8e,2026-10-04T12:56:12-03:00,frannlima,chore: bump service worker cache for campaign effects
+cd167f128fc5f74e40d75aa425271f838227888f,2026-10-04T13:24:18-03:00,frannlima,feat: add popup sound waves and stronger campaign beat
+7d3467757bc460f94af703eecc70fe59ba61b750,2026-10-04T13:24:27-03:00,frannlima,chore: bump service worker cache to v119
+3a224b717a40f8259184b21f4e46ebdcc4283f47,2026-10-04T13:35:02-03:00,frannlima,fix: refine campaign popup copy and prize cards
+e283a48ec55b041bb618c01562309c8c38ae8ebc,2026-10-04T13:35:07-03:00,frannlima,chore: bump app cache to v120
+95f50e94a500266ef55153c315f9f7b55705a6cb,2026-10-04T13:48:25-03:00,frannlima,feat: add campaign as first animated home carousel slide
+41e2bfd003ec24d2469e4f2073a0521303948fb0,2026-10-04T13:48:30-03:00,frannlima,chore: bump app cache to v121
+3dc7abf5acb3026c541ca73d9ba14e44104cd51a,2026-10-04T13:49:21-03:00,frannlima,fix: correct campaign home CTA handler
+1dd14a641da4661a0c4177997820f96cefcd5b92,2026-10-04T13:49:26-03:00,frannlima,chore: bump app cache to v122
+d14c70994b0c76ef9ccf557b6c2e94dac1709e44,2026-10-04T14:35:12-03:00,frannlima,feat: add collaborator rhythm and listen-to-team workflow
+3dc69ac3a420487907c62cfa302ed844ff33df09,2026-10-04T14:35:25-03:00,frannlima,feat: register Ouça seu time route
+bf3386f3b68d782e24c590e26a2f448ff5ae6900,2026-10-04T14:35:39-03:00,frannlima,chore: load collaborator voice module v123
+97046a5dcff963f5cd557a981c4c6a83c7779c7a,2026-10-04T14:36:52-03:00,frannlima,fix: inject Ouça seu time module after app extensions
+d1c3db0e10241c91db9e67688fa7c778d71eb057,2026-10-04T15:49:52-03:00,frannlima,ux: make zero-sales alert clearly tappable
+09903255b04e35f2796c82b06247e087e3a7031c,2026-10-04T15:50:09-03:00,frannlima,chore: bump cache for explicit rhythm alert CTA
+73c2aa4cc94d66fea3fcd77ca55e2314150545bc,2026-10-04T15:53:52-03:00,frannlima,copy: rename ADV to regional eStore speaker
+6d57b2276272fc619ef154cb1b46cafa520ea37c,2026-10-04T15:54:02-03:00,frannlima,chore: bump cache for eStore speaker copy
+2ce216e6cb56b5e88bebc35f922f7e3285fc29b0,2026-10-04T16:50:19-03:00,frannlima,feat: add consolidated Ouça seu time dashboard with FCA insights
+f8e40cb97a8e4b531f469e40b3a3af8b65461ae2,2026-10-04T16:51:11-03:00,frannlima,fix: scope FCA priorities and keep record tabs in sync
+0db499eef538878011f0bb1db8b67f606f560873,2026-10-04T16:51:25-03:00,frannlima,chore: bump cache for Ouça seu time dashboard v127
+6b5c0ba675f89eeaa4a62bf0de16c5d2a60a189a,2026-10-04T17:26:17-03:00,frannlima,feat: add FCA performance pulse dashboard and preserve weekly partial
+3a1320d82973a21281632673478c5065bb103ce7,2026-10-04T17:26:37-03:00,frannlima,chore: bump cache for FCA performance dashboard v128
+c09437b8c68a9fe0e1029217b1be29a6f59f3351,2026-10-04T17:28:12-03:00,frannlima,fix: correct FCA dashboard inline handlers
+a1af8541d12313ba84b9f33bf7f44ee4808dbcf6,2026-10-04T17:29:13-03:00,frannlima,chore: refresh cache after FCA dashboard validation
+fbe949350788fe35e1f3ff8397cdeb11135e7463,2026-10-04T18:45:06-03:00,frannlima,feat: add Riachuelo performance center styles
+1acf2e9b87f0e89e2354c040824289d790235b82,2026-10-04T18:48:52-03:00,frannlima,feat: add FCA intelligent performance center
+3bc0c888f360a94e73953789f80845eaca044b09,2026-10-04T18:49:23-03:00,frannlima,feat: wire Central de Performance into app
+3a0c3d05e98fb6c2088d9cb74e735fc58589c605,2026-10-04T18:49:38-03:00,frannlima,chore: refresh app shell for performance center
+eaa9df734a505db2c72fa4022e297c3b62aa270b,2026-10-04T18:50:58-03:00,frannlima,fix: preserve certified store signals in current performance view
+15f2e4ee9a03dc0750fcf6a79184cb3307dbdc4d,2026-10-04T19:21:57-03:00,frannlima,feat: add KPI gaps and executive treatment summary
+55c1f1b29c27ae13f26d891aeba401178753cf9a,2026-10-04T19:22:14-03:00,frannlima,style: refine executive summary and back navigation
+9ae1cc10dc0e7a8b41ce1762721ebb78d847b039,2026-10-04T19:22:33-03:00,frannlima,chore: publish performance center v131
+5d4b0d2085deaf7db55b99493d22f4f71363de55,2026-10-04T19:22:37-03:00,frannlima,chore: refresh app cache for performance v131
+02f149c6a93c123aecb537606d82c1e9e1e9d07a,2026-10-04T20:08:32-03:00,frannlima,feat: natural weekly summary with editable complement
+63c46820eebc118c8b0bf95b22783a9f64b35584,2026-10-04T20:08:58-03:00,frannlima,style: improve weekly summary readability on FCA card
+558346c87bd027032958263fbd9848a4a60ff258,2026-10-04T20:09:06-03:00,frannlima,chore: publish Central de Performance v132
+ea070ffad677dacfbb02d957f09f5b9dfd14f76a,2026-10-04T20:09:10-03:00,frannlima,chore: refresh app cache for Central de Performance v132
+e979050cc72c6eeca6f7cfb836e17e2141a20b25,2026-10-04T21:43:13-03:00,frannlima,brand: add official Riachuelo logo asset
+df027e99069f8e25810f5f09df93ea1d6f08cedd,2026-10-04T21:43:17-03:00,frannlima,brand: add official Riachuelo logo asset
+9d93ec025ff53758dd1f3e03a6cc9a162ed141dc,2026-10-04T21:44:13-03:00,frannlima,brand: apply approved Riachuelo logo and Priorizadas labels
+d2fa020558b391361fa903164e12279641050fe4,2026-10-04T21:44:20-03:00,frannlima,brand: standardize Riachuelo logo across cards
+31df007ecc77f158e7851b9bf94d0bcbd6535f30,2026-10-04T21:44:25-03:00,frannlima,brand: use approved Riachuelo logo in presentation cards
+b5926173faf46b2fdf1432a767169c829eb85806,2026-10-04T21:44:30-03:00,frannlima,brand: use approved Riachuelo logo in regional team card
+5f00006f750acff7dd40b84fb8beb900e458e81c,2026-10-04T21:44:36-03:00,frannlima,brand: use approved Riachuelo logo in store team card
+4d2272f466b86a36cb866908947e3f8b541ec83c,2026-10-04T21:44:43-03:00,frannlima,brand: use approved Riachuelo logo in BOPIS cards
+8c2dc981cf9ae2dd91ae53096e7ff124ae56410b,2026-10-04T21:45:34-03:00,frannlima,fix: preserve official Riachuelo logo proportions
+a5ee3b10697840f7709999abfb982571b45b6697,2026-10-04T21:45:41-03:00,frannlima,copy: standardize Priorizadas terminology
+627860e091d357854e83e6227be719f777444750,2026-10-04T21:45:50-03:00,frannlima,chore: publish official logo standard v133
+3b10f4dcb4e025ef1a55824b34076f0e9997c8a2,2026-10-04T21:45:58-03:00,frannlima,chore: refresh app shell for official Riachuelo logo v133
+a64c8d437dc8ee834d917df4d62f4a6ab42fcfaa,2026-10-04T22:53:31-03:00,frannlima,feat: add Riachuelo celebration popup styles
+9b0e7668800d4b0c3df510a5ece340ed7082bcfc,2026-10-04T22:53:39-03:00,frannlima,feat: add birthday and work anniversary celebrations
+262274b8787f304df2e06702187d31d7e3b9527f,2026-10-04T22:54:16-03:00,frannlima,fix: align regional store count with 18 stores
+18bee0ad13a4835287f54f75c306c49fd9d1e834,2026-10-04T22:54:28-03:00,frannlima,feat: wire birthday and work anniversary celebrations
+ed8741e80ac2ce2e29ccf316bd0790ad7b835077,2026-10-04T22:54:39-03:00,frannlima,chore: refresh app shell for celebrations v134
+b8563ea655b0eb40aea57c7962149909a1cc78a1,2026-10-04T23:26:06-03:00,frannlima,fix: read authenticated user from global lexical session
+b908a0d642129eea430c0157bdc58f4ec86fe96e,2026-10-04T23:26:30-03:00,frannlima,chore: publish celebration fix v135
+4f517c5ed7741b63a5de95f06bb55d41948b4b01,2026-10-04T23:26:35-03:00,frannlima,chore: refresh app cache for celebration fix v135
+e07f7ad812b473f7b9e740aea2a2b367403bac53,2026-10-05T01:13:49-03:00,frannlima,brand: add eStore CE+PI app icon v136
+0f799844d3f9baa5ac887cad9f9be95736927317,2026-10-05T01:13:58-03:00,frannlima,ui: add responsive desktop home layout v136
+be9263e54a728693f677dc0a7ddbfc300bbbab41,2026-10-05T01:14:18-03:00,frannlima,pwa: use new eStore CE+PI icon v136
+661b1ee69187aa49a47c8c54105466e52ffa7494,2026-10-05T01:14:36-03:00,frannlima,ui: publish responsive desktop and new app icon v136
+5a40d381d004932b166a74d0734e4ad40f01f504,2026-10-05T01:14:44-03:00,frannlima,chore: refresh shell for desktop and icon v136
+eaded0301a87c4acdfc74399acefa92b1d57b40c,2026-10-05T01:28:16-03:00,frannlima,fix: add clean mobile launcher for cache recovery
+a531beeb88168e19287d134274594302dde9c340,2026-10-05T01:28:35-03:00,frannlima,fix: add clean launcher bypass and refresh shell v137
+11b7a0c30713b2af4d8d5da8b05b3dbfcc0b1953,2026-10-05T01:28:51-03:00,frannlima,pwa: bump start URL to v137
+dcfb5e9c7eb6cc6ae109cc1b6e58e9f83efef4a3,2026-10-05T01:29:15-03:00,frannlima,chore: publish mobile recovery build v137
+aa5c974d2ef49160dfb3987062e86a06f234119d,2026-10-05T11:56:44-03:00,frannlima,FCA: adicionar flag regional para fechamento excepcional por eleições
+4d88a07819dc176322685e1d758d1db4ece219c2,2026-10-05T11:57:55-03:00,frannlima,Performance: refletir evento regional excepcional no diagnóstico
+2a6a1cd5ab5c8e6bb644e890b95208d059f95ee8,2026-10-05T11:58:32-03:00,frannlima,Atualizar build da Central de Performance
+499576ca311ea058a206baaed9a5742bd23b4fb4,2026-10-05T11:58:41-03:00,frannlima,Atualizar cache do App para FCA regional
+81352ec9010af9113f541134d5688012f5cd140e,2026-10-06T00:20:53-03:00,frannlima,fix: estabilizar sessão e remover reload automático do PWA
+bb31674e7470a19421f76820c08bcbed9d9d68ec,2026-10-06T00:20:57-03:00,frannlima,perf: publicar service worker estável e cache rápido v139
+a683582841bd35d99ffa8de531cd50d1d3d3f1ef,2026-10-06T00:21:00-03:00,frannlima,pwa: usar start URL estável
+c6549bf012d33c709b26528c4935d337635d5bd9,2026-10-06T00:21:02-03:00,frannlima,pwa: atualizar rota de recuperação sem build fixo
+0cf2304bb3aac912b08f93dddb8cfa105461814d,2026-10-06T00:22:37-03:00,frannlima,perf: eliminar módulos duplicados no carregamento e publicar v140
+1c7f9f99804b475ec70a79b04fa63111d9d5b1ef,2026-10-06T00:22:42-03:00,frannlima,chore: alinhar shell PWA ao build v140
+fcd73b854d62513aeec5bce14f5b5a5f743ca926,2026-10-06T01:09:12-03:00,frannlima,fix: exibir pool mensal parcial com base BOPIS verificada
+dca4f7aeb0edfb91f1d3a83c40f280fe305e66f3,2026-10-06T01:09:39-03:00,frannlima,fix: liberar outubro no seletor de comissão e status mensal
+e108465f60728afd8126623856356a61c4ac145d,2026-10-06T01:09:53-03:00,frannlima,chore: publicar correção do pool e comissão v141
+e2e095c7248145f6264b8f1be093fd94d821b53d,2026-10-06T01:33:16-03:00,frannlima,feat: importar relatório BOPIS no ADM e recalcular Pool
+e6e5132674ac2782f208dc919f79ebe00346aa76,2026-10-06T01:33:31-03:00,frannlima,chore: publicar importador BOPIS e regra de Pool v142
+4409ea21cdb51acd6dec4b06041168098780a69e,2026-10-06T01:33:43-03:00,frannlima,chore: alinhar shell ao build v142
+a97ab7f7bf7c2be3db96198f4cc60431e8f4b7ac,2026-10-06T02:52:44-03:00,frannlima,feat: destacar Pool e adicionar card compartilhável Riachuelo
+f0fa5a9f037293bdb6b3c9eb17e5dae1ac639d79,2026-10-06T02:53:03-03:00,frannlima,chore: publicar card Pool Riachuelo v143
+655f85f3e71264ebdf561f14cb32d6a8dae3ad7e,2026-10-06T02:53:14-03:00,frannlima,chore: alinhar shell ao build v143
+b68743685bf9a847be3a8e347f417b0c0b867ade,2026-10-07T10:39:29-03:00,frannlima,feat: mostra todas as lojas no card do pool em alta resolução
+702b3e7beb05cbbcd09102e71b59a37bff37882a,2026-10-07T10:39:40-03:00,frannlima,chore: ativa card regional completo do pool v144
+d67497d771828cc6676fbc260c8b88c9c685d30e,2026-10-07T10:51:01-03:00,frannlima,fix: remove limite de 8 lojas do card do pool também no script legado
+fb46f8e88ee393ea93a33a5315284c7bb51ca825,2026-10-07T10:51:28-03:00,frannlima,chore: força atualização do cache do card completo do pool
+848fb944ce1383028b5c2db172df7afc0e745b91,2026-10-07T10:58:55-03:00,frannlima,feat: exibe as 18 lojas em uma única lista no card do pool
+f48217043244a3df0a4bab41262e82702c01a188,2026-10-07T10:59:04-03:00,frannlima,chore: ativa card do pool com 18 lojas em lista única
+7093f2ea1904b4064ea4cf882ae086639cac415f,2026-10-08T11:38:26-03:00,frannlima,Adiciona handoff de sessão e navegação do Meu Acompanhamento
+e641ca44fdcdb9096c3b4e2108a9649c42898374,2026-10-08T11:39:57-03:00,frannlima,Integra sessão e navegação direta do Meu Acompanhamento
+63c2a126cc5b3d2331c59ec676fa05fdc8636bd5,2026-10-08T11:40:27-03:00,frannlima,Ativa bridge Meu Acompanhamento no shell eStore v147
+28f259494899819abb1884d42973f6eb080c044a,2026-10-09T08:44:21-03:00,frannlima,Melhora integração eStore e retorno ao Meu Acompanhamento
+8f6f1a1563d0ecc9baab695e18158ea5122c7139,2026-10-09T08:44:25-03:00,frannlima,Sincroniza bridge eStore com retorno ao app principal
+59d43ddb8b980c0555d9f843ff19ae98cf95384b,2026-10-09T08:44:29-03:00,frannlima,Atualiza cache v148 e injeta bridge de navegação integrada
+978af37b284ce5a4fd7d80eacf46e345da2034fd,2026-10-09T19:35:21-03:00,frannlima,"Improve desktop information hierarchy, responsive layouts and KPI readability"
+b85754d2159246cc62540b0a9a7baf698a024c2e,2026-10-09T19:35:23-03:00,frannlima,"Improve desktop information hierarchy, responsive layouts and KPI readability"
+64c91d80fd5a0dd4ef44f710ebf253f9b845b393,2026-10-09T19:47:35-03:00,frannlima,Add configurable sound and vibration alerts for eStore updates
+542469423e953c153bf195c52367f0c0223ab31b,2026-10-09T19:47:46-03:00,frannlima,Harden eStore alert polling for partial API failures and session state
+1e82d88d7af561d6b53e348fa4a5f645714b7807,2026-10-13T11:51:59-03:00,frannlima,Fix BOPIS import API reference and validate admin password
+b4aa5723518c21050ea4aaa45d9c1e34161f5b3b,2026-10-13T11:52:19-03:00,frannlima,Refresh PWA cache for BOPIS import hotfix
+c95f830b1b7ae9c19a20c8ec05fa860401e97616,2026-10-15T11:01:18-03:00,frannlima,fix: synchronize Hora a Hora queries across both apps
+f57394f7eda338caf0eafcf5e448d19612da0520,2026-10-15T12:19:36-03:00,frannlima,fix: compact integrated return navigation without overlays
+b1f326bfadad1661b1e7d96f48b986b392ae1c24,2026-10-15T13:30:42-03:00,frannlima,fix: remove obstructing Voltar overlay and preserve contextual return
+7baa72ec5c88623decf750fa2a3b585be5445dae,2026-10-16T01:04:46-03:00,frannlima,Cria identidade Riachuelo 2025 para o eStore CE+PI
+80be4a61244d31a7bb2947ce306ac41e253bdcb9,2026-10-16T01:04:49-03:00,frannlima,Carrega identidade institucional Riachuelo no CSS principal eStore
+80a7705a0bbedc901eea0d6dd4d51a422eef3541,2026-10-16T01:05:34-03:00,frannlima,Garante precedência dos tokens da marca Riachuelo 2025
+512a14fa9fc1ec413b6c4edcf11f19d8d9dc9642,2026-10-16T01:05:45-03:00,frannlima,Atualiza cache offline do eStore para sistema visual Riachuelo 2025
+d9a19461feb2d0e3cc86a05438fffda9608487ec,2026-10-16T01:06:57-03:00,frannlima,Aplica folha de estilo institucional no HTML entregue pelo PWA eStore
+343ed094c04b30e72c6e5d3236058fe528e4ee0a,2026-10-16T01:14:52-03:00,frannlima,Padroniza assinatura oficial Riachuelo em todos os cards exportáveis
+c8a0d33e163a6e692be225b0489c5bee308bbd38,2026-10-16T01:16:16-03:00,frannlima,Padroniza exportação de cards eStore com logotipo vetorial e paleta Riachuelo 2025
+6ff3ebd2fdbd21575f968d8b80a13f6219190f12,2026-10-16T01:16:33-03:00,frannlima,Uniformiza prévia e compartilhamento do painel com identidade Riachuelo 2025
+e4785a3de0ef93f84fa05adbdcaf6045f9890074,2026-10-16T01:16:37-03:00,frannlima,Uniformiza prévia e compartilhamento do painel com identidade Riachuelo 2025
+9d39cd730c858efcdf9390046c115c4909582aa8,2026-10-16T01:16:39-03:00,frannlima,Uniformiza prévia e compartilhamento do painel com identidade Riachuelo 2025
+3b9431f4c8791955e9c494cff3bd8058258dd8bb,2026-10-16T01:16:53-03:00,frannlima,Aplica assinatura institucional Riachuelo aos cards compartilháveis
+8e98b263e5602f50bba0ea8b0d796069930dfe96,2026-10-16T01:16:55-03:00,frannlima,Aplica assinatura institucional Riachuelo aos cards compartilháveis
+b77c8c76660ba6c5c44f9809b36e7a4cc6fe9206,2026-10-16T01:16:58-03:00,frannlima,Aplica assinatura institucional Riachuelo aos cards compartilháveis
+38a4c36cd318fe92c07436197fdd935756f24c5a,2026-10-16T01:17:40-03:00,frannlima,Invalida cache PWA e publica padrão Riachuelo nos cards do eStore CE+PI
+e27e2b1593cb7a16a4887e96ca49783110ed5984,2026-10-16T02:42:56-03:00,frannlima,Padroniza fonte Larsseit com fallback nos cards compartilháveis eStore
+5a359de064573f426813f9334edd78af79b4c6e8,2026-10-16T02:42:59-03:00,frannlima,Padroniza fonte Larsseit com fallback nos cards compartilháveis eStore
+cc23a7b33f54e44d44d07e2815f6d5d2bbeee7f6,2026-10-16T02:43:34-03:00,frannlima,Aplica tipografia Larsseit nos geradores Canvas existentes sem alterar layout
+26fa7131a35c84f04075e1f40f0be0ae02e027d3,2026-10-16T02:43:37-03:00,frannlima,Aplica tipografia Larsseit nos geradores Canvas existentes sem alterar layout
+77f9ad335060761fcafbb4334fa89ca883ff9dbd,2026-10-16T02:43:40-03:00,frannlima,Aplica tipografia Larsseit nos geradores Canvas existentes sem alterar layout
+58e61a85b97c9c7dc5bbbba986a55fe586cafc8c,2026-10-16T02:43:43-03:00,frannlima,Aplica tipografia Larsseit nos geradores Canvas existentes sem alterar layout
+6291fb8f1ed7afffd6ada11485e888998165a76e,2026-10-16T02:44:19-03:00,frannlima,Padroniza tipografia nos cards Canvas existentes do eStore CE+PI
+8f69665823d542724916cd7e85eeee751a35fa41,2026-10-16T02:45:03-03:00,frannlima,Atualiza PWA eStore para novos estilos tipográficos dos cards institucionais
+68fc141814990fd41d02e9bcadc4458b2420aed2,2026-10-16T02:46:00-03:00,frannlima,Documenta padrões e inventário dos cards compartilháveis da marca
+480d9a311efa824a6d73dbb2066271aac299f7b5,2026-10-16T02:58:41-03:00,frannlima,Alinha acabamento institucional reversível de cards ao Meu Acompanhamento
+24d15e271f45c6e19742c3c80bf9993063d25df4,2026-10-16T02:58:45-03:00,frannlima,Ativa identidade Riachuelo premium no fluxo real de geração dos cards eStore
+dd71e3b8674fcc985b8383d4e878483403949900,2026-10-16T02:59:45-03:00,frannlima,Publica preview reversível dos cards Riachuelo no eStore CE+PI
+014f12a04b3a43e1d887d861be4898601c92ed58,2026-10-16T03:15:28-03:00,frannlima,Exibe acabamento Riachuelo dos cards eStore na própria interface
+c1eaf1768d574f232a970d35dd82e0c817a5120d,2026-10-16T03:16:06-03:00,frannlima,Aplica o visual institucional diretamente aos painéis eStore durante a navegação
+09ac6893cc532e38cbe84bcef538222d043f509d,2026-10-16T03:16:26-03:00,frannlima,Publica estilo de cards diretamente em tela no PWA eStore (v157)
+f39c32be310f84a870a1ef4031bce274bd485f57,2026-10-16T15:29:17-03:00,frannlima,"feat: parcial nacional Top 15 eStore por porte, CTA e cards horizontais"
+7c0e2c832fdc66568fe998dc46b516747d6b7d6e,2026-10-16T15:29:46-03:00,frannlima,feat: carregar nova aba Parcial Top 15 eStore no menu Campanhas
+6e12ba0c2b338bb827e14bf43e49a05754d87706,2026-10-16T15:29:58-03:00,frannlima,chore: atualizar PWA v158 para nova campanha e ranking
+bc6185f79047237208224c49cc98494ed9e5f29d,2026-10-16T15:31:09-03:00,frannlima,fix: mostrar chamada da parcial no topo do pop-up inicial
+9d2a19af5ba7315d8cab4668970c7c5f6bc2af04,2026-10-16T15:31:23-03:00,frannlima,chore: atualizar versão do módulo da campanha
+df952bf6707f7bb3691b772b677fe66fa1d072dc,2026-10-16T15:31:34-03:00,frannlima,chore: PWA v159 com CTA da parcial em destaque
+92759f51746250fa006f64c5d971c65450677f1a,2026-10-16T15:39:07-03:00,frannlima,"fix: integrar chamada da parcial ao próprio popup V86, sem depender de injeção posterior"
+c284c8685d6f674ddb3821eb01cec13fe947fdb8,2026-10-16T15:39:20-03:00,frannlima,fix: impedir aviso duplicado quando popup possui chamada nativa
+f78e26a76512656d6d76ee0977798961a64f2a07,2026-10-16T15:40:00-03:00,frannlima,fix: PWA network-first para HTML/JS/CSS e carregar módulo Top 15 diretamente
+097581bed78af4eb47ffcd23789ac5e46b3a14d1,2026-10-16T15:40:18-03:00,frannlima,fix: validar extensões JS/CSS na política de cache network-first
+fbc54261a73017ce42f397472f5354cef4035c83,2026-10-16T16:53:27-03:00,frannlima,fix: aguardar carregamento da navegação antes de registrar aba Parcial Top 15
+f9fc28cb13c0d9536b428de3eb7bbb8290ef0269,2026-10-16T16:53:45-03:00,frannlima,feat: acesso direto independente ao painel nacional Top 15 da campanha
+fdc4810d2ab4f3b0b90271230d343f3100485fd5,2026-10-16T16:54:45-03:00,frannlima,fix: link nativo independente para parcial em destaque e fallback direto
+6783e7504cf39863edb954f7ef07ac0d0e440e82,2026-10-16T16:54:59-03:00,frannlima,fix: evitar aviso duplicado no menu Campanhas com CTA nativo
+9ccdf402bf202284c3c82a8993c366af9b29c3c0,2026-10-16T16:55:17-03:00,frannlima,fix: v162 PWA e rota direta da parcial sem scripts legados
+26b6fd18550e727d91bc5efbceccf5d42dee6a5e,2026-10-16T17:37:07-03:00,frannlima,feat: simulador por matrícula com consulta automática à parcial aprovada CE+PI e Top45 nacional
+7ef17c9466386b356d1bedc46edc99b558ffcbe7,2026-10-16T17:38:03-03:00,frannlima,"feat: card único Top15/porte com período de corte explícito, aprovado válido e BOPIS excluído"
+1f760253ed61cb1ef26ab64784d32812980532aa,2026-10-16T17:39:55-03:00,frannlima,fix: considerar também matrículas sem vendas aprovadas na base regional
+fc291b281efe8559a2d1d65872a489bccf48dc98,2026-10-16T17:40:04-03:00,frannlima,chore: forçar carregamento do simulador automático da campanha v164
+07b931b61b9e66eab459b098c2798cc012f5d0bc,2026-10-16T17:40:18-03:00,frannlima,feat: tela de parcial com simulação por matrícula e card atualizado v164
+33519d85c056469f8ecff12dfb15fe08b45851f1,2026-10-16T17:40:20-03:00,frannlima,chore: PWA v164 para atualização dos cards e simulador da campanha
+3aa23c25d4537b02231d055915f1163002bc7104,2026-10-16T18:31:06-03:00,frannlima,feat: incluir Parcial Top15 nativamente no menu Campanhas e posicionamento no Meu Resultado até 10/11
+8a484e5d4adc465d62f26d5f9879cf369885c74f,2026-10-16T18:31:39-03:00,frannlima,feat: centralizar ranking com Supabase e desativar duplicação de abas no módulo
+cc74ce0188d2fb88e60860bc5ed8f4496dafd6c2,2026-10-16T18:33:42-03:00,frannlima,feat: simulador visual premium e desafio de sustentação/subida também no Meu Resultado
+8a534cbe52720876ad6f6bb9fa5683c137a3d5c3,2026-10-16T18:34:44-03:00,frannlima,"feat: importação administrativa XLSX, validade até 10/11 e CTA de card regional"
+104a808a81b2b15df1dab0d6e367dbe898ebfb0b,2026-10-16T18:35:19-03:00,frannlima,feat: imagem horizontal única com 45 posições e legendas para compartilhar na regional
+167f4ae5617dbb47a40d62d4e23835c736b52834,2026-10-16T18:36:42-03:00,frannlima,fix: montar aba Parcial nativa com container dinâmico e destaque pulsante no menu
+899a49f7c2e5f800ec1380f64f4de11e5cb4e568,2026-10-16T18:38:43-03:00,frannlima,fix: controlar visibilidade da campanha até 10/11 pelo fuso Fortaleza
+0c174f03c464e44d6bc92d50ddfaadde24d25d4d,2026-10-16T18:38:46-03:00,frannlima,fix: cálculo de validade e seleção automática do porte na consulta por matrícula
+8b835d2ee304ebe027236c346b520e3ff32270a5,2026-10-16T18:40:32-03:00,frannlima,chore: versão v167 com campanha integrada ao menu nativo e Meu Resultado
+c3f5d6e1ca4c265120cec5e440d1e87d5e071824,2026-10-16T18:40:35-03:00,frannlima,chore: atualizar fallback da campanha para v167
+72f6f5590ef1b100fa3b532010184fd14dd7a35d,2026-10-16T18:40:38-03:00,frannlima,chore: PWA v167 com painel de campanha e importação administrativa
+e8715c65bce176756b269d90576b5aaa24b39563,2026-10-16T18:55:05-03:00,frannlima,fix: integrar parcial Top15 nas rotas reais campaigns/resultView do app principal
+d10174aefe6b44a7912dd4d111e4fb6dcd3a848c,2026-10-16T18:55:26-03:00,frannlima,fix: carregar campanha Top15 no index principal efetivamente usado pelo app
+17376de848eb787944d2870b2c63ffbfe85e2884,2026-10-16T18:56:17-03:00,frannlima,fix: PWA v168 registra campanha após os módulos legados e sincroniza cache
+f2b71d52d598113219daf9c0b76304fcd3aae622,2026-10-16T18:57:48-03:00,frannlima,feat: atalho destacado Parcial Top15 no menu lateral real do aplicativo
+ff78607b2cea9627ede3f3fb1b765a6961b1e688,2026-10-16T19:43:36-03:00,frannlima,feat: utilizar regionais oficiais por matrícula no ranking e no card Top15
+61db5194bc34ca299cba0bb541659f02928aa462,2026-10-16T19:44:26-03:00,frannlima,"feat: card consolidado vertical com logo oficial, slogan, 45 posições e regional do relatório"
+6b0a43e34aab12c35ca163a22417ba09450c0b5d,2026-10-16T19:44:49-03:00,frannlima,fix: aplicar slogan oficial também aos cards por porte
+ad7354612ae4c5d6c5ed6d8cc1f507051ddb4383,2026-10-16T19:45:56-03:00,frannlima,chore: publicar PWA v170 com card Top45 e regionais oficiais
+e074386a7b35bb20a1cc12e425d70f3941af0073,2026-10-16T19:45:58-03:00,frannlima,chore: atualizar acesso direto da parcial para versão 170
+6a68eb253aca0e5871eb2660f130c68bc2a57692,2026-10-16T19:46:16-03:00,frannlima,chore: atualizar importação do card da campanha no index principal para v170
+48a66b905aff34aeb97d14f6d620746056037b3b,2026-10-16T21:29:32-03:00,frannlima,docs: regras e implantação do radar automático eStore CE+PI
+b04b8bae1923433c9a368d94dca44015a070b923,2026-10-16T21:31:20-03:00,frannlima,docs: exceção automática para filiais sem meta diária eStore
+e3d0f3e38f7c72f18877b534d7442627ebf1765f,2026-10-16T21:32:06-03:00,frannlima,docs: fallback ao administrador e resultado do teste anti-duplicação
+3da8628442f26b0e009b327ade579ae9271b0a40,2026-10-16T22:25:21-03:00,frannlima,fix: remove undefined render call after eStore report uploads and retain save status
+461406c2b339ea1c28b8999360b149db06b2c6e5,2026-10-16T22:39:07-03:00,frannlima,fix campaign national Excel import by browser consolidation and compact upload
+fe21e960d6a35a70dd977c1a9c4a3a709d2464b4,2026-10-16T22:40:58-03:00,frannlima,chore: refresh eStore PWA cache for campaign import repair
+fcdf3b03dd561be40333931538bad825b044f061,2026-10-16T22:49:37-03:00,frannlima,fix: reject non-cumulative national campaign reports and preserve reliable 14 Oct ranking
+5b36f6a73459d569adca4a1b3ad950de969e3ed7,2026-10-16T22:50:12-03:00,frannlima,chore: invalidate cache after cumulative campaign ranking safeguards
+895bdb33629c81122a4a043506c5c2e455863ba5,2026-10-16T23:07:23-03:00,frannlima,feat: documenta fluxo oficial de alertas pelo WhatsApp Cloud API
+20643210982606bcb181b9dcb7e55269ce3a84c8,2026-10-17T01:55:26-03:00,frannlima,docs: proposta de limites de jornada para alertas WhatsApp por cargo
+84a2be2815908fcd948ff9963f2dfb4818352cb6,2026-10-17T02:13:08-03:00,frannlima,docs: gestores excluídos de alertas WhatsApp; somente supervisores
+86967d46eff0e45b06e73b0f0980d3dd529b5d43,2026-10-18T22:44:16-03:00,frannlima,fix: alternativa segura para importar campanha quando leitor Excel local falhar
+32edc15ad009381e63ef4ad5fedaddf7ea3a9287,2026-10-18T23:20:17-03:00,frannlima,feat: dispersao por frentes operacoes e caixa com periodo anterior e potencial
+96b72791fbc8e496af82911aa6acc40e304af89e,2026-10-18T23:38:55-03:00,frannlima,feat(campanha): indicadores de evolução e alerta de proximidade no Top 15
+4ee17b482e4932acf9f266a4400a97c415c567ff,2026-10-18T23:39:15-03:00,frannlima,fix(campanha): manter comparação de posições após reabrir o aplicativo
+58d56aa27fe16ceefa7e36e65c5a0ecfdc0310a9,2026-10-18T23:39:45-03:00,frannlima,chore(pwa): atualizar cache da campanha para ranking com evolução
+d8f4cdbf0cef7b00f9f9250a05230628ac002338,2026-10-19T15:12:58-03:00,frannlima,fix: isolate conflicting regional orders instead of aborting campaign import
+0d978f69b226d6efcd72f9d8c890c0ec751f9af4,2026-10-19T18:03:20-03:00,frannlima,feat(eStore): cupons oficiais e mecânicas em carrossel na Home
+8032c10f08526c1979138953380450fdfdbe523d,2026-10-19T18:03:22-03:00,frannlima,style(eStore): carrossel de cupons em identidade Riachuelo
+8c51da34928ebea209964acbc47187c70161fe3a,2026-10-19T18:04:00-03:00,frannlima,deploy(eStore): registrar carrossel de cupons e atualizar cache para v174
+bd230d777b50617a2308f15e8add2e784ce9a3e8,2026-10-19T18:05:36-03:00,frannlima,fix(home): destacar a campanha como primeiro ponto ativo do carrossel
+8b6dfcfa05dd826e15bf6308261ddff41e39ae09,2026-10-19T18:07:05-03:00,frannlima,feat(home): disponibilizar cupons desde o primeiro acesso sem depender do PWA
+41ccf7d5a5b366ba0b0f67ec862e66b6599ccd4c,2026-10-20T18:35:11-03:00,frannlima,"Central de Alertas: contatos privados, revisão de parciais e prévias (#7)"
+0c511ee7f86579b51ff6226f315c2c0ea88cbaf0,2026-10-20T18:36:09-03:00,frannlima,fix: carregar scripts de cupons e alertas fora do HTML de impressão
+7169b32f5acad14b91bf0fa5e0872457e1deb963,2026-10-20T18:36:22-03:00,frannlima,fix: remover quebra de linha inválida na string do relatório
+c657c63d5abc543c91b1bb768eb433d80e010e17,2026-10-20T19:47:40-03:00,frannlima,"Central de Alertas: habilitar abertura manual WhatsApp apenas para piloto 108, sem disparos automáticos"
+8c095a8c50c928272f3a2473539e543429c014a2,2026-10-20T20:22:03-03:00,frannlima,Central: mensagem curta com meta de pedidos e prévia de alerta; restringir piloto após parcial validada
+075efdfa5d8f19f1a734b7af2773d2723950b9d3,2026-10-20T20:22:21-03:00,frannlima,Corrigir sintaxe de composição das mensagens de alerta
+4cd8fe1b7a0114b67eae948c480924c2dddf115f,2026-10-20T20:22:33-03:00,frannlima,Estilizar prévia do alerta eStore Connect com caixa vermelha
+07ed46075c8216164db15ef493c28018be45ee60,2026-10-20T20:28:09-03:00,frannlima,Adicionar geração de PNG e compartilhamento nativo para alerta eStore
+51b4af7b69a6b43d4b7120c586758baf67aa43c5,2026-10-20T20:28:31-03:00,frannlima,Compartilhar card PNG de alerta e bloquear lojas sem validação ou metas completas
+68ee0d7b7913316bfad8747d58a216988f70be02,2026-10-20T20:32:30-03:00,frannlima,Corrigir compartilhamento do PNG com ícone real do eStore e remover fallback wa.me
+988afff41927279479c0e6b3c519627943580d3a,2026-10-20T20:32:38-03:00,frannlima,Atualizar cache PWA para distribuir Central de Alertas com imagem PNG
+81e0eb0c7d5ca73698af50b5ab5549be2166f935,2026-10-20T20:38:28-03:00,frannlima,Habilitar teste individual PNG filial 108 separado da validação regional
+5d26a466bbb1810245e5938b4e726814d953b8ec,2026-10-20T20:44:09-03:00,frannlima,Esclarecer autorização isolada de teste PNG no período de férias
+bfe4e7e5cb25552f9c77b439da1d73a7387fe7b0,2026-10-20T20:44:21-03:00,frannlima,Atualizar versão PWA para corrigir cadastro e exibir teste PNG da filial 108
+37295f3c50cf0660e12a0efc85d7f2ba87b483ad,2026-10-20T20:48:20-03:00,frannlima,Incluir link Hora a Hora no PNG e legenda do compartilhamento WhatsApp
+f3620127b3fc1e7561407fd5220e30d6d63739af,2026-10-20T20:48:26-03:00,frannlima,Atualizar PWA para versão do card com link Hora a Hora
+6e88eb5c9a79e9a7f2113c61817a35a99b5f7193,2026-10-20T20:58:32-03:00,frannlima,Adicionar envio em lote assistido com seleção de um supervisor validado por filial
+a352c0c36eef502b9064654796338ffd27de3c2b,2026-10-20T20:58:59-03:00,frannlima,Exibir horário do primeiro print e conectar painel de envio em lote por filial
+cf595570ee93d3d6684423ce8e556386435d88e9,2026-10-20T20:59:06-03:00,frannlima,"Mostrar no PNG hora do primeiro print validado, sem usar horário fixo de 14h"
+88a7d331f4539e5c2399cea2388fa15564f23a7a,2026-10-20T20:59:21-03:00,frannlima,Estilizar painel de lojas priorizadas e fila de compartilhamento assistido
+667d2a3f9261fd16b8856ef089fee17f237c5ffd,2026-10-20T20:59:50-03:00,frannlima,Atualizar versão PWA para alerta com primeiro print e envio em lote assistido
+6ebd5fe6820e1197bb7ba333d47c60bcb3ac1aad,2026-10-20T21:00:50-03:00,frannlima,Adicionar selecionar todas as lojas aptas e limpar seleção no envio em lote
+f9059c43dbb91759bdf3a59d9f94597fb9a35e3a,2026-10-20T21:00:57-03:00,frannlima,Atualizar cache do PWA com seleção múltipla de lojas aptas
+4d25f44ac78716b6849bf94326138834b37a2178,2026-10-20T21:30:48-03:00,frannlima,"Regras de alertas: print sem venda prioritário, venda há 60min, interpretação fiel do relatório"
+9bfa5b37d8d0341ad7d130d1c9e96c1a7d0e44be,2026-10-20T21:31:38-03:00,frannlima,Priorizar ausentes no print e aplicar 60 minutos para lojas com venda informada
+243e148b9889ecccf829655c150e50afc1498a7e,2026-10-20T21:32:02-03:00,frannlima,Central: classificar parciais conforme valores informados e sinalizar fechamento 21h
+c4f68fbc75b6f889e8ed49f3fd1b5fc368e7e1b0,2026-10-20T21:32:36-03:00,frannlima,"Card PNG: alerta prioritário, venda sem atualização 60min e fechamento eStore 21h"
+aa5995379e9a0e43a47665d6a7c06651f8b6edd0,2026-10-20T21:32:46-03:00,frannlima,Incluir legenda específica de fechamento 21h no compartilhamento de alerta
+5e32bcad34a9c85d6679ba31e4f5ac41d96a89fb,2026-10-20T21:32:48-03:00,frannlima,Incluir legenda específica de fechamento 21h no compartilhamento de alerta
+6804c495a2f4922a5863d08f4c76f45636238ef2,2026-10-20T21:33:07-03:00,frannlima,"Publicar cache PWA com prioridades do print, regra 60min e fechamento 21h"
+127ad8393409b0a4746d0989414d866840e30bd7,2026-10-20T21:41:39-03:00,frannlima,Habilitar seleção de lojas pela última parcial classificada e exigir reconfirmação da referência
+a4339b98c800703c966a6985d591089feef41f25,2026-10-20T21:41:54-03:00,frannlima,Exibir no painel hora da parcial classificada usada para habilitar alertas
+ffbb90e7bcdbe525de85091a87eff4628bc063fe,2026-10-20T21:42:13-03:00,frannlima,PWA: atualizar a Central para usar última parcial com classificações de vendas
+1f2e0507fa3c24c70f6aa2042409a362a082c618,2026-10-21T01:40:37-03:00,frannlima,feat: estilos executivos eStore CE+PI com layout único para tela e compartilhamento
+31c099c3ed6df4e6fa2d520a7af5dee7698de418,2026-10-21T01:44:46-03:00,frannlima,"feat: painel executivo com D-1, semana, mês, FCA, benchmark e card WhatsApp"
+97458a4b270c5b090e77899cb3e7764e055d8c5e,2026-10-21T01:46:45-03:00,frannlima,feat: ativar Painel Executivo eStore CE+PI e atualizar PWA
+5993b9db82b0aab2e9348b3812efd2d350ca014a,2026-10-21T01:51:02-03:00,frannlima,fix: incluir todas as 19 filiais no Painel Executivo CE+PI
+25ed54b71a7f44448050276c3facdb6623b4155e,2026-10-21T02:30:20-03:00,frannlima,feat: marca RIA vetorial recortada da assinatura institucional para pódio e card
+4d301d6e1222f6a53c42694963378ae0443d2ea7,2026-10-21T02:31:55-03:00,frannlima,"refactor: ranking diário, curva semanal/mensal, fotos e integridade do benchmark"
+f1969915247c6aad1c73bd2fcc99816657ed569e,2026-10-21T02:33:28-03:00,frannlima,"feat: cards responsivos, lojas em linhas, D-1 por filial, podio regional com fotos e sem caixas inferiores"
+129e40c542579f88f6cfdba655f38e4585efb582,2026-10-21T02:35:13-03:00,frannlima,feat: card WhatsApp compacto 1080x1580 com RIA oficial e indicadores confiáveis
+671eb4a61895c5d79ecd59de74f38ba96c56a419,2026-10-21T02:36:54-03:00,frannlima,"style: alinhamento responsivo, pódio com foto, lojas em linhas e barras D-1"
+9374f871f77d52217c2c18a82ba017fbba10842a,2026-10-21T02:39:19-03:00,frannlima,fix: enquadrar as três letras RIA sem cortar o A
+a0e27d51d522936f4ae15d9592341f617be5c6a5,2026-10-21T02:39:24-03:00,frannlima,fix: rótulo ISO correto das semanas no gráfico mensal
+50d081f01f1e1f75dd3a7979af93d09a8ec8bfe8,2026-10-21T02:41:13-03:00,frannlima,"release: Painel Executivo CE+PI revisado, card WhatsApp compacto e cache PWA v186"
+c6ba0a35d8c74eb54e456d53026cbe078fa24667,2026-10-21T02:42:04-03:00,frannlima,fix: logo RIA no card com proporção vetorial preservada
+1919a92e297b99039b098a27375ebe68f23c8e1a,2026-10-21T02:43:04-03:00,frannlima,release: atualizar PWA v187 e compartilhar com marca RIA sem distorção
+e854c3e250b33210478691f11c8389f2ce8b8bbb,2026-10-21T03:08:59-03:00,frannlima,feat: marca RIA CHU ELO vertical do anexo para card executivo
+fafbe27a2813bd460246fa7ef0e1148f5b27aa75,2026-10-21T03:11:41-03:00,frannlima,"feat: legenda WhatsApp oficial, lojas L, evolução/retração mensal e FCA"
+e216987d48d6bcb53d0da222dd14f9ae35aba5c0,2026-10-21T03:13:01-03:00,frannlima,"feat: card WhatsApp responsivo ao período com logo vertical e listas completas de lojas, potencial e p.p."
+1f1f06ca6ee47a81682f5081e245deb2dde37b4f,2026-10-21T03:13:50-03:00,frannlima,feat: exibir evoluções e retrações de share na tela para semana e mês
+dd3c139d8acdd00bcc974b2089617c154436648a,2026-10-21T03:14:17-03:00,frannlima,style: listas completas evolução/retração em p.p. com responsividade móvel
+993412c8ec0814d414871fd87f44690e185a3695,2026-10-21T03:16:29-03:00,frannlima,fix: marca vertical RIA também no pódio da tela e no card WhatsApp
+ce29b9bfd6fc29bba926ace315c72da24f21da72,2026-10-21T03:16:52-03:00,frannlima,style: aplicação da marca vertical RIA no pódio sem perda de contraste
+2c076cc14726dfd205180a3d6e2686cd03b884c6,2026-10-21T03:18:09-03:00,frannlima,"release: painel eStore CE+PI v188 | RIA vertical, zeradas, impacto e evolução de share"
+108d6f1e6ce97597e8eeed4c24aa641eb8661bf2,2026-10-21T17:38:14-03:00,frannlima,feat(campanha): card visual da terceira parcial de outubro
+25c4e858690d8905effd8ab85727064194474389,2026-10-21T17:39:53-03:00,frannlima,feat(campanha): pop-up de 3ª parcial com leitura individual por matrícula
+0de30d4e53a7f5c6c244904d85d7853b6a217725,2026-10-21T17:40:50-03:00,frannlima,chore(pwa): atualizar cache e pré-carregar ranking 3ª parcial
+a9dd7a8f8a9cd34fbfca3782475618786da30225,2026-10-21T18:00:53-03:00,frannlima,fix(estore): remover botão flutuante Meu Acompanhamento que cobre cabeçalho
+856675e14e52e46eb9f82e39118a80a0263b2f3f,2026-10-21T18:01:15-03:00,frannlima,chore(pwa): renovar cache após retirada do botão flutuante
+dc8c6a57e828802bc5cd3750aa54f08564b58396,2026-10-21T18:40:19-03:00,frannlima,feat(executivo): importar benchmark por print com D-1 automático e revisão inteligente
+adb653c4fa05fb726ed64f1b64b82da2333845cb,2026-10-21T18:41:34-03:00,frannlima,style(executivo): simplificar input de benchmark em telas pequenas
+da319704aa4365feac34cb25a340452de8845b70,2026-10-21T18:42:48-03:00,frannlima,fix(executivo): melhorar leitura OCR e pedidos com separador de milhar
+c8a3b26f5f785cb6da40b6c4fbbc55edd190468a,2026-10-21T18:43:01-03:00,frannlima,chore(pwa): atualizar cache do painel executivo com importação automática OCR
+6a04a53acae52a55391ceb11984e2afb9fe84562,2026-10-21T19:01:22-03:00,frannlima,"feat(executivo): dispersão e impacto regional por D-1, semana e mês na tela e imagem"
+3d9686de516e2adc7393d4c6477bfda47ecfdafe,2026-10-21T19:02:18-03:00,frannlima,style(executivo): indicadores de zeragem e impacto regional responsivos
+2615c6b2563af81777382f6012fc3b6bde7aeff4,2026-10-21T19:02:37-03:00,frannlima,chore(supabase): versionar Edge Function do painel executivo com metas por data
+641019115a3b4aa8d141b177c4a95dba254bdd9d,2026-10-21T19:04:15-03:00,frannlima,chore(pwa): atualizar cache dos indicadores e card executivo
+629f1d51da8a673de54fc3275dfdb62f776ae3e5,2026-10-21T19:17:04-03:00,frannlima,feat(executivo): medalhas e filial L 000 no pódio da tela e PNG compartilhado
+06407de084b6400c79a2f0664e42bfe605068cb0,2026-10-21T19:17:32-03:00,frannlima,style(executivo): destaque responsivo de medalhas e filial L 262
+9e0eed7528d156a2622371c40843421196798544,2026-10-21T19:17:44-03:00,frannlima,chore(pwa): atualizar cache do pódio com medalhas no Painel Executivo
+e8408150fd007557138f80a32cea31926fcc4fc7,2026-10-21T19:27:02-03:00,frannlima,fix(executivo): simplificar lojas zeradas no card compartilhável sem legendas redundantes
+b9c603ce1ac8997b97eb7ef76614ea1f781d9159,2026-10-21T19:27:13-03:00,frannlima,chore(pwa): renovar cache do card compartilhável simplificado
+b69770a77d2a874a4dfca13ff964e74a5d9ad47a,2026-10-21T19:32:29-03:00,frannlima,feat(branding): versão clara transparente do logo vertical para cabeçalho compartilhável
+552339cf3ca7c93862806f8e8e818905ca288e6f,2026-10-21T19:32:52-03:00,frannlima,"fix(executivo): integrar logo vertical claro ao topo direito do card, sem caixa nem sobreposição"
+cf7179899f2b1f135689e05a747c78e7c56a41bb,2026-10-21T19:33:09-03:00,frannlima,chore(pwa): pré-carregar logo transparente e renovar cache da versão v195
+e5d672c6db46ab3ee4e64a38820aba4bd58dbb9c,2026-10-21T19:51:06-03:00,frannlima,feat(executivo): legenda objetiva por período com link para análise detalhada no app
+ee2b99d4551e1fd48f4b6e738b8f292e7822aa39,2026-10-21T19:51:14-03:00,frannlima,fix(executivo): corrigir destaque WhatsApp na chamada do link
+3a56e76395e9371fe9600e60e266b3cfbf0a0046,2026-10-21T19:51:22-03:00,frannlima,chore(pwa): versão v196 da legenda com link do aplicativo
+e95a5ab067c45c0e87071c4642740fa800abb5b8,2026-10-21T19:56:13-03:00,frannlima,fix(executivo): centralizar KPIs e sinalizar desvio com triângulo na imagem compartilhada
+11a430ef9447d47b828a31f76f4db40b4ca82676,2026-10-21T19:56:52-03:00,frannlima,chore(pwa): refresh cache for centered executive card and deviation arrows
+5ee90bd4c2158bb2b8bd74f995c90153a2d280c6,2026-10-21T20:50:26-03:00,frannlima,"feat(hora): importação de prints com revisão, status por parcial e alertas manuais por supervisor"
+2138b6e3b3cde3a793b94d9aa2acfecfad1cd812,2026-10-21T20:51:09-03:00,frannlima,style(hora): painel de importação por print e radar visual de parciais
+372848d58f830dc68f2a4cd5689561e4f66c8dcb,2026-10-21T20:52:43-03:00,frannlima,"feat(hora): card regional vivo com logo vertical, KPIs, status e hierarquia visual"
+cd6cb60539527ef7e50991c182bddc8ad295f2b5,2026-10-21T20:54:03-03:00,frannlima,fix(hora): corrigir link WhatsApp direto para o menu de lançamento após login
+66ef4a02aa427830c939287f60a5ab9b85108333,2026-10-21T20:54:47-03:00,frannlima,feat(pwa): integrar módulo Hora a Hora v198 e atualizar cache
+8e94417039e6d07dfc56330507a3fce04f0915b1,2026-10-21T20:55:52-03:00,frannlima,feat(alertas): reutilizar mensagem padronizada da Central de Alertas no Hora a Hora
+71ed611e5c3f930d0df3389d5d159bcc6a902a49,2026-10-21T20:58:42-03:00,frannlima,test(hora): validar leitura de prints sem confundir metas com venda
+8ec91f0faed2702c7d506110d150948bf089a327,2026-10-21T21:00:53-03:00,frannlima,fix(hora): cruzar grupo validado antes de alertar loja sem input
+b1fe9022817c31abd9f395cefc27480762ac9cdd,2026-10-21T21:01:54-03:00,frannlima,fix(hora): status loja com venda no grupo e alertas de fechamento 21h
+670af910dd73d4fc2ce6d946cc6572990567c9ac,2026-10-21T21:02:11-03:00,frannlima,chore(supabase): versionar importação segura de prints Hora a Hora
+c53144ff36feac2f783449e38d108974705a16a8,2026-10-21T21:03:00-03:00,frannlima,fix(hora): contagem de parciais por data inclusive em consultas históricas
+7d697b8b5a6d8b4faf0431e6787b211974bc3e25,2026-10-21T21:04:36-03:00,frannlima,fix(hora): preservar parâmetros dos módulos existentes ao atualizar radar
+01cfb7c280b234085054ff22749d304e93aff2e4,2026-10-21T21:05:06-03:00,frannlima,fix(hora): manter histórico e alertas de versões anteriores no render completo
+42dc38111af82a108ba798d78c4765773c4ba7d0,2026-10-21T21:06:43-03:00,frannlima,fix(hora): corrigir cor dos ícones na geração do PNG regional
+e5692bc7ce37699a55928f977ca63ef51aac652f,2026-10-21T21:08:28-03:00,frannlima,docs(hora): orientar importação conferida e alertas do app
+e6650e2222f416c36a55bc5b30b1829f6c52b372,2026-10-21T21:08:46-03:00,frannlima,chore(pwa): publicar versão final Hora a Hora v199 e invalidar cache de scripts
+00643602b4bd7c8ced954ce9368572e741474bce,2026-10-21T21:18:05-03:00,frannlima,fix(deeplink): direcionar menu=hourly ao roteador real do app atual
+a9381da6f50d405c3021611ab6508e95d0f1f2ae,2026-10-21T21:19:23-03:00,frannlima,"fix(hora): conectar importação, radar, card e legenda às funções reais do app principal"
+3dec42984263ac56e4e3d345bf9e38e9efa5cd4d,2026-10-21T21:19:57-03:00,frannlima,"style(hora): interface real do Hora a Hora, tabela e central de parciais"
+2442a7df261489a42c504e4b4fed3f36f4b55e84,2026-10-21T21:20:30-03:00,frannlima,fix(hora): carregar implementação v200 diretamente no app principal sem depender do Service Worker
+b370938aea01f8270b6b98933a1009d96b7982c8,2026-10-21T21:20:56-03:00,frannlima,fix(pwa): eliminar injeção antiga e atualizar cache do Hora a Hora real v200
+250f528a70df828232283782846c416e8a6d159d,2026-10-21T21:23:36-03:00,frannlima,"fix(hora): incluir supervisores em alerta a partir da base regional, sem telefone"
+72cb8ab7a5de75080670e01c5c9df67f4d2f14ad,2026-10-21T21:25:02-03:00,frannlima,chore(hora): forçar atualização final v201 dos arquivos de interface e compartilhamento
+02b805e132688169eb6fc879762bd42a461e9569,2026-10-21T21:25:15-03:00,frannlima,chore(pwa): limpar cache antigo e ativar Hora a Hora v201
+48e30568527c63c08a6f26de29dc7b61e26a8500,2026-10-21T21:52:14-03:00,frannlima,build(hora): disponibilizar OCR Tesseract local no GitHub Pages para leitura de prints no celular
+3a3ca6f44c4fc1c5bea3d88f4e90591a1acdc07b,2026-10-21T21:53:43-03:00,frannlima,"feat(hora): importador simplificado, leitura automática ao anexar print"
+e0f12205fe7009a11735ad6f1e4dd020644185bc,2026-10-21T21:54:40-03:00,frannlima,"fix(hora): OCR local automático, progresso e limite de tempo no celular"
+a4abf5b763e95294ddb0021eec2a7da6d2799216,2026-10-21T21:55:16-03:00,frannlima,feat(hora): pré-seleção de venda simples e revisão visual em um único passo
+b6006c9099998736268c8c69367b382e969b8346,2026-10-21T21:55:52-03:00,frannlima,fix(hora): salvar vendas conferidas sem checkbox redundante e reaproveitar autenticação do administrador
+9d47454cd09bd4a32d0053f33056ace605e9bd12,2026-10-21T21:56:33-03:00,frannlima,"style(hora): importação em três passos, revisão legível e menos campos no celular"
+9ad19c4cfdee5192efc89db67494fb6b711bb46d,2026-10-21T21:57:41-03:00,frannlima,fix(deploy): empacotar motor OCR local via npm no Pages sem dependência do CDN em runtime
+3ae43f9f31b76f8252cb2b29f072a9f8eb6f69e1,2026-10-21T21:59:36-03:00,frannlima,fix(pages): arquivos de licença opcionais não bloqueiam publicação do OCR local
+e3c7fb5da708c73024bc929bb7aa031975c9f0df,2026-10-21T22:00:51-03:00,frannlima,chore(hora): publicar importação simples por print com OCR local versão 202
+44b8a02e8ce395e45a1cec72cc4bdadb2bb340d1,2026-10-21T22:01:08-03:00,frannlima,chore(pwa): invalidar cache do antigo importador Hora a Hora e ativar v202
+4704f99eba8e96bc4545f6476ac289281a06cbe1,2026-10-21T22:05:16-03:00,frannlima,fix(hora): impedir conflito ao selecionar segundo print e limpar dados antigos
+2fc530410541d034cd8b261f3b45e3732b525a35,2026-10-21T22:05:46-03:00,frannlima,chore(hora): publicar importação rápida final com versão v203
+f98b7ad381964bfc52d49e5fcaf2bcfb4b800cd4,2026-10-21T22:06:04-03:00,frannlima,chore(pwa): limpar cache do importador e ativar versão final v203
+163f61fe2a26d06481c79f6a69e2b2bff1cb8cd9,2026-10-21T22:06:27-03:00,frannlima,feat(admin): navegação automática entre menus e áreas de trabalho
+3bab884bce433bd61842b6d22e7c38dc4c0a6620,2026-10-21T22:06:51-03:00,frannlima,feat(admin): carregar navegação contextual no app eStore
+4571d9afcb5345a4cad911bcaa84c9e2571b4515,2026-10-21T22:07:34-03:00,frannlima,chore(pwa): atualizar cache e pré-carregar navegação do Administrativo
+97840da2c51aff1f544d54d486997fa10b11589a,2026-10-21T22:08:36-03:00,frannlima,"fix(admin): carregar navegação no HTML principal, sem alterar impressão"
+fc246ee1a12a14b1d42bbf610477d98efc19792f,2026-10-21T22:36:30-03:00,frannlima,fix(hora): reconhecer linhas OCR WhatsApp com setas imprecisas e vendas reais
+4ba3f740c656eecf1a7ee426cdca9c95ec6810bf,2026-10-21T22:37:34-03:00,frannlima,"fix(hora): melhorar OCR com ampliação e contraste, segunda leitura e retorno seguro"
+948f1e24467c43432866da7b9835fd50ebe824e5,2026-10-21T22:38:42-03:00,frannlima,feat(hora): substituir texto WhatsApp por card de alerta individual com link direto e confirmação do contato
+351471b0d05dc40a644027a63d34ab57226f8de2,2026-10-21T22:39:48-03:00,frannlima,style(alerta): card individual com status de parciais e link Hora a Hora
+68113590f8372a663da5d08cc16043692b181c0b,2026-10-21T22:40:25-03:00,frannlima,"fix(admin): abrir espaço de trabalho diretamente, retorno ao menu após salvar"
+83d1a711c5836b6095d7d1b5105cd27dbfd4d11b,2026-10-21T22:41:08-03:00,frannlima,chore(pwa): renovar versão para navegação administrativa embutida
+adcb7e20ba3fc72575f4a98a0601b37ed65279d2,2026-10-21T22:41:27-03:00,frannlima,feat(hora): adicionar venda avulsa quando OCR falhar e gerar alerta PNG atualizado
+403799f7b8bc0fc71f977c445d6601feefa779e6,2026-10-21T22:42:13-03:00,frannlima,style(hora): entrada rápida de filial/valor e botão de compartilhar card de alerta
+ebc91e7ec8222713175835d2bed57490d7857a8c,2026-10-21T22:43:16-03:00,frannlima,fix(hora): ativar OCR melhorado e compartilhamento de cards PNG v205
+17b8d8d9c9419580f0dfb6dc59ac5b02e41e3308,2026-10-21T22:43:56-03:00,frannlima,chore(pwa): renovar cache do OCR e do card de alerta no Hora a Hora
+f399d55e79e7e2966ce7e56378e5504948cdaaf5,2026-10-21T22:46:24-03:00,frannlima,fix(hora): não exibir meta zero fictícia em vendas adicionadas manualmente
+29409d735f46283a1a1f21b5afbbc079d974a825,2026-10-21T22:46:55-03:00,frannlima,chore(hora): atualizar importador OCR e alerta para versão v206
+1b9473aef311ed5e8f7e7ae7d5ab33c3bdccdef4,2026-10-21T22:47:13-03:00,frannlima,chore(pwa): atualizar cache da leitura de prints e cards de alerta
+87c50463b6b11bdb6f423fca91fc4ffa3b1a7533,2026-10-21T23:00:29-03:00,frannlima,fix(hora): parser robusto para texto WhatsApp com múltiplas vendas por filial e quebra de linha
+e9782b8585283d96c2dedf0a2a11a969a35f571b,2026-10-21T23:02:04-03:00,frannlima,"feat(hora): priorizar colar texto WhatsApp, identificar data e valores, corrigir atualização após salvar"
+97908e8c265b7469571489c5f11602a016793244,2026-10-21T23:03:09-03:00,frannlima,feat(hora): somar automaticamente vendas por filial e mostrar consolidado conferível no texto
+56f1e3bde679349a21d75a91412453e94efa227a,2026-10-21T23:03:50-03:00,frannlima,style(hora): destacar entrada por texto e revisão da soma por loja no mobile
+0116f4c472d3cc87c068cdd189b79fc6f83a8672,2026-10-21T23:04:45-03:00,frannlima,fix(hora): exibir data do texto e corrigir rótulo de salvar filiais
+664d67ebe7b63c71f731cebcaa9bb62baa232486,2026-10-21T23:06:25-03:00,frannlima,fix(hora): deixar explícita a conferência dos pedidos no lançamento por texto
+267e608f703cae4478887dbca773642dd7a808d9,2026-10-21T23:06:59-03:00,frannlima,test(hora): validar colagem de mensagens WhatsApp e soma das vendas por loja
+aff5a3706320530eebbc4279478b13abc4711cf0,2026-10-21T23:08:10-03:00,frannlima,feat(hora): ativar importação prioritária por mensagem WhatsApp no app v208
+070f25a23e761360bcb2afb95bcdc518865ca53a,2026-10-21T23:08:29-03:00,frannlima,chore(pwa): atualizar cache do Hora a Hora com importação por texto v208
+5ac6fdca21ff182bd799f37962be70b1c22e1610,2026-10-21T23:48:17-03:00,frannlima,"feat(hora): sugerir um pedido por valor de venda no texto, com confirmação do administrador"
+10c75d6a74c6f94c287fa850949206bc1b9e3690,2026-10-21T23:49:26-03:00,frannlima,feat(hora): ativar texto WhatsApp como entrada principal e pedidos por valor na versão v209
+56bf67d8598da6b0da510886beb7f99d5c648ec6,2026-10-21T23:49:59-03:00,frannlima,chore(pwa): limpar cache e ativar importação WhatsApp por texto v209
+7680a726e6456c4656c5cc420e5d68862a2f85e4,2026-10-21T23:54:01-03:00,frannlima,fix: legenda da parcial regional eStore com KPIs em linhas individuais e acesso ao Hora a Hora
+7f866b381592227282669b79ff88372c66c5117c,2026-10-21T23:54:34-03:00,frannlima,chore: atualizar versão do carregamento da legenda Hora a Hora
+bea555d2b3e7d349a650060ff149a2bf38ffe8de,2026-10-21T23:54:50-03:00,frannlima,chore: renovar cache do PWA para legenda regional atualizada
+8c9612586f12bcc0ecb544cb96483b73496a31b4,2026-10-22T00:06:59-03:00,frannlima,fix: adequar legenda da parcial eStore ao modelo de fechamento com todas as filiais
+626bea476aae04c4c8519d13724fcde65285f9f7,2026-10-22T00:07:22-03:00,frannlima,chore: renovar URL de carregamento da legenda eStore para modelo de fechamento
+c205ededaa69e2e9a1e085f632deec45357c96fd,2026-10-22T00:07:38-03:00,frannlima,chore: atualizar cache do PWA com legenda padrão revisada
+457f60535db2829179a9cb8132bd0bdbc3e6b959,2026-10-22T00:15:37-03:00,frannlima,"fix(alertas): manter Daniele Costa da L350 no diretório, com sinalização de férias"
+8b4849fc3990d8a88308c6d428b50dc104a18356,2026-10-22T00:16:11-03:00,frannlima,style: alinhar filiais e destacar caminho Hora a Hora na legenda WhatsApp
+32944307ef8870bb65ab2b49ac98641bff5fedcc,2026-10-22T00:16:42-03:00,frannlima,fix(hora): exibir Daniele Costa da L350 e confirmar retorno de férias antes do alerta
+ea4c640eed036e2d53e931e6b79f926724d93340,2026-10-22T00:16:44-03:00,frannlima,chore: renovar script v212 para alinhamento corrigido da legenda
+1a303d89713da1df7f15678a7a8c3e87e2182b95,2026-10-22T00:17:04-03:00,frannlima,chore: atualizar cache PWA para alinhamento final da legenda
+450dbd99a388f367b5cb188c719e03cffd91f2f3,2026-10-22T00:17:52-03:00,frannlima,style(hora): destacar situação de férias do supervisor na lista de alertas
+87545bdfd1c966c6dedee8624b51ea4e705467cc,2026-10-22T00:18:50-03:00,frannlima,fix(hora): carregar contato Daniele Costa da L350 e alerta de férias na versão v213
+e142ef17cf600729ee61538a533ec030101eeac1,2026-10-22T00:19:24-03:00,frannlima,chore(pwa): renovar cache da base de supervisores da filial 350
+16dd3e9ec80f387f763491da99620528f09b76ac,2026-10-22T00:45:13-03:00,frannlima,"fix(eStore): suppress promotional startup popups, restrict admin menu to 2457695 and add share deep links"
+f7d655ff1c2a83f93d4430b937200a44a7cc70b8,2026-10-22T00:46:22-03:00,frannlima,feat(eStore): once-daily supervisor goal prompt and deep links for share cards
+06942d0280062c84f4bc7f855d4e8016145e6f10,2026-10-22T00:53:05-03:00,frannlima,feat: append direct menu links to native WhatsApp share captions
+77536900f9bef8ca8db81f6de92fb3afdb6147f4,2026-10-22T00:59:32-03:00,frannlima,chore(pwa): publish fresh eStore supervisor flow and shared menu links
+5225f9282a400e2d398c457b98398bb76e3428a4,2026-10-22T01:00:29-03:00,frannlima,fix: use active eStore navigation function for supervisor daily goal CTA
+d9e6e03f18a677fb63c21cb47f4fbc22f490c0d5,2026-10-22T01:03:23-03:00,frannlima,fix: suppress startup campaign popups in live eStore runtime and enable hourly deep links
+5754f91fe16091fabbf408b0c674a064d1e4d3c6,2026-10-22T01:03:54-03:00,frannlima,fix: revoke admin UI flag for non-owner without removing supervisory access
+97d82bd8c3cbc8276af9d6224741ce2ef30e90b0,2026-10-22T01:12:17-03:00,frannlima,fix: stop V89/V84/V83 campaign popups at their real inline source
+eed9a47a5e8d80659b110bb7e5f9c2acfb17e92a,2026-10-22T01:12:34-03:00,frannlima,chore: invalidate PWA cache after removal of campaign startup popup V89
+58a677041413670c791c952e160ad23e90ecd4f6,2026-10-22T01:22:38-03:00,frannlima,"fix(profile): recorte de foto com foco no rosto, arrastar e zoom"
+4d0a4b49ed719ec2e2d631154384522093f043a8,2026-10-22T01:23:06-03:00,frannlima,chore(pwa): atualizar cache para novo recorte de foto do perfil
+6520216b832718b8898881cac0530f66bea1d4e3,2026-10-22T01:31:48-03:00,frannlima,fix(avatars): padronizar fotos existentes em moldura circular sem reenvio
+43d5f6106daacef968e9d944fa2d6e5c627128e0,2026-10-22T01:33:23-03:00,frannlima,feat(profile): permitir corrigir foto já cadastrada sem novo upload
+61ff69b57ab0b4b475d2eca94c811708def1f6b5,2026-10-22T01:33:45-03:00,frannlima,chore(pwa): atualizar versão para enquadramento das fotos antigas
+21aeb2d667b8b6a3cffa4921ebaeffe498df7a60,2026-10-22T21:04:49-03:00,frannlima,Sincroniza D-1 na data correta e evita acumulados semana/mês de fontes desatualizadas
+fc39f2b7474d9a182481db05675855e4d0dca2a3,2026-10-22T21:05:41-03:00,frannlima,"Importa prints semanais e mensais automaticamente após validação, sem redigitar ou confirmar números"
+fbb30b26ebaa232ff6e92c3fa3a53a8228634080,2026-10-22T21:06:41-03:00,frannlima,Atualiza cache PWA para carregar correções de D-1 e importação de intervalos
+2007bb9c265f1fca03c0409f2a25989ad5b2ee7d,2026-10-22T22:22:59-03:00,frannlima,docs: preparar integração Power BI com requisitos de segurança e validação
+21d6a77c715255322863aff4ff2ba9469501efc4,2026-10-22T23:04:31-03:00,frannlima,data: registrar base gerencial oficial CE+PI e empresa até 21/10
+b757124f485079e468399cb3f3be516aee16c52e,2026-10-22T23:40:04-03:00,frannlima,feat: radar competitivo semanal compacto no Painel Executivo
+b3d2ec8fb7f78277befc4dc18c87a3fd614b38f1,2026-10-22T23:40:22-03:00,frannlima,style: radar competitivo legivel em mobile e desktop
+26b280714a07ee0e43d43d24fb9d19b994a13b7a,2026-10-22T23:54:18-03:00,frannlima,feat: radar semanal com comparativo real 21 regionais e empate na zona de corte
+61ee4a397befdde8f2208cd58de6d04863fd3ed4,2026-10-22T23:54:36-03:00,frannlima,fix: distinguir atenção de retração e sintaxe do benchmark semanal
+3ef2ee695993c843b226e7f0c2e34fb41cc8c1c0,2026-10-22T23:54:43-03:00,frannlima,style: alerta amarelo para risco de priorizacao sem retracao
+aa951a9327aeb0974aa35d9017ae3bae006bb093,2026-10-23T10:30:20-03:00,frannlima,feat: centralizar importacao D-1 e acumulado no administrativo preservando processos legados
+bc610e9ec9fa2c0f86f23eac4cecf899e9a0c7f6,2026-10-23T10:32:39-03:00,frannlima,feat: importar BOPIS diretamente pela Central de Dados com fluxo protegido existente
+77d9076dfa30e5413119d97d6658fa5ae81ea291,2026-10-23T10:35:33-03:00,frannlima,feat: conferencia central de disponibilidade gerencial BOPIS rankings e benchmark
+8ef3019c0f1cf6ff53d9f3d8f3ced172a5fe5e78,2026-10-23T11:02:34-03:00,frannlima,feat: Central de Dados funcional no menu administrativo principal v206
+ea45e3843d7e148a56ed30ed45c2cc0fa592490d,2026-10-23T11:03:05-03:00,frannlima,fix: montar Central de Dados no menu ADM efetivo via script carregado
+466a64344f46c9d6897b94c5c847e4ea5374ef1e,2026-10-23T11:03:39-03:00,frannlima,chore: atualizar PWA para incluir Central de Dados v206
+9cb09615097b44b4142aff462af6b8971ba2206e,2026-10-23T11:04:03-03:00,frannlima,fix: mostrar tile Central apos login e ocultar atalhos substituidos
+1c88237e9c942881f94ea2b65dae82df96e85ca3,2026-10-23T11:10:22-03:00,frannlima,ui: remover atalho redundante da Central de Alertas no Administrativo
+0a407550a73577a7d306ec2dca7e48027caab430,2026-10-23T11:10:37-03:00,frannlima,ui: acesso a gestão completa de alertas dentro do Hora a Hora
+e8acf6e86b63f32991b4005d8de99870ebe51258,2026-10-23T11:10:56-03:00,frannlima,chore: atualizar versão PWA após realocar Central de Alertas
+6e1641588894ab222156de75dc76d386f19b3b58,2026-10-23T13:01:11-03:00,frannlima,"fix: compartilhamento Meu Time por filial com pre-visualizacao, PNG resiliente e envio com gesto nativo"
+a17961ddbbd3972fc3a999891da7ca84ff3832d6,2026-10-23T13:02:11-03:00,frannlima,chore: versionar PWA para correção de compartilhamento de card Meu Time filial
+a5d01eb7114620eacbfc9d63c04d38c96d76b304,2026-10-23T13:02:53-03:00,frannlima,fix: evitar carregamento indefinido do logo e do comparativo anterior no card da filial
+f601660775b2d561e94547f1787083e1dcaddbb9,2026-10-23T13:03:03-03:00,frannlima,chore: versionar release PWA do card de filial com timeout e preview
+5dfe87e4f3b6a4f163ea594a94a01df7f5781c85,2026-10-23T17:18:52-03:00,frannlima,feat(hourly): share eStore usa Total Flash autenticado por filial
+a0fd4fca84fd428377dd822a0f98f7f97f7dab05,2026-10-23T19:43:38-03:00,frannlima,docs: define shared CE+PI automated voice alert architecture
+e1863259ac84be93add247aeb724f294892d596b,2026-10-23T20:00:16-03:00,frannlima,feat: add opt-in Android notification test page
+b08434e25b6d6e6a95e7b7e775953b85aeed78d6,2026-10-23T20:00:23-03:00,frannlima,feat: service worker for opt-in local notification demo
+73df6ca9765e6c27adad68077c4221991fe493ef,2026-10-23T20:19:41-03:00,frannlima,docs: register public Web Push VAPID and remote push rollout checklist
+3557e6c4678470ee73a8a14eb72c3f0b4bca225d,2026-10-23T20:23:03-03:00,frannlima,feat: register Android device for real Firebase Cloud Messaging push test
+e56ecb24f96d5f18b5c6572774503ef8326a7adf,2026-10-23T20:23:06-03:00,frannlima,feat: register Android device for real Firebase Cloud Messaging push test
+cf94aad294f0c58d6203349ae11f72d89e02ba05,2026-10-23T20:52:29-03:00,frannlima,fix: add FCM foreground listener and Android push diagnostics
+903af9e064f37686e1b39b68b80371a1a5f4721e,2026-10-23T20:55:00-03:00,frannlima,fix: guide Samsung Internet users through blocked Android push permissions
+2706dc5ad97d9309a45adf91c34b202dbe6dde25,2026-10-23T21:19:33-03:00,frannlima,fix: trace real Web Push delivery in service worker without exposing FCM tokens
+4aeb6ba36ec62c2764014fb4d6bc5eceff7ac75e,2026-10-23T21:19:52-03:00,frannlima,feat: distinguish local Android notification display from remote Web Push delivery
+553e88df692ac5c9dcf039a2e88c58e6e583ee6f,2026-10-23T21:19:54-03:00,frannlima,feat: show diagnostic controls for local and remote FCM notification testing
+560d7c246b981ae55f1c08c353c7da72c5a24eb7,2026-10-23T21:40:07-03:00,frannlima,feat: add admin-only FCM pilot console with device registration and remote test
+d7f92c6fbaea54da51533e30c2cb4447ce4141e4,2026-10-23T21:41:08-03:00,frannlima,fix: wait for dedicated FCM service worker activation without hanging dashboard scope
+dfa7da367530658ab40e05b6d63a3483590e956b,2026-10-23T21:41:16-03:00,frannlima,feat: link FCM diagnostics to protected administration pilot
+4c8a9b64bf791df029e497dccc1ff1532cf9e781,2026-10-23T21:42:26-03:00,frannlima,docs: record secure FCM pilot deployment and secret-configuration steps
+be68049f9639cb149d849057008eda73705fb9b8,2026-10-23T22:07:44-03:00,frannlima,feat: add admin radar of two-consecutive partial delays across 18 stores
+528c3e8bbfc9c705a53f83ac668db878dcefefd9,2026-10-23T22:08:00-03:00,frannlima,fix: display push pending overview with readable line breaks
+462eb9b28144c2d6e4c77784ad0f62f9502e904b,2026-10-23T22:09:49-03:00,frannlima,fix: show current business-hour eligibility separately from historical store delays
+f9fa29346c26fee8b6328cf83aee08eb9679957b,2026-10-23T22:10:19-03:00,frannlima,"docs: record operational pending radar, business-hour constraints and remaining secure rollout blockers"
+a7aad3a1c9ce0ab65b6713d8360da012474c0dc8,2026-10-24T16:49:55-03:00,frannlima,feat(hourly): track store check-ins and distinguish direct inputs from consolidated print imports
+12236821e58c175e09f4786f36341cb1347b0e0f,2026-10-24T16:51:44-03:00,frannlima,"feat(hourly): supervisor zero-sale check-in, status by store activity and consolidated sales"
+b03a8b2ac04b8e6536aae2533cbefa618a0193c3,2026-10-24T16:52:53-03:00,frannlima,fix(alerts): prioritize recent direct store check-ins and distinguish print-only sales
+96dbffb9143307319fa603adfa8c2a9e69510e99,2026-10-24T16:53:21-03:00,frannlima,fix(alert-center): use supervisor last check-in instead of print import timestamp
+dc672d3b545bc3b808ad56bcf0f667294401945b,2026-10-24T16:54:42-03:00,frannlima,fix(alerts): respect 60 minute grace for print sales and add regression coverage
+1f1fa12ff288f22b616852cb07feedd8dd25dffc,2026-10-24T16:54:44-03:00,frannlima,fix(alerts): respect 60 minute grace for print sales and add regression coverage
+e038bed709380028e426eb4a1f49e6dc4bf47e5a,2026-10-24T16:54:47-03:00,frannlima,fix(alerts): respect 60 minute grace for print sales and add regression coverage
+203cc6bcbfb6bd6f0f3247c25b1d4a1b31e5f6e2,2026-10-24T16:54:49-03:00,frannlima,fix(alerts): respect 60 minute grace for print sales and add regression coverage
+b2e8f95925836780b80fcc29e54793142267933e,2026-10-24T16:56:39-03:00,frannlima,"fix(alerts): base freshness strictly on direct store check-ins, not consolidated imports"
+0c92a039d60798688cd12f7c838d2bf03ad92213,2026-10-24T16:56:57-03:00,frannlima,"chore(hourly): validate alert logic, style overdue status and refresh app cache"
+9466f9cc4835067feb9e780bade2f6f0aac4a115,2026-10-24T16:57:00-03:00,frannlima,"chore(hourly): validate alert logic, style overdue status and refresh app cache"
+67d3668e59528b0f9ab021a50e6ca40239c750a8,2026-10-24T16:57:03-03:00,frannlima,"chore(hourly): validate alert logic, style overdue status and refresh app cache"
+e14717c107c6fc62ff19ff3a09b2da5835badc9a,2026-10-24T16:57:06-03:00,frannlima,"chore(hourly): validate alert logic, style overdue status and refresh app cache"
+3e91a0b5a99cc05adce23341c24997f41d98dba7,2026-10-24T17:00:22-03:00,frannlima,feat(hourly import): register the verified WhatsApp consolidated partial directly into alerts
+adfe23a8acc093e0ce742f357f979202b949935f,2026-10-24T17:00:55-03:00,frannlima,fix(alert import): validate cent-value sale signatures without double-escaped regex
+386169a5abcf74d0f15bbe70cd0a19ed25b22ade,2026-10-24T17:01:58-03:00,frannlima,"feat(hourly): single confirmed WhatsApp import updates sales and alert partials, including no-sale reports"
+316f87889be353591050bab471439777f503cec1,2026-10-24T17:03:46-03:00,frannlima,fix(alerts): honor one-hour protection when a newer print confirms additional sales
+bc55b40ede65a9017d584ea650486be6a9d676b0,2026-10-24T17:03:48-03:00,frannlima,test(alerts): protect stores after a newly confirmed WhatsApp sale
+acf957937616291f11fb94f34ad97da159a50b41,2026-10-24T17:09:02-03:00,frannlima,Corrige leitura e diagnóstico de relatórios D-1 CE+PI
+ae237940876b5e8a2350c520fcb76a74ea9cf954,2026-10-24T17:25:33-03:00,frannlima,feat(hourly): priority WhatsApp queue for verified supervisors of stores without reported sales
+f0b702cf125034e77e6558f71d0ed59c0a9335da,2026-10-24T17:26:48-03:00,frannlima,feat(hourly): show WhatsApp supervisor list in import and mobilization automatically
+a2ef4b9b9bcff628454e8fb187266885bf601d48,2026-10-24T17:28:00-03:00,frannlima,"style(test): responsive supervisor queue, worker cache and validation"
+53be165a015b27df0b8804d2d117d63da3756066,2026-10-24T17:28:02-03:00,frannlima,"style(test): responsive supervisor queue, worker cache and validation"
+2f32b03ce3a91f64c6111b4312179331fa7834ef,2026-10-24T17:28:05-03:00,frannlima,"style(test): responsive supervisor queue, worker cache and validation"
+fa6b89e6e4818314b1ae9b3e22172c2139c6eb42,2026-10-24T17:28:07-03:00,frannlima,"style(test): responsive supervisor queue, worker cache and validation"
+86faf2a488602a4190b711837d937bd3f179cbc0,2026-10-24T17:28:34-03:00,frannlima,"test(hourly): cover WhatsApp queue eligibility, direct sales, recent zero check-ins and regional exclusions"
+af1c67291d568b69a6da8f2fd30b8786238abfb6,2026-10-24T17:28:36-03:00,frannlima,Atualiza dados oficiais da filial ao abrir painel D-1
+2828db93bc1078e2260faed62dc637e249e290f8,2026-10-24T17:29:07-03:00,frannlima,Atualiza cache PWA para refletir novas vendas no painel da filial
+50e165c3e52255e8027c149fec848beec9ee98eb,2026-10-24T17:54:14-03:00,frannlima,feat(alert queue): one Enviar alerta action for PNG and personalized WhatsApp message
+1b621a70f0dea9a56c7b4d0a88facd953c52931d,2026-10-24T17:54:59-03:00,frannlima,feat(share): include PNG and full personalized caption in single native-share flow with safe desktop fallback
+1fd0a3a132f8746b84df304d8ac93848afbb6ce9,2026-10-24T17:55:57-03:00,frannlima,"test(ui): validate single PNG+caption alert action, mobile fallback and service-worker release v227"
+7b4b81d733456312808089183c353e4b87df717f,2026-10-24T17:56:00-03:00,frannlima,"test(ui): validate single PNG+caption alert action, mobile fallback and service-worker release v227"
+2bd1846427e8986cb3d14990d6723f4ed772f664,2026-10-24T17:56:02-03:00,frannlima,"test(ui): validate single PNG+caption alert action, mobile fallback and service-worker release v227"
+2085c5e976883bd1e40bc6991a872b3c35a75103,2026-10-24T17:56:04-03:00,frannlima,"test(ui): validate single PNG+caption alert action, mobile fallback and service-worker release v227"
+091362c58ae37f40d80dfab7d438088145dec1e4,2026-10-24T17:57:15-03:00,frannlima,fix(cache): refresh single-button alert queue module on Android PWA
+a0eb87bedee8f93eaeccb076bed7b2b619a22fba,2026-10-24T17:57:18-03:00,frannlima,fix(pwa): treat ES modules as network-first and bump shell to v228
+3ed3cc7d0b9b7dab35966941f2a82f92d5718e8b,2026-10-24T18:02:03-03:00,frannlima,"Unifica data D-1 oficial em painéis filial, colaboradores, rankings, pool, equipe e FCA"
+806dc9944d3caf170a18842a205e3ffc44cbfa5f,2026-10-24T18:52:44-03:00,frannlima,fix(alerts): make Enviar alerta interactive with per-supervisor confirmation and immediate inline feedback
+91969b36a011970c26c007cd1f692f77672f94bc,2026-10-24T18:53:03-03:00,frannlima,fix(alert sharing): route Windows desktop directly to WhatsApp chat + downloadable PNG
+4b6f3d599f0152d45041e6291707b03ed9aa6cd5,2026-10-24T18:53:36-03:00,frannlima,"fix(alerts v229): visible per-button response, browser-confirm flow, PWA refresh and click regression test"
+0f7ae0589a3eeb746876e879f1b485f9e822ce05,2026-10-24T18:53:39-03:00,frannlima,"fix(alerts v229): visible per-button response, browser-confirm flow, PWA refresh and click regression test"
+e7e94b7ff84a47a5ea17d904b7aee06df0c83916,2026-10-24T18:53:41-03:00,frannlima,"fix(alerts v229): visible per-button response, browser-confirm flow, PWA refresh and click regression test"
+aeb36cf79c25a08518a2b443212f535b3ac4c81a,2026-10-24T18:53:43-03:00,frannlima,"fix(alerts v229): visible per-button response, browser-confirm flow, PWA refresh and click regression test"
+34bc0dfe8a25759474c14208911627ab3d1ac5fa,2026-10-24T18:54:16-03:00,frannlima,fix(alerts): eligible supervisors can prepare WhatsApp alerts with one click and no prior selection
+f8d6fcc6402cf6a7d28c2d918350a26809520ab6,2026-10-24T18:54:34-03:00,frannlima,fix(v230): automatically enable eligible supervisor alerts without preselection
+c32d9c1f556dff58e4499e56afce0b52910ceb72,2026-10-24T18:54:37-03:00,frannlima,fix(v230): automatically enable eligible supervisor alerts without preselection
+2a1d8d6348b4f6299aa6c936688215d876b3f11d,2026-10-24T18:54:39-03:00,frannlima,fix(v230): automatically enable eligible supervisor alerts without preselection
+189f095183372bf033f241f7ce882d8de33ee952,2026-10-24T19:19:06-03:00,frannlima,feat: tremor de tela no eStore para duas parciais sem atualizacao da filial
+7c47bddfa4d0cd5385aaa525f6e0553dea866210,2026-10-24T19:19:39-03:00,frannlima,fix: validar corretamente filial do usuário no alerta visual eStore
+a7ec8ca8b4e5746613701ddf8aeb260cd12089c5,2026-10-25T19:37:05-03:00,frannlima,Restaurar importação Excel oficial semanal e mensal no Painel Executivo
+7a6305effd173bb59ddaf0c87b2716f72eb95595,2026-10-25T19:41:18-03:00,frannlima,Invalidar cache PWA do importador Excel e atualizar versão do Painel Executivo
+08a1e70ac031db1f19b6faef5a5eb8527ac66195,2026-10-25T19:41:30-03:00,frannlima,Corrigir substituição de versão do script executivo no Service Worker
+78c6141e0ed99c80a980b6ff117663732ea3409b,2026-10-25T21:54:04-03:00,frannlima,Expose home promotions catalog for shared coupon menu
+fec85d00232b262ca385fee44c7c78d0a2d7b578,2026-10-25T21:54:12-03:00,frannlima,Show current home carousel coupons in coupons menu with fixed eStore priority and expiry filtering
+2f4538f724e0016c39e67e6f984324292981ef2b,2026-10-25T22:01:24-03:00,frannlima,Render live carousel offers in actual coupons view with fixed eStore offers first and daily expiration
+8b28ca85d98d208d65f275ebd8fe76401cdbee2d,2026-10-25T22:02:06-03:00,frannlima,Update expired coupon list after date rollover in active view
+553c0aa98e141b3f9244f50d51466345c9eefd08,2026-10-25T22:02:09-03:00,frannlima,Style unified carousel offers inside coupons menu for mobile and desktop
+25c8f210004fc37436b6f6d161371b4a8624cce1,2026-10-25T22:03:07-03:00,frannlima,Bump service worker cache and asset versions for synced coupon menu deployment
+0a842261b9e8792c820f892c64d9ad685687e4bb,2026-10-25T22:09:59-03:00,frannlima,Fix actual V75 coupons screen to display active home carousel coupons after fixed eStore discounts
+b3843eff1cdfa2c23e686a144fa08b0075db013c,2026-10-25T22:10:57-03:00,frannlima,Use shared coupon source only; remove obsolete DOM observer and fix local-date expiry
+83af8ac94c31b8951a2a3e98a4a40ec5cb1da638,2026-10-25T22:11:00-03:00,frannlima,Style actual campaign coupons section with fixed and dated offers for mobile
+5d8ef1aef9d479006c7087fde3ce9ca2c0dcc375,2026-10-25T22:11:40-03:00,frannlima,Force published app to load correct coupons renderer and updated carousel assets
+b477d6abb3bd834219586ef3d458909e1bee50e0,2026-10-26T02:59:36-03:00,frannlima,"Extend official FCA dashboard with previous-week deltas, front-specific dispersion, zero-sale days, and weekly recurrence; preserve deployed API code"
+f1dbd30775c51e23e49e3bb98c8e533a6863af06,2026-10-26T03:04:30-03:00,frannlima,"Create personalized weekly FCA dashboard cards, recurrence radar, guarded WhatsApp share and deep links"
+d4474a28e748f9d6f4a5661f389fc8ad43fa536e,2026-10-26T03:05:46-03:00,frannlima,"Style the FCA priority per-store WhatsApp actions, KPI dashboard and recurrence radar"
+04f56c06f23f60fb4d7688a26caf3728819eb351,2026-10-26T03:08:06-03:00,frannlima,"Implement weekly FCA action on top 5 store rankings, verified-data linkage, recurrence badge and route"
+25dd4e6b6a03667fb1f388378684885dab3e1877,2026-10-26T03:09:28-03:00,frannlima,Allow FCA weekly prioritization from homologated weekly management import without an extra Sunday D-1
+c54226f6b297b531e08df98b3a367c6c3af7d0b6,2026-10-26T03:12:32-03:00,frannlima,Correct Fortaleza date handling and modal keyboard cleanup in FCA supervisor sharing
+813280bdc6e4cc48f17e6772c2d5cf2f30b4903b,2026-10-26T03:13:02-03:00,frannlima,Refresh PWA cache V241 with new FCA sharing assets
+f460339f58ae6f9c517c8d65e3917c04555c366c,2026-10-26T03:13:06-03:00,frannlima,Keep prioritized FCA send buttons visible and responsive in mobile rankings
+7266538db8f342662d69f8bcc4d22cbef1983368,2026-10-26T03:17:02-03:00,frannlima,Render official Riachuelo logo in FCA dashboard PNG with robust image loading
+a25ed1b66442da3c38c6544f9d276ebbaff0891c,2026-10-26T03:41:03-03:00,frannlima,FCA: consult confirmed supervisors directly from per-store Enviar FCA action
+fd93bf5b7f1fa606c6eab40812f4df802f3cd289,2026-10-26T03:43:04-03:00,frannlima,Invalidate mobile PWA cache for FCA direct-supervisor workflow V242
+ab8e8813406224d1777ba077c68811116b613187,2026-10-26T03:43:10-03:00,frannlima,Load updated FCA direct-contact module V242 to avoid stale Android assets
+1fa5dc330cc421499f003f9068fba22341cfaa8d,2026-10-26T04:09:15-03:00,frannlima,"Keep weekly FCA actions visible while latest managerial report is pending, show 5-place queue and add buttons in weekly comparison"
+9afb3fb47bb3d0e45d85592fcf846c1c099b1a74,2026-10-26T04:10:22-03:00,frannlima,Fix JavaScript escaping in FCA pending-state upload button and verify complete inline scripts
+579940b479de25555d1da87c7eb85f4ce8baa6ed,2026-10-26T04:11:19-03:00,frannlima,"Add prominent FCA send entry, five-place pending ranking and mobile weekly comparison buttons"
+af6c6e698bb27d349e5cc8e1298ba0242a5e970b,2026-10-26T04:12:59-03:00,frannlima,Allow direct URL to visible FCA priority workspace after login
+02cebf019f56b2b5b3e640bada8255c8c06766d9,2026-10-26T04:13:57-03:00,frannlima,Invalidate Android PWA cache after fixing permanently visible FCA queue
+8e0ee3413fe2d7d590e9c6b1696d1a9afafe562f,2026-10-26T04:14:04-03:00,frannlima,"Release FCA V243 direct Priority workspace, visible pending queue and top-five weekly comparison actions"
+ba7020527812868cd64e49d6ff38eb86b71b1ee3,2026-10-26T16:06:40-03:00,frannlima,"FCA: greet supervisor by Fortaleza time at sharing (Bom dia / Boa tarde / Boa noite), keep preview current"
+af9ea9e1860c782a2bd707bcbdd7e6aef2da2c79,2026-10-26T16:07:56-03:00,frannlima,PWA build V244: invalidate cache for dynamic FCA greeting
+2b09fc8f125e500745ec8ddf22de0aa7f7e367ec,2026-10-26T16:08:12-03:00,frannlima,Load dynamic FCA greeting module V244 on Android and web

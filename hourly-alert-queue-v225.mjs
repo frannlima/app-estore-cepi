@@ -1,7 +1,7 @@
 // eStore CE+PI — fila de mobilização após consolidar a parcial do WhatsApp.
 // O WhatsApp exige a confirmação de envio pelo usuário; abrir a conversa NÃO é entrega.
 import {createAlertImage,sharePreparedAlert,canNativeFileShare} from './alert-card-share.mjs';
-const LINK='https://frannlima.github.io/app-estore-cepi/?menu=hourly';
+const LINK=(globalThis.EstoreIdentity?.url('?menu=hourly')||'https://frannlima.github.io/app-estore-cepi/?menu=hourly');
 const STREETS=new Set(['084','113','146']);
 const STORES=new Set(['073','084','108','113','138','142','146','175','177','222','238','258','262','314','318','344','350','552']);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

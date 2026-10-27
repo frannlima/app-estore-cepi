@@ -40,7 +40,7 @@ if(window.__hourlyWorkflowV198)return;
 window.__hourlyWorkflowV198=true;
 const STORES=['073','084','108','113','138','142','146','175','177','222','238','258','262','314','318','344','350','552'];
 const API='https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-hourly-import';
-const APP_URL='https://frannlima.github.io/app-estore-cepi/?menu=hourly';
+const APP_URL=(globalThis.EstoreIdentity?.url('?menu=hourly')||'https://frannlima.github.io/app-estore-cepi/?menu=hourly');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const curr=()=>typeof HOURLY_CACHE!=='undefined'?HOURLY_CACHE:null;
 const user=()=>typeof U!=='undefined'?U?.u:null;

@@ -41,14 +41,14 @@ export async function createAlertImage(contact,row){
  wrap(row.closing?'Informe a venda eStore do dia ou confirme sem novos pedidos.':'Atualize a parcial, mobilize a equipe e confirme se houve novos pedidos.',80,991,920,35,dark,false,45);
  line('ATUALIZE SUA PARCIAL',55,1130,37,dark,true);
  wrap('Menu → Hora a Hora → Registrar ou Confirmar sem novas vendas',55,1181,965,30,dark,false,43);
- line('frannlima.github.io/app-estore-cepi/?menu=hourly',55,1241,29,'#1458A5',true);
+ line((globalThis.EstoreIdentity?.url('?menu=hourly')||HOURLY_LINK).replace(/^https:\/\//,''),55,1241,29,'#1458A5',true);
  rect(40,1280,1000,125,red);
  line(row.closing?'FECHAMENTO eSTORE | 21H':'A PRÓXIMA HORA PODE MUDAR O JOGO!',73,1330,38,'#fff',true);
  line(row.closing?'INFORME A VENDA CAPTADA NA LOJA':'VAMOS GIRAR O PONTEIRO!',row.closing?73:220,1381,38,'#fff',true);
  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob)throw Error('Falha na geração do PNG.');
  return new File([blob],'alerta-estore-filial-'+row.st+'.png',{type:'image/png'});
 }
-export const HOURLY_LINK='https://frannlima.github.io/app-estore-cepi/?menu=hourly';
+export const HOURLY_LINK=(globalThis.EstoreIdentity?.url('?menu=hourly')||'https://frannlima.github.io/app-estore-cepi/?menu=hourly');
 export async function shareAlertImage(file,phone,closing=false){
  if(navigator.canShare?.({files:[file]}) && typeof navigator.share==='function'){
   await navigator.share({files:[file],title:'Alerta eStore Connect',text:(closing?'📌 FECHAMENTO 21H: informe o valor total da venda eStore captada hoje na loja e a quantidade de pedidos. Se não vendeu, registre zero.\n':'📲 Atualize sua venda e pedidos no Hora a Hora:\n')+HOURLY_LINK});

@@ -18,7 +18,7 @@ const alertText=(c,row)=>{
  '🛍️ *Meta de pedidos:* '+(Number(row.orders)>0?row.orders+' pedidos':'A confirmar'),
  '🔴 *Ação imediata:* Mobilizar o time, analisar o speed de atendimento e intensificar a captação.',
  '📲 *Registre a venda:* Menu → Hora a Hora → Sua filial → Registrar',
- 'https://frannlima.github.io/app-estore-cepi/?menu=hourly',
+ (globalThis.EstoreIdentity?.url('?menu=hourly')||'https://frannlima.github.io/app-estore-cepi/?menu=hourly'),
  row.closing?'📌 *Fechamento 21h:* Informe a venda eStore total captada na loja hoje e a quantidade de pedidos, mesmo que o valor tenha sido zero.':'📌 *Obs.:* Última referência sem atualização: '+since+'.',
  row.closing?'✅ *Finalize o registro da venda eStore do dia no Hora a Hora.*':'🚀 *A próxima hora pode mudar o jogo. Vamos girar o ponteiro!*'
  ].join('\n\n');

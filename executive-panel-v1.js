@@ -595,7 +595,7 @@ function caption(){
  ];
  if(!z.complete||z.missingGoals)lines.push("⚠️ *Apuração parcial:* "+z.daysCovered+"/"+z.daysExpected+" dias.");
  lines.push("","🔎 *Explore os indicadores e a performance detalhada no app:*",
-  "https://frannlima.github.io/app-estore-cepi/","","_Moda que inspira o Brasil_");
+  (globalThis.EstoreIdentity?.url('')||'https://frannlima.github.io/app-estore-cepi/'),"","_Moda que inspira o Brasil_");
  return lines.join("\n");
 }
 

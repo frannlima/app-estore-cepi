@@ -20,7 +20,7 @@ const prettyDay=x=>/^\d{4}-\d{2}-\d{2}$/.test(String(x||""))?x.slice(8)+"/"+x.sl
 const weekday=x=>!x?"—":new Intl.DateTimeFormat("pt-BR",{weekday:"long",day:"2-digit",month:"2-digit",timeZone:"UTC"}).format(new Date(String(x)+"T12:00:00Z"));
 const stores=(d)=>Array.isArray(d?.prioritized)?d.prioritized.slice(0,5):[];
 const locate=(st)=>{const d=data();return stores(d).find(x=>stCode(x.st)===stCode(st))||null;};
-const urlFor=(st,d)=>{const u=new URL("./",location.href);u.search="";u.hash="";u.searchParams.set("fca_store",stCode(st));u.searchParams.set("fca_week",String(d.weekStart||""));return u.href;};
+const urlFor=(st,d)=>{const u=new URL(globalThis.EstoreIdentity?.url()||new URL("./",location.href).href);u.search="";u.hash="";u.searchParams.set("fca_store",stCode(st));u.searchParams.set("fca_week",String(d.weekStart||""));return u.href;};
 const negative=x=>num(x)!==null&&num(x)<0;
 const change=(v,type)=>type==="money"?diffMoney(v):type==="pp"?diffPp(v):diffCount(v);
 const nameStore=x=>String(x.name||("Filial "+stCode(x.st))).replace(/^\d{3}\s*[-–•]\s*/,"");
