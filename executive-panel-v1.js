@@ -319,8 +319,10 @@ function render(){
  const bar=(v)=>v==null?"0%":Math.min(100,v/maxCompare*100)+"%";
  const trend=d.delta,opp=opportunities(),recs=topCollaborators(),ordered=[recs[1],recs[0],recs[2]];
 
- const benchmarkMessage=bad?'<div class="execErrorV1">⚠ Benchmark oficial de '+e(dateText)+' inconsistente: a captação empresa é inferior à captação CE+PI. Indicadores afetados ficam indisponíveis; valores gerenciais são preservados.</div>':
-  !bench?'<p class="execNoticeV2">'+(EX.period==="day"?"D-1 sincronizado pelo gerencial. Share regional indisponível: faltam as vendas totais reais das filiais ou o share oficial; não é possível calculá-lo apenas pela captação.":"Aguardando print oficial do intervalo para acumular e comparar share de CE+PI e empresa.")+'</p>':"";
+ const d1Pending=EX.period==="day"&&!bench&&d.rows.length>0;
+ const benchmarkMessage=bad?'<div class="execErrorV1">⚠ Benchmark de '+e(dateText)+' inconsistente. Valores gerenciais preservados.</div>':
+  d1Pending?'<div class="execNoticeV2"><strong>D-1 de '+e(dateText)+' registrado. Comparativo CE+PI × Empresa pendente.</strong> A importação anterior preservou o resultado das lojas, mas não os totais oficiais da empresa. '+(isMain()?'<button type="button" class="execSecondaryV2" onclick="execOpenD1RepairV1()">Conciliar apenas o share D-1</button>':'A conciliação pode ser feita pelo administrador sem alterar vendas ou comissões.')+'</div>':
+  !bench?'<p class="execNoticeV2">Comparativo oficial não disponível para '+e(dateText)+'. Não serão usados shares de outro período.</p>':"";
   const regionLine='<div class="execCompareLineV2"><span>CE+PI</span><b>'+percent(share)+'</b><div class="execMeterV1"><i style="width:'+bar(share)+'"></i></div></div>';
  const companyLine='<div class="execCompareLineV2"><span>Empresa</span><b>'+percent(company)+'</b><div class="execMeterV1 national"><i style="width:'+bar(company)+'"></i></div></div>';
  const mini=[
@@ -823,6 +825,23 @@ w.execShowAdminV1=showAdmin;
 w.execSaveBenchmarkV1=saveBenchmark;
 w.execReadPrintV1=readPrint;
 w.execReadExcelV1=readExcel;
+
+function execOpenD1RepairV1(){
+ if(!isMain())return notify("Conciliação disponível somente para administrador.");
+ const date=latestDate();
+ if(typeof go!=="function")return notify("Abra a Central de Dados na Administração.");
+ go("admin");
+ setTimeout(()=>{
+  if(typeof window.adminCentralDataV206==="function")window.adminCentralDataV206();
+  const panel=document.querySelector(".estoreD1ReconcileV1");
+  if(!panel){notify("Abra Central de Dados → D-1 Diário → Corrigir share.");return}
+  panel.open=true;
+  const input=document.getElementById("estoreD1RepairDateV1");
+  if(input)input.value=date;
+  panel.scrollIntoView({behavior:"smooth",block:"center"});
+ },120);
+}
+w.execOpenD1RepairV1=execOpenD1RepairV1;
 w.execShareV1=shareCard;
 w.execShareCaptionV1=caption;
 w.execToggleStoresV2=toggleStores;
