@@ -571,7 +571,9 @@ async function estoreCentralAuditV2(){
   const daily=Array.isArray(j.daily)?j.daily:[];
   const first=benchmarks.filter(x=>x.period==='week'&&x.regional_share!=null).sort((a,b)=>String(b.end_date).localeCompare(String(a.end_date)))[0];
   const month=benchmarks.filter(x=>x.period==='month'&&x.regional_share!=null).sort((a,b)=>String(b.end_date).localeCompare(String(a.end_date)))[0];
-  checks.push({label:'Painel Executivo | D-1',ok:daily.length>0,detail:daily.length+' data(s) com histórico gerencial.'});
+  const lastD1=[...daily].sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
+  const dailyBench=lastD1?benchmarks.find(x=>x.period==='day'&&x.start_date===lastD1.date&&x.end_date===lastD1.date&&x.company_share!=null&&x.regional_share!=null):null;
+  checks.push({label:'Painel Executivo | D-1',ok:!!dailyBench,detail:lastD1?(dailyBench?'Share CE+PI e Empresa conciliados em '+lastD1.date:'Gerencial '+lastD1.date+' carregado, mas comparativo Empresa × CE+PI pendente; use Corrigir share D-1 sem reimportar vendas.'):'Sem D-1 gerencial disponível.'});
   checks.push({label:'Share oficial | Semana',ok:!!first,detail:first?'Até '+first.end_date:'Sem benchmark semanal oficial'});
   checks.push({label:'Share oficial | Mês',ok:!!month,detail:month?'Até '+month.end_date:'Sem benchmark mensal oficial'});
  }catch(e){checks.push({label:'Painel Executivo | benchmarks',ok:false,detail:String(e.message||e)})}
