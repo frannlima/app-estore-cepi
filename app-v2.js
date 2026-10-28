@@ -482,6 +482,12 @@ function importV3(){
  <div class=uploadCardsV3><div><span class=uPinkV3>▣</span><b>Metas</b><input class=field type=file id=fMeta accept=".xlsx,.xls,.csv"></div></div>
  <div class=importActionsV3><input class=field type=password id=metaPwd placeholder="Senha ADM"><button class=btn id=metaBtn onclick="uploadMeta()">Incorporar meta</button><div id=metaOut></div></div></details>
  </div>
+ <details class="estoreD1ReconcileV1" style="margin-top:12px"><summary>Corrigir share Empresa × CE+PI de um D-1 já importado</summary>
+ <p class="muted">Conciliação pontual: utilize apenas o mesmo Gerencial nível empresa. Não reimporta vendas, pedidos, colaboradores ou comissões.</p>
+ <div class="uploadCardsV3"><div><span class="uOrangeV3">▥</span><b>Gerencial oficial D-1</b><small>Precisa conter as linhas CE + PI / Total e Total / Empresa</small><input class="field" type="file" id="estoreD1RepairFileV1" accept=".xlsx,.xls"></div></div>
+ <div class="importActionsV3"><label>Data do resultado</label><input class="field" type="date" id="estoreD1RepairDateV1"><input class="field" type="password" id="estoreD1RepairPwdV1" placeholder="Senha ADM">
+ <button class="btn" id="estoreD1RepairBtnV1" type="button" onclick="estoreD1RepairV1()">Conciliar comparativo D-1</button><div id="estoreD1RepairStatusV1" role="status" aria-live="polite"></div></div>
+ </details>
  <div id="estoreCentralOfficialV1" hidden><div class="notice">O acumulado oficial é uma fotografia do Power BI para o intervalo exato: substitui a referência gerencial daquele período, sem somar novamente os pedidos já registrados no D-1.</div>
  <p class="muted">No Painel Executivo, selecione Semana ou Mês e utilize <b>Importar Semana/Mês</b>. O controle oficial de share fica naquele painel até a migração segura do serviço de processamento.</p>
  <button class="btn" type="button" onclick="go('executive')">Abrir Painel Executivo — importar acumulado</button>
@@ -497,6 +503,34 @@ function estoreCentralModeV1(mode){
  tabs.forEach((btn,i)=>{btn.classList.toggle('ghost',['daily','official','history'][i]!==mode)});
 }
 window.estoreCentralModeV1=estoreCentralModeV1;
+
+async function estoreD1RepairV1(){
+ if(!admV3())return;
+ const file=document.getElementById("estoreD1RepairFileV1")?.files?.[0];
+ const date=document.getElementById("estoreD1RepairDateV1")?.value;
+ const password=document.getElementById("estoreD1RepairPwdV1")?.value||"";
+ const out=document.getElementById("estoreD1RepairStatusV1"),btn=document.getElementById("estoreD1RepairBtnV1");
+ if(!file||!date||!password){if(out)out.textContent="Informe data do resultado, gerencial oficial e senha ADM.";return}
+ if(btn)btn.disabled=true;
+ if(out)out.textContent="Conferindo os totais oficiais e o D-1 salvo…";
+ try{
+  const form=new FormData();
+  form.append("action","daily_benchmark_repair");form.append("date",date);
+  form.append("matricula",String(U.u.id));form.append("password",password);
+  form.append("management",file,file.name);
+  const resp=await fetch(ESTORE_API,{method:"POST",body:form,cache:"no-store"});
+  const json=await resp.json();
+  if(!resp.ok||!json?.ok)throw Error(json?.error||"Não foi possível conciliar o D-1.");
+  const bench=json.benchmark||{},fmt=v=>Number(v*100).toLocaleString("pt-BR",{minimumFractionDigits:4,maximumFractionDigits:4})+"%";
+  const pp=Number((Number(bench.regional_share)-Number(bench.company_share))*100).toLocaleString("pt-BR",{minimumFractionDigits:4,maximumFractionDigits:4})+" p.p.";
+  if(out)out.textContent="✓ Comparativo conciliado: CE+PI "+fmt(bench.regional_share)+" × Empresa "+fmt(bench.company_share)+" • desvio "+pp+". Sem alterar as vendas e comissões.";
+  const p=document.getElementById("estoreD1RepairPwdV1");if(p)p.value="";
+  if(typeof window.execRefreshV1==="function")window.execRefreshV1();
+ }catch(err){if(out)out.textContent="Não concluído: "+String(err?.message||err)}
+ finally{if(btn)btn.disabled=false}
+}
+window.estoreD1RepairV1=estoreD1RepairV1;
+
 async function estoreCentralImportBopisV1(){
  if(!admV3())return;
  const file=document.getElementById('estoreCentralBopisFileV1')?.files?.[0];
