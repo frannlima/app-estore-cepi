@@ -629,6 +629,56 @@ function pick(r:any,...keys:string[]){
   return null;
 }
 function isCePiRegion(v:any){return String(v??"").normalize("NFKC").toUpperCase().replace(/\s+/g,"").replace(/[^A-Z]/g,"")==="CEPI";}
+
+/* Consolidados oficiais do Power BI: CE + PI / Total e Total (empresa).
+ * Share é a fração decimal oficial do relatório, nunca média simples das lojas. */
+function officialD1Number(value:any):number|null{
+ if(value===null||value===undefined||String(value).trim()==="")return null;
+ if(typeof value==="number")return Number.isFinite(value)?value:null;
+ const raw=String(value).trim(),isPct=raw.includes("%");
+ const cleaned=raw.replace(/R\$/gi,"").replace(/\s/g,"").replace(/%/g,"");
+ const decimal=cleaned.includes(",")?cleaned.replace(/\./g,"").replace(",","."):cleaned;
+ const n=Number(decimal);
+ return Number.isFinite(n)?(isPct?n/100:n):null;
+}
+function officialD1Totals(rows:any[],expectedCaptured:number|null){
+ const region=(rows||[]).find((r:any)=>isCePiRegion(pick(r,"Regional"))&&
+  /^TOTAL$/i.test(String(pick(r,"Loja")||"").trim()));
+ const company=(rows||[]).find((r:any)=>
+  /^(TOTAL|EMPRESA|BRASIL|TOTAL GERAL)$/i.test(String(pick(r,"Regional")||"").trim())&&
+  !String(pick(r,"Loja")||"").trim());
+ if(!region||!company)return {ok:false,reason:"Não localizados os totais CE+PI e Empresa no relatório gerencial.",record:null};
+ const capturedRegion=officialD1Number(pick(region,"Captação","Captacao"));
+ const capturedCompany=officialD1Number(pick(company,"Captação","Captacao"));
+ const shareRegion=officialD1Number(pick(region,"Share Loja %","Share Loja","Share %"));
+ const shareCompany=officialD1Number(pick(company,"Share Loja %","Share Loja","Share %"));
+ if(capturedRegion===null||capturedCompany===null||shareRegion===null||shareCompany===null||
+    capturedRegion<0||capturedCompany<capturedRegion||
+    shareRegion<0||shareRegion>.05||shareCompany<0||shareCompany>.05||
+    (capturedRegion>0&&shareRegion===0)||(capturedCompany>0&&shareCompany===0))
+  return {ok:false,reason:"Totais oficiais incompletos ou inconsistentes. Verifique captação e share decimal da empresa e CE+PI.",record:null};
+ if(expectedCaptured!==null&&Number.isFinite(expectedCaptured)&&
+    Math.abs(capturedRegion-expectedCaptured)>Math.max(2,expectedCaptured*.001))
+  return {ok:false,reason:"Captação do total CE+PI diverge das lojas do D-1. Confira data e filtros do arquivo.",record:null};
+ const orders=(r:any)=>{const value=officialD1Number(pick(r,"Qtde Pedidos","Qtd Pedidos","Quantidade Pedidos"));return value!==null&&Number.isInteger(value)&&value>=0?value:null};
+ const approved=officialD1Number(pick(company,"Aprovado"));
+ return {ok:true,reason:"",record:{
+  company_captured:+capturedCompany.toFixed(2),
+  company_share:shareCompany,
+  company_orders:orders(company),
+  company_approved:approved===null?null:+approved.toFixed(2),
+  regional_captured:+capturedRegion.toFixed(2),
+  regional_share:shareRegion,
+  regional_orders:orders(region)
+ }};
+}
+async function publishOfficialD1(date:string,matricula:string,totals:any){
+ const record={period:"day",start_date:date,end_date:date,...totals,submitted_by:matricula,updated_at:new Date().toISOString()};
+ const {error}=await db.from("estore_executive_benchmark").upsert(record,{onConflict:"period,start_date,end_date"});
+ if(error)throw error;
+ return record;
+}
+
 /** Official D-1 reference: never advance a closed report using provisional
  * collaborator rows from the current day. */
 async function latestD1Date():Promise<string>{
@@ -1659,6 +1709,26 @@ Deno.serve(async(req)=>{
         await db.from("app_audit").insert({event_type:"bopis_import",entity:"bopis_sales_history",entity_id:dates[0]+"_"+dates.at(-1),actor_matricula:matricula,after_data:{rows:payload.length,stores:stores.size,approved:+approved.toFixed(2),orders,source_file:safeFileName(f.name||"bopis.xlsx")}});
         return json({ok:true,rows:payload.length,stores:stores.size,minDate:dates[0],maxDate:dates.at(-1),approved:+approved.toFixed(2),orders,message:"Relatório BOPIS incorporado. Esses valores serão descontados automaticamente da base do Pool."});
       }
+
+      if(action==="daily_benchmark_repair"){
+        const requested=String(form.get("date")||"");
+        if(!(await adminOk(matricula,password)))return json({error:"Acesso administrativo inválido."},403);
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(requested))return json({error:"Informe a data do D-1."},400);
+        const file=form.get("management");
+        if(!(file instanceof File))return json({error:"Anexe somente o gerencial oficial nível empresa."},400);
+        const {data:existing,error:existingError}=await db.from("daily_updates")
+          .select("management,management_mode").eq("result_date",requested).maybeSingle();
+        if(existingError)throw existingError;
+        if(!existing||String(existing.management_mode||"daily")!=="daily")
+          return json({error:"D-1 diário não encontrado nesta data. A conciliação não altera captação nem pedidos."},400);
+        const stored=Array.isArray(existing.management)?existing.management:[];
+        if(stored.length<15)return json({error:"Base de lojas D-1 incompleta; não é seguro publicar o share."},400);
+        const captured=stored.reduce((sum:number,x:any)=>sum+n(x.c),0);
+        const parsed=officialD1Totals(await sheetRows(file),captured);
+        if(!parsed.ok)return json({error:parsed.reason},400);
+        const benchmark=await publishOfficialD1(requested,matricula,parsed.record);
+        return json({ok:true,date:requested,benchmark,message:"Comparativo CE+PI × Empresa conciliado. Vendas, pedidos e comissões anteriores preservados."});
+      }
       if(action!=="daily_update")return json({error:"Ação inválida."},400);
       const requested=String(form.get("date")||"");
       if(!(await adminOk(matricula,password)))return json({error:"Acesso administrativo inválido."},403);
@@ -1739,6 +1809,15 @@ Deno.serve(async(req)=>{
       const managementMode=(managementCaptured>50000&&collabCaptured>0&&managementCaptured>collabCaptured*5)?"cumulative_ytd":"daily";
       const {error}=await db.from("daily_updates").upsert({result_date:requested,collaborators:collab,management,management_mode:managementMode,imported_by:matricula,imported_at:new Date().toISOString()},{onConflict:"result_date"});
       if(error)throw error;
+
+      let dailyOfficialBenchmark:any=null;
+      let dailyBenchmarkWarning="";
+      if(managementMode==="daily"){
+        const parsed=officialD1Totals(mr,managementCaptured);
+        if(parsed.ok)dailyOfficialBenchmark=await publishOfficialD1(requested,matricula,parsed.record);
+        else dailyBenchmarkWarning=parsed.reason;
+      }else dailyBenchmarkWarning="Gerencial identificado como acumulado: não publicar como D-1.";
+
       await db.from("import_log").insert({result_date:requested,collaborators_count:collab.length,management_count:management.length,action:"upsert",imported_by:matricula});
       const month=requested.slice(0,7),magg:any={};
       for(const r of collab){
@@ -1773,7 +1852,7 @@ Deno.serve(async(req)=>{
         const {error:mh}=await db.from("monthly_collaborator_history").upsert({...row,bopis_approved:row.commission_verified?+n(row.bopis_approved).toFixed(2):null,bopis_captured:row.commission_verified?+n(row.bopis_captured).toFixed(2):null,bopis_orders:row.commission_verified?Math.trunc(n(row.bopis_orders)):null,commissionable_approved:row.commission_verified?+n(row.commissionable_approved).toFixed(2):null,updated_at:new Date().toISOString()},{onConflict:"month,matricula,store_code"});
         if(mh)throw mh;
       }
-      return json({ok:true,date:requested,collaborators:collab.length,management:management.length,commissionVerified:hasDeliveryTypeColumn,message:hasDeliveryTypeColumn?"Resultado incorporado ao histórico com sucesso. Comissão calculada com exclusão de BOPIS.":"Resultado incorporado ao histórico. Comissão não publicada: o relatório de colaboradores precisa conter a coluna Tipo Entrega para separar BOPIS."});
+      return json({ok:true,date:requested,collaborators:collab.length,management:management.length,benchmark:dailyOfficialBenchmark,benchmark_warning:dailyBenchmarkWarning,commissionVerified:hasDeliveryTypeColumn,message:hasDeliveryTypeColumn?"Resultado incorporado ao histórico com sucesso. Comissão calculada com exclusão de BOPIS.":"Resultado incorporado ao histórico. Comissão não publicada: o relatório de colaboradores precisa conter a coluna Tipo Entrega para separar BOPIS."});
     }
     const body=await req.json();
     if(String(body.matricula||"")==="0000000"){
