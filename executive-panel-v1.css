@@ -296,3 +296,12 @@
 @media(max-width:620px){.execRadarGridV4{grid-template-columns:repeat(2,minmax(0,1fr))}.execRadarGridV4>div{padding:10px}.execRadarActionV4{display:grid}.execRadarGridV4 strong{font-size:21px}}
 
 .execRadarActionV4.warning{border-left-color:#dd922b;background:#fff7e8}
+
+/* Radar competitivo V5: leitura executiva das 5 menores evoluções e ranking completo. */
+.execRadarTopV5{border:1px solid #d7e2db;background:#f7faf7;border-radius:12px;padding:12px 14px}
+.execRadarTopV5>strong{display:block;font-size:12px;letter-spacing:.045em;color:#173f35}
+.execRadarTopV5 .execRadarRankV4{max-height:none}
+.execRadarTopV5 .execRadarRankV4>div:first-child{font-weight:800;color:#76232F}
+.execRadarDetailsV4 .execRadarRankV4>div{flex-wrap:wrap;align-items:center}
+.execRadarDetailsV4 .execRadarRankV4>div>span:nth-child(2){color:#63756c;font-size:11px}
+.execRadarGridV4 strong{font-variant-numeric:tabular-nums}
