@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v258-radar-semanal';
-const BUILD='v258-radar-semanal';
+const CACHE='estore-cepi-shell-v259-d1-empresa-share';
+const BUILD='v259-d1-empresa-share';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
@@ -39,9 +39,9 @@ function injectAppV104(html){
   }
   const tags='\n<script src="'+PRESENTATION_SCRIPT+'"></script>\n<script src="'+HOURLY_META_SCRIPT+'"></script>\n<script src="'+TEAM_SCRIPT+'"></script>\n<script src="'+TEAM_STORE_SCRIPT+'"></script>\n<script src="'+COMMISSION_ELIGIBILITY_SCRIPT+'"></script>\n<script src="'+COMMISSION_BOPIS_SCRIPT+'"></script>\n<script src="'+TEAM_COLLAPSE_SCRIPT+'"></script>\n<script src="'+TEAM_AREA_REGIONAL_SCRIPT+'"></script>\n<script src="'+BOPIS_ANALYTICS_SCRIPT+'"></script>\n<script src="'+VOICE_SCRIPT+'"></script>\n<script src="'+MEU_ACOMPANHAMENTO_BRIDGE+'"></script>\n<script src="'+CAMPAIGN_PARTIAL_SCRIPT+'"></script>\n<script src="'+CAMPAIGN_NATIVE_SCRIPT+'"></script>\n';
   // Forçar versão nova do módulo executivo nas páginas anteriormente cacheadas.
-  html=html.replace(/executive-panel-v1[.]js[?]build=[^"']+/g,'executive-panel-v1.js?build=v258-radar-semanal');
-  html=html.replace(/hourly-live-v200[.]js[?]build=[^"']+/g,'hourly-live-v200.js?build=v258-radar-semanal');
-  html=html.replace(/executive-panel-v1[.]css[?]build=[^"']+/g,'executive-panel-v1.css?build=v258-radar-semanal');
+  html=html.replace(/executive-panel-v1[.]js[?]build=[^"']+/g,'executive-panel-v1.js?build=v259-d1-empresa-share');
+  html=html.replace(/hourly-live-v200[.]js[?]build=[^"']+/g,'hourly-live-v200.js?build=v259-d1-empresa-share');
+  html=html.replace(/executive-panel-v1[.]css[?]build=[^"']+/g,'executive-panel-v1.css?build=v259-d1-empresa-share');
   html=html.replace('</head>','<link rel="stylesheet" href="./brand-riachuelo-2025.css?build=v168"><link rel="stylesheet" href="./cards-visible-preview-v1.css?build=v168"><link rel="stylesheet" href="./coupon-home-carousel-v174.css?build=v176"></head>');
   return html.replace(/<\/body>\s*<\/html>\s*$/i, tags+'<script src="./coupon-home-carousel-v174.js?build=v176"></script>'+'</body></html>');
 }
