@@ -284,7 +284,7 @@ function competitiveRadar(){
  const need=target!=null&&Number.isFinite(sales)&&sales>0&&Number.isFinite(capture)?
   Math.max(0,Math.ceil((target*sales-capture)*100)/100):null;
  const rankLabel=rank==null?"—":(lastRank>rank?rank+"º–"+lastRank+"º":rank+"º")+" / "+rows.length;
- const textDelta=delta==null?"—":(delta>0?"▲ ":delta<0?"▼ ":"= ")+pp(delta);
+ const textDelta=delta==null?"—":(delta>0?"▲ ":delta<0?"▼ ":"= ")+pp4(delta);
  const weekCaption=pair?"S"+weekNumber(pair.start)+" • "+dia(pair.start)+" a "+dia(pair.end)+" vs S"+weekNumber(pair.previousStart):"Sem histórico comparável";
  const topFive=rows.length?'<div class="execRadarTopV5"><strong>5 REGIONAIS COM MENOR EVOLUÇÃO</strong><div class="execRadarRankV4">'+
   rows.slice(0,5).map((x,i)=>'<div><span>'+(i+1)+'º • '+e(x.region)+(i===4?' • linha de corte':'')+'</span><b class="'+(x.delta<0?"execDangerV1":"execSuccessV1")+'">'+pp4(x.delta)+'</b></div>').join("")+
