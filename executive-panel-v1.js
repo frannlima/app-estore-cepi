@@ -242,6 +242,8 @@ function executivePanelViewV1(){
 // mesmo quando a semana corrente ainda não foi importada.
 function competitiveRadar(){
  const historical=Array.isArray(EX.data?.competitive_weeks)?EX.data.competitive_weeks:[];
+ const pct4=v=>v==null?"—":(Number(v)*100).toLocaleString("pt-BR",{minimumFractionDigits:4,maximumFractionDigits:4})+"%";
+ const pp4=v=>v==null?"—":(v>0?"+":"")+(Number(v)*100).toLocaleString("pt-BR",{minimumFractionDigits:4,maximumFractionDigits:4})+" p.p.";
  const groups=new Map();
  const canon=v=>String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g,"").toUpperCase();
  for(const item of historical){
@@ -285,16 +287,16 @@ function competitiveRadar(){
  const textDelta=delta==null?"—":(delta>0?"▲ ":delta<0?"▼ ":"= ")+pp(delta);
  const weekCaption=pair?"S"+weekNumber(pair.start)+" • "+dia(pair.start)+" a "+dia(pair.end)+" vs S"+weekNumber(pair.previousStart):"Sem histórico comparável";
  const topFive=rows.length?'<div class="execRadarTopV5"><strong>5 REGIONAIS COM MENOR EVOLUÇÃO</strong><div class="execRadarRankV4">'+
-  rows.slice(0,5).map((x,i)=>'<div><span>'+(i+1)+'º • '+e(x.region)+(i===4?' • linha de corte':'')+'</span><b class="'+(x.delta<0?"execDangerV1":"execSuccessV1")+'">'+pp(x.delta)+'</b></div>').join("")+
+  rows.slice(0,5).map((x,i)=>'<div><span>'+(i+1)+'º • '+e(x.region)+(i===4?' • linha de corte':'')+'</span><b class="'+(x.delta<0?"execDangerV1":"execSuccessV1")+'">'+pp4(x.delta)+'</b></div>').join("")+
   '</div></div>':"";
  const fullRank=rows.length?'<div class="execRadarRankV4">'+rows.map((x,i)=>
-  '<div><span>'+(i+1)+'º • '+e(x.region)+'</span><span>Antes: '+percent(x.before)+' | Atual: '+percent(x.now)+'</span><b class="'+(x.delta<0?"execDangerV1":"execSuccessV1")+'">'+pp(x.delta)+'</b></div>').join("")+'</div>':
+  '<div><span>'+(i+1)+'º • '+e(x.region)+'</span><span>Antes: '+pct4(x.before)+' | Atual: '+pct4(x.now)+'</span><b class="'+(x.delta<0?"execDangerV1":"execSuccessV1")+'">'+pp4(x.delta)+'</b></div>').join("")+'</div>':
   '<p class="execHelpV1">Os dados de semanas completas serão usados automaticamente após a carga gerencial nível empresa.</p>';
  return '<section class="execSectionV1 execRadarV4" aria-label="Radar competitivo share semanal">'+
   '<div class="execSectionHeadV2"><h3>RADAR COMPETITIVO | SHARE SEMANAL</h3><span class="execTinyV2">'+e(weekCaption)+'</span></div>'+
   '<div class="execRadarGridV4">'+
-  '<div><small>SEMANA ANTERIOR • CE+PI</small><strong>'+percent(previous)+'</strong></div>'+
-  '<div><small>SHARE ATUAL • CE+PI</small><strong>'+percent(current)+'</strong></div>'+
+  '<div><small>SEMANA ANTERIOR • CE+PI</small><strong>'+pct4(previous)+'</strong></div>'+
+  '<div><small>SHARE ATUAL • CE+PI</small><strong>'+pct4(current)+'</strong></div>'+
   '<div><small>EVOLUÇÃO • CE+PI</small><strong class="'+(delta!=null&&delta<0?"execDangerV1":"execSuccessV1")+'">'+textDelta+'</strong></div>'+
   '<div><small>POSIÇÃO POR MENOR EVOLUÇÃO</small><strong>'+rankLabel+'</strong></div></div>'+
   '<div class="execRadarActionV4 '+status+'"><strong>'+e(label)+'</strong><span>Captação adicional teórica para superar a linha de corte: <b>'+money2(need)+'</b></span></div>'+
