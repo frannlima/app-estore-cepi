@@ -238,7 +238,7 @@ function executivePanelViewV1(){
 }
 
 // Radar competitivo alimentado pelo histórico oficial das semanas importadas.
-// Sempre utiliza o par de semanas completas mais recente (21 regionais em cada),
+// Compara a semana atual (inclusive parcial) com a anterior, exigindo 21 regionais comparáveis,
 // mesmo quando a semana corrente ainda não foi importada.
 function competitiveRadar(){
  const historical=Array.isArray(EX.data?.competitive_weeks)?EX.data.competitive_weeks:[];
@@ -275,7 +275,7 @@ function competitiveRadar(){
  const rank=poorer==null?null:poorer+1,lastRank=rank==null?null:rank+tied-1;
  const definiteRisk=rank!=null&&lastRank<=cutoffCount,tieRisk=rank!=null&&rank<=cutoffCount&&!definiteRisk;
  const safe=rank!=null&&rank>cutoffCount;
- const label=!rows.length?"Aguardando duas semanas completas do gerencial por regional":safe?"CE+PI fora das 5 menores evoluções":tieRisk?"CE+PI empatada na linha de corte":definiteRisk?"CE+PI entre as 5 menores evoluções":"Acompanhamento semanal";
+ const label=!rows.length?"Aguardando duas semanas comparáveis do gerencial por regional":safe?"CE+PI fora das 5 menores evoluções":tieRisk?"CE+PI empatada na linha de corte":definiteRisk?"CE+PI entre as 5 menores evoluções":"Acompanhamento semanal";
  const status=!rows.length?"neutral":safe?"ok":"danger";
  const capture=cepi?.captured;
  const sales=cepi&&cepi.now>0&&Number.isFinite(capture)&&capture>=0?capture/cepi.now:null;
@@ -285,7 +285,10 @@ function competitiveRadar(){
   Math.max(0,Math.ceil((target*sales-capture)*100)/100):null;
  const rankLabel=rank==null?"—":(lastRank>rank?rank+"º–"+lastRank+"º":rank+"º")+" / "+rows.length;
  const textDelta=delta==null?"—":(delta>0?"▲ ":delta<0?"▼ ":"= ")+pp4(delta);
- const weekCaption=pair?"S"+weekNumber(pair.start)+" • "+dia(pair.start)+" a "+dia(pair.end)+" vs S"+weekNumber(pair.previousStart):"Sem histórico comparável";
+ const latestWeekBenchmark=(EX.data?.benchmarks||[]).filter(x=>x.period==="week"&&x.start_date===pair?.start).sort((a,b)=>String(b.end_date||"").localeCompare(String(a.end_date||"")))[0];
+ const importedThrough=latestWeekBenchmark?.end_date||pair?.end||"";
+ const partial=!!pair&&!!importedThrough&&importedThrough<pair.end;
+ const weekCaption=pair?"S"+weekNumber(pair.start)+" • "+dia(pair.start)+" a "+dia(partial?importedThrough:pair.end)+(partial?" • PARCIAL":" • FECHADA")+" vs S"+weekNumber(pair.previousStart):"Sem histórico comparável";
  const topFive=rows.length?'<div class="execRadarTopV5"><strong>5 REGIONAIS COM MENOR EVOLUÇÃO</strong><div class="execRadarRankV4">'+
   rows.slice(0,5).map((x,i)=>'<div><span>'+(i+1)+'º • '+e(x.region)+(i===4?' • linha de corte':'')+'</span><b class="'+(x.delta<0?"execDangerV1":"execSuccessV1")+'">'+pp4(x.delta)+'</b></div>').join("")+
   '</div></div>':"";
@@ -301,7 +304,7 @@ function competitiveRadar(){
   '<div><small>POSIÇÃO POR MENOR EVOLUÇÃO</small><strong>'+rankLabel+'</strong></div></div>'+
   '<div class="execRadarActionV4 '+status+'"><strong>'+e(label)+'</strong><span>Captação adicional teórica para superar a linha de corte: <b>'+money2(need)+'</b></span></div>'+
   topFive+
-  '<p class="execTinyV2">Fonte: histórico oficial de share das regionais. Priorização indicativa pela regra das cinco menores evoluções. Estimativa em R$ considera denominador da semana fechado e desempenho das demais regionais constante; não altera resultado já encerrado.</p>'+
+  '<p class="execTinyV2">Fonte: histórico regional importado. Enquanto a semana estiver em andamento, ranking e priorização são parciais e podem mudar. A estimativa em R$ pressupõe denominador de vendas e demais regionais constantes; não é uma projeção garantida.</p>'+
   '<details class="execRadarDetailsV4"><summary>Ver ranking completo das '+rows.length+' regionais ▾</summary>'+fullRank+'</details></section>';
 }
 
