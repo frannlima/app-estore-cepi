@@ -26,10 +26,11 @@ function model(data,store){
    return pending('Aguardando apuração da semana em curso.');
  const valid=current.stores.filter(x=>{
    const a=n(x.share),b=n(x.previous_share),c=n(x.captured);
-   return code(x.st)!=='000'&&a!==null&&a>=0&&a<=1&&b!==null&&b>0&&b<=1&&c!==null&&c>=0&&(c===0||a>0);
+   return code(x.st)!=='000'&&a!==null&&a>=0&&a<=1&&b!==null&&b>=0&&b<=1&&c!==null&&c>=0&&(c===0||a>0);
  }).map(x=>({st:code(x.st),share:Number(x.share),previous:Number(x.previous_share),captured:Number(x.captured),
    delta:Number((Number(x.share)-Number(x.previous_share)).toFixed(10))}));
- // A base CE+PI contém 18 filiais comparáveis ativas; cobertura menor não permite Top 5.
+ // Shares iguais a zero são resultados válidos e precisam permanecer no universo das 18 filiais.
+ // Retirar lojas com 0% na semana anterior reduz indevidamente a base e bloqueia o radar.
  if(valid.length<18||new Set(valid.map(x=>x.st)).size<18)return pending('Faltam shares comparáveis na semana em curso.');
  const mine=valid.find(x=>x.st===store);
  if(!mine)return pending('Filial sem comparativo de share validado.');
