@@ -70,9 +70,18 @@ function render(){
  const counts=d.counts||{},locked=!d.complete;
  const note=locked?"⚠️ D-1 "+br(d.reference_date)+" ainda não foi carregado completamente. Comunicação bloqueada para não usar dados antigos.":
   "Resultado oficial de "+br(d.reference_date)+" confirmado. Confira a lista e prepare os comunicados.";
+ const riskStores=Array.isArray(d.weekly_risk_stores)?d.weekly_risk_stores:[];
+ const riskMap=new Map(riskStores.map(x=>[String(x.store).padStart(3,'0'),x.radar]));
+ const weeklyPanel=riskStores.length?
+   '<section class="dcRiskPanel"><h3>🚨 RADAR DE POSSÍVEL PRIORIZAÇÃO • SEMANA EM CURSO</h3>'+
+   '<p>Projeção parcial de quinta-feira, com base no histórico da semana anterior e nos resultados D-1. O domingo ainda pode depender de programação.</p>'+
+   riskStores.map(x=>'<div class="dcRiskRow"><b>L'+esc(x.store)+'</b><span>Retração parcial: '+esc(Number(x.radar?.partial_deviation_pp||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}))+' p.p.</span><span>Desvio de ritmo: '+esc(money(x.radar?.pace_gap||0))+'</span><span>Reforço extra estimado: '+esc(money(x.radar?.gap_to_avoid_priority||0))+'</span></div>').join('')+
+   '</section>':
+   '<section class="dcRiskPanel dcRiskInfo"><b>📡 Radar semanal:</b> '+(new Date(d.goal_date+'T12:00:00Z').getUTCDay()===4?'Nenhuma loja em risco identificada nos dados disponíveis ou projeção ainda insuficiente.':'Ativado nas quintas-feiras, utilizando a parcial até quarta-feira.')+'</section>';
  const sorted=d.supervisors.map((p,i)=>({p,i})).sort((a,b)=>priority(a.p)-priority(b.p)||String(a.p.store).localeCompare(String(b.p.store)));
  const cards=sorted.map(({p,i},position)=>{
   const group=priority(p);
+  const riskHere=riskMap.has(String(p.store).padStart(3,'0'));
   const groupHeader=position===0||priority(sorted[position-1].p)!==group?'<h3 class="dcPriority dcPriority'+group+'">'+priorityTitle(group)+'</h3>':'';
   const reason=!p.active_store?"Loja fora da base ativa de resultados":
     locked?"D-1 oficial ainda incompleto — envio bloqueado":
@@ -85,7 +94,7 @@ function render(){
     !p.active_store?"Filial fora do escopo ativo":
     !p.ready?"Aguardando D-1 e metas oficiais":!p.phone?"Contato ainda não validado para compartilhamento":"Compartilhamento manual; confirme o destinatário";
   return groupHeader+'<article class="dcPerson dcCategory'+group+'"><div class="dcName"><b>'+esc(p.name)+'</b><b class="dcStoreBadge '+(group===0?'dcBlink':'')+'">L'+esc(p.store)+'</b></div>'+
-   '<small>'+esc(kind)+' • '+esc(reason)+'</small>'+
+   '<small>'+esc(kind)+' • '+esc(reason)+(riskHere?' • 🚨 RISCO SEMANAL — VER PLANO NO CARD':'')+'</small>'+
    (p.ready?'<p>Captado: '+esc(money(p.captured))+' • Share: '+esc(pct(p.share))+' • Meta vendas hoje: '+esc(money(p.goal))+' • Meta pedidos hoje: '+esc(p.goal_orders)+'</p>':'')+
    '<div class="dcBtns"><button data-view="'+i+'" '+(!canPrepare?"disabled":"")+'>Ver legenda</button>'+
    '<button data-copy="'+i+'" '+(!canPrepare?"disabled":"")+'>Copiar mensagem</button>'+
@@ -93,7 +102,7 @@ function render(){
    '<button class="dcMain dcSend" data-send="'+i+'" '+(!canSend?'disabled title="'+esc(sendHelp)+'"':'title="Preparar card PNG e mensagem para compartilhar com este supervisor"')+'>📲 Preparar card + WhatsApp</button></div></article>';
  }).join("");
  ID("dcBody").innerHTML='<p class="dcNote">'+esc(note)+'</p>'+
-  '<div class="dcCount"><span><b>'+counts.total+'</b> supervisores</span><span><b>'+counts.prepared+'</b> prontos com dados</span><span><b>'+counts.contact_verified+'</b> contatos liberados</span><span><b>'+counts.outside_active_scope+'</b> fora do escopo ativo</span></div>'+
+  weeklyPanel+'<div class="dcCount"><span><b>'+counts.total+'</b> supervisores</span><span><b>'+counts.prepared+'</b> prontos com dados</span><span><b>'+counts.contact_verified+'</b> contatos liberados</span><span><b>'+counts.outside_active_scope+'</b> fora do escopo ativo</span></div>'+
   '<div class="dcBtns"><button id="dcRefresh">Atualizar dados</button><button id="dcCopyAll" '+(locked?"disabled":"")+'>Copiar todas as legendas</button></div>'+
   '<div class="dcList">'+cards+'</div>';
  ID("dcRefresh").addEventListener("click",load);
@@ -277,6 +286,7 @@ function makeUI(){
  "#dcModal button.dcMain{background:#173f35;color:#fff}.dcCount{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:12px 0}.dcCount span{background:#e8eee8;padding:10px;border-radius:9px;font-size:12px}.dcCount b{display:block;font-size:19px}",
  ".dcNote{background:#f3ecd9;padding:12px;border-left:4px solid #de7c00}.dcBtns{display:flex;gap:8px;flex-wrap:wrap}.dcList{display:grid;gap:10px;margin:13px 0}.dcPerson{background:white;border:1px solid #d6e1d6;border-radius:11px;padding:12px}.dcPerson small{display:block;color:#667569;margin:7px 0}.dcPerson p{font-size:12px}",
  " .dcPriority{margin:12px 0 0;padding:12px;border-radius:10px;font-size:13px}.dcPriority0{background:#ffe5e5;color:#9b1919}.dcPriority1{background:#fff0d5;color:#9b5300}.dcPriority2{background:#ddf8e8;color:#12653a}.dcStoreBadge{padding:4px 8px;border-radius:7px;background:#edf0ee}.dcBlink{background:#ca1c26;color:#fff;animation:dcPulse 1.1s infinite alternate}@keyframes dcPulse{to{box-shadow:0 0 14px #f22929;opacity:.7}}@media(prefers-reduced-motion:reduce){.dcBlink{animation:none}}",
+ "#dcModal .dcRiskPanel{background:#fff1ef;border:1px solid #edaaa2;border-radius:11px;padding:12px;margin:12px 0;color:#77322b}#dcModal .dcRiskPanel h3{font-size:14px;margin:0 0 8px}#dcModal .dcRiskPanel p{font-size:12px;margin:0 0 8px}#dcModal .dcRiskRow{padding:7px 4px;border-top:1px solid #eed1ce;display:flex;flex-wrap:wrap;gap:7px 14px;font-size:12px}#dcModal .dcRiskRow b{font-size:14px;color:#a21c16}#dcModal .dcRiskInfo{background:#f5f2e8;border-color:#ded7ca;color:#365e4f}",
  "#dcStatus{font-size:12px;margin-top:10px}#dcPreview{width:100%;height:200px;font:13px/1.5 Arial;padding:10px;border:1px solid #b6c9be;border-radius:8px;white-space:pre-wrap}#dcPreview[hidden]{display:none}",
  "@media(max-width:500px){#dcModal{padding:13px}.dcBtns button{flex:1;font-size:11px}}"
  ].join("");
