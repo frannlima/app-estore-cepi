@@ -113,12 +113,41 @@ async function prepareMyFilialCard(p,d,options={}){
    caption:caption(p,d),phone:p.phone,...options
  });
 }
+async function enrichedD1Card(result,p,d){
+ const radar=weeklyRadar(p,d);
+ if(!radar||radar.incomplete||!result?.file)return result;
+ const bitmap=await createImageBitmap(result.file);
+ const width=1080,scale=width/bitmap.width,topHeight=Math.ceil(bitmap.height*scale),bottomHeight=750;
+ const canvas=document.createElement('canvas');canvas.width=width;canvas.height=topHeight+bottomHeight;
+ const ctx=canvas.getContext('2d');if(!ctx)return result;
+ ctx.fillStyle='#fff';ctx.fillRect(0,0,width,canvas.height);
+ ctx.drawImage(bitmap,0,0,width,topHeight);bitmap.close?.();
+ const y=topHeight;ctx.fillStyle='#173f35';ctx.fillRect(0,y,width,95);
+ ctx.fillStyle='#fff';ctx.font='bold 39px Arial';ctx.fillText('🚨 RADAR PARCIAL DA SEMANA',45,y+59);
+ ctx.fillStyle='#fff5f2';ctx.fillRect(0,y+95,width,655);
+ ctx.fillStyle='#932a24';ctx.font='bold 29px Arial';ctx.fillText('Projeção de recuperação • não é fechamento oficial',45,y+148);
+ ctx.font='bold 44px Arial';ctx.fillText('Gap adicional estimado: '+money(radar.gap),45,y+218);
+ ctx.fillStyle='#173f35';ctx.font='25px Arial';ctx.fillText('Meta programada + oportunidade de recuperação = meta ajustada',45,y+267);
+ radar.days.forEach((v,i)=>{
+   const yy=y+310+i*102;
+   ctx.fillStyle='#fff';ctx.fillRect(40,yy,width-80,90);
+   ctx.strokeStyle='#cbded5';ctx.strokeRect(40,yy,width-80,90);
+   ctx.fillStyle='#173f35';ctx.font='bold 31px Arial';ctx.fillText(v.label,60,yy+53);
+   ctx.font='24px Arial';ctx.fillText(money(v.planned)+' + '+money(v.extra),175,yy+35);
+   ctx.font='bold 27px Arial';ctx.fillText('= '+money(v.final)+' | '+v.orders+' pedidos',175,yy+70);
+ });
+ ctx.fillStyle='#173f35';ctx.font='bold 30px Arial';ctx.fillText('Seu time tem potencial para girar o ponteiro!',45,y+662);
+ ctx.font='23px Arial';ctx.fillText('Mobilize, distribua as metas e transforme o desafio em entrega.',45,y+706);
+ const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+ if(!blob)return result;
+ return {...result,file:new File([blob],'eStore_D1_Radar_L'+p.store+'.png',{type:'image/png'})};
+}
 async function downloadCard(index,button){
  const d=R.data,p=d?.supervisors?.[index];
  if(!canPrepare(p,d)){status('Complete o D-1 oficial antes de gerar o card.',true);return;}
  const old=button.textContent;button.disabled=true;button.textContent='Preparando card...';
  try{
-  const result=await prepareMyFilialCard(p,d,{downloadOnly:true});
+  const result=await enrichedD1Card(await prepareMyFilialCard(p,d,{downloadOnly:true}),p,d);
   if(result?.mode==='saved')status('Card original Minha Filial → Dia salvo para L'+p.store+'. Nenhuma mensagem foi enviada.');
   else status('Não foi possível salvar o card; atualize os dados e tente novamente.',true);
  }catch(e){status(String(e?.message||'Falha ao gerar card.'),true)}
@@ -197,7 +226,7 @@ async function share(index,button){
  const old=button.textContent;
  button.disabled=true;button.textContent='Preparando resultado...';
  try{
-  const result=await prepareMyFilialCard(p,d);
+  const result=await enrichedD1Card(await prepareMyFilialCard(p,d),p,d);
   if(result?.mode==='native'){
    status('Compartilhamento aberto: confira se o WhatsApp Business mostra o card e a legenda antes de enviar.');
   }else if(result?.mode==='cancelled'){
