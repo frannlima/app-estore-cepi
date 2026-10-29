@@ -67,13 +67,13 @@ function render(){
   const group=priority(p);\n  const groupHeader=position===0||priority(sorted[position-1].p)!==group?'<h3 class="dcPriority dcPriority'+group+'">'+priorityTitle(group)+'</h3>':'';\n  const reason=!p.active_store?"Loja fora da base ativa de resultados":
     locked?"D-1 oficial ainda incompleto — envio bloqueado":
     !p.ready?"Sem D-1 oficial ou meta do dia":
-    !p.phone?"Sem telefone vinculado: selecione o supervisor manualmente no WhatsApp Business":"Contato validado • envio sujeito à sua confirmação";
+    !p.phone?"Contato sem número validado para o WhatsApp":"Telefone vinculado • envio sujeito à sua confirmação";
   const kind=p.category==="zero"?"🚨 Radar":p.category==="excellent"?"🏆 Acima de 0,30%":p.category==="contribution"?"🤝 Contribuição":"Aguardando D-1";
   const canPrepare=!locked&&p.ready&&p.active_store;
-  const canSend=canPrepare;
+  const canSend=canPrepare&&!!p.phone;
   const sendHelp=locked?"Complete o D-1 antes de preparar qualquer comunicado":
     !p.active_store?"Filial fora do escopo ativo":
-    !p.ready?"Aguardando D-1 e metas oficiais":"Compartilhamento manual; confirme o destinatário";
+    !p.ready?"Aguardando D-1 e metas oficiais":!p.phone?"Contato ainda não validado para compartilhamento":"Compartilhamento manual; confirme o destinatário";
   return groupHeader+'<article class="dcPerson dcCategory'+group+'"><div class="dcName"><b>'+esc(p.name)+'</b><b class="dcStoreBadge '+(group===0?'dcBlink':'')+'">L'+esc(p.store)+'</b></div>'+
    '<small>'+esc(kind)+' • '+esc(reason)+'</small>'+
    (p.ready?'<p>Captado: '+esc(money(p.captured))+' • Share: '+esc(pct(p.share))+' • Meta vendas hoje: '+esc(money(p.goal))+' • Meta pedidos hoje: '+esc(p.goal_orders)+'</p>':'')+
