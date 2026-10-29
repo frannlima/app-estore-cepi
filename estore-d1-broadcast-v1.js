@@ -35,32 +35,28 @@ function caption(p,data){
  const hour=Number(parts.hour);
  const greeting=hour>=5&&hour<12?'Bom dia':hour>=12&&hour<18?'Boa tarde':'Boa noite';
  const name=String(p.name||'Supervisão').trim().split(/\s+/)[0];
- const intro=greeting+', *'+name+'*! Tudo bem?';
- const tone=p.category==='zero'
-   ?'🚨 *Radar de atenção:* sua operação encerrou o D-1 sem captação. Hoje temos a oportunidade de mudar esse resultado.'
-   :p.category==='excellent'
-   ?'🏆 *Parabéns pela entrega de ontem!* Sua operação alcançou *'+pct(p.share)+' de share*. Reconheça seu time e vamos manter o ritmo!'
-   :'🤝 *Obrigado pela contribuição de ontem!* Sua operação tem potencial para avançar ainda mais hoje.';
- const lines=[intro,'',tone,'','🎯 *Compromisso de hoje:* '+money(p.goal)+' em vendas e *'+p.goal_orders+' pedidos*.','Distribua a meta com sua equipe em *Metas > Distribuição diária por HC*.'];
  const weekday=new Intl.DateTimeFormat('en-US',{timeZone:'America/Fortaleza',weekday:'short'}).format(new Date());
- const w=weekday==='Thu'?weeklyRadar(p,data):null;
- if(w&&!w.incomplete){
-   lines.push('','🚨 *RADAR PARCIAL SEMANA*',
-    'Sua operação apresenta retração de share nesta semana, mas ainda há uma oportunidade real de reverter esse cenário e evitar a priorização semanal!');
-   if(Number.isFinite(w.deviation_pp))lines.push('Retração parcial do share: *'+w.deviation_pp.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' p.p.*');
-   if(w.paceGap!==null)lines.push('Desvio no ritmo até o D-1: *'+money(w.paceGap)+'*.');
-   if(w.gap>0)lines.push('Reforço adicional estimado, além das metas programadas: *'+money(w.gap)+'*.');
-   else lines.push('O cenário indica que cumprir as metas já programadas pode recuperar o ritmo, sem reforço adicional calculado.');
-   for(const day of w.days){
-     if(day.missing){lines.push('*'+day.label+':* meta ainda não informada; programação pendente.');continue;}
-     lines.push('*'+day.label+':* '+money(day.planned)+' programada + '+money(day.extra)+' de reforço = *'+money(day.final)+'* | *'+day.orders+' pedidos*');
-   }
-   if(w.partial)lines.push('⚠️ *Projeção parcial:* meta do domingo ou de outro dia ainda não informada. O cálculo não representa classificação oficial.');
-   lines.push('','💪 O resultado começa com a nossa atitude! Você e sua equipe têm potencial para transformar esse desafio em entrega.',
-     '🚀 Vamos mobilizar o time, assumir o protagonismo e *girar o ponteiro!*');
- }else if(w?.incomplete)lines.push('','⚠️ Radar semanal em apuração: dados insuficientes para redistribuir o gap com segurança.');
- lines.push('','Confira os detalhes em *Minha Filial > Dia*.','https://frannlima.github.io/app-estore-cepi/','','Conte comigo para construir essa entrega! 🤝');
- return lines.join('\n');
+ const radar=weekday==='Thu'?weeklyRadar(p,data):null;
+ const direction=radar&&!radar.incomplete
+   ?'📡 Sua operação apresenta retração no share nesta semana. Alinhe o time e acompanhe o plano de recuperação no card.'
+   :p.category==='zero'
+   ?'🚨 Sua operação encerrou ontem sem captação. Mobilize o time para mudar esse resultado hoje.'
+   :p.category==='excellent'
+   ?'🏆 Parabéns pela entrega de ontem! Reconheça a equipe e mantenha o ritmo.'
+   :'🤝 Obrigado pela contribuição de ontem! Vamos buscar uma entrega ainda melhor hoje.';
+ return [
+   greeting+', *'+name+'*!',
+   '',
+   direction,
+   '',
+   '🎯 Alinhe as metas com a equipe em *Metas > Distribuição diária por HC*.',
+   '',
+   'Conte comigo para apoiar! 💪',
+   '🚀 *Vamos girar o ponteiro!*',
+   '',
+   '📲 Detalhes em *Minha Filial > Dia*:',
+   'https://frannlima.github.io/app-estore-cepi/'
+ ].join('\n');
 }
 function priority(p){return p.category==='zero'?0:p.category==='excellent'?2:1}
 function priorityTitle(k){return ['🚨 PRIORIDADE MÁXIMA • LOJAS ZERADAS NO D-1','⚡ ALTO POTENCIAL • BAIXO DESEMPENHO NO D-1','🏆 RECONHECIMENTO • BOA PERFORMANCE'][k]}
