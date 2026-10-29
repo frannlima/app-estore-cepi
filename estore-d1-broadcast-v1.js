@@ -37,17 +37,24 @@ function caption(p,data){
  const name=String(p.name||'Supervisão').trim().split(/\s+/)[0];
  const weekday=new Intl.DateTimeFormat('en-US',{timeZone:'America/Fortaleza',weekday:'short'}).format(new Date());
  const radar=weekday==='Thu'?weeklyRadar(p,data):null;
- const direction=radar&&!radar.incomplete
-   ?'📡 Sua operação apresenta retração no share nesta semana. Alinhe o time e acompanhe o plano de recuperação no card.'
-   :p.category==='zero'
-   ?'🚨 Sua operação encerrou ontem sem captação. Mobilize o time para mudar esse resultado hoje.'
+ const hasWeeklyRisk=!!(radar&&!radar.incomplete);
+ const zeroD1=p.category==='zero';
+ // Uma zeragem confirmada no D-1 sempre tem prioridade sobre o alerta de share semanal.
+ const direction=zeroD1
+   ?'🚨 *Alerta D-1:* Sua operação encerrou ontem sem captação eStore. Hoje, a prioridade é reverter a zeragem e mobilizar o time.'
+   :hasWeeklyRisk
+   ?'📡 Sua operação apresenta retração no share nesta semana. Mobilize o time e siga o plano de recuperação do card.'
    :p.category==='excellent'
    ?'🏆 Parabéns pela entrega de ontem! Reconheça a equipe e mantenha o ritmo.'
    :'🤝 Obrigado pela contribuição de ontem! Vamos buscar uma entrega ainda melhor hoje.';
+ const weeklyReminder=zeroD1&&hasWeeklyRisk
+   ?'📡 Há também retração semanal. Confira no card o plano para recuperar o share.'
+   :null;
  return [
    greeting+', *'+name+'*!',
    '',
    direction,
+   ...(weeklyReminder?['',weeklyReminder]:[]),
    '',
    '🎯 Alinhe as metas com a equipe em *Metas > Distribuição diária por HC*.',
    '',
