@@ -271,7 +271,7 @@ function makeUI(){
  ].join("");
  document.head.appendChild(style);
  const launch=document.createElement("button");launch.id="dcLaunch";launch.type="button";launch.textContent="📣 Comunicados D-1";
- launch.addEventListener("click",()=>{ID("dcOverlay").hidden=false;if(R.data)render();else load()});document.body.append(launch);
+ launch.addEventListener("click",()=>window.estoreOpenD1());document.body.append(launch);
  const overlay=document.createElement("div");overlay.id="dcOverlay";overlay.hidden=true;
  overlay.innerHTML='<section id="dcModal" role="dialog" aria-modal="true" aria-label="Comunicados D-1">'+
  '<div class="dcTop"><div><h2>📣 Comunicado D-1 | Supervisores</h2><small>Fila por filial. Confira os destinatários e confirme o envio no WhatsApp.</small></div><button id="dcClose" aria-label="Fechar">×</button></div>'+
@@ -280,6 +280,14 @@ function makeUI(){
  overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.hidden=true});
  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!overlay.hidden)overlay.hidden=true});
 }
+window.estoreOpenD1=function(){
+ if(!admin()){alert("Comunicados D-1 disponíveis apenas para o administrador.");return;}
+ if(!ID("dcLaunch"))makeUI();
+ const overlay=ID("dcOverlay");
+ if(!overlay){alert("Não foi possível abrir Comunicados D-1.");return;}
+ overlay.hidden=false;
+ if(R.data)render();else load();
+};
 function sync(){const can=admin(),el=ID("dcLaunch");if(can&&!el)makeUI();else if(el)el.hidden=!can;
  if(!can&&ID("dcOverlay"))ID("dcOverlay").hidden=true;}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",sync,{once:true});else sync();
