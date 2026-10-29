@@ -12,36 +12,59 @@ const br=d=>String(d||"").split("-").reverse().join("/");
 const R={data:null,loading:false};
 function admin(){try{return typeof U!=="undefined"&&U?.u?.id==="2457695"&&!!U?.admin&&!ID("app")?.classList.contains("hide")}catch(_){return false}}
 function status(t,error=false){const el=ID("dcStatus");if(el){el.textContent=t;el.style.color=error?"#9c3030":"#345c4d"}}
+function weeklyRadar(p,d){
+ const w=p.weekly_radar||p.weeklyRadar||d?.weekly_radar?.[p.store]||null;
+ if(!w||w.risk!==true)return null;
+ const gap=Number(w.gap_to_avoid_priority);
+ const ticket=Number(w.average_ticket);
+ const days=Array.isArray(w.days)?w.days:[];
+ if(!Number.isFinite(gap)||gap<=0||!Number.isFinite(ticket)||ticket<=0||days.length!==3)return {incomplete:true};
+ const valid=days.every(x=>Number.isFinite(Number(x.programmed_goal))&&Number(x.programmed_goal)>=0&&Number.isFinite(Number(x.weight))&&Number(x.weight)>0);
+ if(!valid)return {incomplete:true};
+ const total=days.reduce((a,x)=>a+Number(x.weight),0);
+ let remaining=Math.round(gap*100);
+ const allocations=days.map((x,i)=>{
+   const cents=i===2?remaining:Math.round(Math.round(gap*100)*Number(x.weight)/total);
+   remaining-=cents;
+   const extra=cents/100,planned=Number(x.programmed_goal),final=planned+extra;
+   return {label:x.label||['Sex','Sáb','Dom'][i],planned,extra,final,orders:Math.ceil(final/ticket)};
+ });
+ return {gap,ticket,deviation_pp:w.deviation_pp,days:allocations};
+}
 function caption(p,data){
  const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'America/Fortaleza',hour:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).map(x=>[x.type,x.value]));
  const hour=Number(parts.hour);
  const greeting=hour>=5&&hour<12?'Bom dia':hour>=12&&hour<18?'Boa tarde':'Boa noite';
  const name=String(p.name||'Supervisão').trim().split(/\s+/)[0];
- const intro=greeting+', *'+name+'*! Espero que esteja bem!';
+ const intro=greeting+', *'+name+'*! Tudo bem?';
  const tone=p.category==='zero'
-   ?'*Radar de atenção:* ontem a filial encerrou sem venda eStore registrada. Hoje temos a oportunidade de mudar esse resultado.'
+   ?'🚨 *Radar de atenção:* sua operação encerrou o D-1 sem captação. Hoje temos a oportunidade de mudar esse resultado.'
    :p.category==='excellent'
-   ?'*Parabéns pela entrega de ontem!* A filial L'+p.store+' alcançou *'+pct(p.share)+' de share*. Vamos manter esse ritmo!'
-   :'*Obrigado pela contribuição de ontem!* Cada venda faz diferença. Vamos avançar hoje!';
- return [
-   intro,'',tone,'',
-   '*Desafio de hoje*',
-   'Meta financeira: *'+money(p.goal)+'*',
-   'Meta de pedidos: *'+p.goal_orders+'*','',
-   'Distribua a meta com o time em *Metas > Distribuição diária por HC*.','',
-   'Confira mais detalhes em *Minha Filial > Dia*.',
-   'https://frannlima.github.io/app-estore-cepi/','',
-   'Conte comigo para apoiar!'
- ].join('\n');
+   ?'🏆 *Parabéns pela entrega de ontem!* Sua operação alcançou *'+pct(p.share)+' de share*. Reconheça seu time e vamos manter o ritmo!'
+   :'🤝 *Obrigado pela contribuição de ontem!* Sua operação tem potencial para avançar ainda mais hoje.';
+ const lines=[intro,'',tone,'','🎯 *Compromisso de hoje:* '+money(p.goal)+' em vendas e *'+p.goal_orders+' pedidos*.','Distribua a meta com sua equipe em *Metas > Distribuição diária por HC*.'];
+ const weekday=new Intl.DateTimeFormat('en-US',{timeZone:'America/Fortaleza',weekday:'short'}).format(new Date());
+ const w=weekday==='Thu'?weeklyRadar(p,data):null;
+ if(w&&!w.incomplete){
+   lines.push('','🚨 *RADAR PARCIAL SEMANA*','Sua operação apresenta retração de share nesta semana, mas ainda há uma oportunidade real de reverter esse cenário e evitar a priorização semanal!');
+   if(Number.isFinite(Number(w.deviation_pp)))lines.push('Desvio semanal: *'+Number(w.deviation_pp).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' p.p.*');
+   lines.push('Gap de recuperação: *'+money(w.gap)+'*','');
+   for(const day of w.days)lines.push('*'+day.label+':* programada '+money(day.planned)+' + recuperação '+money(day.extra)+' = *'+money(day.final)+'* | *'+day.orders+' pedidos*');
+   lines.push('','💪 O resultado começa com a nossa atitude! Você e sua equipe têm potencial para transformar esse desafio em entrega.','🚀 Vamos mobilizar o time, assumir o protagonismo e *girar o ponteiro!*');
+ }else if(w?.incomplete)lines.push('','⚠️ Radar semanal em apuração: dados insuficientes para redistribuir o gap com segurança.');
+ lines.push('','Confira os detalhes em *Minha Filial > Dia*.','https://frannlima.github.io/app-estore-cepi/','','Conte comigo para construir essa entrega! 🤝');
+ return lines.join('\n');
 }
+function priority(p){return p.category==='zero'?0:p.category==='excellent'?2:1}
+function priorityTitle(k){return ['🚨 PRIORIDADE MÁXIMA • LOJAS ZERADAS NO D-1','⚡ ALTO POTENCIAL • BAIXO DESEMPENHO NO D-1','🏆 RECONHECIMENTO • BOA PERFORMANCE'][k]}
 
 function render(){
  const d=R.data;if(!d)return;
  const counts=d.counts||{},locked=!d.complete;
  const note=locked?"⚠️ D-1 "+br(d.reference_date)+" ainda não foi carregado completamente. Comunicação bloqueada para não usar dados antigos.":
   "Resultado oficial de "+br(d.reference_date)+" confirmado. Confira a lista e prepare os comunicados.";
- const cards=d.supervisors.map((p,i)=>{
-  const reason=!p.active_store?"Loja fora da base ativa de resultados":
+ const sorted=d.supervisors.map((p,i)=>({p,i})).sort((a,b)=>priority(a.p)-priority(b.p)||String(a.p.store).localeCompare(String(b.p.store)));\n const cards=sorted.map(({p,i},position)=>{
+  const group=priority(p);\n  const groupHeader=position===0||priority(sorted[position-1].p)!==group?'<h3 class="dcPriority dcPriority'+group+'">'+priorityTitle(group)+'</h3>':'';\n  const reason=!p.active_store?"Loja fora da base ativa de resultados":
     locked?"D-1 oficial ainda incompleto — envio bloqueado":
     !p.ready?"Sem D-1 oficial ou meta do dia":
     !p.phone?"Sem telefone vinculado: selecione o supervisor manualmente no WhatsApp Business":"Contato validado • envio sujeito à sua confirmação";
@@ -51,7 +74,7 @@ function render(){
   const sendHelp=locked?"Complete o D-1 antes de preparar qualquer comunicado":
     !p.active_store?"Filial fora do escopo ativo":
     !p.ready?"Aguardando D-1 e metas oficiais":"Compartilhamento manual; confirme o destinatário";
-  return '<article class="dcPerson"><div class="dcName"><b>'+esc(p.name)+'</b><b>L'+esc(p.store)+'</b></div>'+
+  return groupHeader+'<article class="dcPerson dcCategory'+group+'"><div class="dcName"><b>'+esc(p.name)+'</b><b class="dcStoreBadge '+(group===0?'dcBlink':'')+'">L'+esc(p.store)+'</b></div>'+
    '<small>'+esc(kind)+' • '+esc(reason)+'</small>'+
    (p.ready?'<p>Captado: '+esc(money(p.captured))+' • Share: '+esc(pct(p.share))+' • Meta vendas hoje: '+esc(money(p.goal))+' • Meta pedidos hoje: '+esc(p.goal_orders)+'</p>':'')+
    '<div class="dcBtns"><button data-view="'+i+'" '+(!canPrepare?"disabled":"")+'>Ver legenda</button>'+
@@ -214,7 +237,7 @@ function makeUI(){
  "#dcModal button{cursor:pointer;background:#fff;border:1px solid #b6c9be;border-radius:8px;padding:9px;font-weight:700;color:#173f35}#dcModal button:disabled{opacity:.4;cursor:not-allowed}",
  "#dcModal button.dcMain{background:#173f35;color:#fff}.dcCount{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:12px 0}.dcCount span{background:#e8eee8;padding:10px;border-radius:9px;font-size:12px}.dcCount b{display:block;font-size:19px}",
  ".dcNote{background:#f3ecd9;padding:12px;border-left:4px solid #de7c00}.dcBtns{display:flex;gap:8px;flex-wrap:wrap}.dcList{display:grid;gap:10px;margin:13px 0}.dcPerson{background:white;border:1px solid #d6e1d6;border-radius:11px;padding:12px}.dcPerson small{display:block;color:#667569;margin:7px 0}.dcPerson p{font-size:12px}",
- "#dcStatus{font-size:12px;margin-top:10px}#dcPreview{width:100%;height:200px;font:13px/1.5 Arial;padding:10px;border:1px solid #b6c9be;border-radius:8px;white-space:pre-wrap}#dcPreview[hidden]{display:none}",
+ " .dcPriority{margin:12px 0 0;padding:12px;border-radius:10px;font-size:13px}.dcPriority0{background:#ffe5e5;color:#9b1919}.dcPriority1{background:#fff0d5;color:#9b5300}.dcPriority2{background:#ddf8e8;color:#12653a}.dcStoreBadge{padding:4px 8px;border-radius:7px;background:#edf0ee}.dcBlink{background:#ca1c26;color:#fff;animation:dcPulse 1.1s infinite alternate}@keyframes dcPulse{to{box-shadow:0 0 14px #f22929;opacity:.7}}@media(prefers-reduced-motion:reduce){.dcBlink{animation:none}}",\n "#dcStatus{font-size:12px;margin-top:10px}#dcPreview{width:100%;height:200px;font:13px/1.5 Arial;padding:10px;border:1px solid #b6c9be;border-radius:8px;white-space:pre-wrap}#dcPreview[hidden]{display:none}",
  "@media(max-width:500px){#dcModal{padding:13px}.dcBtns button{flex:1;font-size:11px}}"
  ].join("");
  document.head.appendChild(style);
