@@ -558,7 +558,7 @@ function openD1Communications(){
  // Recupera carregamento quando uma versão antiga do módulo foi mantida no PWA.
  window.__estoreDailyCommV1=false;
  const script=document.createElement('script');
- script.src='./estore-d1-broadcast-v1.js?build=20261029-native-home';
+ script.src='./estore-d1-broadcast-v1.js?build=20261029-d1-syntaxfix-v262';
  script.onload=()=>{
    window.__d1HomeLoading=false;
    if(typeof window.estoreOpenD1==='function')window.estoreOpenD1();
@@ -6744,5 +6744,5 @@ window.uploadHistoricalTicketsV97=async function(){
 <link rel="stylesheet" href="./fca-weekly-brief-v240.css?build=v243">
 <script src="./fca-weekly-brief-v240.js?build=v245"></script>
 <!-- COMUNICADOS-D1-ADMIN -->
-<script defer src="./estore-d1-broadcast-v1.js?build=20261029-native-home"></script>
+<script defer src="./estore-d1-broadcast-v1.js?build=20261029-d1-syntaxfix-v262"></script>
 </body></html>
