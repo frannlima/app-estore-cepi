@@ -10,7 +10,7 @@ const money=n=>n==null?"—":Number(n).toLocaleString("pt-BR",{style:"currency",
 const pct=n=>n==null?"—":(100*Number(n)).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+"%";
 const br=d=>String(d||"").split("-").reverse().join("/");
 const R={data:null,loading:false};
-function admin(){try{return typeof U!=="undefined"&&U?.u?.id==="2457695"&&!!U?.admin&&!ID("app")?.classList.contains("hide")}catch(_){return false}}
+function admin(){try{return typeof U!=="undefined"&&String(U?.u?.id||U?.u?.matricula||"")==="2457695"&&!ID("app")?.classList.contains("hide")}catch(_){return false}}
 function status(t,error=false){const el=ID("dcStatus");if(el){el.textContent=t;el.style.color=error?"#9c3030":"#345c4d"}}
 function weeklyRadar(p,d){
  const w=p.weekly_radar||p.weeklyRadar||d?.weekly_radar?.[p.store]||null;
