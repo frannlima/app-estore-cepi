@@ -20,7 +20,7 @@ function session(){
 }
 function model(data,store){
  const pending=(note)=>({zone:'pending',title:'RADAR SEMANAL EM APURAÇÃO',subtitle:note,detail:'Os valores serão apresentados quando houver comparativo suficiente entre as filiais.'});
- if(!data?.ok||!data?.comparisonReady)return pending('Comparativo semanal ainda não homologado.');
+ if(!data?.ok||Number(data?.coverage?.closed?.share_verified_stores||0)<18)return pending('Semana anterior sem share validado para comparação.');
  const current=data.currentPartial;
  if(!current||current.start!==data.currentWeekStart||!Array.isArray(current.stores)||!current.end||current.end<current.start||current.end>today())
    return pending('Aguardando apuração da semana em curso.');
@@ -40,11 +40,11 @@ function model(data,store){
  const base={weekEnd:current.end,delta:mine.delta,denominator:denom,cutoff,rank:index+1,store};
  if(index>=0&&index<5){
    // Sair do Top 5 exige superar, não empatar com, o desvio da 5ª retração.
-   const target=Math.min(0,cutoff+0.000001);
+   const target=Math.min(0,cutoff+0.0001); // Margem de segurança: 0,01 p.p. acima do corte.
    const need=Math.max(0,target-mine.delta);
    return {...base,zone:'red',title:'ALERTA • RETRAÇÃO DE SHARE',subtitle:'Risco de priorização na semana',
     badge:(index+1)+'ª entre as priorizadas',missingPp:need,missingMoney:denom!==null?Math.ceil(need*denom*100)/100:null,
-    detail:'Venda eStore adicional calculada sobre a venda total já apurada da filial. A posição e o valor podem mudar até o fechamento.'};
+    detail:'Equivalência em R$ calculada sobre a venda total já apurada, incluindo margem de 0,01 p.p. A posição e o valor podem mudar até domingo.'};
  }
  if(mine.delta<0){
    const margin=Math.max(0,mine.delta-cutoff);
