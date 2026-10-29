@@ -63,8 +63,11 @@ function render(){
  const counts=d.counts||{},locked=!d.complete;
  const note=locked?"⚠️ D-1 "+br(d.reference_date)+" ainda não foi carregado completamente. Comunicação bloqueada para não usar dados antigos.":
   "Resultado oficial de "+br(d.reference_date)+" confirmado. Confira a lista e prepare os comunicados.";
- const sorted=d.supervisors.map((p,i)=>({p,i})).sort((a,b)=>priority(a.p)-priority(b.p)||String(a.p.store).localeCompare(String(b.p.store)));\n const cards=sorted.map(({p,i},position)=>{
-  const group=priority(p);\n  const groupHeader=position===0||priority(sorted[position-1].p)!==group?'<h3 class="dcPriority dcPriority'+group+'">'+priorityTitle(group)+'</h3>':'';\n  const reason=!p.active_store?"Loja fora da base ativa de resultados":
+ const sorted=d.supervisors.map((p,i)=>({p,i})).sort((a,b)=>priority(a.p)-priority(b.p)||String(a.p.store).localeCompare(String(b.p.store)));
+ const cards=sorted.map(({p,i},position)=>{
+  const group=priority(p);
+  const groupHeader=position===0||priority(sorted[position-1].p)!==group?'<h3 class="dcPriority dcPriority'+group+'">'+priorityTitle(group)+'</h3>':'';
+  const reason=!p.active_store?"Loja fora da base ativa de resultados":
     locked?"D-1 oficial ainda incompleto — envio bloqueado":
     !p.ready?"Sem D-1 oficial ou meta do dia":
     !p.phone?"Contato sem número validado para o WhatsApp":"Telefone vinculado • envio sujeito à sua confirmação";
@@ -266,7 +269,8 @@ function makeUI(){
  "#dcModal button{cursor:pointer;background:#fff;border:1px solid #b6c9be;border-radius:8px;padding:9px;font-weight:700;color:#173f35}#dcModal button:disabled{opacity:.4;cursor:not-allowed}",
  "#dcModal button.dcMain{background:#173f35;color:#fff}.dcCount{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:12px 0}.dcCount span{background:#e8eee8;padding:10px;border-radius:9px;font-size:12px}.dcCount b{display:block;font-size:19px}",
  ".dcNote{background:#f3ecd9;padding:12px;border-left:4px solid #de7c00}.dcBtns{display:flex;gap:8px;flex-wrap:wrap}.dcList{display:grid;gap:10px;margin:13px 0}.dcPerson{background:white;border:1px solid #d6e1d6;border-radius:11px;padding:12px}.dcPerson small{display:block;color:#667569;margin:7px 0}.dcPerson p{font-size:12px}",
- " .dcPriority{margin:12px 0 0;padding:12px;border-radius:10px;font-size:13px}.dcPriority0{background:#ffe5e5;color:#9b1919}.dcPriority1{background:#fff0d5;color:#9b5300}.dcPriority2{background:#ddf8e8;color:#12653a}.dcStoreBadge{padding:4px 8px;border-radius:7px;background:#edf0ee}.dcBlink{background:#ca1c26;color:#fff;animation:dcPulse 1.1s infinite alternate}@keyframes dcPulse{to{box-shadow:0 0 14px #f22929;opacity:.7}}@media(prefers-reduced-motion:reduce){.dcBlink{animation:none}}",\n "#dcStatus{font-size:12px;margin-top:10px}#dcPreview{width:100%;height:200px;font:13px/1.5 Arial;padding:10px;border:1px solid #b6c9be;border-radius:8px;white-space:pre-wrap}#dcPreview[hidden]{display:none}",
+ " .dcPriority{margin:12px 0 0;padding:12px;border-radius:10px;font-size:13px}.dcPriority0{background:#ffe5e5;color:#9b1919}.dcPriority1{background:#fff0d5;color:#9b5300}.dcPriority2{background:#ddf8e8;color:#12653a}.dcStoreBadge{padding:4px 8px;border-radius:7px;background:#edf0ee}.dcBlink{background:#ca1c26;color:#fff;animation:dcPulse 1.1s infinite alternate}@keyframes dcPulse{to{box-shadow:0 0 14px #f22929;opacity:.7}}@media(prefers-reduced-motion:reduce){.dcBlink{animation:none}}",
+ "#dcStatus{font-size:12px;margin-top:10px}#dcPreview{width:100%;height:200px;font:13px/1.5 Arial;padding:10px;border:1px solid #b6c9be;border-radius:8px;white-space:pre-wrap}#dcPreview[hidden]{display:none}",
  "@media(max-width:500px){#dcModal{padding:13px}.dcBtns button{flex:1;font-size:11px}}"
  ].join("");
  document.head.appendChild(style);
