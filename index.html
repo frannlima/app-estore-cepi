@@ -1232,7 +1232,8 @@ async function shareStoreResultV40(options={}){
       attention=status.filter(z=>z.status==='att'||z.status==='zero'),
       zeroDays=status.filter(z=>z.status==='zero').length;
 
-  const W=1080,SCALE=2,H=1180;
+  const radar=external&&options.radarData?.risk===true&&!options.radarData?.incomplete?options.radarData:null;
+  const W=1080,SCALE=2,H=radar?1920:1180;
   let cv=document.createElement('canvas');cv.width=W*SCALE;cv.height=H*SCALE;let c=cv.getContext('2d');
   c.scale(SCALE,SCALE);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
 
@@ -1292,7 +1293,7 @@ async function shareStoreResultV40(options={}){
 
   y=910;
   rr(55,y,970,154,18,BE);
-  txt('DESTAQUES DO periodKeyÍODO',80,y+34,18,'700',G);
+  txt('DESTAQUES DO PERÍODO',80,y+34,18,'700',G);
   let bestTxt=best.length?best.map(b=>fmtChartDate(b[0])+' '+money(b[1])).join(' • '):'Sem histórico diário';
   txt(fitText('Melhores dias: '+bestTxt,880,'700 13px Arial, sans-serif'),80,y+64,13,'700',G);
   if(periodKey==='month'){
@@ -1300,6 +1301,36 @@ async function shareStoreResultV40(options={}){
     txt('Participação: '+rows.length+' colaboradores com venda no período.',80,y+120,13,'400',G);
   }else{
     txt('Participação: '+rows.length+' colaboradores com venda no período.',80,y+94,13,'400',G);
+  }
+
+  if(radar){
+    // Card semanal na própria imagem PNG, ANTES do compartilhamento nativo Android.
+    const sy=1170,fmtPp=n=>Number(n).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' p.p.';
+    rr(32,sy,1016,710,20,'#FFF0ED');
+    rr(32,sy,1016,95,20,'#B62824');
+    txt('RADAR PARCIAL SEMANA • POSSÍVEL PRIORIZAÇÃO',56,sy+56,28,'700',WHT);
+    txt('Referência: share da semana anterior • cenário projetado, não oficial',55,sy+137,21,'700','#862622');
+    if(Number.isFinite(radar.deviation_pp)){
+      txt('Retração de share até D-1: '+fmtPp(radar.deviation_pp),55,sy+186,25,'700','#97251F');
+    }
+    if(Number.isFinite(radar.paceGap)){
+      txt('Desvio no ritmo atual: '+money(radar.paceGap),55,sy+225,24,'700',G);
+    }
+    txt('Reforço estimado sobre metas programadas: '+money(radar.gap),55,sy+271,22,'700',G);
+    txt('PROGRAMAÇÃO DE RECUPERAÇÃO • VENDAS E PEDIDOS',55,sy+327,23,'700',G);
+    (radar.days||[]).forEach((day,i)=>{
+      const yy=sy+345+i*98;
+      rr(52,yy,975,89,12,WHT);
+      txt(day.label+(day.date?' • '+day.date.split('-').reverse().slice(0,2).join('/'):''),68,yy+31,22,'700',G);
+      if(day.missing){
+        txt('Meta não cadastrada • aguardar programação oficial',68,yy+67,19,'700','#A6312A');
+      }else{
+        txt('Programada: '+money(day.planned)+' + reforço '+money(day.extra),68,yy+57,21,'400',G);
+        txt('Final '+money(day.final)+' / '+day.orders+' pedidos',1000,yy+57,21,'700',G,'right');
+      }
+    });
+    txt('Sua liderança pode mobilizar o time e transformar o desafio.',55,sy+668,23,'700',G);
+    txt(radar.partial?'ATENÇÃO: projeção parcial; domingo sem meta oficial.':'Proj. sujeita ao resultado real dos próximos dias.',55,sy+693,17,'700','#9E332A');
   }
 
   txt('Atualizado até '+(asof?fmtChartDate(asof):'—'),1025,H-30,12,'400',S,'right');
