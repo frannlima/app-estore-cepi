@@ -15,21 +15,20 @@ function status(t,error=false){const el=ID("dcStatus");if(el){el.textContent=t;e
 function weeklyRadar(p,d){
  const w=p.weekly_radar||p.weeklyRadar||d?.weekly_radar?.[p.store]||null;
  if(!w||w.risk!==true)return null;
- const gap=Number(w.gap_to_avoid_priority);
- const ticket=Number(w.average_ticket);
+ const gap=Number(w.gap_to_avoid_priority),ticket=Number(w.average_ticket);
  const days=Array.isArray(w.days)?w.days:[];
- if(!Number.isFinite(gap)||gap<=0||!Number.isFinite(ticket)||ticket<=0||days.length!==3)return {incomplete:true};
- const valid=days.every(x=>Number.isFinite(Number(x.programmed_goal))&&Number(x.programmed_goal)>=0&&Number.isFinite(Number(x.weight))&&Number(x.weight)>0);
- if(!valid)return {incomplete:true};
- const total=days.reduce((a,x)=>a+Number(x.weight),0);
- let remaining=Math.round(gap*100);
- const allocations=days.map((x,i)=>{
-   const cents=i===2?remaining:Math.round(Math.round(gap*100)*Number(x.weight)/total);
-   remaining-=cents;
-   const extra=cents/100,planned=Number(x.programmed_goal),final=planned+extra;
-   return {label:x.label||['Sex','Sáb','Dom'][i],planned,extra,final,orders:Math.ceil(final/ticket)};
- });
- return {gap,ticket,deviation_pp:w.deviation_pp,days:allocations};
+ if(!Number.isFinite(gap)||gap<0||!Number.isFinite(ticket)||ticket<=0||days.length!==3)return {incomplete:true};
+ const val=x=>x===null||x===undefined||x===''?null:Number.isFinite(Number(x))?Number(x):null;
+ return {
+   risk:true,gap,ticket,partial:!!w.partial,paceGap:val(w.pace_gap),
+   deviation_pp:val(w.partial_deviation_pp),projected_pp:val(w.deviation_pp),
+   days:days.map((x,i)=>({
+     label:x.label||['Sex','Sáb','Dom'][i],date:x.date||'',
+     planned:val(x.programmed_goal),extra:val(x.additional_goal),
+     final:val(x.adjusted_goal),orders:val(x.goal_orders),
+     missing:x.source==='sem_meta_programada'||x.adjusted_goal===null
+   }))
+ };
 }
 function caption(p,data){
  const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'America/Fortaleza',hour:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).map(x=>[x.type,x.value]));
@@ -46,11 +45,19 @@ function caption(p,data){
  const weekday=new Intl.DateTimeFormat('en-US',{timeZone:'America/Fortaleza',weekday:'short'}).format(new Date());
  const w=weekday==='Thu'?weeklyRadar(p,data):null;
  if(w&&!w.incomplete){
-   lines.push('','🚨 *RADAR PARCIAL SEMANA*','Sua operação apresenta retração de share nesta semana, mas ainda há uma oportunidade real de reverter esse cenário e evitar a priorização semanal!');
-   if(Number.isFinite(Number(w.deviation_pp)))lines.push('Desvio semanal: *'+Number(w.deviation_pp).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' p.p.*');
-   lines.push('Gap de recuperação: *'+money(w.gap)+'*','');
-   for(const day of w.days)lines.push('*'+day.label+':* programada '+money(day.planned)+' + recuperação '+money(day.extra)+' = *'+money(day.final)+'* | *'+day.orders+' pedidos*');
-   lines.push('','💪 O resultado começa com a nossa atitude! Você e sua equipe têm potencial para transformar esse desafio em entrega.','🚀 Vamos mobilizar o time, assumir o protagonismo e *girar o ponteiro!*');
+   lines.push('','🚨 *RADAR PARCIAL SEMANA*',
+    'Sua operação apresenta retração de share nesta semana, mas ainda há uma oportunidade real de reverter esse cenário e evitar a priorização semanal!');
+   if(Number.isFinite(w.deviation_pp))lines.push('Retração parcial do share: *'+w.deviation_pp.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+' p.p.*');
+   if(w.paceGap!==null)lines.push('Desvio no ritmo até o D-1: *'+money(w.paceGap)+'*.');
+   if(w.gap>0)lines.push('Reforço adicional estimado, além das metas programadas: *'+money(w.gap)+'*.');
+   else lines.push('O cenário indica que cumprir as metas já programadas pode recuperar o ritmo, sem reforço adicional calculado.');
+   for(const day of w.days){
+     if(day.missing){lines.push('*'+day.label+':* meta ainda não informada; programação pendente.');continue;}
+     lines.push('*'+day.label+':* '+money(day.planned)+' programada + '+money(day.extra)+' de reforço = *'+money(day.final)+'* | *'+day.orders+' pedidos*');
+   }
+   if(w.partial)lines.push('⚠️ *Projeção parcial:* meta do domingo ou de outro dia ainda não informada. O cálculo não representa classificação oficial.');
+   lines.push('','💪 O resultado começa com a nossa atitude! Você e sua equipe têm potencial para transformar esse desafio em entrega.',
+     '🚀 Vamos mobilizar o time, assumir o protagonismo e *girar o ponteiro!*');
  }else if(w?.incomplete)lines.push('','⚠️ Radar semanal em apuração: dados insuficientes para redistribuir o gap com segurança.');
  lines.push('','Confira os detalhes em *Minha Filial > Dia*.','https://frannlima.github.io/app-estore-cepi/','','Conte comigo para construir essa entrega! 🤝');
  return lines.join('\n');
@@ -113,7 +120,7 @@ async function prepareMyFilialCard(p,d,options={}){
  return shareStoreResultV40({
    store:p.store,period:'day',referenceDate:d.reference_date,
    expectedCaptured:p.captured,expectedOrders:p.orders,
-   caption:caption(p,d),phone:p.phone,...options
+   caption:caption(p,d),phone:p.phone,radarData:weeklyRadar(p,d),...options
  });
 }
 async function enrichedD1Card(result,p,d){
@@ -150,7 +157,7 @@ async function downloadCard(index,button){
  if(!canPrepare(p,d)){status('Complete o D-1 oficial antes de gerar o card.',true);return;}
  const old=button.textContent;button.disabled=true;button.textContent='Preparando card...';
  try{
-  const result=await enrichedD1Card(await prepareMyFilialCard(p,d,{downloadOnly:true}),p,d);
+  const result=await prepareMyFilialCard(p,d,{downloadOnly:true});
   if(result?.mode==='saved')status('Card original Minha Filial → Dia salvo para L'+p.store+'. Nenhuma mensagem foi enviada.');
   else status('Não foi possível salvar o card; atualize os dados e tente novamente.',true);
  }catch(e){status(String(e?.message||'Falha ao gerar card.'),true)}
@@ -229,7 +236,7 @@ async function share(index,button){
  const old=button.textContent;
  button.disabled=true;button.textContent='Preparando resultado...';
  try{
-  const result=await enrichedD1Card(await prepareMyFilialCard(p,d),p,d);
+  const result=await prepareMyFilialCard(p,d);
   if(result?.mode==='native'){
    status('Compartilhamento aberto: confira se o WhatsApp Business mostra o card e a legenda antes de enviar.');
   }else if(result?.mode==='cancelled'){
