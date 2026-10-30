@@ -169,7 +169,7 @@ function opportunities(){
    zero.days++;zero.dates.push(date);zeroDays++;
    const h=history.get(st);
    // Exigir sete dias observados e pelo menos uma captação: sem dados, não inventar ticket.
-   if(!h||h.observed<7||h.orders<=0){zero.missing++;missingEstimates++;continue}
+   if(!h||h.observed<14||h.orders<=0){zero.missing++;missingEstimates++;continue}
    const ticket=h.captured/h.orders,ordersPerDay=h.orders/h.observed;
    zero.potential+=ordersPerDay*ticket;
   }
@@ -177,7 +177,9 @@ function opportunities(){
  const complete=daysMissing.length===0&&incompleteDays.length===0&&daysCovered===allDates.length&&daysCovered>0&&validStoreDays===daysCovered*STORES.length;
  const official=matchBenchmark()?.regional_captured;
  const regionalCaptured=official!=null&&Number.isFinite(Number(official))&&Number(official)>0?Number(official):(complete&&regionCaptured>0?regionCaptured:null);
- const potential=missingEstimates===0&&daysCovered>0?[...byStore.values()].reduce((sum,x)=>sum+x.potential,0):null;
+ const rawPotential=missingEstimates===0&&daysCovered>0?[...byStore.values()].reduce((sum,x)=>sum+x.potential,0):null;
+ const opportunityReliable=rawPotential!=null&&regionalCaptured!=null&&rawPotential<=regionalCaptured;
+ const potential=opportunityReliable?rawPotential:null;
  const denominator=potential!=null&&regionalCaptured!=null?regionalCaptured+potential:null;
  const zeros=[...byStore.values()].map(x=>{
   const storePotential=x.missing?null:x.potential;
@@ -186,7 +188,7 @@ function opportunities(){
  const ratio=denominator>0?potential/denominator:null;
  const missing=EX.period==="day"?STORES.filter(st=>!daily.get(end)?.stores?.some(x=>String(x.st||"").padStart(3,"0")===st)):[];
  return {zeros,missing,potential,ratio,regionalCaptured,daysCovered,daysExpected:allDates.length,
-  zeroDays,validStoreDays,missingStoreDays,zeroRate:validStoreDays>0?zeroDays/validStoreDays:null,complete,missingEstimates,missingGoals:missingEstimates,daysMissing,incompleteDays};
+  zeroDays,opportunityReliable,validStoreDays,missingStoreDays,zeroRate:validStoreDays>0?zeroDays/validStoreDays:null,complete,missingEstimates,missingGoals:missingEstimates,daysMissing,incompleteDays};
 }
 function shareMovements(){
  const ref=latestDate(),p=EX.period,valid=x=>x&&STORES.includes(String(x.st||"").padStart(3,"0"))&&x.share_delta!=null&&Number.isFinite(Number(x.share_delta));
@@ -437,7 +439,7 @@ function render(){
  '<div class="execZeroStatsV2"><span>Oportunidade estimada (R$)</span><b>'+money2(opp.potential)+'</b>'+
  '<span>Parcela da oportunidade (%)</span><b>'+percent(opp.ratio)+'</b>'+ 
  '<span>Taxa de zeragem (%)</span><b>'+percent(opp.zeroRate)+'</b></div>'+
- (!opp.complete||opp.missingGoals?'<p class="execTinyV2 execZeroWarningV3">Cobertura '+opp.daysCovered+'/'+opp.daysExpected+' dias do calendário • '+opp.validStoreDays+'/'+(opp.daysExpected*STORES.length)+' loja-dias válidos'+(opp.missingGoals?' • histórico insuficiente em '+opp.missingEstimates+' ocorrência(s)':'')+'. Sem dados não é zeragem.</p>':'')+
+ (!opp.complete||opp.missingGoals||!opp.opportunityReliable?'<p class="execTinyV2 execZeroWarningV3">Cobertura '+opp.daysCovered+'/'+opp.daysExpected+' dias do calendário • '+opp.validStoreDays+'/'+(opp.daysExpected*STORES.length)+' loja-dias válidos'+(opp.missingGoals?' • histórico insuficiente em '+opp.missingEstimates+' ocorrência(s)':'')+'. Sem dados não é zeragem.</p>':'')+
  '</div>';
  const rightCard='<div class="execPriorityV1 execZeroStoresV3"><h4>'+(daily?'LOJAS SEM CAPTAÇÃO DE VENDA NO DIA':'LOJAS COM ZERAGEM DE VENDAS NO PERÍODO')+'</h4>'+
  (daily?'<div class="execZeroHeadV3"><span>Filial</span><span>Situação</span></div>':
