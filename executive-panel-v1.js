@@ -137,7 +137,7 @@ function opportunities(){
  // Janela de 42 dias anteriores ao início; nenhuma meta ou share presumido no cálculo.
  const lookback=new Date(start+"T12:00:00Z");lookback.setUTCDate(lookback.getUTCDate()-42);
  const historyStart=lookback.toISOString().slice(0,10);
- for(const day of entries.filter(d=>d.date>=historyStart&&d.date<start)){
+ for(const day of entries.filter(d=>d.date>=historyStart&&d.date<=end)){
   for(const x of day.stores||[]){
    const st=String(x.st||"").padStart(3,"0"),c=Number(x.c),o=Number(x.o);
    if(!STORES.includes(st)||!Number.isFinite(c)||!Number.isFinite(o)||c<0||o<0)continue;
