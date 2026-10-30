@@ -279,7 +279,7 @@ function dailyStoreChart(rows){
 function executivePanelViewV1(){
  if(!isLeader())return '<div class="notice">Painel Executivo disponível para supervisores e gestores.</div>';
  EX.active=true;
- return '<div class="execPageV1"><div class="execToolbarV1"><div class="execSegmentV1"><button class="'+(EX.period==="day"?"on":"")+'" onclick="execSetPeriodV1(\'day\')">D-1</button><button class="'+(EX.period==="week"?"on":"")+'" onclick="execSetPeriodV1(\'week\')">Semana</button><button class="'+(EX.period==="month"?"on":"")+'" onclick="execSetPeriodV1(\'month\')">Mês</button></div><div style="display:flex;flex-wrap:wrap;gap:7px"><button class="light" onclick="execRefreshV1()">↻ Atualizar</button>'+(isMain()?'<button class="orange" onclick="execShowAdminV1()">＋ Importar Semana/Mês</button>':'')+'<button onclick="execShareV1()">↗ Compartilhar</button></div></div><div id="execMessageV1"></div><div id="execVisualV1"><div class="execSectionV1">Consolidando relatórios oficiais e o FCA...</div></div><div id="execAdminSlotV1"></div></div>';
+ return '<div class="execPageV1"><div class="execToolbarV1"><div class="execSegmentV1"><button class="'+(EX.period==="day"?"on":"")+'" onclick="execSetPeriodV1(\'day\')">D-1</button><button class="'+(EX.period==="week"?"on":"")+'" onclick="execSetPeriodV1(\'week\')">Semana</button><button class="'+(EX.period==="month"?"on":"")+'" onclick="execSetPeriodV1(\'month\')">Mês</button></div><div style="display:flex;flex-wrap:wrap;gap:7px"><button class="light" onclick="execRefreshV1()">↻ Atualizar</button>'+(isMain()?'<button class="orange" onclick="execShowAdminV1()">＋ Importar Semana/Mês</button>':'')+'<button onclick="execShareV1()">↗ Card do período</button><button class="orange" onclick="execShareMondayV1()">↗ Resumo D-1 + Semana + Mês</button></div></div><div id="execMessageV1"></div><div id="execVisualV1"><div class="execSectionV1">Consolidando relatórios oficiais e o FCA...</div></div><div id="execAdminSlotV1"></div></div>';
 }
 
 // Radar competitivo alimentado pelo histórico oficial das semanas importadas.
@@ -881,6 +881,24 @@ async function shareCard(){
  }catch(err){alert("Não foi possível gerar o card: "+String(err.message||err))}
 }
 
+function execShareMondayV1(){
+ if(!EX.data)return notify("Dados oficiais ainda não carregados.");
+ const reference=latestDate(),base=(EX.data?.daily||[]),last=base.find(x=>x.date===reference);
+ const summarize=(period)=>{
+  const beginning=period==="day"?reference:period==="week"?isoWeek(reference):firstMonth(reference);
+  const rows=base.filter(x=>x.date>=beginning&&x.date<=reference);
+  let captured=0,orders=0;
+  for(const d of rows)for(const x of d.stores||[])if(STORES.includes(String(x.st||"").padStart(3,"0"))){captured+=n(x.c);orders+=n(x.o)}
+  const benchmark=(EX.data.benchmarks||[]).filter(x=>x.period===period&&x.end_date===reference).sort((a,b)=>String(b.updated_at||"").localeCompare(String(a.updated_at||"")))[0];
+  return {captured:period==="day"&&!last?null:rows.length?captured:null,orders:rows.length?orders:null,share:benchmark?.regional_share??null,start:beginning,complete:period==="day"||period==="week"&&new Date(reference+"T12:00:00Z").getUTCDay()===0};
+ };
+ const a=summarize("day"),b=summarize("week"),c=summarize("month");
+ const url=globalThis.EstoreIdentity?.url('')||'https://frannlima.github.io/app-estore-cepi/';
+ const block=(name,x)=>name+"\\n💰 Captação: "+money2(x.captured)+"\\n📦 Pedidos: "+count(x.orders)+"\\n📊 Share: "+percent(x.share);
+ const msg="📊 *eSTORE CE+PI | Painel de Resultado*\\n\\nBom dia, time! ☀️\\nCompartilho nosso consolidado com os principais resultados e oportunidades.\\n\\n"+block("📍 *01 | RESULTADO D-1* • "+dia(reference),a)+"\\n\\n"+block("📍 *02 | SEMANA* • "+dia(b.start)+" a "+dia(reference)+(b.complete?" • FECHAMENTO":" • PARCIAL"),b)+"\\n\\n"+block("📍 *03 | MÊS* • "+dia(c.start)+" a "+dia(reference)+" • "+(reference.slice(8)==="30"||reference.slice(8)==="31"?"ACUMULADO / CONFERIR FECHAMENTO":"ACUMULADO"),c)+"\\n\\n🔎 *Explore o Relatório Executivo*\\n"+url+"\\n\\n🚀 *Talento é conquista!*";
+ window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank","noopener");
+}
+w.execShareMondayV1=execShareMondayV1;
 w.executivePanelViewV1=executivePanelViewV1;
 w.loadExecutiveV1=loadExecutiveV1;
 w.execSetPeriodV1=setPeriod;
