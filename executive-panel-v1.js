@@ -457,7 +457,7 @@ function render(){
  '<div class="execZeroStatsV2"><span>Oportunidade estimada (R$)</span><b>'+money2(opp.potential)+'</b>'+
  '<span>Parcela da oportunidade (%)</span><b>'+percent(opp.ratio)+'</b>'+ 
  '<span>Taxa de zeragem (%)</span><b>'+percent(opp.zeroRate)+'</b></div>'+
- (!opp.complete||opp.missingGoals||!opp.opportunityReliable?'<p class="execTinyV2 execZeroWarningV3">Cobertura '+opp.daysCovered+'/'+opp.daysExpected+' dias do calendário • '+opp.validStoreDays+'/'+(opp.daysExpected*STORES.length)+' loja-dias válidos'+(opp.missingGoals?' • histórico insuficiente em '+opp.missingEstimates+' ocorrência(s)':'')+'. Sem dados não é zeragem.</p>':'')+
+ (!opp.complete||opp.missingGoals||!opp.opportunityReliable?'<p class="execTinyV2 execZeroWarningV3">Cobertura '+opp.daysCovered+'/'+opp.daysExpected+' dias do calendário • '+opp.validStoreDays+'/'+(opp.daysExpected*STORES.length)+' loja-dias válidos'+(opp.missingGoals?' • histórico insuficiente em '+opp.missingEstimates+' ocorrência(s)':'')+'. Sem dados não é zeragem.'+(!opp.opportunityReliable?' • Oportunidade financeira suspensa: histórico insuficiente ou valor desproporcional à captação real.':'')+'</p>':'')+
  '</div>';
  const rightCard='<div class="execPriorityV1 execZeroStoresV3"><h4>'+(daily?'LOJAS SEM CAPTAÇÃO DE VENDA NO DIA':'LOJAS COM ZERAGEM DE VENDAS NO PERÍODO')+'</h4>'+
  (daily?'<div class="execZeroHeadV3"><span>Filial</span><span>Situação</span></div>':
