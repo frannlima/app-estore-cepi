@@ -76,21 +76,34 @@ function banner(m){
 }
 function isVisible(el){return !!el&&el.isConnected&&!!(el.offsetWidth||el.offsetHeight||el.getClientRects().length);}
 function titleNode(){
- const root=document.querySelector('#app:not(.hide)')||document.body;
- const selectors='.pageTitleV3,.title,h1,h2,h3,strong,b,span';
- const candidates=Array.from(root.querySelectorAll(selectors));
+ // Montar somente no título da página da filial, nunca nos atalhos da Home.
+ const root=document.querySelector('#app:not(.hide)');
+ if(!root)return null;
+ const candidates=Array.from(root.querySelectorAll('.pageTitleV3,.sectionHeadV3 h1,.sectionHeadV3 h2,h1,h2'));
  return candidates.find(el=>{
    const t=(el.textContent||'').trim();
-   return /^Minha Filial(?:\s*[•|\-]\s*\d{2,4})?$/i.test(t)&&t.length<45&&isVisible(el)&&
-    !el.closest('#drawer,nav,.menuGridV13,.menuGridV20,.menuHeadV20');
+   const isStore=/^(Minha Filial|Dashboard Filial)(?:\\s*[•|\\-]\\s*\\d{2,4})?$/i.test(t);
+   return isStore&&isVisible(el)&&!el.closest('button,a,[role="button"],.menuGridV13,.menuGridV20,.menuHeadV20,.homeTileV20,.menuTileV20,#drawer,nav');
  })||null;
 }
 function mount(){
  const s=session();
  if(!s)return null;
  const node=titleNode();
- if(!node)return null;
- const title=node.closest('.pageTitleV3')||node;
+ if(!node){
+   // Remover um alerta previamente montado em um card da Home.
+   const stray=document.getElementById(ID);
+   if(stray){
+     const wrapper=stray.closest('.riskTopRow266');
+     if(wrapper){
+       const title=wrapper.querySelector('.pageTitleV3,h1,h2');
+       if(title&&wrapper.parentNode)wrapper.parentNode.insertBefore(title,wrapper);
+       wrapper.remove();
+     }else stray.remove();
+   }
+   return null;
+ }
+ const title=node;
  let out=document.getElementById(ID);
  if(!out||!out.isConnected){
    out=document.createElement('div');out.id=ID;
