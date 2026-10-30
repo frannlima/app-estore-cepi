@@ -210,23 +210,23 @@ function trendData(){
  const end=latestDate(),start=periodBounds(EX.period,end).start_date;
  const days=(EX.data?.daily||[]).filter(x=>x.date>=start&&x.date<=end);
  const grouped=new Map();
- for(const d of days){
-  const key=EX.period==="month"?isoWeek(d.date):d.date;
-  const item=grouped.get(key)||{date:d.date,until:d.date,captured:0,sales:0,shareKnown:false,coverage:0};
-  for(const x of d.stores.filter(x=>STORES.includes(x.st))){
-   item.captured+=n(x.c);
-   if(x.share!=null&&Number(x.share)>0&&Number(x.c)>=0){item.sales+=Number(x.c)/Number(x.share);item.shareKnown=true}
-  }
-  item.until=d.date;item.coverage++;
-  grouped.set(key,item);
+ for(const day of days){
+  const key=EX.period==="month"?isoWeek(day.date):day.date;
+  const entry=grouped.get(key)||{date:day.date,until:day.date,captured:0,coverage:0};
+  entry.captured+=(day.stores||[]).filter(x=>STORES.includes(x.st)).reduce((a,x)=>a+n(x.c),0);
+  entry.until=day.date;entry.coverage++;
+  grouped.set(key,entry);
  }
- const weekly=(EX.data?.competitive_weeks||[]).filter(x=>/^(CE\s*\+\s*PI|CEPI)$/i.test(String(x.regional||"").trim()));
+ const weekly=(EX.data?.competitive_weeks||[]).filter(x=>/^(CE\\s*\\+\\s*PI|CEPI)$/i.test(String(x.regional||"").trim()));
+ const benchmarks=(EX.data?.benchmarks||[]).filter(b=>b.period===(EX.period==="month"?"week":"day"));
  return [...grouped.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(([key,x])=>{
-  // A fonte oficial da regional CE+PI tem prioridade sobre shares reconstruídos a partir das lojas.
-  const official=EX.period==="month"?weekly.filter(w=>w.week_start===key&&w.week_end<=x.until&&w.share!=null&&Number.isFinite(Number(w.share))).sort((a,b)=>String(b.week_end).localeCompare(String(a.week_end)))[0]:null;
-  const reconstructed=x.shareKnown&&x.sales>0?x.captured/x.sales:null;
-  const match=(EX.data?.benchmarks||[]).filter(b=>b.period===(EX.period==="month"?"week":"day")&&b.start_date===(EX.period==="month"?key:x.date)&&b.end_date===x.until&&b.company_share!=null&&Number.isFinite(Number(b.company_share))).sort((a,b)=>String(b.updated_at||"").localeCompare(String(a.updated_at||"")))[0];
-  return {...x,share:official?Number(official.share):reconstructed,companyShare:match?Number(match.company_share):null,shareSource:official?"CE+PI oficial semanal":reconstructed!=null?"CE+PI reconstruído das filiais":null};
+  const boundsStart=EX.period==="month"?key:x.date;
+  const relevant=benchmarks.filter(b=>b.start_date===boundsStart&&b.end_date<=x.until&&b.regional_share!=null&&Number.isFinite(Number(b.regional_share))).sort((a,b)=>String(b.end_date).localeCompare(String(a.end_date)));
+  const latestOfficial=relevant[0]||null;
+  const historic=EX.period==="month"?weekly.filter(w=>w.week_start===key&&w.share!=null&&Number.isFinite(Number(w.share))).sort((a,b)=>String(b.week_end).localeCompare(String(a.week_end)))[0]:null;
+  const share=latestOfficial?Number(latestOfficial.regional_share):historic?Number(historic.share):null;
+  const national=latestOfficial?.company_share!=null?Number(latestOfficial.company_share):null;
+  return {...x,share,companyShare:Number.isFinite(national)?national:null,shareSource:latestOfficial?"gerencial semanal CE+PI":historic?"histórico semanal CE+PI":null,shareThrough:latestOfficial?.end_date||historic?.week_end||null};
  });
 }
 function firstTwoNames(name){
@@ -280,7 +280,7 @@ function drawChart(rows){
  const pts=rows.map((r,i)=>r.share==null?null:{x:25+i*step+step/2,y:65+105*(1-Math.min(1,n(r.share)/Math.max(.0001,...rows.map(t=>n(t.share))))),share:r.share}).filter(Boolean);
  if(pts.length){svg+='<polyline points="'+pts.map(p=>p.x+','+p.y).join(' ')+'" fill="none" stroke="#BFA66A" stroke-width="3"/>';
  pts.forEach(p=>{svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="4" fill="#BFA66A" stroke="#fff" stroke-width="1.5"/><text x="'+p.x+'" y="'+(p.y-10)+'" text-anchor="middle" font-size="11" fill="#786234">'+(p.share*100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+'%</text>'});}
- return svg+'</svg><p class="execTinyV2">Valores financeiros sem abreviação. Vermelho: queda acima de 25% em relação ao intervalo anterior. Share CE+PI na linha. ▲ acima / ▼ abaixo da média empresa do mesmo intervalo; sem indicador quando faltar benchmark comparável.</p>';
+ return svg+'</svg><p class="execTinyV2">Valores financeiros sem abreviação. Vermelho: queda acima de 25% em relação ao intervalo anterior. Linha: share semanal oficial CE+PI; ▲/▼ compara com a média empresa da mesma referência. Sem valor oficial, não se estima share.</p>';
 }
 function dailyStoreChart(rows){
  const items=[...rows].filter(x=>n(x.c)>0).sort((a,b)=>n(b.c)-n(a.c)).slice(0,5);
