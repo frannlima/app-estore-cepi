@@ -225,7 +225,8 @@ function trendData(){
   // A fonte oficial da regional CE+PI tem prioridade sobre shares reconstruídos a partir das lojas.
   const official=EX.period==="month"?weekly.filter(w=>w.week_start===key&&w.week_end<=x.until&&w.share!=null&&Number.isFinite(Number(w.share))).sort((a,b)=>String(b.week_end).localeCompare(String(a.week_end)))[0]:null;
   const reconstructed=x.shareKnown&&x.sales>0?x.captured/x.sales:null;
-  return {...x,share:official?Number(official.share):reconstructed,shareSource:official?"CE+PI oficial semanal":reconstructed!=null?"CE+PI reconstruído das filiais":null};
+  const match=(EX.data?.benchmarks||[]).filter(b=>b.period===(EX.period==="month"?"week":"day")&&b.start_date===(EX.period==="month"?key:x.date)&&b.end_date===x.until&&b.company_share!=null&&Number.isFinite(Number(b.company_share))).sort((a,b)=>String(b.updated_at||"").localeCompare(String(a.updated_at||"")))[0];
+  return {...x,share:official?Number(official.share):reconstructed,companyShare:match?Number(match.company_share):null,shareSource:official?"CE+PI oficial semanal":reconstructed!=null?"CE+PI reconstruído das filiais":null};
  });
 }
 function firstTwoNames(name){
@@ -269,12 +270,17 @@ function drawChart(rows){
   const warn=i>0&&r.captured<rows[i-1].captured*.75;
   svg+='<rect x="'+(x-22)+'" y="'+y+'" width="44" height="'+h+'" rx="5" fill="'+(warn?'#C83732':'#173F35')+'"/>';
   svg+='<text x="'+x+'" y="'+(y-10)+'" font-size="12" text-anchor="middle" fill="#173F35">'+Math.round(r.captured).toLocaleString("pt-BR")+'</text>';
+  if(r.share!=null&&r.companyShare!=null){
+   const difference=Number(r.share)-Number(r.companyShare),symbol=difference>0.000001?'▲':difference< -0.000001?'▼':'◆';
+   const color=symbol==='▲'?'#168252':symbol==='▼'?'#C83732':'#66746b';
+   svg+='<text x="'+(x+29)+'" y="'+Math.max(18,y-10)+'" font-size="15" font-weight="800" text-anchor="middle" fill="'+color+'">'+symbol+'</text>';
+  }
   svg+='<text x="'+x+'" y="275" font-size="12" text-anchor="middle" fill="#52635B">'+(EX.period==="month"?"Sem "+weekNumber(r.date):dia(r.date).slice(0,5))+'</text>';
  });
  const pts=rows.map((r,i)=>r.share==null?null:{x:25+i*step+step/2,y:65+105*(1-Math.min(1,n(r.share)/Math.max(.0001,...rows.map(t=>n(t.share))))),share:r.share}).filter(Boolean);
  if(pts.length){svg+='<polyline points="'+pts.map(p=>p.x+','+p.y).join(' ')+'" fill="none" stroke="#BFA66A" stroke-width="3"/>';
  pts.forEach(p=>{svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="4" fill="#BFA66A" stroke="#fff" stroke-width="1.5"/><text x="'+p.x+'" y="'+(p.y-10)+'" text-anchor="middle" font-size="11" fill="#786234">'+(p.share*100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+'%</text>'});}
- return svg+'</svg><p class="execTinyV2">Valores financeiros sem abreviação. Vermelho: queda acima de 25% em relação ao intervalo anterior. Share exclusivamente CE+PI; histórico oficial semanal quando disponível, ou cálculo ponderado das filiais.</p>';
+ return svg+'</svg><p class="execTinyV2">Valores financeiros sem abreviação. Vermelho: queda acima de 25% em relação ao intervalo anterior. Share CE+PI na linha. ▲ acima / ▼ abaixo da média empresa do mesmo intervalo; sem indicador quando faltar benchmark comparável.</p>';
 }
 function dailyStoreChart(rows){
  const items=[...rows].filter(x=>n(x.c)>0).sort((a,b)=>n(b.c)-n(a.c)).slice(0,5);
