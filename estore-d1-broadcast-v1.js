@@ -34,36 +34,34 @@ function caption(p,data){
  const parts=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'America/Fortaleza',hour:'2-digit',hourCycle:'h23'}).formatToParts(new Date()).map(x=>[x.type,x.value]));
  const hour=Number(parts.hour);
  const greeting=hour>=5&&hour<12?'Bom dia':hour>=12&&hour<18?'Boa tarde':'Boa noite';
- const name=String(p.name||'Supervisão').trim().split(/\s+/)[0];
- const weekday=new Intl.DateTimeFormat('en-US',{timeZone:'America/Fortaleza',weekday:'short'}).format(new Date());
- const radar=weekday==='Thu'?weeklyRadar(p,data):null;
- const hasWeeklyRisk=!!(radar&&!radar.incomplete);
+ const name=String(p.name||'Supervisão').trim().split(/\\s+/)[0];
+ const radar=weeklyRadar(p,data);
  const zeroD1=p.category==='zero';
- // Uma zeragem confirmada no D-1 sempre tem prioridade sobre o alerta de share semanal.
- const direction=zeroD1
-   ?'🚨 *Alerta D-1:* Sua operação encerrou ontem sem captação eStore. Hoje, a prioridade é reverter a zeragem e mobilizar o time.'
-   :hasWeeklyRisk
-   ?'📡 Sua operação apresenta retração no share nesta semana. Mobilize o time e siga o plano de recuperação do card.'
-   :p.category==='excellent'
-   ?'🏆 Parabéns pela entrega de ontem! Reconheça a equipe e mantenha o ritmo.'
-   :'🤝 Obrigado pela contribuição de ontem! Vamos buscar uma entrega ainda melhor hoje.';
- const weeklyReminder=zeroD1&&hasWeeklyRisk
-   ?'📡 Há também retração semanal. Confira no card o plano para recuperar o share.'
-   :null;
+ // A recorrência é informada exclusivamente quando o backend confirmar a sequência pelo histórico gerencial.
+ const streakRaw=p.consecutive_zero_days??p.zero_streak??p.consecutiveZeroDays??p.days_without_capture;
+ const streak=streakRaw==null?null:Number(streakRaw);
+ const consecutive=zeroD1&&Number.isInteger(streak)&&streak>=2;
+ const direction=consecutive
+  ?'🚨 *Alerta de recorrência:* Sua operação apresentou ausência de captação eStore nos últimos '+streak+' dias operacionais consecutivos. Precisamos retomar a captação hoje.'
+  :zeroD1
+  ?'🚨 *Alerta D-1:* Sua operação encerrou ontem sem captação eStore. Hoje, a prioridade é reverter a zeragem e mobilizar o time.'
+  :p.category==='excellent'
+  ?'🏆 Parabéns pela entrega de ontem! Reconheça a equipe e mantenha o ritmo.'
+  :'🤝 Obrigado pela contribuição de ontem! Vamos buscar uma entrega ainda melhor hoje.';
+ const val=x=>x===null||x===undefined||x===''||!Number.isFinite(Number(x))?null:Number(x);
+ const goal=val(p.goal),orders=val(p.goal_orders);
+ const commitment=['🎯 *COMPROMISSO DE HOJE | FILIAL '+p.store+'*',
+  '💰 Meta eStore: *'+(goal===null?'Pendente de cadastro':money(goal))+'*',
+  '📦 Meta de pedidos: *'+(orders===null?'Pendente de cadastro':orders+' pedidos')+'*'];
  return [
-   greeting+', *'+name+'*!',
-   '',
-   direction,
-   ...(weeklyReminder?['',weeklyReminder]:[]),
-   '',
-   '🎯 Alinhe as metas com a equipe em *Metas > Distribuição diária por HC*.',
-   '',
-   'Conte comigo para apoiar! 💪',
-   '🚀 *Vamos girar o ponteiro!*',
-   '',
-   '📲 Detalhes em *Minha Filial > Dia*:',
-   'https://frannlima.github.io/app-estore-cepi/'
- ].join('\n');
+  greeting+', *'+name+'*!','',direction,
+  ...(radar&&!radar.incomplete?['','📡 Consulte também o radar semanal e o plano de recuperação no card.']:[]),
+  '',...commitment,'',
+  '📊 Distribua o compromisso em *Metas > Distribuição diária por HC*.','',
+  '🤝 Conte com a gente! Qualquer suporte, seu *Speak eStore* está aqui para apoiá-lo.',
+  '🚀 *Talento é conquista!*','',
+  '📲 Detalhes em *Minha Filial > Dia*:','https://frannlima.github.io/app-estore-cepi/'
+ ].join('\\n');
 }
 function priority(p){return p.category==='zero'?0:p.category==='excellent'?2:1}
 function priorityTitle(k){return ['🚨 PRIORIDADE MÁXIMA • LOJAS ZERADAS NO D-1','⚡ ALTO POTENCIAL • BAIXO DESEMPENHO NO D-1','🏆 RECONHECIMENTO • BOA PERFORMANCE'][k]}
