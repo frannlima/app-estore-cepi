@@ -124,7 +124,7 @@ function topRows(type){
  return [...rows].filter(x=>type==="share"?(x.share!=null&&Number.isFinite(Number(x.share))&&Number(x.share)>=0):n(x[type])>0)
  .sort((a,b)=>n(b[type])-n(a[type])||String(a.st).localeCompare(String(b.st))).slice(0,3);
 }
-function topCollaborators(){return (EX.ranking?.regional||[]).filter(x=>n(x.c)>0).sort((a,b)=>n(b.c)-n(a.c)).slice(0,3)}
+function topCollaborators(){return [...new Map((EX.ranking?.regional||[]).filter(x=>n(x.c)>0).map(x=>[String(x.id||x.matricula||x.name)+":"+String(x.st),x])).values()].sort((a,b)=>n(b.c)-n(a.c)).slice(0,10)}
 /* Zeragens: dias-filial reais e oportunidade baseada na entrega observada, nunca 1% da meta. */
 function opportunities(){
  const bounds=periodBounds(EX.period,latestDate()),start=bounds.start_date,end=bounds.end_date;
@@ -280,9 +280,10 @@ function executivePanelViewV1(){
 // Compara a semana atual (inclusive parcial) com a anterior, exigindo 21 regionais comparáveis,
 // mesmo quando a semana corrente ainda não foi importada.
 function competitiveRadar(){
- const historical=Array.isArray(EX.data?.competitive_weeks)?EX.data.competitive_weeks:[];
- const pct4=v=>v==null?"—":(Number(v)*100).toLocaleString("pt-BR",{minimumFractionDigits:4,maximumFractionDigits:4})+"%";
- const pp4=v=>v==null?"—":(v>0?"+":"")+(Number(v)*100).toLocaleString("pt-BR",{minimumFractionDigits:4,maximumFractionDigits:4})+" p.p.";
+ const selected=EX.period;
+ const historical=selected==="week"&&Array.isArray(EX.data?.competitive_weeks)?EX.data.competitive_weeks:[];
+ const pct4=v=>v==null?"—":(Number(v)*100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+"%";
+ const pp4=v=>v==null?"—":(v>0?"+":"")+(Number(v)*100).toLocaleString("pt-BR",{minimumFractionDigits:Math.abs(v)>0&&Math.abs(v)<.00005?4:3,maximumFractionDigits:4})+" p.p.";
  const groups=new Map();
  const canon=v=>String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g,"").toUpperCase();
  for(const item of historical){
@@ -291,6 +292,7 @@ function competitiveRadar(){
   if(!groups.has(start))groups.set(start,new Map());
   groups.get(start).set(canon(region),{region,share,captured:item.captured==null?null:Number(item.captured),end:String(item.week_end||"")});
  }
+ if(selected!=="week")return competitivePeriodRadar(selected);
  let pair=null;
  for(const start of [...groups.keys()].sort().reverse()){
   const date=new Date(start+"T12:00:00Z");
@@ -347,6 +349,21 @@ function competitiveRadar(){
   '<details class="execRadarDetailsV4"><summary>Ver ranking completo das '+rows.length+' regionais ▾</summary>'+fullRank+'</details></section>';
 }
 
+function competitivePeriodRadar(period){
+ const label=period==="month"?"MENSAL":"DIÁRIO";
+ const current=latestDate(), previous=new Date(current+"T12:00:00Z");
+ previous.setUTCDate(previous.getUTCDate()-1);
+ const past=period==="month"?(current.slice(0,7)+"-01"):(previous.toISOString().slice(0,10));
+ const ref=period==="month"?(new Date(new Date(past+"T12:00:00Z").setUTCDate(0))).toISOString().slice(0,10):past;
+ const data=EX.data?.competitive_periods?.[period]||[];
+ const latest=data.filter(x=>x.period_end===current),old=data.filter(x=>x.period_end===ref);
+ const before=new Map(old.map(x=>[String(x.regional),x]));
+ const rows=latest.filter(x=>before.has(String(x.regional))).map(x=>({regional:String(x.regional),share:Number(x.share),prev:Number(before.get(String(x.regional)).share),delta:Number(x.share)-Number(before.get(String(x.regional)).share)})).filter(x=>Number.isFinite(x.delta)).sort((a,b)=>a.delta-b.delta);
+ const fmt=v=>(v*100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+"%";
+ const delta=v=>(v>=0?"+":"")+(v*100).toLocaleString("pt-BR",{maximumFractionDigits:3})+" p.p.";
+ const me=rows.find(x=>/CE\\s*\\+?\\s*PI/i.test(x.regional));
+ return '<section class="execSectionV1 execRadarV4"><div class="execSectionHeadV2"><h3>RADAR COMPETITIVO | SHARE '+label+'</h3><span class="execTinyV2">'+(period==="month"?"Mês anterior vs acumulado atual":"D-2 vs D-1")+'</span></div>'+(rows.length>=21&&me?'<div class="execRadarGridV4"><div><small>ANTERIOR</small><strong>'+fmt(me.prev)+'</strong></div><div><small>ATUAL</small><strong>'+fmt(me.share)+'</strong></div><div><small>EVOLUÇÃO</small><strong>'+delta(me.delta)+'</strong></div><div><small>POSIÇÃO</small><strong>'+(rows.indexOf(me)+1)+'º / '+rows.length+'</strong></div></div><div class="execRadarTopV5"><strong>5 REGIONAIS COM MENOR EVOLUÇÃO</strong>'+rows.slice(0,5).map((x,i)=>'<div class="execMiniRowV1"><b>'+(i+1)+'º '+e(x.regional)+'</b><strong>'+delta(x.delta)+'</strong></div>').join("")+'</div>':'<p class="execHelpV1">Comparativo '+label.toLowerCase()+' indisponível: são necessários shares oficiais por regional nos dois períodos. Não será utilizado o radar de outra semana.</p>')+'</section>';
+}
 function render(){
  const root=document.getElementById("execVisualV1");if(!root)return;
  if(!EX.data){root.innerHTML='<div class="execSectionV1">Consultando as fontes oficiais...</div>';return}
@@ -389,7 +406,7 @@ function render(){
  (daily?'<div class="execZeroHeadV3"><span>Filial</span><span>Situação</span></div>':
  '<div class="execZeroHeadV3"><span>Filial</span><span>Dias zerados</span><span>Impacto regional</span></div>')+
  (opp.zeros.length?'<div class="execZeroListV3">'+opp.zeros.map(x=>'<div class="execZeroRowV3"><b>L'+e(x.st)+'</b>'+
- (daily?'<strong class="execDangerV1">ZERADA</strong>':'<b>'+x.days+' dia'+(x.days===1?'':'s')+'</b><strong class="execDangerV1">'+percent(x.impact)+'</strong>')+
+ (daily?'<strong class="execDangerV1">ZERADA</strong>':'<span><b>'+x.days+' dia'+(x.days===1?'':'s')+'</b><small style="display:block;font-size:10px;color:#66746b">('+x.dates.map(d=>dia(d)).join(' • ')+')</small></span><strong class="execDangerV1">'+percent(x.impact)+'<small style="display:block;font-size:10px">'+(x.potential==null?'Sem histórico':'('+money(x.potential)+')')+'</small></strong>')+
  '</div>').join("")+'</div>':
  '<div class="execHelpV1">'+(opp.daysCovered?'Nenhuma filial com zeragem registrada no período.':'Aguardando registros oficiais do período.')+'</div>')+
  '<small class="execTinyV2">Estimativa = média de pedidos por dia observado × ticket médio real de cada filial (42 dias anteriores). Parcela potencial = oportunidade ÷ (captação real + oportunidade). Dias sem registro não são zeragens.</small></div>';
@@ -398,7 +415,7 @@ function render(){
  const movementPanel=daily?"":'<section class="execSectionV1"><div class="execSectionHeadV2"><h3>EVOLUÇÃO DO SHARE | '+(EX.period==="week"?"SEMANA":"MÊS")+'</h3><span class="execTinyV2">'+e(moves.source)+'</span></div>'+
  (moves.available?'<div class="execMovementGridV188"><div><h4 class="execSuccessV1">▲ EVOLUÍRAM</h4>'+lines(moves.up,"execSuccessV1")+'</div><div><h4 class="execDangerV1">▼ RETRAÍRAM</h4>'+lines(moves.down,"execDangerV1")+'</div></div>':'<p class="execHelpV1">'+e(moves.reason||"Comparativo oficial indisponível")+'</p>')+'</section>';
  const podium='<section class="execSectionV1"><div class="execSectionHeadV2"><h3>TOP 3 COLABORADORES | REGIONAL</h3><span class="execTinyV2">Venda captada • '+periodName+'</span></div>'+
- '<div class="execPodiumV1">'+ordered.map((x,i)=>podiumItem(x,[2,1,3][i])).join("")+'</div></section>';
+ '<div class="execPodiumV1">'+ordered.map((x,i)=>podiumItem(x,[2,1,3][i])).join("")+'</div>'+ (recs.length>3?'<details class="execRadarDetailsV4"><summary>Ver Top 10 colaboradores ▾</summary><div class="execRadarRankV4">'+recs.slice(3,10).map((x,i)=>'<div><b>'+(i+4)+'º • '+e(displayColName(x))+' • L'+e(x.st)+'</b><strong>'+money2(x.c)+'</strong></div>').join("")+'</div></details>':'')+'</section>';
  const warning=!same(ref,currentAsOf())&&EX.period!=="day"?'<p class="execNoticeV2">Referência histórica: os rankings por loja refletem o último acumulado gerencial disponível.</p>':"";
  root.innerHTML=benchmarkMessage+warning+
  '<div class="execReportV1" id="execShareCardV1"><header class="execHeaderV1">'+
