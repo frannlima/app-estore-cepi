@@ -34,23 +34,23 @@ function model(data,store){
  if(valid.length<18||new Set(valid.map(x=>x.st)).size<18)return pending('Faltam shares comparáveis na semana em curso.');
  const mine=valid.find(x=>x.st===store);
  if(!mine)return pending('Filial sem comparativo de share validado.');
- const losses=valid.filter(x=>x.delta<0).sort((a,b)=>a.delta-b.delta||a.st.localeCompare(b.st));
- const index=losses.findIndex(x=>x.st===store);
- const cutoff=losses.length>=5?losses[4].delta:0;
+ const ranked=[...valid].sort((a,b)=>a.delta-b.delta||a.st.localeCompare(b.st));
+ const index=ranked.findIndex(x=>x.st===store);
+ const cutoff=ranked.length>=5?ranked[4].delta:null;
  const denom=mine.share>0&&mine.captured>0?mine.captured/mine.share:null;
  const base={weekEnd:current.end,delta:mine.delta,denominator:denom,cutoff,rank:index+1,store};
  if(index>=0&&index<5){
    // Sair do Top 5 exige superar, não empatar com, o desvio da 5ª retração.
-   const target=Math.min(0,cutoff+0.0001); // Margem de segurança: 0,01 p.p. acima do corte.
+   const target=cutoff+0.0001; // Margem de segurança: 0,01 p.p. acima do corte.
    const need=Math.max(0,target-mine.delta);
-   return {...base,zone:'red',title:'ALERTA • RETRAÇÃO DE SHARE',subtitle:'Risco de priorização na semana',
-    badge:(index+1)+'ª entre as priorizadas',missingPp:need,missingMoney:denom!==null?Math.ceil(need*denom*100)/100:null,
+   return {...base,zone:mine.delta<0?'red':'yellow',title:mine.delta<0?'ALERTA • RETRAÇÃO DE SHARE':'ATENÇÃO • MENOR EVOLUÇÃO',subtitle:'TOP 5 de possível priorização semanal',
+    badge:(index+1)+'ª no TOP 5 semanal',missingPp:need,missingMoney:denom!==null?Math.ceil(need*denom*100)/100:null,
     detail:'Equivalência em R$ calculada sobre a venda total já apurada, incluindo margem de 0,01 p.p. A posição e o valor podem mudar até domingo.'};
  }
- if(mine.delta<0){
+ if(index>=5){
    const margin=Math.max(0,mine.delta-cutoff);
-   return {...base,zone:'yellow',title:'ATENÇÃO • SHARE SEMANAL',subtitle:margin<=0.001?'Próxima da zona de priorização':'Retração sob monitoramento',
-    badge:'Fora do Top 5',marginPp:margin,marginMoney:denom!==null?Math.floor(margin*denom*100)/100:null,
+   return {...base,zone:'yellow',title:'ATENÇÃO • SHARE SEMANAL',subtitle:margin<=0.001?'Próxima da zona de priorização':'Fora do TOP 5 semanal',
+    badge:'Fora do TOP 5',marginPp:margin,marginMoney:denom!==null?Math.floor(margin*denom*100)/100:null,
     detail:'Margem até o corte da 5ª maior retração, sobre os dados parciais. Não representa venda adicional necessária.'};
  }
  return {...base,zone:'green',title:mine.delta>0?'EVOLUÇÃO DE SHARE':'SHARE ESTÁVEL',
@@ -60,7 +60,7 @@ function model(data,store){
 function banner(m){
  const meta=m.weekEnd?'Parcial até '+m.weekEnd.slice(8,10)+'/'+m.weekEnd.slice(5,7):'Semana em curso';
  let metrics='';
- if(m.zone==='red')metrics='<div class="riskMetric266"><span>Perda na semana</span><strong>'+pp(m.delta)+'</strong></div>'+
+ if((m.zone==='red'||m.zone==='yellow')&&m.missingPp!==undefined)metrics='<div class="riskMetric266"><span>Perda na semana</span><strong>'+pp(m.delta)+'</strong></div>'+
    '<div class="riskMetric266"><span>Faltam para sair</span><strong>'+pp(m.missingPp)+'</strong></div>'+
    '<div class="riskMetric266"><span>Equivalente em eStore</span><strong>'+money(m.missingMoney)+'</strong></div>';
  else if(m.zone==='yellow')metrics='<div class="riskMetric266"><span>Retração no share</span><strong>'+pp(m.delta)+'</strong></div>'+
