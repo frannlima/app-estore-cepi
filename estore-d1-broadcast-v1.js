@@ -61,7 +61,7 @@ function caption(p,data){
   '🤝 Conte com a gente! Qualquer suporte, seu *Speak eStore* está aqui para apoiá-lo.',
   '🚀 *Talento é conquista!*','',
   '📲 Detalhes em *Minha Filial > Dia*:','https://frannlima.github.io/app-estore-cepi/'
- ].join('\\n');
+ ].join('\n');
 }
 function priority(p){return p.category==='zero'?0:p.category==='excellent'?2:1}
 function priorityTitle(k){return ['🚨 PRIORIDADE MÁXIMA • LOJAS ZERADAS NO D-1','⚡ ALTO POTENCIAL • BAIXO DESEMPENHO NO D-1','🏆 RECONHECIMENTO • BOA PERFORMANCE'][k]}
