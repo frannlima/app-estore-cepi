@@ -178,8 +178,8 @@ function opportunities(){
  const official=matchBenchmark()?.regional_captured;
  const regionalCaptured=official!=null&&Number.isFinite(Number(official))&&Number(official)>0?Number(official):(complete&&regionCaptured>0?regionCaptured:null);
  const rawPotential=missingEstimates===0&&daysCovered>0?[...byStore.values()].reduce((sum,x)=>sum+x.potential,0):null;
- const opportunityReliable=rawPotential!=null&&regionalCaptured!=null&&rawPotential<=regionalCaptured;
- const potential=opportunityReliable?rawPotential:null;
+ const opportunityReliable=missingEstimates===0;
+ const potential=rawPotential;
  const denominator=potential!=null&&regionalCaptured!=null?regionalCaptured+potential:null;
  const zeros=[...byStore.values()].map(x=>{
   const storePotential=x.missing?null:x.potential;
