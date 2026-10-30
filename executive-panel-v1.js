@@ -169,7 +169,7 @@ function opportunities(){
    zero.days++;zero.dates.push(date);zeroDays++;
    const h=history.get(st);
    // Exigir sete dias observados e pelo menos uma captação: sem dados, não inventar ticket.
-   if(!h||h.observed<14||h.orders<=0){zero.missing++;missingEstimates++;continue}
+   if(!h||h.observed<4||h.orders<=0){zero.missing++;missingEstimates++;continue}
    const ticket=h.captured/h.orders,ordersPerDay=h.orders/h.observed;
    zero.potential+=ordersPerDay*ticket;
   }
