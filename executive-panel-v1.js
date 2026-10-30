@@ -217,7 +217,7 @@ function trendData(){
   entry.until=day.date;entry.coverage++;
   grouped.set(key,entry);
  }
- const weekly=(EX.data?.competitive_weeks||[]).filter(x=>/^(CE\\s*\\+\\s*PI|CEPI)$/i.test(String(x.regional||"").trim()));
+ const weekly=(EX.data?.cepi_weekly||EX.data?.competitive_weeks||[]).filter(x=>/^(CE\\s*\\+\\s*PI|CEPI)$/i.test(String(x.regional||"").trim()));
  const benchmarks=(EX.data?.benchmarks||[]).filter(b=>b.period===(EX.period==="month"?"week":"day"));
  return [...grouped.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(([key,x])=>{
   const boundsStart=EX.period==="month"?key:x.date;
@@ -384,6 +384,23 @@ function competitivePeriodRadar(period){
  const me=rows.find(x=>/CE\\s*\\+?\\s*PI/i.test(x.regional));
  return '<section class="execSectionV1 execRadarV4"><div class="execSectionHeadV2"><h3>RADAR COMPETITIVO | SHARE '+label+'</h3><span class="execTinyV2">'+(period==="month"?"Mês anterior vs acumulado atual":"D-2 vs D-1")+'</span></div>'+(rows.length>=21&&me?'<div class="execRadarGridV4"><div><small>ANTERIOR</small><strong>'+fmt(me.prev)+'</strong></div><div><small>ATUAL</small><strong>'+fmt(me.share)+'</strong></div><div><small>EVOLUÇÃO</small><strong>'+delta(me.delta)+'</strong></div><div><small>POSIÇÃO</small><strong>'+(rows.indexOf(me)+1)+'º / '+rows.length+'</strong></div></div><div class="execRadarTopV5"><strong>5 REGIONAIS COM MENOR EVOLUÇÃO</strong>'+rows.slice(0,5).map((x,i)=>'<div class="execMiniRowV1"><b>'+(i+1)+'º '+e(x.regional)+'</b><strong>'+delta(x.delta)+'</strong></div>').join("")+'</div>':'<p class="execHelpV1">Comparativo '+label.toLowerCase()+' indisponível: são necessários shares oficiais por regional nos dois períodos. Não será utilizado o radar de outra semana.</p>')+'</section>';
 }
+function executiveAreaDispersal(){
+ const stores=EX.team?.stores||[];
+ if(!stores.length)return '<section class="execSectionV1"><h3>DISPERSÃO REGIONAL POR ÁREAS</h3><p class="execHelpV1">Aguardando a base oficial de colaboradores do Meu Time para '+(EX.period==="day"?"D-1":EX.period==="week"?"semana":"mês")+'. Não serão estimados colaboradores sem venda.</p></section>';
+ const areas={"Operações":{zero:0,sold:0},"Caixa / Atendimento":{zero:0,sold:0}};
+ const seen=new Set();
+ for(const store of stores)for(const x of store.rows||[]){
+  const id=String(x.id||x.matricula||x.name||""),st=String(x.st||store.st||store.store||"");
+  if(!id||seen.has(st+"|"+id))continue;seen.add(st+"|"+id);
+  const role=String(x.cargo||x.role||"").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").toLowerCase();
+  const area=/caixa|atendimento|balcao|balcoes|servic|solucoes|credi|financeir|administrativ/.test(role)?"Caixa / Atendimento":"Operações";
+  if(Number(x.c)>0)areas[area].sold++;else areas[area].zero++;
+ }
+ return '<section class="execSectionV1"><div class="execSectionHeadV2"><h3>DISPERSÃO REGIONAL POR ÁREAS</h3><span class="execTinyV2">Fonte: Meu Time • '+(EX.period==="day"?"D-1":EX.period==="week"?"Semana":"Mês")+'</span></div><div class="execAreaGrid">'+Object.entries(areas).map(([name,v])=>{
+ const total=v.zero+v.sold,pct=total?v.zero/total:null,angle=(pct||0)*360;
+ return '<div class="execAreaBox"><b>'+e(name)+'</b><div class="execAreaInner"><div class="execAreaDonut" style="background:conic-gradient(#DE7C00 '+angle+'deg,#173F35 '+angle+'deg 360deg)"><span>'+ (pct==null?'—':percent(pct))+'</span></div><div><small>'+v.zero+' sem venda</small><small>'+v.sold+' com venda</small><small>'+total+' colaboradores</small></div></div></div>';
+ }).join("")+'</div></section>';
+}
 function render(){
  const root=document.getElementById("execVisualV1");if(!root)return;
  if(!EX.data){root.innerHTML='<div class="execSectionV1">Consultando as fontes oficiais...</div>';return}
@@ -450,7 +467,7 @@ function render(){
  '<div class="execCompareV1"><div class="execCompareRowsV2">'+regionLine+companyLine+'</div><div class="execDiffV1"><b class="'+(gap!=null&&gap>=0?"execSuccessV1":"")+'">'+pp(gap)+'</b><small>Desvio vs empresa</small></div></div></section>'+
  competitiveRadar()+chart+
  '<section class="execSectionV1"><div class="execSectionHeadV2"><h3>DESTAQUES POR FILIAL</h3></div><div class="execTriGridV1">'+mini+'</div></section>'+
- '<section class="execPairV1">'+zeroCard+rightCard+'</section>'+
+ '<section class="execPairV1">'+zeroCard+rightCard+'</section>'+ executiveAreaDispersal()+
  movementPanel+podium+
  '<p class="execSourceV1">Fonte: Gerencial eStore / FCA'+(bench?" • Benchmark empresa importado":" • Empresa pendente")+' • '+dateText+'</p>'+
  '</div><footer class="execFootV1"><img src="'+logo+'" alt="Riachuelo"><span>Moda que inspira o Brasil</span></footer></div>';
@@ -467,11 +484,12 @@ async function loadExecutiveV1(){
  try{
   const id=mat();
   if(!id)return;
-  const [db,fca,ranking,highlights]=await Promise.allSettled([
+  const [db,fca,ranking,highlights,team]=await Promise.allSettled([
    exApi({action:"get",matricula:id}),
    (typeof api==="function"?api({action:"fca_dashboard",matricula:id}):Promise.reject(Error("FCA indisponível"))),
    (typeof api==="function"?api({action:"ranking_period",matricula:id,period:EX.period,month:EX.period==="month"?currentAsOf().slice(0,7):undefined,store:w.U?.u?.st}):Promise.reject(Error("Ranking indisponível"))),
-   (typeof api==="function"?api({action:"supervisor_highlights",matricula:id,period:EX.period}):Promise.reject(Error("Destaques indisponíveis")))
+   (typeof api==="function"?api({action:"supervisor_highlights",matricula:id,period:EX.period}):Promise.reject(Error("Destaques indisponíveis"))),
+   (typeof api==="function"?api({action:"team_period",matricula:id,period:EX.period,store:w.U?.u?.st}):Promise.reject(Error("Meu Time indisponível")))
   ]);
   if(db.status==="rejected")throw db.reason;
   EX.data=db.value;
@@ -479,6 +497,7 @@ async function loadExecutiveV1(){
   EX.fca=fca.status==="fulfilled"?fca.value:null;
   EX.ranking=ranking.status==="fulfilled"?ranking.value:null;
   EX.highlight=highlights.status==="fulfilled"?highlights.value:null;
+  EX.team=team.status==="fulfilled"?team.value:null;
   EX.date=null; // D-1 recalculado a cada consulta.
   render();
  }catch(err){EX.error=String(err.message||err);if(root)root.innerHTML='<div class="execErrorV1">Não foi possível obter o histórico do painel: '+e(EX.error)+' <button onclick="execRefreshV1()">Tentar novamente</button></div>'}
