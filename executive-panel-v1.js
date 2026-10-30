@@ -223,8 +223,9 @@ function trendData(){
   const boundsStart=EX.period==="month"?key:x.date;
   const relevant=benchmarks.filter(b=>b.start_date===boundsStart&&b.end_date<=x.until&&b.regional_share!=null&&Number.isFinite(Number(b.regional_share))).sort((a,b)=>String(b.end_date).localeCompare(String(a.end_date)));
   const latestOfficial=relevant[0]||null;
-  const historic=EX.period==="month"?weekly.filter(w=>w.week_start===key&&w.share!=null&&Number.isFinite(Number(w.share))).sort((a,b)=>String(b.week_end).localeCompare(String(a.week_end)))[0]:null;
-  const share=latestOfficial?Number(latestOfficial.regional_share):historic?Number(historic.share):null;
+  const historic=EX.period==="month"?weekly.filter(w=>String(w.week_start)===key&&w.share!=null&&Number.isFinite(Number(w.share))).sort((a,b)=>String(b.week_end).localeCompare(String(a.week_end)))[0]:null;
+  // Snapshot mensal do gráfico: benchmark apenas quando é mais recente que o histórico semanal.
+  const share=latestOfficial&&(!historic||String(latestOfficial.end_date)>=String(historic.week_end)||String(historic.week_end)>end)?Number(latestOfficial.regional_share):historic?Number(historic.share):null;
   const national=latestOfficial?.company_share!=null?Number(latestOfficial.company_share):null;
   return {...x,share,companyShare:Number.isFinite(national)?national:null,shareSource:latestOfficial?"gerencial semanal CE+PI":historic?"histórico semanal CE+PI":null,shareThrough:latestOfficial?.end_date||historic?.week_end||null};
  });
