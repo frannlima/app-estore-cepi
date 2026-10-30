@@ -305,3 +305,8 @@
 .execRadarDetailsV4 .execRadarRankV4>div{flex-wrap:wrap;align-items:center}
 .execRadarDetailsV4 .execRadarRankV4>div>span:nth-child(2){color:#63756c;font-size:11px}
 .execRadarGridV4 strong{font-variant-numeric:tabular-nums}
+
+/* Executive zero-sales card: prevent stretching to the tall per-store list. */
+.execPairV1:has(.execZeroPeriodV3){align-items:start!important}
+.execPairV1 .execZeroPeriodV3{height:auto!important;min-height:0!important;align-self:start!important}
+@media(max-width:650px){.execPairV1:has(.execZeroPeriodV3){display:flex!important;flex-direction:column!important;gap:10px!important}.execPairV1 .execZeroPeriodV3,.execPairV1 .execZeroStoresV3{width:100%!important;min-width:0!important}}
