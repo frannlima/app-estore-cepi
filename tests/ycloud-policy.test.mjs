@@ -1,0 +1,14 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { prepareTest, interpretObservation } from '../supabase/functions/_shared/ycloud-policy.mjs';
+const fixture=()=>({channel:{whatsapp_enabled:false},config:{manual_test_enabled:true,contact_id:1,expected_phone_e164:'+15555550101'},contact:{id:1,enabled:true,opt_in_at:'2026-01-01',validated_at:'2026-01-01',matricula:'SYNTHETIC',store_code:'108',phone_e164:'+15555550101'},sender:'+15555550102',templateStatus:'APPROVED',parameters:['Loja sintética','Teste simulado','12:00']});
+test('synthetic_unverified: fixed recipient and three parameters',()=>{const r=prepareTest(fixture());assert.equal(r.to,'+15555550101');assert.equal(r.template.components[0].parameters.length,3);});
+test('regional channel must remain disabled',()=>{const f=fixture();f.channel.whatsapp_enabled=true;assert.throws(()=>prepareTest(f));});
+test('reject different recipient',()=>{const f=fixture();f.contact.phone_e164='+15555550103';assert.throws(()=>prepareTest(f));});
+test('reject missing consent, validation and employee link',()=>{for(const field of ['opt_in_at','validated_at','matricula']){const f=fixture();f.contact[field]=null;assert.throws(()=>prepareTest(f));}});
+test('reject excluded stores',()=>{for(const code of ['089','090','109','89']){const f=fixture();f.contact.store_code=code;assert.throws(()=>prepareTest(f));}});
+test('reject unapproved template',()=>{for(const status of ['PENDING','REJECTED','ARCHIVED','UNKNOWN']){const f=fixture();f.templateStatus=status;assert.throws(()=>prepareTest(f));}});
+test('reject malformed parameters and sender',()=>{const f=fixture();f.parameters=['one'];assert.throws(()=>prepareTest(f));f.parameters=['a','b','c'];f.sender='';assert.throws(()=>prepareTest(f));});
+test('accepted and sent never mean delivered',()=>{for(const status of ['accepted','sent','failed','future_status'])assert.equal(interpretObservation({id:'Opaque-ID',status}).delivery_confirmed,false);});
+test('delivery requires explicit delivered/read observation',()=>{for(const status of ['delivered','read'])assert.equal(interpretObservation({id:'Opaque-ID',status}).delivery_confirmed,true);});
+test('ambiguous outcome never retries automatically',()=>assert.deepEqual(interpretObservation({}),{status:'uncertain',delivery_confirmed:false,automatic_retry:false}));
