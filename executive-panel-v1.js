@@ -398,7 +398,7 @@ function incompleteMonthlyRadar(){
  return '<section class="execSectionV1 execRadarV4"><div class="execSectionHeadV2"><h3>RADAR COMPETITIVO | OUTUBRO x SETEMBRO</h3><span class="execTinyV2">Amostra semanal, não fechamento mensal</span></div><div class="execRadarGridV4"><div><small>SETEMBRO CE+PI</small><strong>'+pct(me.before)+'</strong></div><div><small>OUTUBRO OFICIAL CE+PI</small><strong>'+(official!=null?pct(Number(official)):"—")+'</strong></div><div><small>DESVIO OFICIAL CE+PI</small><strong>'+(official!=null?pp3(Number(official)-me.before):"—")+'</strong></div><div><small>AMOSTRA COMPETITIVA</small><strong>'+sharedWeeks.length+' semanas</strong></div></div><p class="execTinyV2">As posições abaixo comparam apenas as semanas com 21 regionais válidas. Não equivalem ao ranking mensal acumulado.</p><details class="execRadarDetailsV4"><summary>Ver evolução das 21 regionais na amostra ▾</summary><div class="execRadarRankV4">'+rows.map((x,i)=>'<div><span>'+(i+1)+'º • '+e(x.name)+'</span><b class="'+(x.delta<0?"execDangerV1":"execSuccessV1")+'">'+pp3(x.delta)+'</b></div>').join("")+'</div></details></section>';
 }
 function officialOctoberRadar(){
- const norm=v=>String(v||"").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/\\s+/g,"").toUpperCase();
+ const norm=v=>String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\\s+/g,"").toUpperCase();
  const previous=new Map((EX.septemberRegions||[]).map(x=>[norm(x.regional),x]));
  const rows=(EX.octoberRegions||[]).map(x=>{const old=previous.get(norm(x.regional));if(!old)return null;return {name:x.regional,prior:Number(old.share),current:Number(x.share),captured:Number(x.captured),delta:Number(x.share)-Number(old.share)};}).filter(x=>x&&Number.isFinite(x.delta)).sort((a,b)=>a.delta-b.delta);
  const ce=rows.find(x=>norm(x.name)==="CE+PI"),cutoff=rows[4]?.delta;
@@ -437,7 +437,7 @@ function executiveAreaDispersal(){
  for(const store of stores)for(const x of store.rows||[]){
   const id=String(x.id||x.matricula||x.name||""),st=String(x.st||store.st||store.store||"");
   if(!id||seen.has(st+"|"+id))continue;seen.add(st+"|"+id);
-  const role=String(x.cargo||x.role||"").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").toLowerCase();
+  const role=String(x.cargo||x.role||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
   const area=/caixa|atendimento|balcao|balcoes|servic|solucoes|credi|financeir|administrativ/.test(role)?"Caixa / Atendimento":"Operações";
   if(Number(x.c)>0)areas[area].sold++;else areas[area].zero++;
  }
