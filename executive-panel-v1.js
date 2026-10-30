@@ -397,6 +397,20 @@ function incompleteMonthlyRadar(){
  const pct=x=>(x*100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+"%";
  return '<section class="execSectionV1 execRadarV4"><div class="execSectionHeadV2"><h3>RADAR COMPETITIVO | OUTUBRO x SETEMBRO</h3><span class="execTinyV2">Amostra semanal, não fechamento mensal</span></div><div class="execRadarGridV4"><div><small>SETEMBRO CE+PI</small><strong>'+pct(me.before)+'</strong></div><div><small>OUTUBRO OFICIAL CE+PI</small><strong>'+(official!=null?pct(Number(official)):"—")+'</strong></div><div><small>DESVIO OFICIAL CE+PI</small><strong>'+(official!=null?pp3(Number(official)-me.before):"—")+'</strong></div><div><small>AMOSTRA COMPETITIVA</small><strong>'+sharedWeeks.length+' semanas</strong></div></div><p class="execTinyV2">As posições abaixo comparam apenas as semanas com 21 regionais válidas. Não equivalem ao ranking mensal acumulado.</p><details class="execRadarDetailsV4"><summary>Ver evolução das 21 regionais na amostra ▾</summary><div class="execRadarRankV4">'+rows.map((x,i)=>'<div><span>'+(i+1)+'º • '+e(x.name)+'</span><b class="'+(x.delta<0?"execDangerV1":"execSuccessV1")+'">'+pp3(x.delta)+'</b></div>').join("")+'</div></details></section>';
 }
+function officialOctoberRadar(){
+ const norm=v=>String(v||"").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/\\s+/g,"").toUpperCase();
+ const previous=new Map((EX.septemberRegions||[]).map(x=>[norm(x.regional),x]));
+ const rows=(EX.octoberRegions||[]).map(x=>{const old=previous.get(norm(x.regional));if(!old)return null;return {name:x.regional,prior:Number(old.share),current:Number(x.share),captured:Number(x.captured),delta:Number(x.share)-Number(old.share)};}).filter(x=>x&&Number.isFinite(x.delta)).sort((a,b)=>a.delta-b.delta);
+ const ce=rows.find(x=>norm(x.name)==="CE+PI"),cutoff=rows[4]?.delta;
+ if(rows.length<21||!ce)return incompleteMonthlyRadar();
+ const rank=rows.indexOf(ce)+1;
+ const fmt=x=>(x*100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+"%";
+ const pp3=x=>(x>0?"+":"")+(x*100).toLocaleString("pt-BR",{minimumFractionDigits:3,maximumFractionDigits:3})+" p.p.";
+ const distance=cutoff==null?null:Math.max(0,cutoff-ce.delta);
+ const sales=ce.current>0?ce.captured/ce.current:null;
+ const needed=distance>0&&sales>0?(ce.prior+cutoff+0.0000001)*sales-ce.captured:0;
+ return '<section class="execSectionV1 execRadarV4"><div class="execSectionHeadV2"><h3>RADAR COMPETITIVO | SHARE MENSAL</h3><span class="execTinyV2">Setembro fechado × outubro até '+e(dia(EX.octoberThrough))+'</span></div><div class="execRadarGridV4"><div><small>SETEMBRO CE+PI</small><strong>'+fmt(ce.prior)+'</strong></div><div><small>OUTUBRO CE+PI</small><strong>'+fmt(ce.current)+'</strong></div><div><small>EVOLUÇÃO</small><strong class="'+(ce.delta<0?"execDangerV1":"execSuccessV1")+'">'+pp3(ce.delta)+'</strong></div><div><small>POSIÇÃO POR MENOR EVOLUÇÃO</small><strong>'+rank+'º / 21</strong></div></div><div class="execRadarActionV4 '+(rank>5?"ok":"danger")+'"><strong>'+(rank>5?"CE+PI fora das cinco menores evoluções":"CE+PI na zona de priorização")+'</strong><span>Distância para superar a linha de corte: '+(distance==null?"—":pp3(distance))+' • Captação adicional teórica: '+money2(needed)+'</span></div><div class="execRadarTopV5"><strong>5 REGIONAIS COM MENOR EVOLUÇÃO</strong><div class="execRadarRankV4">'+rows.slice(0,5).map((x,i)=>'<div><span>'+(i+1)+'º • '+e(x.name)+'</span><b class="'+(x.delta<0?"execDangerV1":"execSuccessV1")+'">'+pp3(x.delta)+'</b></div>').join("")+'</div></div><details class="execRadarDetailsV4"><summary>Ver ranking das 21 regionais ▾</summary><div class="execRadarRankV4">'+rows.map((x,i)=>'<div><span>'+(i+1)+'º • '+e(x.name)+'</span><b>'+pp3(x.delta)+'</b></div>').join("")+'</div></details><p class="execTinyV2">Comparativo parcial de outubro com setembro fechado. O valor adicional é cenário teórico com denominador constante, não projeção de vendas.</p></section>';
+}
 function competitivePeriodRadar(period){
  const label=period==="month"?"MENSAL":"DIÁRIO";
  const current=latestDate(), previous=new Date(current+"T12:00:00Z");
@@ -404,6 +418,7 @@ function competitivePeriodRadar(period){
  const past=period==="month"?(current.slice(0,7)+"-01"):(previous.toISOString().slice(0,10));
  const ref=period==="month"?(new Date(new Date(past+"T12:00:00Z").setUTCDate(0))).toISOString().slice(0,10):past;
  const data=EX.data?.competitive_periods?.[period]||[];
+ if(period==="month"&&EX.octoberRegions?.length>=21&&EX.septemberRegions?.length>=21)return officialOctoberRadar();
  if(period==="month"&&!data.length){return incompleteMonthlyRadar();}
  const baseline=period==="month"&&ref==="2026-09-30"?(EX.septemberRegions||[]).map(x=>({...x,period_end:ref})):[];
  const latest=data.filter(x=>x.period_end===current),old=[...data.filter(x=>x.period_end===ref),...baseline];
@@ -524,6 +539,7 @@ async function loadExecutiveV1(){
   if(db.status==="rejected")throw db.reason;
   EX.data=db.value;
   if(!EX.septemberRegions){try{const response=await fetch("./data/radar-regional-setembro-2026.json",{cache:"no-store"});if(response.ok){const json=await response.json();EX.septemberRegions=Array.isArray(json.regions)?json.regions:[]}}catch(err){console.warn("Histórico setembro indisponível",err)}}
+  try{const response=await fetch("./data/radar-regional-outubro-2026-10-29.json",{cache:"no-store"});if(response.ok){const json=await response.json();EX.octoberRegions=json?.regions||[];EX.octoberThrough=json?.through||""}}catch(err){console.warn("Histórico outubro indisponível",err)}
   EX.fca=fca.status==="fulfilled"?fca.value:null;
   EX.ranking=ranking.status==="fulfilled"?ranking.value:null;
   EX.highlight=highlights.status==="fulfilled"?highlights.value:null;
