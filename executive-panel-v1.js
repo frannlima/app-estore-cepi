@@ -110,9 +110,11 @@ function officialShareRows(){
    byStore.set(x.st,old);
   }
  }
- const month=EX.data?.official_months?.find(x=>x.month===date.slice(0,7)&&x.through>=bounds.end_date);
+ const month=EX.data?.official_months?.find(x=>x.month===date.slice(0,7)&&x.through===bounds.end_date);
+ const weekRows=EX.period==="week"?(EX.data?.official_weeks||[]).filter(x=>x.week_start===bounds.start_date&&x.week_end===bounds.end_date):[];
+ const officialWeek=new Map(weekRows.map(x=>[String(x.store_code||"").padStart(3,"0"),x.share]));
  return [...byStore.values()].map(x=>{
-  const official=EX.period==="month"?month?.stores?.[x.st]:null;
+  const official=EX.period==="month"?month?.stores?.[x.st]:EX.period==="week"?officialWeek.get(x.st):null;
   const share=official!=null&&Number.isFinite(Number(official))?Number(official):x.valid&&x.sales>0?x.c/x.sales:null;
   return {...x,share};
  });
