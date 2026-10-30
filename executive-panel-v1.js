@@ -279,7 +279,7 @@ function drawChart(rows){
  });
  const pts=rows.map((r,i)=>r.share==null?null:{x:25+i*step+step/2,y:65+105*(1-Math.min(1,n(r.share)/Math.max(.0001,...rows.map(t=>n(t.share))))),share:r.share}).filter(Boolean);
  if(pts.length){svg+='<polyline points="'+pts.map(p=>p.x+','+p.y).join(' ')+'" fill="none" stroke="#BFA66A" stroke-width="3"/>';
- pts.forEach(p=>{svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="4" fill="#BFA66A" stroke="#fff" stroke-width="1.5"/><text x="'+p.x+'" y="'+(p.y-10)+'" text-anchor="middle" font-size="11" fill="#786234">'+(p.share*100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+'%</text>'});}
+ pts.forEach(p=>{const index=Math.round((p.x-25)/step-.5),r=rows[index],barTop=r?base-n(r.captured)/max*155:0;const above=Math.abs((p.y-10)-(barTop-10))<19;svg+='<circle cx="'+p.x+'" cy="'+p.y+'" r="4" fill="#BFA66A" stroke="#fff" stroke-width="1.5"/><text x="'+p.x+'" y="'+(above?p.y+17:p.y-13)+'" text-anchor="middle" font-size="11" fill="#786234">'+(p.share*100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+'%</text>'});}
  return svg+'</svg><p class="execTinyV2">Valores financeiros sem abreviação. Vermelho: queda acima de 25% em relação ao intervalo anterior. Linha: share semanal oficial CE+PI; ▲/▼ compara com a média empresa da mesma referência. Sem valor oficial, não se estima share.</p>';
 }
 function dailyStoreChart(rows){
