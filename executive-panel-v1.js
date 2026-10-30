@@ -170,8 +170,8 @@ function opportunities(){
    const h=history.get(st);
    // Exigir sete dias observados e pelo menos uma captação: sem dados, não inventar ticket.
    if(!h||h.observed<4||h.orders<=0){zero.missing++;missingEstimates++;continue}
-   const ticket=h.captured/h.orders,ordersPerDay=h.orders/h.observed;
-   zero.potential+=ordersPerDay*ticket;
+   const averageDailyCapture=h.captured/h.observed;
+   zero.potential+=averageDailyCapture;
   }
  }
  const complete=daysMissing.length===0&&incompleteDays.length===0&&daysCovered===allDates.length&&daysCovered>0&&validStoreDays===daysCovered*STORES.length;
