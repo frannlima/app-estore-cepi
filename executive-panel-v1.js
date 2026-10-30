@@ -362,7 +362,8 @@ function competitivePeriodRadar(period){
  const past=period==="month"?(current.slice(0,7)+"-01"):(previous.toISOString().slice(0,10));
  const ref=period==="month"?(new Date(new Date(past+"T12:00:00Z").setUTCDate(0))).toISOString().slice(0,10):past;
  const data=EX.data?.competitive_periods?.[period]||[];
- const latest=data.filter(x=>x.period_end===current),old=data.filter(x=>x.period_end===ref);
+ const baseline=period==="month"&&ref==="2026-09-30"?(EX.septemberRegions||[]).map(x=>({...x,period_end:ref})):[];
+ const latest=data.filter(x=>x.period_end===current),old=[...data.filter(x=>x.period_end===ref),...baseline];
  const before=new Map(old.map(x=>[String(x.regional),x]));
  const rows=latest.filter(x=>before.has(String(x.regional))).map(x=>({regional:String(x.regional),share:Number(x.share),prev:Number(before.get(String(x.regional)).share),delta:Number(x.share)-Number(before.get(String(x.regional)).share)})).filter(x=>Number.isFinite(x.delta)).sort((a,b)=>a.delta-b.delta);
  const fmt=v=>(v*100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+"%";
@@ -461,6 +462,7 @@ async function loadExecutiveV1(){
   ]);
   if(db.status==="rejected")throw db.reason;
   EX.data=db.value;
+  if(!EX.septemberRegions){try{const response=await fetch("./data/radar-regional-setembro-2026.json",{cache:"no-store"});if(response.ok){const json=await response.json();EX.septemberRegions=Array.isArray(json.regions)?json.regions:[]}}catch(err){console.warn("Histórico setembro indisponível",err)}}
   EX.fca=fca.status==="fulfilled"?fca.value:null;
   EX.ranking=ranking.status==="fulfilled"?ranking.value:null;
   EX.highlight=highlights.status==="fulfilled"?highlights.value:null;
