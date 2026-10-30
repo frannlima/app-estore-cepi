@@ -175,12 +175,13 @@ function opportunities(){
  const complete=daysMissing.length===0&&incompleteDays.length===0&&daysCovered===allDates.length&&daysCovered>0;
  const official=matchBenchmark()?.regional_captured;
  const regionalCaptured=official!=null&&Number.isFinite(Number(official))&&Number(official)>0?Number(official):(complete&&regionCaptured>0?regionCaptured:null);
+ const potential=missingEstimates===0&&daysCovered>0?[...byStore.values()].reduce((sum,x)=>sum+x.potential,0):null;
+ const denominator=potential!=null&&regionalCaptured!=null?regionalCaptured+potential:null;
  const zeros=[...byStore.values()].map(x=>{
-  const potential=x.missing?null:x.potential;
-  return {...x,potential,impact:potential!=null&&regionalCaptured!=null&&regionalCaptured+potential>0?potential/(regionalCaptured+potential):null};
+  const storePotential=x.missing?null:x.potential;
+  return {...x,potential:storePotential,impact:storePotential!=null&&denominator>0?storePotential/denominator:null};
  }).sort((a,b)=>b.days-a.days||(b.potential??0)-(a.potential??0)||a.st.localeCompare(b.st));
- const potential=missingEstimates===0&&daysCovered>0?zeros.reduce((sum,x)=>sum+x.potential,0):null;
- const ratio=potential!=null&&regionalCaptured!=null&&regionalCaptured+potential>0?potential/(regionalCaptured+potential):null;
+ const ratio=denominator>0?potential/denominator:null;
  const missing=EX.period==="day"?STORES.filter(st=>!daily.get(end)?.stores?.some(x=>String(x.st||"").padStart(3,"0")===st)):[];
  return {zeros,missing,potential,ratio,regionalCaptured,daysCovered,daysExpected:allDates.length,
   zeroDays,complete,missingEstimates,missingGoals:missingEstimates,daysMissing,incompleteDays};
