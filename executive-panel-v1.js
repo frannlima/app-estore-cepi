@@ -431,7 +431,7 @@ function competitivePeriodRadar(period){
 }
 function executiveAreaDispersal(){
  const stores=EX.team?.stores||[];
- if(!stores.length)return '<section class="execSectionV1"><h3>DISPERSÃO REGIONAL POR ÁREAS</h3><p class="execHelpV1">Aguardando a base oficial de colaboradores do Meu Time para '+(EX.period==="day"?"D-1":EX.period==="week"?"semana":"mês")+'. Não serão estimados colaboradores sem venda.</p></section>';
+ if(!stores.length)return '<section class="execSectionV1"><h3>DISPERSÃO REGIONAL POR ÁREAS</h3><p class="execHelpV1">Dados do Meu Time indisponíveis ('+e(EX.teamError||'sem retorno')+'). Período: '+(EX.period==="day"?"D-1":EX.period==="week"?"semana":"mês")+'. Não serão estimados colaboradores sem venda.</p></section>';
  const areas={"Operações":{zero:0,sold:0},"Caixa / Atendimento":{zero:0,sold:0}};
  const seen=new Set();
  for(const store of stores)for(const x of store.rows||[]){
@@ -534,7 +534,7 @@ async function loadExecutiveV1(){
    (typeof api==="function"?api({action:"fca_dashboard",matricula:id}):Promise.reject(Error("FCA indisponível"))),
    (typeof api==="function"?api({action:"ranking_period",matricula:id,period:EX.period,month:EX.period==="month"?currentAsOf().slice(0,7):undefined,store:w.U?.u?.st}):Promise.reject(Error("Ranking indisponível"))),
    (typeof api==="function"?api({action:"supervisor_highlights",matricula:id,period:EX.period}):Promise.reject(Error("Destaques indisponíveis"))),
-   (typeof api==="function"?api({action:"team_period",matricula:id,period:EX.period,store:w.U?.u?.st}):Promise.reject(Error("Meu Time indisponível")))
+   (typeof api==="function"?api({action:"team_period",matricula:id,period:EX.period,store:STORES[0],reference_date:latestDate()}):Promise.reject(Error("Meu Time indisponível")))
   ]);
   if(db.status==="rejected")throw db.reason;
   EX.data=db.value;
@@ -543,7 +543,8 @@ async function loadExecutiveV1(){
   EX.fca=fca.status==="fulfilled"?fca.value:null;
   EX.ranking=ranking.status==="fulfilled"?ranking.value:null;
   EX.highlight=highlights.status==="fulfilled"?highlights.value:null;
-  EX.team=team.status==="fulfilled"&&team.value?.ok&&team.value?.dataAvailable!==false?team.value:null;
+  EX.team=team.status==="fulfilled"&&Array.isArray(team.value?.stores)&&team.value.stores.length?team.value:null;
+  EX.teamError=team.status==="rejected"?String(team.reason):!EX.team?String(team.value?.error||"Sem base regional de colaboradores"):"";
   EX.date=null; // D-1 recalculado a cada consulta.
   render();
  }catch(err){EX.error=String(err.message||err);if(root)root.innerHTML='<div class="execErrorV1">Não foi possível obter o histórico do painel: '+e(EX.error)+' <button onclick="execRefreshV1()">Tentar novamente</button></div>'}
