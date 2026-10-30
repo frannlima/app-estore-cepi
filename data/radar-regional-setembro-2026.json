@@ -1,0 +1,90 @@
+{
+  "period": "2026-09",
+  "source": "Relatório gerencial setembro enviado",
+  "regions": [
+    {
+      "regional": "BA + SE",
+      "share": 0.0026550629775361086
+    },
+    {
+      "regional": "BRB",
+      "share": 0.003400654243855351
+    },
+    {
+      "regional": "CARTERS",
+      "share": 0.0073038242544804805
+    },
+    {
+      "regional": "CARTERS OUTLET",
+      "share": 0.004027263613198713
+    },
+    {
+      "regional": "CASA",
+      "share": 0.00364273314938509
+    },
+    {
+      "regional": "CE + PI",
+      "share": 0.0026882315541907273
+    },
+    {
+      "regional": "CPS",
+      "share": 0.0059468561067548735
+    },
+    {
+      "regional": "GO",
+      "share": 0.003966626541881522
+    },
+    {
+      "regional": "MAN",
+      "share": 0.0012867437329074712
+    },
+    {
+      "regional": "MG",
+      "share": 0.003180007441642353
+    },
+    {
+      "regional": "PA + MA",
+      "share": 0.0028921234845475
+    },
+    {
+      "regional": "PE + AL",
+      "share": 0.0027687166292964123
+    },
+    {
+      "regional": "PR + SC",
+      "share": 0.003321419526047665
+    },
+    {
+      "regional": "RIB",
+      "share": 0.005537245990902264
+    },
+    {
+      "regional": "RJ1",
+      "share": 0.0042550254487813965
+    },
+    {
+      "regional": "RJ2",
+      "share": 0.0032989004786456336
+    },
+    {
+      "regional": "RN + PB",
+      "share": 0.003793664362286747
+    },
+    {
+      "regional": "RS + SC",
+      "share": 0.002258326346459929
+    },
+    {
+      "regional": "SP1",
+      "share": 0.006859424290309209
+    },
+    {
+      "regional": "SP2",
+      "share": 0.006205908672626277
+    },
+    {
+      "regional": "SP3",
+      "share": 0.005282771384576142
+    }
+  ]
+}
