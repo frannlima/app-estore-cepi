@@ -125,21 +125,33 @@ function topRows(type){
  .sort((a,b)=>n(b[type])-n(a[type])||String(a.st).localeCompare(String(b.st))).slice(0,3);
 }
 function topCollaborators(){return (EX.ranking?.regional||[]).filter(x=>n(x.c)>0).sort((a,b)=>n(b.c)-n(a.c)).slice(0,3)}
-/* Indicadores de dispersão apurados exclusivamente com inputs oficiais e metas da data. */
+/* Zeragens: dias-filial reais e oportunidade baseada na entrega observada, nunca 1% da meta. */
 function opportunities(){
- const bounds=periodBounds(EX.period,latestDate());
- const start=bounds.start_date,end=bounds.end_date;
- const daily=new Map((EX.data?.daily||[]).filter(x=>x.date>=start&&x.date<=end).map(x=>[x.date,x]));
- const byStore=new Map(),incompleteDays=[],daysMissing=[],allDates=[];
- let regionCaptured=0,daysCovered=0,zeroDays=0,missingGoals=0;
- if(!start||!end)return {zeros:[],missing:[],potential:null,ratio:null,regionalCaptured:null,daysCovered:0,daysExpected:0,zeroDays:0,complete:false};
+ const bounds=periodBounds(EX.period,latestDate()),start=bounds.start_date,end=bounds.end_date;
+ const entries=(EX.data?.daily||[]).filter(x=>x.date<=end).sort((a,b)=>a.date.localeCompare(b.date));
+ const daily=new Map(entries.filter(x=>x.date>=start).map(x=>[x.date,x]));
+ const byStore=new Map(),incompleteDays=[],daysMissing=[],allDates=[],history=new Map();
+ let regionCaptured=0,daysCovered=0,zeroDays=0,missingEstimates=0;
+ if(!start||!end)return {zeros:[],missing:[],potential:null,ratio:null,regionalCaptured:null,daysCovered:0,daysExpected:0,zeroDays:0,complete:false,missingEstimates:0};
+ // Média conservadora: pedidos/dia observado (inclusive dias zerados) × ticket histórico real.
+ // Janela de 42 dias anteriores ao início; nenhuma meta ou share presumido no cálculo.
+ const lookback=new Date(start+"T12:00:00Z");lookback.setUTCDate(lookback.getUTCDate()-42);
+ const historyStart=lookback.toISOString().slice(0,10);
+ for(const day of entries.filter(d=>d.date>=historyStart&&d.date<start)){
+  for(const x of day.stores||[]){
+   const st=String(x.st||"").padStart(3,"0"),c=Number(x.c),o=Number(x.o);
+   if(!STORES.includes(st)||!Number.isFinite(c)||!Number.isFinite(o)||c<0||o<0)continue;
+   const v=history.get(st)||{observed:0,captured:0,orders:0,activeDays:0};
+   v.observed++;v.captured+=c;v.orders+=o;if(o>0)v.activeDays++;
+   history.set(st,v);
+  }
+ }
  const cursor=new Date(start+"T12:00:00Z"),last=new Date(end+"T12:00:00Z");
  for(let count=0;cursor<=last&&count<35;count++,cursor.setUTCDate(cursor.getUTCDate()+1)){
   const date=cursor.toISOString().slice(0,10);allDates.push(date);
   const entry=daily.get(date);
   if(!entry){daysMissing.push(date);continue}
-  const stores=new Map((entry.stores||[]).filter(x=>STORES.includes(String(x.st||"").padStart(3,"0")))
-   .map(x=>[String(x.st).padStart(3,"0"),x]));
+  const stores=new Map((entry.stores||[]).filter(x=>STORES.includes(String(x.st||"").padStart(3,"0"))).map(x=>[String(x.st).padStart(3,"0"),x]));
   if(stores.size!==STORES.length)incompleteDays.push(date);
   daysCovered++;
   for(const [st,item] of stores){
@@ -151,30 +163,27 @@ function opportunities(){
    regionCaptured+=captured;
    if(captured!==0||orders!==0)continue;
    let zero=byStore.get(st);
-   if(!zero){zero={st,days:0,potential:0,goalsComplete:true,dates:[]};byStore.set(st,zero)}
-   zero.days++;
-   zero.dates.push(date);
-   zeroDays++;
-   // "target" vem exclusivamente da meta eStore da filial na data, nunca de aproximações.
-   const goal=item.target;
-   if(goal==null||!Number.isFinite(Number(goal))||Number(goal)<0){
-    zero.goalsComplete=false;missingGoals++;
-   }else zero.potential+=Number(goal);
+   if(!zero){zero={st,days:0,potential:0,missing:0,dates:[]};byStore.set(st,zero)}
+   zero.days++;zero.dates.push(date);zeroDays++;
+   const h=history.get(st);
+   // Exigir sete dias observados e pelo menos uma captação: sem dados, não inventar ticket.
+   if(!h||h.observed<7||h.orders<=0){zero.missing++;missingEstimates++;continue}
+   const ticket=h.captured/h.orders,ordersPerDay=h.orders/h.observed;
+   zero.potential+=ordersPerDay*ticket;
   }
  }
  const complete=daysMissing.length===0&&incompleteDays.length===0&&daysCovered===allDates.length&&daysCovered>0;
  const official=matchBenchmark()?.regional_captured;
- const regionalCaptured=official!=null&&Number.isFinite(Number(official))&&Number(official)>0
-  ?Number(official):(complete&&regionCaptured>0?regionCaptured:null);
+ const regionalCaptured=official!=null&&Number.isFinite(Number(official))&&Number(official)>0?Number(official):(complete&&regionCaptured>0?regionCaptured:null);
  const zeros=[...byStore.values()].map(x=>{
-  const potential=x.goalsComplete?x.potential:null;
-  return {...x,potential,impact:potential!=null&&regionalCaptured>0?potential/regionalCaptured:null};
+  const potential=x.missing?null:x.potential;
+  return {...x,potential,impact:potential!=null&&regionalCaptured!=null&&regionalCaptured+potential>0?potential/(regionalCaptured+potential):null};
  }).sort((a,b)=>b.days-a.days||(b.potential??0)-(a.potential??0)||a.st.localeCompare(b.st));
- const potential=missingGoals===0&&daysCovered>0?zeros.reduce((sum,x)=>sum+x.potential,0):null;
- const ratio=potential!=null&&regionalCaptured>0?potential/regionalCaptured:null;
+ const potential=missingEstimates===0&&daysCovered>0?zeros.reduce((sum,x)=>sum+x.potential,0):null;
+ const ratio=potential!=null&&regionalCaptured!=null&&regionalCaptured+potential>0?potential/(regionalCaptured+potential):null;
  const missing=EX.period==="day"?STORES.filter(st=>!daily.get(end)?.stores?.some(x=>String(x.st||"").padStart(3,"0")===st)):[];
  return {zeros,missing,potential,ratio,regionalCaptured,daysCovered,daysExpected:allDates.length,
-  zeroDays,complete,missingGoals,daysMissing,incompleteDays};
+  zeroDays,complete,missingEstimates,missingGoals:missingEstimates,daysMissing,incompleteDays};
 }
 function shareMovements(){
  const ref=latestDate(),p=EX.period,valid=x=>x&&STORES.includes(String(x.st||"").padStart(3,"0"))&&x.share_delta!=null&&Number.isFinite(Number(x.share_delta));
@@ -368,9 +377,9 @@ function render(){
  const zeroCard='<div class="execZeroV1 execZeroPeriodV3"><h4>'+(daily?'LOJAS ZERADAS NO DIA':'LOJAS COM ZERAGEM NO PERÍODO')+'</h4>'+
  '<strong class="execNumBigV2">'+(opp.daysCovered?opp.zeros.length:'—')+'</strong>'+
  '<small>'+(daily?'Com captação igual a zero':opp.zeroDays+' dia(s) de zeragem de vendas nas filiais')+'</small>'+
- '<div class="execZeroStatsV2"><span>Potencial dispersão (R$)</span><b>'+money2(opp.potential)+'</b>'+
- '<span>Impacto na regional (%)</span><b>'+percent(opp.ratio)+'</b></div>'+
- (!opp.complete||opp.missingGoals?'<p class="execTinyV2 execZeroWarningV3">Apuração '+opp.daysCovered+'/'+opp.daysExpected+' dias'+(opp.missingGoals?' • meta de '+opp.missingGoals+' zeragem(ns) indisponível':'')+'. Valores indisponíveis não foram estimados.</p>':'')+
+ '<div class="execZeroStatsV2"><span>Oportunidade estimada (R$)</span><b>'+money2(opp.potential)+'</b>'+
+ '<span>Parcela do potencial (%)</span><b>'+percent(opp.ratio)+'</b></div>'+
+ (!opp.complete||opp.missingGoals?'<p class="execTinyV2 execZeroWarningV3">Apuração '+opp.daysCovered+'/'+opp.daysExpected+' dias'+(opp.missingGoals?' • histórico insuficiente em '+opp.missingEstimates+' dia(s)-filial':'')+'. Valores indisponíveis não foram estimados.</p>':'')+
  '</div>';
  const rightCard='<div class="execPriorityV1 execZeroStoresV3"><h4>'+(daily?'LOJAS SEM CAPTAÇÃO DE VENDA NO DIA':'LOJAS COM ZERAGEM DE VENDAS NO PERÍODO')+'</h4>'+
  (daily?'<div class="execZeroHeadV3"><span>Filial</span><span>Situação</span></div>':
@@ -379,7 +388,7 @@ function render(){
  (daily?'<strong class="execDangerV1">ZERADA</strong>':'<b>'+x.days+' dia'+(x.days===1?'':'s')+'</b><strong class="execDangerV1">'+percent(x.impact)+'</strong>')+
  '</div>').join("")+'</div>':
  '<div class="execHelpV1">'+(opp.daysCovered?'Nenhuma filial com zeragem registrada no período.':'Aguardando registros oficiais do período.')+'</div>')+
- '<small class="execTinyV2">Impacto regional = potencial dos dias zerados ÷ captação CE+PI no intervalo. Filiais sem registro não são classificadas como zeradas.</small></div>';
+ '<small class="execTinyV2">Estimativa = média de pedidos por dia observado × ticket médio real de cada filial (42 dias anteriores). Parcela potencial = oportunidade ÷ (captação real + oportunidade). Dias sem registro não são zeragens.</small></div>';
  const moves=shareMovements();
  const lines=(list,cls)=>list.length?list.map(x=>'<div class="execMoveRowV188"><strong>L'+e(x.st)+'</strong><b class="'+cls+'">'+pp(x.delta)+'</b></div>').join(""):'<div class="execHelpV1">Nenhuma filial neste critério.</div>';
  const movementPanel=daily?"":'<section class="execSectionV1"><div class="execSectionHeadV2"><h3>EVOLUÇÃO DO SHARE | '+(EX.period==="week"?"SEMANA":"MÊS")+'</h3><span class="execTinyV2">'+e(moves.source)+'</span></div>'+
