@@ -1,0 +1,133 @@
+{
+  "month": "2026-10",
+  "through": "2026-10-29",
+  "source": "data (7)(1).xlsx",
+  "regions": [
+    {
+      "regional": "BA + SE",
+      "captured": 105167.41,
+      "orders": 640,
+      "share": 0.003087612327442888
+    },
+    {
+      "regional": "BRB",
+      "captured": 123542.875,
+      "orders": 660,
+      "share": 0.004755092402961957
+    },
+    {
+      "regional": "CARTERS",
+      "captured": 244886.862,
+      "orders": 959,
+      "share": 0.009074830175295085
+    },
+    {
+      "regional": "CARTERS OUTLET",
+      "captured": 18944.42,
+      "orders": 43,
+      "share": 0.005294481272903699
+    },
+    {
+      "regional": "CASA",
+      "captured": 26556.466,
+      "orders": 69,
+      "share": 0.003706119863186365
+    },
+    {
+      "regional": "CE + PI",
+      "captured": 100503.23,
+      "orders": 664,
+      "share": 0.0028694319926359938
+    },
+    {
+      "regional": "CPS",
+      "captured": 161793.57,
+      "orders": 971,
+      "share": 0.005165598517268718
+    },
+    {
+      "regional": "GO",
+      "captured": 94580.425,
+      "orders": 490,
+      "share": 0.0033145975630958363
+    },
+    {
+      "regional": "MAN",
+      "captured": 42946.61,
+      "orders": 258,
+      "share": 0.0015806705754027074
+    },
+    {
+      "regional": "MG",
+      "captured": 125105.06,
+      "orders": 757,
+      "share": 0.0031352210580530846
+    },
+    {
+      "regional": "PA + MA",
+      "captured": 83031.37,
+      "orders": 448,
+      "share": 0.0024425921211014613
+    },
+    {
+      "regional": "PE + AL",
+      "captured": 108447.05,
+      "orders": 703,
+      "share": 0.0029441424348277973
+    },
+    {
+      "regional": "PR + SC",
+      "captured": 126820.95,
+      "orders": 702,
+      "share": 0.0038664397897524784
+    },
+    {
+      "regional": "RIB",
+      "captured": 141532.39,
+      "orders": 822,
+      "share": 0.006229220985357064
+    },
+    {
+      "regional": "RJ1",
+      "captured": 191470.42,
+      "orders": 1083,
+      "share": 0.005036426669707923
+    },
+    {
+      "regional": "RJ2",
+      "captured": 86228.82,
+      "orders": 466,
+      "share": 0.002826717342328089
+    },
+    {
+      "regional": "RN + PB",
+      "captured": 93944.696,
+      "orders": 538,
+      "share": 0.002730724606725292
+    },
+    {
+      "regional": "RS + SC",
+      "captured": 65473.05,
+      "orders": 379,
+      "share": 0.0024261037498018103
+    },
+    {
+      "regional": "SP1",
+      "captured": 177942.5,
+      "orders": 1005,
+      "share": 0.006402985347204192
+    },
+    {
+      "regional": "SP2",
+      "captured": 212733.93,
+      "orders": 1266,
+      "share": 0.006801601443204309
+    },
+    {
+      "regional": "SP3",
+      "captured": 154097.86,
+      "orders": 966,
+      "share": 0.006348006774195883
+    }
+  ]
+}
