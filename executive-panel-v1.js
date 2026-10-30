@@ -371,21 +371,31 @@ function competitiveRadar(){
 }
 
 function incompleteMonthlyRadar(){
- const records=(EX.data?.competitive_weeks||[]).filter(x=>String(x.week_start||"").slice(0,7)===latestDate().slice(0,7));
- const names=x=>String(x||"").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/\\s+/g,"").toUpperCase();
- const groups=new Map();
- for(const x of records){
-  const key=names(x.regional),c=Number(x.captured),sh=Number(x.share);
-  if(!key||!Number.isFinite(c)||!Number.isFinite(sh)||sh<=0||c<0)continue;
-  const previous=groups.get(key)||{name:x.regional,c:0,denominator:0,weeks:new Set()};
-  if(previous.weeks.has(x.week_start))continue;
-  previous.weeks.add(x.week_start);previous.c+=c;previous.denominator+=c/sh;groups.set(key,previous);
+ const canon=x=>String(x||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/\s+/g,"").toUpperCase();
+ const now=latestDate(),month=now.slice(0,7);
+ const previous=new Map((EX.septemberRegions||[]).map(x=>[canon(x.regional),x]));
+ const weekly=(EX.data?.competitive_weeks||[]).filter(x=>String(x.week_start||"").slice(0,7)===month&&String(x.week_start)<=now);
+ const byRegion=new Map(),weeks=new Map();
+ for(const x of weekly){
+  const key=canon(x.regional),c=Number(x.captured),sh=Number(x.share),day=String(x.week_start||"");
+  if(!key||!previous.has(key)||!Number.isFinite(c)||c<0||!Number.isFinite(sh)||sh<=0)continue;
+  if(!weeks.has(day))weeks.set(day,new Set());weeks.get(day).add(key);
+  if(!byRegion.has(key))byRegion.set(key,{name:x.regional,parts:new Map()});
+  byRegion.get(key).parts.set(day,{captured:c,denominator:c/sh});
  }
- const count=groups.size,cepi=groups.get("CE+PI")||groups.get("CEPI");
- const previous=(EX.septemberRegions||[]).find(x=>names(x.regional)==="CE+PI");
- if(count<21||!cepi||!previous)return '<section class="execSectionV1 execRadarV4"><div class="execSectionHeadV2"><h3>RADAR COMPETITIVO | SHARE MENSAL</h3></div><p class="execHelpV1">Aguardando o consolidado gerencial oficial de outubro para as 21 regionais. O histórico semanal parcial não substitui o mês.</p></section>';
- const weeks=[...new Set(records.map(x=>x.week_start))].sort(),value=cepi.denominator?cepi.c/cepi.denominator:null;
- return '<section class="execSectionV1 execRadarV4"><div class="execSectionHeadV2"><h3>RADAR COMPETITIVO | SHARE MENSAL</h3><span class="execTinyV2">Comparativo parcial • outubro x setembro</span></div><div class="execRadarGridV4"><div><small>SETEMBRO • CE+PI</small><strong>'+percent(previous.share)+'</strong></div><div><small>OUTUBRO • AMOSTRA</small><strong>'+percent(value)+'</strong></div><div><small>EVOLUÇÃO AMOSTRAL</small><strong>'+pp(value-Number(previous.share))+'</strong></div><div><small>COBERTURA</small><strong>'+weeks.length+' semanas</strong></div></div><p class="execNoticeV2">Amostra de '+weeks.length+' semanas com 21 regionais. Sem cobertura integral do mês, não há ranking mensal definitivo nem cálculo de priorização. O share parcial é ponderado pelo denominador informado nos relatórios semanais.</p></section>';
+ const sharedWeeks=[...weeks].filter(([_,set])=>set.size>=21).map(([day])=>day).sort();
+ const rows=[...byRegion].map(([key,x])=>{
+  const items=sharedWeeks.map(w=>x.parts.get(w)).filter(Boolean),c=items.reduce((a,b)=>a+b.captured,0),sales=items.reduce((a,b)=>a+b.denominator,0);
+  const before=Number(previous.get(key)?.share),share=sales>0?c/sales:null;
+  return {key,name:x.name,share,before,delta:share!=null?share-before:null};
+ }).filter(x=>x.delta!=null&&Number.isFinite(x.delta)).sort((a,b)=>a.delta-b.delta);
+ const me=rows.find(x=>x.key==="CE+PI"||x.key==="CEPI");
+ if(sharedWeeks.length===0||rows.length<21||!me)return '<section class="execSectionV1 execRadarV4"><h3>RADAR COMPETITIVO | SHARE MENSAL</h3><p class="execHelpV1">Setembro está registrado. Ainda faltam shares mensais de outubro das 21 regionais; os registros semanais disponíveis não formam uma comparação mensal completa.</p></section>';
+ const pp3=x=>(x>0?"+":"")+(x*100).toLocaleString("pt-BR",{maximumFractionDigits:3})+" p.p.";
+ const monthly=EX.data?.benchmarks?.filter(x=>x.period==="month"&&x.end_date===now).sort((a,b)=>String(b.updated_at||"").localeCompare(String(a.updated_at||"")))[0];
+ const official=monthly?.regional_share;
+ const pct=x=>(x*100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+"%";
+ return '<section class="execSectionV1 execRadarV4"><div class="execSectionHeadV2"><h3>RADAR COMPETITIVO | OUTUBRO x SETEMBRO</h3><span class="execTinyV2">Amostra semanal, não fechamento mensal</span></div><div class="execRadarGridV4"><div><small>SETEMBRO CE+PI</small><strong>'+pct(me.before)+'</strong></div><div><small>OUTUBRO OFICIAL CE+PI</small><strong>'+(official!=null?pct(Number(official)):"—")+'</strong></div><div><small>DESVIO OFICIAL CE+PI</small><strong>'+(official!=null?pp3(Number(official)-me.before):"—")+'</strong></div><div><small>AMOSTRA COMPETITIVA</small><strong>'+sharedWeeks.length+' semanas</strong></div></div><p class="execTinyV2">As posições abaixo comparam apenas as semanas com 21 regionais válidas. Não equivalem ao ranking mensal acumulado.</p><details class="execRadarDetailsV4"><summary>Ver evolução das 21 regionais na amostra ▾</summary><div class="execRadarRankV4">'+rows.map((x,i)=>'<div><span>'+(i+1)+'º • '+e(x.name)+'</span><b class="'+(x.delta<0?"execDangerV1":"execSuccessV1")+'">'+pp3(x.delta)+'</b></div>').join("")+'</div></details></section>';
 }
 function competitivePeriodRadar(period){
  const label=period==="month"?"MENSAL":"DIÁRIO";
@@ -517,7 +527,7 @@ async function loadExecutiveV1(){
   EX.fca=fca.status==="fulfilled"?fca.value:null;
   EX.ranking=ranking.status==="fulfilled"?ranking.value:null;
   EX.highlight=highlights.status==="fulfilled"?highlights.value:null;
-  EX.team=team.status==="fulfilled"?team.value:null;
+  EX.team=team.status==="fulfilled"&&team.value?.ok&&team.value?.dataAvailable!==false?team.value:null;
   EX.date=null; // D-1 recalculado a cada consulta.
   render();
  }catch(err){EX.error=String(err.message||err);if(root)root.innerHTML='<div class="execErrorV1">Não foi possível obter o histórico do painel: '+e(EX.error)+' <button onclick="execRefreshV1()">Tentar novamente</button></div>'}
