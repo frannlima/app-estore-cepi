@@ -96,7 +96,32 @@ function regionalData(){
  return {rows,strict,total,share,delta:null,benchmark:b};
 }
 function activeStores(){const day=dailyRows(latestDate());const r=regionalData();return EX.period==="day"?(day.length?day:r.rows):r.rows}
-function topRows(type){return [...activeStores()].sort((a,b)=>n(b[type])-n(a[type])||a.st.localeCompare(b.st)).filter(x=>type==="share"?x.share!=null:n(x[type])>0).slice(0,3)}
+function officialShareRows(){
+ const date=latestDate(),bounds=periodBounds(EX.period,date);
+ if(EX.period==="day")return dailyRows(date).map(x=>({...x,share:x.share==null?null:Number(x.share)}));
+ const byStore=new Map();
+ for(const d of (EX.data?.daily||[]).filter(x=>x.date>=bounds.start_date&&x.date<=bounds.end_date)){
+  for(const x of d.stores||[]){
+   if(!STORES.includes(String(x.st)))continue;
+   const old=byStore.get(x.st)||{st:x.st,c:0,o:0,sales:0,valid:false};
+   const captured=Number(x.c),share=x.share==null?NaN:Number(x.share);
+   old.c+=Number.isFinite(captured)?captured:0;old.o+=n(x.o);
+   if(Number.isFinite(share)&&share>0&&captured>=0){old.sales+=captured/share;old.valid=true}
+   byStore.set(x.st,old);
+  }
+ }
+ const month=EX.data?.official_months?.find(x=>x.month===date.slice(0,7)&&x.through>=bounds.end_date);
+ return [...byStore.values()].map(x=>{
+  const official=EX.period==="month"?month?.stores?.[x.st]:null;
+  const share=official!=null&&Number.isFinite(Number(official))?Number(official):x.valid&&x.sales>0?x.c/x.sales:null;
+  return {...x,share};
+ });
+}
+function topRows(type){
+ const rows=type==="share"?officialShareRows():activeStores();
+ return [...rows].filter(x=>type==="share"?(x.share!=null&&Number.isFinite(Number(x.share))&&Number(x.share)>=0):n(x[type])>0)
+ .sort((a,b)=>n(b[type])-n(a[type])||String(a.st).localeCompare(String(b.st))).slice(0,3);
+}
 function topCollaborators(){return (EX.ranking?.regional||[]).filter(x=>n(x.c)>0).sort((a,b)=>n(b.c)-n(a.c)).slice(0,3)}
 /* Indicadores de dispersão apurados exclusivamente com inputs oficiais e metas da data. */
 function opportunities(){
