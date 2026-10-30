@@ -217,7 +217,7 @@ function trendData(){
   entry.until=day.date;entry.coverage++;
   grouped.set(key,entry);
  }
- const weekly=(EX.data?.cepi_weekly||EX.data?.competitive_weeks||[]).filter(x=>/^(CE\\s*\\+\\s*PI|CEPI)$/i.test(String(x.regional||"").trim()));
+ const weekly=(EX.data?.cepi_weekly?.length?EX.data.cepi_weekly:EX.data?.competitive_weeks||[]).filter(x=>String(x.regional||"").replace(/\s+/g,"").toUpperCase()==="CE+PI"||String(x.regional||"").replace(/\s+/g,"").toUpperCase()==="CEPI");
  const benchmarks=(EX.data?.benchmarks||[]).filter(b=>b.period===(EX.period==="month"?"week":"day"));
  return [...grouped.entries()].sort((a,b)=>a[0].localeCompare(b[0])).map(([key,x])=>{
   const boundsStart=EX.period==="month"?key:x.date;
@@ -467,7 +467,7 @@ function render(){
  '<div class="execCompareV1"><div class="execCompareRowsV2">'+regionLine+companyLine+'</div><div class="execDiffV1"><b class="'+(gap!=null&&gap>=0?"execSuccessV1":"")+'">'+pp(gap)+'</b><small>Desvio vs empresa</small></div></div></section>'+
  competitiveRadar()+chart+
  '<section class="execSectionV1"><div class="execSectionHeadV2"><h3>DESTAQUES POR FILIAL</h3></div><div class="execTriGridV1">'+mini+'</div></section>'+
- '<section class="execPairV1">'+zeroCard+rightCard+'</section>'+ executiveAreaDispersal()+
+ '<section class="execPairV1 execPairFixedV1">'+zeroCard+rightCard+'</section>'+ executiveAreaDispersal()+
  movementPanel+podium+
  '<p class="execSourceV1">Fonte: Gerencial eStore / FCA'+(bench?" • Benchmark empresa importado":" • Empresa pendente")+' • '+dateText+'</p>'+
  '</div><footer class="execFootV1"><img src="'+logo+'" alt="Riachuelo"><span>Moda que inspira o Brasil</span></footer></div>';
