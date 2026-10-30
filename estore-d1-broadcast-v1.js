@@ -85,24 +85,33 @@ function render(){
  const cards=sorted.map(({p,i},position)=>{
   const group=priority(p);
   const riskHere=riskMap.has(String(p.store).padStart(3,'0'));
-  const groupHeader=position===0||priority(sorted[position-1].p)!==group?'<h3 class="dcPriority dcPriority'+group+'">'+priorityTitle(group)+'</h3>':'';
-  const reason=!p.active_store?"Loja fora da base ativa de resultados":
-    locked?"D-1 oficial ainda incompleto — envio bloqueado":
-    !p.ready?"Sem D-1 oficial ou meta do dia":
-    !p.phone?"Contato sem número validado para o WhatsApp":"Telefone vinculado • envio sujeito à sua confirmação";
-  const kind=p.category==="zero"?"🚨 Radar":p.category==="excellent"?"🏆 Acima de 0,30%":p.category==="contribution"?"🤝 Contribuição":"Aguardando D-1";
+  const groupCount=sorted.filter(x=>priority(x.p)===group).length;
+  const groupHeader=position===0||priority(sorted[position-1].p)!==group?'<h3 class="dcPriority dcPriority'+group+'"><span>'+priorityTitle(group).split(' • ')[0]+'</span><small>'+groupCount+' '+(groupCount===1?'supervisor':'supervisores')+' · '+priorityTitle(group).split(' • ').slice(1).join(' • ')+'</small></h3>':'';
   const canPrepare=!locked&&p.ready&&p.active_store;
   const canSend=canPrepare&&!!p.phone;
   const sendHelp=locked?"Complete o D-1 antes de preparar qualquer comunicado":
     !p.active_store?"Filial fora do escopo ativo":
     !p.ready?"Aguardando D-1 e metas oficiais":!p.phone?"Contato ainda não validado para compartilhamento":"Compartilhamento manual; confirme o destinatário";
-  return groupHeader+'<article class="dcPerson dcCategory'+group+'"><div class="dcName"><b>'+esc(p.name)+'</b><b class="dcStoreBadge '+(group===0?'dcBlink':'')+'">L'+esc(p.store)+'</b></div>'+
-   '<small>'+esc(kind)+' • '+esc(reason)+(riskHere?' • 🚨 RISCO SEMANAL — VER PLANO NO CARD':'')+'</small>'+
-   (p.ready?'<p>Captado: '+esc(money(p.captured))+' • Share: '+esc(pct(p.share))+' • Meta vendas hoje: '+esc(money(p.goal))+' • Meta pedidos hoje: '+esc(p.goal_orders)+'</p>':'')+
-   '<div class="dcBtns"><button data-view="'+i+'" '+(!canPrepare?"disabled":"")+'>Ver legenda</button>'+
-   '<button data-copy="'+i+'" '+(!canPrepare?"disabled":"")+'>Copiar mensagem</button>'+
-   '<button data-card="'+i+'" '+(!canPrepare?"disabled":"")+'>Gerar card</button>'+
-   '<button class="dcMain dcSend" data-send="'+i+'" '+(!canSend?'disabled title="'+esc(sendHelp)+'"':'title="Preparar card PNG e mensagem para compartilhar com este supervisor"')+'>📲 Preparar card + WhatsApp</button></div></article>';
+  const enrollment=p.matricula??p.registration??p.employee_id??p.employeeId??p.id??p.user_id??p.userId??"";
+  const cleanMat=String(enrollment).trim();
+  const role=String(p.role??p.cargo??p.position??"Supervisão").trim();
+  const title=group===0?"Prioridade máxima":group===1?"Atenção":"Reconhecimento";
+  return groupHeader+'<article class="dcPerson dcCategory'+group+'">'+
+   '<div class="dcName"><div class="dcIdentity"><b class="dcPersonName">'+esc(p.name)+'</b>'+
+   '<span class="dcPersonMeta">'+(cleanMat?'Mat. '+esc(cleanMat)+' · ':'')+esc(role)+'</span></div>'+
+   '<b class="dcStoreBadge">L'+esc(p.store)+'</b></div>'+
+   (p.ready?'<div class="dcKpis">'+
+     '<div class="dcKpi dcKpiAlert"><span>Captado</span><strong>'+esc(money(p.captured))+'</strong></div>'+
+     '<div class="dcKpi dcKpiAlert"><span>Share</span><strong>'+esc(pct(p.share))+'</strong></div>'+
+     '<div class="dcKpi"><span>Meta hoje</span><strong>'+esc(money(p.goal))+'</strong></div>'+
+     '<div class="dcKpi"><span>Pedidos</span><strong>'+esc(p.goal_orders)+'</strong></div>'+
+   '</div>':'<p class="dcPending">Dados oficiais ainda não disponíveis.</p>')+
+   (riskHere?'<span class="dcRiskChip">⚠ Risco semanal</span>':'')+
+   '<div class="dcActions"><div class="dcSecondaryActions">'+
+     '<button data-view="'+i+'" '+(!canPrepare?"disabled":"")+'>Legenda</button>'+
+     '<button data-copy="'+i+'" '+(!canPrepare?"disabled":"")+'>Copiar</button>'+
+     '<button data-card="'+i+'" '+(!canPrepare?"disabled":"")+'>Gerar card</button>'+
+   '</div><button class="dcMain dcSend" data-send="'+i+'" '+(!canSend?'disabled title="'+esc(sendHelp)+'"':'title="Preparar card PNG e mensagem para compartilhar com este supervisor"')+'>Enviar no WhatsApp</button></div></article>';
  }).join("");
  ID("dcBody").innerHTML='<p class="dcNote">'+esc(note)+'</p>'+
   weeklyPanel+'<div class="dcCount"><span><b>'+counts.total+'</b> supervisores</span><span><b>'+counts.prepared+'</b> prontos com dados</span><span><b>'+counts.contact_verified+'</b> contatos liberados</span><span><b>'+counts.outside_active_scope+'</b> fora do escopo ativo</span></div>'+
@@ -294,7 +303,30 @@ function makeUI(){
  " .dcPriority{margin:12px 0 0;padding:12px;border-radius:10px;font-size:13px}.dcPriority0{background:#ffe5e5;color:#9b1919}.dcPriority1{background:#fff0d5;color:#9b5300}.dcPriority2{background:#ddf8e8;color:#12653a}.dcStoreBadge{padding:4px 8px;border-radius:7px;background:#edf0ee}.dcBlink{background:#ca1c26;color:#fff;animation:dcPulse 1.1s infinite alternate}@keyframes dcPulse{to{box-shadow:0 0 14px #f22929;opacity:.7}}@media(prefers-reduced-motion:reduce){.dcBlink{animation:none}}",
  "#dcModal .dcRiskPanel{background:#fff1ef;border:1px solid #edaaa2;border-radius:11px;padding:12px;margin:12px 0;color:#77322b}#dcModal .dcRiskPanel h3{font-size:14px;margin:0 0 8px}#dcModal .dcRiskPanel p{font-size:12px;margin:0 0 8px}#dcModal .dcRiskRow{padding:7px 4px;border-top:1px solid #eed1ce;display:flex;flex-wrap:wrap;gap:7px 14px;font-size:12px}#dcModal .dcRiskRow b{font-size:14px;color:#a21c16}#dcModal .dcRiskInfo{background:#f5f2e8;border-color:#ded7ca;color:#365e4f}",
  "#dcStatus{font-size:12px;margin-top:10px}#dcPreview{width:100%;height:200px;font:13px/1.5 Arial;padding:10px;border:1px solid #b6c9be;border-radius:8px;white-space:pre-wrap}#dcPreview[hidden]{display:none}",
- "@media(max-width:500px){#dcModal{padding:13px}.dcBtns button{flex:1;font-size:11px}}"
+ "@media(max-width:500px){#dcModal{padding:13px}.dcBtns button{flex:1;font-size:11px}}",
+ "/* Layout executivo compacto dos comunicados D-1 — mobile first */",
+ "#dcModal{width:min(860px,100%);padding:clamp(12px,3vw,20px)}#dcModal .dcTop{align-items:flex-start}#dcModal .dcTop h2{font-size:18px}",
+ "#dcModal .dcList{gap:12px}#dcModal .dcPriority{display:flex;flex-direction:column;gap:4px;padding:13px 15px;margin:18px 0 2px;border-radius:12px;font-size:14px;line-height:1.25}#dcModal .dcPriority small{font-size:11px;font-weight:500;opacity:.85}",
+ "#dcModal .dcPerson{border:1px solid #d9e1dc;border-left:5px solid #d1d8d4;border-radius:16px;padding:14px;box-shadow:0 2px 12px #173f350c;min-width:0}",
+ "#dcModal .dcCategory0{border-left-color:#e45059}#dcModal .dcCategory1{border-left-color:#e4a632}#dcModal .dcCategory2{border-left-color:#279c69}",
+ "#dcModal .dcName{display:flex;align-items:flex-start;gap:8px}#dcModal .dcIdentity{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px}",
+ "#dcModal .dcPersonName{color:#173f35;font-size:clamp(13px,3.8vw,17px);line-height:1.27;overflow-wrap:anywhere}",
+ "#dcModal .dcPersonMeta{color:#66746c;font-size:12px;line-height:1.35;overflow-wrap:anywhere}",
+ "#dcModal .dcStoreBadge{background:#e9eeeb;color:#173f35;border-radius:9px;padding:7px 9px;flex-shrink:0;font-size:12px;box-shadow:none;animation:none!important}",
+ "#dcModal .dcCategory0 .dcStoreBadge{background:#ffe1e1;color:#a41d28}#dcModal .dcCategory1 .dcStoreBadge{background:#fff0d5;color:#86540a}#dcModal .dcCategory2 .dcStoreBadge{background:#ddf6e8;color:#12653a}",
+ "#dcModal .dcKpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:14px 0 12px}",
+ "#dcModal .dcKpi{display:flex;flex-direction:column;justify-content:center;gap:5px;min-width:0;padding:11px 8px;border-radius:11px;background:#f1f4f2;color:#173f35}",
+ "#dcModal .dcKpi span{font-size:11px;line-height:1.2;color:#637169}#dcModal .dcKpi strong{font-size:clamp(12px,3.3vw,17px);line-height:1.3;overflow-wrap:anywhere}",
+ "#dcModal .dcCategory0 .dcKpiAlert{background:#fff0f0}#dcModal .dcCategory0 .dcKpiAlert strong{color:#a21c26}",
+ "#dcModal .dcRiskChip{display:inline-flex;background:#fff0dd;color:#8c5100;font-size:11px;font-weight:700;padding:5px 9px;border-radius:8px;margin-bottom:10px}",
+ "#dcModal .dcActions{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:8px;align-items:stretch}",
+ "#dcModal .dcSecondaryActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;min-width:0}",
+ "#dcModal .dcSecondaryActions button{font-size:11px;padding:10px 5px;min-width:0;white-space:normal;line-height:1.3;border:1px solid #d4dcd7;background:#f7f9f7}",
+ "#dcModal .dcActions .dcSend{font-size:12px;min-height:44px;padding:10px 8px;line-height:1.25;background:#173f35;color:#fff;border:1px solid #173f35}",
+ "#dcModal .dcPending{margin:12px 0;font-size:12px;color:#8d5d26}",
+ "@media(max-width:600px){#dcModal .dcActions{grid-template-columns:1fr}#dcModal .dcSecondaryActions button{min-height:40px}#dcModal .dcActions .dcSend{min-height:44px}#dcModal .dcKpis{grid-template-columns:repeat(2,minmax(0,1fr))}#dcModal .dcKpi{padding:10px}#dcModal .dcKpi strong{font-size:15px}#dcModal .dcPerson{padding:12px}#dcModal .dcCount{gap:5px}}",
+ "@media(max-width:350px){#dcModal .dcKpi strong{font-size:13px}#dcModal .dcPersonName{font-size:13px}}",
+ "@media(prefers-reduced-motion:reduce){#dcModal *{animation:none!important}}"
  ].join("");
  document.head.appendChild(style);
  const launch=document.createElement("button");launch.id="dcLaunch";launch.type="button";
