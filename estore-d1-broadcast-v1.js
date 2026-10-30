@@ -72,11 +72,13 @@ function render(){
  const note=locked?"⚠️ D-1 "+br(d.reference_date)+" ainda não foi carregado completamente. Comunicação bloqueada para não usar dados antigos.":
   "Resultado oficial de "+br(d.reference_date)+" confirmado. Confira a lista e prepare os comunicados.";
  const riskStores=Array.isArray(d.weekly_risk_stores)?d.weekly_risk_stores:[];
+ // Preserve incomplete daily goals as unavailable; never interpret missing goals as zero.
+ const displayRiskMoney=v=>v===null||v===undefined||v===''||!Number.isFinite(Number(v))?'Em apuração':money(v);
  const riskMap=new Map(riskStores.map(x=>[String(x.store).padStart(3,'0'),x.radar]));
  const weeklyPanel=riskStores.length?
    '<section class="dcRiskPanel"><h3>🚨 RADAR DE POSSÍVEL PRIORIZAÇÃO • SEMANA EM CURSO</h3>'+
    '<p>Projeção parcial de quinta-feira, com base no histórico da semana anterior e nos resultados D-1. O domingo ainda pode depender de programação.</p>'+
-   riskStores.map(x=>'<div class="dcRiskRow"><b>L'+esc(x.store)+'</b><span>Retração parcial: '+esc(Number(x.radar?.partial_deviation_pp||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}))+' p.p.</span><span>Desvio de ritmo: '+esc(money(x.radar?.pace_gap||0))+'</span><span>Reforço extra estimado: '+esc(money(x.radar?.gap_to_avoid_priority||0))+'</span></div>').join('')+
+   riskStores.map(x=>'<div class="dcRiskRow"><b>L'+esc(x.store)+'</b><span>Retração parcial: '+esc(Number(x.radar?.partial_deviation_pp||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}))+' p.p.</span><span>Desvio de ritmo: '+esc(displayRiskMoney(x.radar?.pace_gap))+'</span><span>Reforço extra estimado: '+esc(displayRiskMoney(x.radar?.gap_to_avoid_priority))+'</span></div>').join('')+
    '</section>':
    '<section class="dcRiskPanel dcRiskInfo"><b>📡 Radar semanal:</b> '+(new Date(d.goal_date+'T12:00:00Z').getUTCDay()===4?'Nenhuma loja em risco identificada nos dados disponíveis ou projeção ainda insuficiente.':'Ativado nas quintas-feiras, utilizando a parcial até quarta-feira.')+'</section>';
  const sorted=d.supervisors.map((p,i)=>({p,i})).sort((a,b)=>priority(a.p)-priority(b.p)||String(a.p.store).localeCompare(String(b.p.store)));
