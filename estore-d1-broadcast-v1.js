@@ -281,7 +281,10 @@ function makeUI(){
  if(ID("dcLaunch"))return;
  const style=document.createElement("style");
  style.textContent=[
- "#dcLaunch{position:fixed;bottom:calc(93px + env(safe-area-inset-bottom,0px));left:12px;z-index:2147480050;background:#173f35;color:white;border:2px solid #deae62;border-radius:30px;padding:12px 14px;font:700 13px Arial;box-shadow:0 6px 18px #0004;cursor:pointer}",
+ "#dcLaunch{position:static!important;inset:auto!important;z-index:auto!important;flex:0 0 43px;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:0;width:43px;height:43px;min-width:43px;margin:0;padding:3px 0;color:#775117;background:#fff6e6;border:1px solid #e4c693;border-radius:12px;font:800 10px/1.1 Arial,sans-serif;box-shadow:none;cursor:pointer;touch-action:manipulation}",
+ "#dcLaunch svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}#dcLaunch small{font-size:9px;letter-spacing:.1px;color:#725019}#dcLaunch[hidden]{display:none!important}",
+ "#ecHeaderActions{display:flex;align-items:center;justify-content:flex-end;gap:5px;flex-shrink:0;margin-left:auto;min-width:0}",
+ "#dcLaunch:focus-visible{outline:3px solid #de7c00;outline-offset:2px}",
  "#dcOverlay[hidden]{display:none}#dcOverlay{position:fixed;inset:0;z-index:2147481000;background:#081b17d9;display:grid;place-items:center;padding:10px;box-sizing:border-box}",
  "#dcModal{background:#faf8f3;color:#173f35;width:min(760px,100%);max-height:94dvh;overflow:auto;border-radius:17px;padding:18px;font:14px/1.5 Arial,sans-serif;box-sizing:border-box}",
  "#dcModal *{box-sizing:border-box}.dcTop,.dcName{display:flex;justify-content:space-between;gap:12px}.dcTop h2{margin:0;font-size:19px}.dcTop small{display:block;color:#587267}",
@@ -294,8 +297,12 @@ function makeUI(){
  "@media(max-width:500px){#dcModal{padding:13px}.dcBtns button{flex:1;font-size:11px}}"
  ].join("");
  document.head.appendChild(style);
- const launch=document.createElement("button");launch.id="dcLaunch";launch.type="button";launch.textContent="📣 Comunicados D-1";
- launch.addEventListener("click",()=>window.estoreOpenD1());document.body.append(launch);
+ const launch=document.createElement("button");launch.id="dcLaunch";launch.type="button";
+ launch.setAttribute("aria-label","Abrir Comunicados D-1 para supervisores");
+ launch.title="Comunicados D-1";
+ launch.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><small>D-1</small>';
+ launch.addEventListener("click",()=>window.estoreOpenD1());
+ launch.hidden=true;document.body.append(launch);
  const overlay=document.createElement("div");overlay.id="dcOverlay";overlay.hidden=true;
  overlay.innerHTML='<section id="dcModal" role="dialog" aria-modal="true" aria-label="Comunicados D-1">'+
  '<div class="dcTop"><div><h2>📣 Comunicado D-1 | Supervisores</h2><small>Fila por filial. Confira os destinatários e confirme o envio no WhatsApp.</small></div><button id="dcClose" aria-label="Fechar">×</button></div>'+
@@ -312,8 +319,29 @@ window.estoreOpenD1=function(){
  overlay.hidden=false;
  if(R.data)render();else load();
 };
-function sync(){const can=admin(),el=ID("dcLaunch");if(can&&!el)makeUI();else if(el)el.hidden=!can;
- if(!can&&ID("dcOverlay"))ID("dcOverlay").hidden=true;}
+function sync(){
+ const can=admin();
+ if(can&&!ID("dcLaunch"))makeUI();
+ const el=ID("dcLaunch");
+ if(el){
+   const header=document.querySelector("#shell > header.top");
+   if(header){
+     let bar=header.querySelector("#ecHeaderActions");
+     if(!bar){
+       bar=document.createElement("div");
+       bar.id="ecHeaderActions";
+       bar.setAttribute("role","group");
+       bar.setAttribute("aria-label","Atalhos de ajuda e comunicados");
+       header.appendChild(bar);
+     }
+     if(el.parentElement!==bar)bar.insertBefore(el,bar.firstChild);
+     el.hidden=!can;
+   }else{
+     el.hidden=true;
+   }
+ }
+ if(!can&&ID("dcOverlay"))ID("dcOverlay").hidden=true;
+}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",sync,{once:true});else sync();
 setInterval(sync,2000);
 })();
