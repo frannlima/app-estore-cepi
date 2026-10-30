@@ -252,17 +252,17 @@ function top3HTML(title,rows,key,format){
  )+'</div></div>';
 }
 function drawChart(rows){
- if(!rows.length)return '<p class="execHelpV1">Ainda não há histórico gerencial suficiente para o período.</p>';
- const W=700,H=224,left=45,right=12,top=25,bottom=37,plot=H-top-bottom,max=Math.max(1,...rows.map(x=>x.captured))*1.18;
- const bw=(W-left-right)/rows.length;
- let a='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' '+H+'" class="execChartV1" role="img" aria-label="Captação regional oficial por '+(EX.period==="week"?"dia":"semana")+'">';
- for(let i=0;i<4;i++){let y=top+i*plot/3,unit=max*(3-i)/3;a+='<line x1="'+left+'" x2="'+(W-right)+'" y1="'+y+'" y2="'+y+'" stroke="#e5e8e4"/><text x="'+(left-6)+'" y="'+(y+5)+'" text-anchor="end" fill="#66746b" font-size="13">'+(unit>=1000?(unit/1000).toFixed(1)+"k":Math.round(unit))+'</text>'}
- rows.forEach((x,i)=>{const bx=left+i*bw+bw*.15,w=bw*.68,h=plot*x.captured/max,y=top+plot-h;
- a+='<rect x="'+bx+'" y="'+y+'" width="'+w+'" height="'+Math.max(0,h)+'" rx="5" fill="'+(i===rows.length-1?"#DE7C00":"#173F35")+'"/>'+
- '<text x="'+(bx+w/2)+'" y="'+(H-10)+'" text-anchor="middle" font-size="13" fill="#51635b">'+(EX.period==="month"?"Sem. "+weekNumber(x.date):x.date.slice(8))+'</text>';
- if(i===rows.length-1)a+='<text x="'+(bx+w/2)+'" y="'+Math.max(14,y-7)+'" font-size="14" font-weight="bold" text-anchor="middle" fill="#b96200">'+count(x.captured)+'</text>';
+ if(!rows.length)return '<p class="execHelpV1">Sem histórico oficial no intervalo.</p>';
+ const max=Math.max(1,...rows.map(r=>n(r.captured))), width=850, base=245, step=800/rows.length;
+ let svg='<svg viewBox="0 0 850 295" class="execChartV1" role="img" aria-label="Captação por intervalo">';
+ rows.forEach((r,i)=>{
+  const x=25+i*step+step/2,h=n(r.captured)/max*155,y=base-h;
+  const warn=i>0&&r.captured<rows[i-1].captured*.75;
+  svg+='<rect x="'+(x-22)+'" y="'+y+'" width="44" height="'+h+'" rx="5" fill="'+(warn?'#C83732':'#173F35')+'"/>';
+  svg+='<text x="'+x+'" y="'+(y-10)+'" font-size="12" text-anchor="middle" fill="#173F35">'+Math.round(r.captured).toLocaleString("pt-BR")+'</text>';
+  svg+='<text x="'+x+'" y="275" font-size="12" text-anchor="middle" fill="#52635B">'+(EX.period==="month"?"Sem "+weekNumber(r.date):dia(r.date).slice(0,5))+'</text>';
  });
- return a+"</svg>";
+ return svg+'</svg>';
 }
 function dailyStoreChart(rows){
  const items=[...rows].filter(x=>n(x.c)>0).sort((a,b)=>n(b.c)-n(a.c)).slice(0,5);
