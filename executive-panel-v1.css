@@ -355,3 +355,8 @@
 .execZeroDailyImpactV5{display:flex;flex-direction:column;align-items:flex-end;gap:3px;text-align:right}
 .execZeroDailyImpactV5 small{font-size:11px;color:#687770;font-weight:600}
 @media(max-width:650px){.execZeroStoresV3.execZeroDailyV5 .execZeroRowV3{grid-template-columns:minmax(65px,1fr) minmax(105px,1fr)}.execZeroDailyImpactV5 small{font-size:10px}}
+
+.execZeroShareHeadV6{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.execZeroShareHeadV6 h4{margin:0!important}
+.execZeroShareHeadV6 .execSecondaryV2{font-size:12px;padding:8px 12px;white-space:normal}
+@media(max-width:650px){.execZeroShareHeadV6{align-items:flex-start}.execZeroShareHeadV6 .execSecondaryV2{font-size:11px}}
