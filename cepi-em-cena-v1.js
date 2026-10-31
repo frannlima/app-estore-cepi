@@ -38,7 +38,15 @@ function suggestion(){
  let message='';
  if(current===3)message='📊 *CEPI EM CENA | RADAR DO MOVIMENTO*\n\n'+numbers+'\n\n'+hint+'\n\nCada informação contribui para um consolidado mais completo. Vamos manter o acompanhamento vivo!';
  else if(current===4)message='🔥 *CEPI EM CENA | ACOMPANHAMENTO DA TARDE*\n\n'+numbers+'\n\nAinda temos oportunidades de ação nas próximas horas. Seguimos acompanhando e apoiando as operações!';
- else if(current===5){const ranked=d.rows.filter(x=>Number(x.captured||0)>0).sort((a,b)=>Number(b.captured||0)-Number(a.captured||0));const top=ranked[0];message='👏 *CEPI EM CENA | LIDERANÇA PRESENTE*\n\n'+(top?'Filial *'+String(top.st)+'*: '+money(top.captured)+' captados, '+Number(top.orders||0)+' pedidos informados.\n\n':'')+'Supervisores e gerentes, que boa prática da equipe merece reconhecimento hoje?';}
+ else if(current===5){
+  const ranked=d.rows.filter(x=>Number(x.captured||0)>0).sort((a,b)=>Number(b.captured||0)-Number(a.captured||0));
+  const top=ranked[0];
+  const directory=typeof window.cepiCenaEligibleSupervisorsV1==='function'?window.cepiCenaEligibleSupervisorsV1():[];
+  const entry=top?directory.find(e=>String(e.st).padStart(3,'0')===String(top.st).padStart(3,'0')):null;
+  const names=(entry?.people||[]).map(p=>p.name.trim()).filter(Boolean);
+  const label=names.length?'Supervisão vinculada à filial: '+names.join(', ')+'.\n\n':'';
+  message='👏 *CEPI EM CENA | LIDERANÇA PRESENTE*\n\n'+(top?'A filial *'+String(top.st)+'* está no acompanhamento com '+money(top.captured)+' captados e '+Number(top.orders||0)+' pedidos informados.\n\n'+label:'')+'Supervisores e gerentes, qual iniciativa da equipe merece ser reconhecida hoje?';
+ }
  else if(current===6)message='🌟 *CEPI EM CENA | MOVIMENTO DO DIA*\n\n'+numbers+'\n\nObrigado pela participação! Seguimos acompanhando as operações até o fechamento, conforme o horário de cada filial.';
  else message='🎬 *CEPI EM CENA | O MOVIMENTO É NOSSO*\n\n'+numbers+'\n\nVamos construir uma visão mais completa da CEPI ao longo do dia!';
  return {label:'Dados atuais disponíveis para contextualizar',detail:numbers+' · '+hint,value:message};
