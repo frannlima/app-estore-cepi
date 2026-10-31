@@ -489,13 +489,13 @@ function render(){
  '<strong class="execNumBigV2">'+(opp.daysCovered?opp.zeros.length:'—')+'</strong>'+
  '<small>'+(daily?'Com captação igual a zero':opp.zeroDays+' ocorrências loja-dia zeradas • '+opp.validStoreDays+' loja-dias com meta')+'</small>'+
  '<div class="execZeroStatsV2"><span>Oportunidade estimada (R$)</span><b>'+money2(opp.potential)+'</b>'+
- '<span>Parcela da oportunidade (%)</span><b>'+impactPercent(opp.ratio)+'</b>'+ 
+ '<span>Impacto potencial estimado (%)</span><b>'+impactPercent(opp.ratio)+'</b>'+ 
  '<span>Taxa de zeragem (%)</span><b>'+percent(opp.zeroRate)+'</b></div>'+
  (!opp.complete||opp.missingGoals||!opp.opportunityReliable?'<p class="execTinyV2 execZeroWarningV3">Cobertura '+opp.daysCovered+'/'+opp.daysExpected+' dias do calendário • '+opp.validStoreDays+' loja-dias com meta positiva'+(opp.missingGoals?' • histórico insuficiente em '+opp.missingEstimates+' ocorrência(s)':'')+'. Sem dados não é zeragem.'+(!opp.opportunityReliable?' • Oportunidade financeira suspensa: histórico insuficiente ou valor desproporcional à captação real.':'')+'</p>':'')+
  '</div>';
  const rightCard='<div class="execPriorityV1 execZeroStoresV3"><h4>'+(daily?'LOJAS SEM CAPTAÇÃO DE VENDA NO DIA':'LOJAS COM ZERAGEM DE VENDAS NO PERÍODO')+'</h4>'+
  (daily?'<div class="execZeroHeadV3"><span>Filial</span><span>Situação</span></div>':
- '<div class="execZeroHeadV3"><span>Filial</span><span>Ocorrências e datas</span><span>Impacto regional</span></div><div class="execZeroLegendV4"><span><i class="execLegendEdayV4"></i> eDay</span><span><i class="execLegendSaturdayV4"></i> Sábado</span><span><i class="execLegendSundayV4"></i> Domingo</span></div>')+
+ '<div class="execZeroHeadV3"><span>Filial</span><span>Ocorrências e datas</span><span>Impacto potencial estimado</span></div><div class="execZeroLegendV4"><span><i class="execLegendEdayV4"></i> eDay</span><span><i class="execLegendSaturdayV4"></i> Sábado</span><span><i class="execLegendSundayV4"></i> Domingo</span></div>')+
  (opp.zeros.length?'<div class="execZeroListV3">'+opp.zeros.map(x=>'<div class="execZeroRowV3"><b>L'+e(x.st)+'</b>'+
  (daily?'<strong class="execDangerV1">ZERADA</strong>':'<span class="execZeroDatesCellV4"><b>'+x.days+' dia'+(x.days===1?'':'s')+'</b><span class="execZeroDatesV4">'+x.dates.map(execZeroDateTag).join('')+'</span></span><strong class="execDangerV1">'+impactPercent(x.impact)+'<small style="display:block;font-size:10px">'+(x.potential==null?'Sem histórico':'('+money(x.potential)+')')+'</small></strong>')+
  '</div>').join("")+'</div>':
@@ -745,7 +745,7 @@ function caption(){
   "",
   "🏬 *"+labels+":* "+(z.daysCovered?z.zeros.length:"—"),
   "💸 *Potencial de dispersão:* "+money2(z.potential),
-  "📉 *Impacto regional:* "+percent(z.ratio)
+  "📉 *Impacto potencial estimado:* "+impactPercent(z.ratio)
  ];
  if(!z.complete||z.missingGoals)lines.push("⚠️ *Apuração parcial:* "+z.daysCovered+"/"+z.daysExpected+" dias.");
  lines.push("","🔎 *Explore os indicadores e a performance detalhada no app:*",
@@ -871,8 +871,8 @@ function paintShare(ctx,data){
  print(String(data.zeroCount??"—"),170,1002,29,true,R);
  print("Potencial dispersão:",283,1002,22,false,M);
  fit(money2(data.potential),505,1002,26,195,true,G);
- print("Impacto:",724,1002,22,false,M);
- fit(percent(data.ratio),1007,1002,27,155,true,R,"right");
+ print("Impacto potencial:",724,1002,20,false,M);
+ fit(impactPercent(data.ratio),1007,1002,27,155,true,R,"right");
  // D-1: manter apenas indicadores e a sequência das filiais, sem títulos intermediários.
  // Semana e mês: preservar dias de zeragem e impacto regional por loja.
  if(isDaily){
