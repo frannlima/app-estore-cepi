@@ -174,7 +174,7 @@ function caption(j){
  ];
  if(missing>0)lines.push('⚠️ *'+missing+' '+(missing===1?'filial sem venda informada.':'filiais sem venda informada.')+'*');
  lines.push('',tot.meta<=0?'📍 Meta do dia indisponível; acompanhemos a captação informada.':missing>0?'🚀 Vamos ampliar a participação e acelerar a captação, time!':tot.captured>=tot.meta?'👏 Meta atingida! Vamos sustentar essa entrega, time!':'🚀 Vamos acelerar a captação e girar esse ponteiro, time!');
- return lines.join('\\n');
+ return lines.join('\n');
 }
 // Compartilhamento gratuito assistido: mensagem da parcial, sem anexos e sem envio automático.
 window.hourlyWhatsAppTextV246=function(){
