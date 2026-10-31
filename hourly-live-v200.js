@@ -156,36 +156,25 @@ function decorateScreen(){
 }
 function caption(j){
  if(!j)return '';
- const arr=j.stores||[],r={captured:0,meta:0,orders:0,orderTarget:0,storeSales:0};
- for(const x of arr){r.captured+=Number(x.captured||0);r.meta+=Number(x.metaValue||0);r.orders+=Number(x.orders||0);r.orderTarget+=Number(x.orderTarget||0);r.storeSales+=Number(x.storeSales||0)}
- const n=arr.filter(x=>Number(x.captured||0)>0).length,miss=noInput(j),desvio=r.captured-r.meta;
- const t=clock(),latestTime=j.result_date===t.date?t.time:'Fechamento';
+ const stores=j.stores||[],tot={captured:0,meta:0,orders:0};
+ for(const row of stores){
+  tot.captured+=Number(row.captured||0);
+  tot.meta+=Number(row.metaValue||0);
+  tot.orders+=Number(row.orders||0);
+ }
+ const missing=noInput(j).length;
+ const current=clock();
+ const label=j.result_date===current.date?current.time:'Fechamento';
+ const atg=tot.meta>0?fmtPercent(tot.captured/tot.meta):'—';
  const lines=[
-  '📊 *PARCIAL eSTORE | CE+PI*',
-  '📅 '+dateBR(j.result_date)+' • '+latestTime,
-  '',
-  '🎯 *Meta:* '+moneyBR(r.meta),
-  '💰 *Captado:* '+moneyBR(r.captured),
-  '🛍️ *Pedidos:* '+r.orders+'/'+r.orderTarget,
-  '📈 *Atingimento:* '+fmtPercent(r.meta>0?r.captured/r.meta:null),
-  '📊 *Share Flash:* '+(j.regionalFlash?.complete?fmtPercent(j.regionalFlash.share):'— • coleta '+Number(j.regionalFlash?.covered_stores||0)+'/18 lojas'),
-  (desvio<0?'🔻':'🔺')+' *Desvio:* '+moneyBR(desvio),
-  '🏬 *Lojas com venda:* '+n+'/'+arr.length,
-  '⚠️ *Lojas sem venda informada:* - '+miss.length,
-  '',
-  '📍 *Filiais sem venda informada:*',
-  ' '+(miss.length?miss.join(', '):'Nenhuma'),
-  '',
-  '🔗 *Atualize a venda da sua loja*',
-  '',
-  '📲  *Menu → Hora a Hora → Registrar incremento*',
-  '',
-  APP_URL,
-  '',
-  '',
-  '_Moda que inspira o Brasil_'
+  '📊 *CEPI | PARCIAL '+label+'*',
+  '💰 *Captado:* '+moneyBR(tot.captured),
+  '🛍️ *Pedidos:* '+tot.orders,
+  '🎯 *ATG:* '+atg+' da meta do dia'
  ];
- return lines.join('\n');
+ if(missing>0)lines.push('⚠️ *'+missing+' '+(missing===1?'filial sem venda informada.':'filiais sem venda informada.')+'*');
+ lines.push('',tot.meta<=0?'📍 Meta do dia indisponível; acompanhemos a captação informada.':missing>0?'🚀 Vamos ampliar a participação e acelerar a captação, time!':tot.captured>=tot.meta?'👏 Meta atingida! Vamos sustentar essa entrega, time!':'🚀 Vamos acelerar a captação e girar esse ponteiro, time!');
+ return lines.join('\\n');
 }
 // Compartilhamento gratuito assistido: mensagem da parcial, sem anexos e sem envio automático.
 window.hourlyWhatsAppTextV246=function(){
