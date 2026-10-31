@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="360" viewBox="0 0 920 360" role="img" aria-label="CE+PI com chapéu nordestino e contorno bege">
+<defs><linearGradient id="green" x2="0" y2="1"><stop stop-color="#014732"/><stop offset="1" stop-color="#002a20"/></linearGradient><linearGradient id="hat" x2="0" y2="1"><stop stop-color="#e4a34b"/><stop offset="1" stop-color="#8d401a"/></linearGradient></defs>
+<text x="26" y="301" font-family="Arial,sans-serif" font-size="288" font-weight="900" letter-spacing="-16" fill="url(#green)" stroke="#f3dfb9" stroke-width="14" paint-order="stroke">CE+PI</text>
+<path d="M217 122 Q243 86 273 31 Q322 -26 389 36 Q425 89 445 111 Q443 133 412 137 Q317 107 232 155 Q211 158 217 122Z" fill="url(#hat)" stroke="#f8e2bc" stroke-width="11" stroke-linejoin="round"/>
+<path d="M237 121 Q321 81 424 113" fill="none" stroke="#f7cf92" stroke-width="6" stroke-dasharray="10 9"/>
+<path d="M322 42 L333 66 L358 70 L338 88 L344 112 L322 99 L300 112 L306 88 L286 70 L311 66 Z" fill="#f9ead0"/>
+<circle cx="263" cy="107" r="8" fill="#ffdb92"/><circle cx="386" cy="99" r="8" fill="#ffdb92"/>
+</svg>
