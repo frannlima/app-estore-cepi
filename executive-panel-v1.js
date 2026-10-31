@@ -966,22 +966,22 @@ function zeroDashboardInsightV7(period,ref,opp,daily){
  let body="";
  if(period==="day"){
   body=zeroStores?
-   "🔴 *"+zeroStores+"/"+eligible+" filiais elegíveis zeradas ("+rate(zeroStores,eligible)+").*\n"+financial+
+   "🔴 *"+zeroStores+" de "+eligible+" filiais elegíveis sem captação ("+rate(zeroStores,eligible)+").*\n"+financial+
    (eligibleEday?eday+"\n":"")+
    "\n💭 *O que podemos fortalecer?* O BD/BT alinhou metas e incentivos"+(eligibleEday?", com protagonismo do eDay":"")+"? Os mobiles estavam no provador e caixas? As parciais do Hora a Hora orientaram a mobilização?\n"+
    "✅ *Direção:* alinhar na abertura, garantir equipamentos e reagir a cada parcial.":
    "🟢 *Nenhuma filial elegível zerada nos registros do dia.* Vale reconhecer as boas práticas e manter a atenção à participação do time.\n"+
    "✅ *Direção:* reforçar BD/BT, disponibilidade dos mobiles e acompanhamento Hora a Hora.";
  }else if(period==="week"){
-  body="🔴 *"+zeroStores+" filiais | "+zeroOccurrences+" zeragens* entre "+eligible+" registros filial-dia elegíveis ("+rate(zeroOccurrences,eligible)+").\n"+financial+
+  body="🔴 *"+zeroStores+" "+(zeroStores===1?"filial":"filiais")+" | "+zeroOccurrences+" "+(zeroOccurrences===1?"zeragem":"zeragens")+"* entre "+eligible+" registros filial-dia elegíveis ("+rate(zeroOccurrences,eligible)+").\n"+financial+
    (eligibleEday>0?eday:"")+
-   "\n💭 O eDay foi reforçado no BD/BT? Como estão a dispersão por frente e os reconhecimentos semanais? "+
+   (zeroWeekend>0?"\n🗓 *Fins de semana:* "+zeroWeekend+" zeragem"+(zeroWeekend===1?"":"ens")+" em dias elegíveis.":"")+"\n💭 O eDay foi reforçado no BD/BT? Como estão a dispersão por frente e os reconhecimentos semanais? "+
    (zeroWeekend>0?"Os mobiles estavam nos pontos de captação nos fins de semana?":"As parciais do Hora a Hora geraram reação?")+
    "\n✅ *Direção:* antecipar o eDay, mobilizar em cada parcial e valorizar os avanços.";
  }else{
-  body="🔴 *"+zeroStores+" filiais | "+zeroOccurrences+" zeragens no mês* ("+rate(zeroOccurrences,eligible)+" dos "+eligible+" registros filial-dia elegíveis).\n"+financial+
+  body="🔴 *"+zeroStores+" "+(zeroStores===1?"filial":"filiais")+" | "+zeroOccurrences+" "+(zeroOccurrences===1?"zeragem":"zeragens")+" no mês* ("+rate(zeroOccurrences,eligible)+" dos "+eligible+" registros filial-dia elegíveis).\n"+financial+
    (eligibleEday>0?eday:"")+
-   "\n💭 O BD/BT virou ação consistente? A dispersão recebe acompanhamento diário? "+
+   (zeroWeekend>0?"\n🗓 *Fins de semana:* "+zeroWeekend+" zeragem"+(zeroWeekend===1?"":"ens")+" em dias elegíveis.":"")+"\n💭 O BD/BT virou ação consistente? A dispersão recebe acompanhamento diário? "+
    (zeroWeekend>0?"Os finais de semana foram bem mobilizados?":"O Hora a Hora orientou decisões?")+
    " O time conhece os incentivos e os destaques semanais?\n"+
    "✅ *Próximo ciclo:* planejar, acompanhar cada parcial e reconhecer as entregas.";
