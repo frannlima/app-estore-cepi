@@ -500,7 +500,7 @@ function render(){
  '<span>Taxa de zeragem (%)</span><b>'+percent(opp.zeroRate)+'</b></div>'+
  (!opp.complete||opp.missingGoals||!opp.opportunityReliable?'<p class="execTinyV2 execZeroWarningV3">Cobertura '+opp.daysCovered+'/'+opp.daysExpected+' dias do calendário • '+opp.validStoreDays+' loja-dias com meta positiva'+(opp.missingGoals?' • histórico insuficiente em '+opp.missingEstimates+' ocorrência(s)':'')+'. Sem dados não é zeragem.'+(!opp.opportunityReliable?' • Oportunidade financeira suspensa: histórico insuficiente ou valor desproporcional à captação real.':'')+'</p>':'')+
  '</div>';
- const rightCard='<div class="execPriorityV1 execZeroStoresV3 '+(daily?'execZeroDailyV5':'')+'"><h4>'+(daily?'LOJAS SEM CAPTAÇÃO DE VENDA NO DIA':'LOJAS COM ZERAGEM DE VENDAS NO PERÍODO')+'</h4>'+
+ const rightCard='<div class="execPriorityV1 execZeroStoresV3 '+(daily?'execZeroDailyV5':'')+'"><div class="execZeroShareHeadV6"><h4>'+(daily?'LOJAS SEM CAPTAÇÃO DE VENDA NO DIA':'LOJAS COM ZERAGEM DE VENDAS NO PERÍODO')+'</h4><button type="button" class="execSecondaryV2" onclick="execShareZeroDashboardV6()">↗ Compartilhar dashboard</button></div>'+
  (daily?'<div class="execZeroHeadV3"><span>Filial</span><span>Impacto potencial estimado</span></div>':
  '<div class="execZeroHeadV3"><span>Filial</span><span>Ocorrências e datas</span><span>Impacto potencial estimado</span></div><div class="execZeroLegendV4"><span><i class="execLegendEdayV4"></i> eDay</span><span><i class="execLegendSaturdayV4"></i> Sábado</span><span><i class="execLegendSundayV4"></i> Domingo</span></div>')+
  (opp.zeros.length?'<div class="execZeroListV3">'+opp.zeros.map(x=>'<div class="execZeroRowV3"><b>L'+e(x.st)+'</b>'+
@@ -930,6 +930,43 @@ function paintShare(ctx,data){
  print("MODA QUE INSPIRA O BRASIL",58,data.height-56,26,true,W);
  print("eStore CE+PI • "+period,58,data.height-22,19,false,"#C5DAD0");
 }
+
+async function execZeroDashboardV6(){
+ if(!EX.data)return notify("Dados indisponíveis.");
+ const period=EX.period,ref=latestDate(),bounds=periodBounds(period,ref),opp=opportunities(),rows=opp.zeros;
+ if(!opp.daysCovered)return notify("Sem dados para compartilhar.");
+ const title=period==="day"?"ZERAGEM D-1":period==="week"?"ZERAGENS DA SEMANA":"ZERAGENS DO MÊS";
+ const dates=period==="day"?dia(ref):dia(bounds.start_date)+" a "+dia(ref);
+ const cv=document.createElement("canvas"),w=1120,h=380+rows.length*(period==="day"?60:82)+115,rh=period==="day"?60:82;
+ cv.width=w;cv.height=h;const c=cv.getContext("2d");if(!c)return notify("Canvas indisponível.");
+ await document.fonts?.ready;
+ const block=(x,y,w,h,color)=>{c.fillStyle=color;c.fillRect(x,y,w,h)};
+ const t=(v,x,y,sz=18,col="#173f35",bold=false,align="left")=>{
+  c.font=(bold?"700 ":"400 ")+sz+"px Larsseit,Arial,sans-serif";c.fillStyle=col;c.textAlign=align;c.textBaseline="middle";c.fillText(String(v),x,y);c.textAlign="left";
+ };
+ block(0,0,w,h,"#f6f7f5");block(22,22,w-44,h-44,"white");block(45,55,5,45,"#173f35");
+ t("eSTORE | CE+PI",65,70,17,"#173f35",true);t(title,65,111,32,"#173f35",true);t(dates,1073,86,20,"#62746d",false,"right");
+ t("IMPACTO POTENCIAL ESTIMADO | HISTÓRICO REAL",65,153,16,"#62746d");
+ const boxes=[["FILIAIS ZERADAS",rows.length],["IMPACTO POTENCIAL",impactPercent(opp.ratio)],["OPORTUNIDADE HISTÓRICA",money(opp.potential)]];
+ boxes.forEach(([label,v],i)=>{let x=45+i*345;block(x,190,330,110,"#f1f5f2");t(label,x+15,216,14,"#62746d",true);t(v,x+15,260,i===2?26:32,i===0?"#b22b36":"#173f35",true)});
+ block(45,333,1030,47,"#eaf0ec");t("FILIAL",60,356,15,"#62746d",true);t("DIAS / DATAS",180,356,15,"#62746d",true);t("IMPACTO",725,356,15,"#62746d",true);t("VALOR ESTIMADO",1060,356,15,"#62746d",true,"right");
+ rows.forEach((row,i)=>{let y=380+i*rh,mid=y+rh/2;if(i%2)block(45,y,1030,rh,"#fafbfa");
+  t("L"+row.st,60,mid,21,"#173f35",true);t(row.days+" dia"+(row.days===1?"":"s"),180,period==="day"?mid:mid-13,18,"#173f35",true);
+  if(period!=="day"){const labels=(row.dates||[]).map(d=>{const wd=new Date(d+"T12:00:00Z").getUTCDay();return dia(d).slice(0,5)+(wd===1?" eDay":wd===6?" SÁB":wd===0?" DOM":"");});let z=labels.join(" • ");c.font="13px Arial";while(z.length>3&&c.measureText(z).width>480)z=z.slice(0,-2);t(z,180,mid+15,13,"#62746d");}
+  t(impactPercent(row.impact),725,mid,22,"#b22b36",true);t(row.potential==null?"Sem histórico":money(row.potential),1060,mid,20,"#173f35",true,"right");block(45,y+rh-1,1030,1,"#e1e7e2");
+ });
+ const foot=380+rows.length*rh+25;t("METODOLOGIA",60,foot,14,"#62746d",true);
+ t("Média diária da captação nos 42 dias anteriores com meta positiva. Dias sem meta são excluídos.",60,foot+27,15,"#62746d");
+ t("Estimativa de oportunidade, não desvio da meta financeira de 1%.",60,foot+50,15,"#62746d");
+ const blob=await new Promise(resolve=>cv.toBlob(resolve,"image/png"));if(!blob)return notify("PNG indisponível.");
+ const name="eStore-CEPI-zeragens-"+period+"-"+ref+".png",file=new File([blob],name,{type:"image/png"});
+ const legend="*eStore CE+PI | "+title+"*\n"+dates+"\n"+rows.length+" filiais zeradas • "+impactPercent(opp.ratio)+" de impacto potencial • "+money(opp.potential)+" de oportunidade histórica.\n"+(globalThis.EstoreIdentity?.url("")||"https://frannlima.github.io/app-estore-cepi/");
+ if(navigator.canShare?.({files:[file]})&&navigator.share){try{await navigator.share({title,text:legend,files:[file]});return}catch(err){if(err?.name==="AbortError")return}}
+ const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
+ try{await navigator.clipboard.writeText(legend);notify("PNG salvo e legenda copiada.")}catch(_){notify("PNG salvo para compartilhar.")}
+}
+w.execShareZeroDashboardV6=execZeroDashboardV6;
+
 async function shareCard(){
  if(!EX.data)return notify("Aguarde o carregamento dos indicadores.");
  const d=regionalData(),b=d.benchmark,cap=d.rows.length?d.total.captured:b?.regional_captured??null;
