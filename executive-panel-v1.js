@@ -931,6 +931,69 @@ function paintShare(ctx,data){
  print("eStore CE+PI • "+period,58,data.height-22,19,false,"#C5DAD0");
 }
 
+
+// Legenda do dashboard: dados gerenciais elegíveis, sem inferir causas operacionais.
+function zeroDashboardInsightV7(period,ref,opp,daily){
+ const bounds=periodBounds(period,ref),start=bounds.start_date,end=bounds.end_date;
+ const title=period==="day"?"RADAR D-1":period==="week"?"RADAR SEMANAL":"RADAR MENSAL";
+ const windowLabel=period==="day"?dia(ref):dia(start)+" a "+dia(end);
+ const valid=(x)=>x&&x.target!=null&&Number.isFinite(Number(x.target))&&Number(x.target)>0&&
+  Number.isFinite(Number(x.c))&&Number(x.c)>=0&&Number.isFinite(Number(x.o))&&Number(x.o)>=0;
+ let eligible=0,eligibleEday=0,zeroEday=0,zeroWeekend=0;
+ for(const day of daily||[]){
+  if(String(day.date)<start||String(day.date)>end)continue;
+  const weekday=new Date(day.date+"T12:00:00Z").getUTCDay();
+  for(const item of day.stores||[]){
+   if(!STORES.includes(String(item.st||"").padStart(3,"0"))||!valid(item))continue;
+   eligible++;
+   const zero=Number(item.c)===0&&Number(item.o)===0;
+   if(weekday===1){eligibleEday++;if(zero)zeroEday++}
+   if(zero&&(weekday===0||weekday===6))zeroWeekend++;
+  }
+ }
+ const rate=(part,total)=>total>0?(100*part/total).toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1})+"%":"—";
+ const zeroStores=opp.zeros.length,zeroOccurrences=opp.zeroDays||0;
+ const reliability=opp.missingEstimates===0&&opp.opportunityReliable!==false;
+ const financial=reliability?
+  "💰 *Oportunidade histórica:* "+money(opp.potential)+" | *Impacto potencial:* "+impactPercent(opp.ratio)+".\n":
+  "💰 *Impacto financeiro parcial:* histórico insuficiente para estimar todas as zeragens.\n";
+ const partial=opp.daysCovered<opp.daysExpected?"\n⚠️ Base parcial: "+opp.daysCovered+"/"+opp.daysExpected+" datas carregadas. Taxas consideram apenas registros elegíveis.":"";
+ const eday=eligibleEday>0?
+  "\n🎯 *eDay:* "+zeroEday+"/"+eligibleEday+" ocorrências filial-dia elegíveis zeradas ("+rate(zeroEday,eligibleEday)+"). "+
+  (zeroEday>0?"O incentivo de 10% de comissão não gerou captação nessas ocorrências.":"Boa oportunidade para reconhecer e replicar a mobilização."):"";
+ const header="📊 *eSTORE CE+PI | "+title+"*\n📅 "+windowLabel+"\n";
+ const address=globalThis.EstoreIdentity?.url("")||"https://frannlima.github.io/app-estore-cepi/";
+ let body="";
+ if(period==="day"){
+  body=zeroStores?
+   "🔴 *"+zeroStores+"/"+eligible+" filiais elegíveis zeradas ("+rate(zeroStores,eligible)+").*\n"+financial+
+   (eligibleEday?eday+"\n":"")+
+   "\n💭 *O que podemos fortalecer?* O BD/BT alinhou metas e incentivos"+(eligibleEday?", com protagonismo do eDay":"")+"? Os mobiles estavam no provador e caixas? As parciais do Hora a Hora orientaram a mobilização?\n"+
+   "✅ *Direção:* alinhar na abertura, garantir equipamentos e reagir a cada parcial.":
+   "🟢 *Nenhuma filial elegível zerada nos registros do dia.* Vale reconhecer as boas práticas e manter a atenção à participação do time.\n"+
+   "✅ *Direção:* reforçar BD/BT, disponibilidade dos mobiles e acompanhamento Hora a Hora.";
+ }else if(period==="week"){
+  body="🔴 *"+zeroStores+" filiais | "+zeroOccurrences+" zeragens* entre "+eligible+" registros filial-dia elegíveis ("+rate(zeroOccurrences,eligible)+").\n"+financial+
+   (eligibleEday>0?eday:"")+
+   "\n💭 O eDay foi reforçado no BD/BT? Como estão a dispersão por frente e os reconhecimentos semanais? "+
+   (zeroWeekend>0?"Os mobiles estavam nos pontos de captação nos fins de semana?":"As parciais do Hora a Hora geraram reação?")+
+   "\n✅ *Direção:* antecipar o eDay, mobilizar em cada parcial e valorizar os avanços.";
+ }else{
+  body="🔴 *"+zeroStores+" filiais | "+zeroOccurrences+" zeragens no mês* ("+rate(zeroOccurrences,eligible)+" dos "+eligible+" registros filial-dia elegíveis).\n"+financial+
+   (eligibleEday>0?eday:"")+
+   "\n💭 O BD/BT virou ação consistente? A dispersão recebe acompanhamento diário? "+
+   (zeroWeekend>0?"Os finais de semana foram bem mobilizados?":"O Hora a Hora orientou decisões?")+
+   " O time conhece os incentivos e os destaques semanais?\n"+
+   "✅ *Próximo ciclo:* planejar, acompanhar cada parcial e reconhecer as entregas.";
+ }
+ const conclusion=period==="day"?
+  "✨ *Resultados consistentes começam na execução de cada etapa, todos os dias.*":
+  period==="week"?"✨ *Mude o jogo: consistência é transformar planejamento em ação, todos os dias.*":
+  "✨ *Resultados consistentes nascem de processos executados ao longo do dia, da semana e do mês.*";
+ return header+body+partial+"\n\n"+conclusion+"\n🔎 "+address;
+}
+w.zeroDashboardInsightV7=zeroDashboardInsightV7;
+
 async function execZeroDashboardV6(){
  if(!EX.data)return notify("Dados indisponíveis.");
  const period=EX.period,ref=latestDate(),bounds=periodBounds(period,ref),opp=opportunities(),rows=opp.zeros;
@@ -960,7 +1023,10 @@ async function execZeroDashboardV6(){
  t("Estimativa de oportunidade, não desvio da meta financeira de 1%.",60,foot+50,15,"#62746d");
  const blob=await new Promise(resolve=>cv.toBlob(resolve,"image/png"));if(!blob)return notify("PNG indisponível.");
  const name="eStore-CEPI-zeragens-"+period+"-"+ref+".png",file=new File([blob],name,{type:"image/png"});
- const legend="*eStore CE+PI | "+title+"*\n"+dates+"\n"+rows.length+" filiais zeradas • "+impactPercent(opp.ratio)+" de impacto potencial • "+money(opp.potential)+" de oportunidade histórica.\n"+(globalThis.EstoreIdentity?.url("")||"https://frannlima.github.io/app-estore-cepi/");
+ const legend=zeroDashboardInsightV7(period,ref,opp,EX.data?.daily||[]);
+ // Guardar a legenda na área de transferência como apoio quando o WhatsApp
+ // aceitar a imagem mas não preservar o texto no compartilhamento nativo.
+ try{await navigator.clipboard?.writeText(legend);}catch(_){}
  if(navigator.canShare?.({files:[file]})&&navigator.share){try{await navigator.share({title,text:legend,files:[file]});return}catch(err){if(err?.name==="AbortError")return}}
  const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
  try{await navigator.clipboard.writeText(legend);notify("PNG salvo e legenda copiada.")}catch(_){notify("PNG salvo para compartilhar.")}
