@@ -326,3 +326,26 @@
 .execReportV1 .execPairFixedV1{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:12px!important;grid-template-columns:none!important;height:auto!important;min-height:0!important}
 .execReportV1 .execPairFixedV1>.execZeroPeriodV3{display:block!important;flex:0 0 auto!important;align-self:auto!important;width:100%!important;height:max-content!important;min-height:0!important;max-height:none!important;box-sizing:border-box!important}
 .execReportV1 .execPairFixedV1>.execZeroStoresV3{flex:0 0 auto!important;width:100%!important;height:auto!important;min-height:0!important;box-sizing:border-box!important}
+
+/* V4: datas de zeragem e calendário operacional */
+.execZeroStoresV3 .execZeroHeadV3,.execZeroStoresV3 .execZeroRowV3{grid-template-columns:minmax(56px,.5fr) minmax(0,2.4fr) minmax(85px,.85fr)}
+.execZeroLegendV4{display:flex;flex-wrap:wrap;gap:13px;padding:9px 1px 4px;font-size:10px;color:#62756b;font-weight:700}
+.execZeroLegendV4 span{display:inline-flex;align-items:center;gap:5px}
+.execZeroLegendV4 i{display:inline-block;width:9px;height:9px;border-radius:3px}
+.execLegendEdayV4{background:#ba2635}.execLegendSaturdayV4{background:#d79525}.execLegendSundayV4{background:#3c6891}
+.execZeroDatesCellV4{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:0}
+.execZeroDatesV4{display:flex;flex-wrap:wrap;gap:4px}
+.execZeroDateV4{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;padding:3px 5px;border-radius:5px;background:#f2f5f2;color:#526258;font-size:10px;font-weight:650;line-height:1.2;font-variant-numeric:tabular-nums}
+.execZeroDateV4 em{font-size:8px;font-weight:850;font-style:normal}
+.execDateEdayV4{background:#fff0f1;color:#b22033;border:1px solid #f2b9c0}
+.execDateSaturdayV4{background:#fff5e5;color:#986016}
+.execDateSundayV4{background:#ecf4fc;color:#2a5e87}
+@media(max-width:650px){
+ .execZeroStoresV3 .execZeroHeadV3{display:none}
+ .execZeroStoresV3 .execZeroRowV3{grid-template-columns:minmax(43px,.48fr) minmax(0,2.5fr) minmax(72px,.88fr);gap:6px;padding:12px 0}
+ .execZeroStoresV3 .execZeroRowV3> b:first-child{font-size:12px}
+ .execZeroStoresV3 .execZeroRowV3 strong{font-size:11px}
+ .execZeroDateV4{font-size:9px;padding:3px 4px}
+ .execZeroDateV4 em{font-size:7px}
+ .execZeroLegendV4{gap:9px;font-size:9px}
+}
