@@ -32,6 +32,7 @@ const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'B
 function suggestion(){
  const d=operationalData();if(!d)return {label:'Sem parcial carregada nesta sessão',detail:'Abra o Hora a Hora e atualize o painel antes de gerar um destaque baseado em dados.',value:null};
  if(d.stale)return {label:'Parcial de outra data',detail:'Os dados disponíveis são de '+d.date+'. Atualize o Hora a Hora para usar informações de hoje.',value:null};
+ if(!d.informed)return {label:'Sem filiais atualizadas',detail:'Nenhuma parcial validada hoje. Atualize Hora a Hora antes de preparar a mensagem.',value:null};
  if(current===0||current===1)return {label:'Rotina oficial preservada',detail:'Para D-1, indicadores e campanhas, utilize os cards já existentes no aplicativo.',value:null};
  const numbers='Captado: '+money(d.captured)+' • Pedidos: '+d.orders+' • ATG: '+(d.meta>0?(d.captured/d.meta*100).toFixed(0)+'%':'não calculável')+' • Cobertura: '+d.informed+'/'+d.total+' filiais';
  const hint=d.pending>0?'Ainda existem '+d.pending+' filiais sem atualização registrada.':'Todas as filiais da base consultada possuem atualização registrada.';
