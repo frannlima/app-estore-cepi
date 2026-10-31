@@ -25,6 +25,25 @@ test("não inventa datas nem permite divergência na mesma loja e data",()=>{
  assert.throws(()=>compact([sheet([["Data","Loja","Meta Fin"],["31/11/2026",108,300000]])]),/confira Data/);
  assert.throws(()=>compact([sheet([["Data","Loja","Meta Fin"],["01/11/2026",108,300000],["01/11/2026",108,320000]])]),/divergentes/);
 });
+test("importa o layout original Loja / Dia / Meta Diária com subtotais e rodapé",()=>{
+ const result=compact([sheet([
+ ["Loja","Dia","Meta Diária"],
+ ["L073 - CE FORTALEZA PARANGABA SH","Total",3917116.33],
+ ["L073 - CE FORTALEZA PARANGABA SH","01/11/2026 (DOM)",110129.91],
+ ["L073 - CE FORTALEZA PARANGABA SH","02/11/2026 (SEG)",101354.21],
+ ["L084 - PI TERESINA CT (GRD)","Total",1898526.96],
+ ["L084 - PI TERESINA CT (GRD)","01/11/2026 (DOM)",0],
+ ["L084 - PI TERESINA CT (GRD)","02/11/2026 (SEG)",0],
+ ["Total",null,45742622.76],
+ ["Filtros aplicados: novembro",null,null]
+ ],"Export")]);
+ assert.equal(result.rows.length,4);
+ assert.equal(result.stores,2);
+ assert.equal(result.minDate,"2026-11-01");
+ assert.equal(result.maxDate,"2026-11-02");
+ assert.equal(result.rows.find(r=>r[1]==="073"&&r[0]==="2026-11-01")[2],110129.91);
+ assert.equal(result.rows.find(r=>r[1]==="084"&&r[0]==="2026-11-01")[2],0);
+});
 test("não permite envio sem os três cabeçalhos",()=>{
- assert.throws(()=>compact([sheet([["Filial","Meta eStore"],[108,3000]])]),/cabeçalhos Data, Loja e Meta Fin/);
+ assert.throws(()=>compact([sheet([["Filial","Meta eStore"],[108,3000]])]),/colunas Loja, Data\/Dia e Meta Fin\/Meta Diária/);
 });

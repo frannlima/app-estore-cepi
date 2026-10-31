@@ -19,7 +19,7 @@
    const s=String(v??"").trim();
    let m=s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
    if(m)return validDate(m[1],m[2],m[3]);
-   m=s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
+   m=s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})(?:\s*\([^)]+\))?\s*$/);
    if(m)return validDate(m[3],m[2],m[1]);
    return null;
  };
@@ -51,7 +51,7 @@
    const find=(set)=>names.findIndex(v=>set.includes(v));
    const date=find(["data","dia","datameta","datavenda","dataref","datareferencia","dataoperacao"]);
    const store=find(["loja","filial","nloja","numeroloja","numerodaloja","codigoloja","codigodaloja","codigofilial","unidade","store"]);
-   const meta=find(["metafin","metafinanceira","metavenda","metavendas","metatotal","meta"]);
+   const meta=find(["metafin","metafinanceira","metavenda","metavendas","metadiaria","metatotal","meta"]);
    return date<0||store<0||meta<0?null:{date,store,meta};
  }
  function compactRows(sheets){
@@ -69,6 +69,8 @@
        if(!row.some(v=>v!==null&&v!==undefined&&String(v).trim()!==""))continue;
        const st=storeCode(row[cols.store]);
        if(!STORES.has(st)){skipped++;continue}
+       // Exportação oficial contém uma linha Total por filial, não uma meta diária.
+       if(/^total(?:\s|$)/i.test(String(row[cols.date]??"").trim())){skipped++;continue}
        const date=dateISO(row[cols.date]),value=amount(row[cols.meta]);
        inspected++;
        if(!date||value===null){errors.push((sheet.name||"Planilha")+" linha "+(i+1)+": confira Data e Meta Fin da filial "+st);continue}
@@ -83,9 +85,9 @@
        if(list.length>MAX_ROWS)throw new Error("Planilha com mais de "+MAX_ROWS+" metas. Separe por mês.");
      }
    }
-   if(!matched)throw new Error("Nenhuma aba contém os cabeçalhos Data, Loja e Meta Fin. Use esse modelo na primeira linha de cabeçalho.");
+   if(!matched)throw new Error("Nenhuma aba contém as colunas Loja, Data/Dia e Meta Fin/Meta Diária.");
    if(errors.length)throw new Error("Metas não enviadas. "+errors.slice(0,3).join("; ")+(errors.length>3?" e mais "+(errors.length-3)+" divergências.":""));
-   if(!list.length)throw new Error("Não encontrei metas das filiais CE+PI. Verifique as colunas Data, Loja e Meta Fin.");
+   if(!list.length)throw new Error("Não encontrei metas das filiais CE+PI. Confira Loja, Dia/Data e Meta Diária/Meta Fin.");
    list.sort((a,b)=>a[0].localeCompare(b[0])||a[1].localeCompare(b[1]));
    return {rows:list,stores:new Set(list.map(r=>r[1])).size,minDate:list[0][0],maxDate:list[list.length-1][0],skipped,inspected};
  }
