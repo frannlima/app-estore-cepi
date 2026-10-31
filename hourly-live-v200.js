@@ -5,6 +5,16 @@
  if(window.__HOURA_HORA_LIVE_V200)return;
  window.__HOURA_HORA_LIVE_V200=true;
  let HOURLY_CACHE=null;
+ // Read-only snapshot for the ADM CEPI em Cena. Does not mutate hourly records.
+ window.cepiHourlySnapshotV1=function(){
+  if(typeof isAdmin!=='function'||!isAdmin()||!HOURLY_CACHE)return null;
+  const j=HOURLY_CACHE;
+  return {result_date:j.result_date,stores:(j.stores||[]).map(x=>({
+   st:String(x.st||''),captured:Number(x.captured||0),orders:Number(x.orders||0),
+   metaValue:Number(x.metaValue||0),updated_at:x.updated_at||null,
+   last_input_at:x.last_input_at||null,last_updated_at:x.last_updated_at||null
+  }))};
+ };
  let hourlyV5=hourly,shareHourlyV5=shareHourly,hourlyCaptionV6=()=>'',admV3=isAdmin;
  let renderHourlyV5=function(j){
    if(!j)return;
