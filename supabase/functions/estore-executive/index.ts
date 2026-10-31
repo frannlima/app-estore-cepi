@@ -34,14 +34,15 @@ Deno.serve(async(req:Request)=>{
   const lead=/supervisor|gerente|coordenad|líder|lider|diretor|admin|gestor/i.test(role);
   if(!main&&(!user||!lead||/desligad/i.test(String(user.situacao||""))))return reply({error:"Disponível somente para a liderança."},403);
   if(body.action==="get"){
-   const [{data:bench,error:be},{data:daily,error:de},{data:official,error:oe},{data:meta,error:me},{data:weekly,error:we}]=await Promise.all([
+   const [{data:bench,error:be},{data:daily,error:de},{data:official,error:oe},{data:meta,error:me},{data:weekly,error:we},{data:dailyRegions,error:re}]=await Promise.all([
     db.from("estore_executive_benchmark").select("period,start_date,end_date,company_captured,company_approved,company_orders,company_share,regional_captured,regional_orders,regional_share,updated_at").order("end_date",{ascending:false}).limit(120),
     db.from("daily_updates").select("result_date,management,management_mode,imported_at").order("result_date",{ascending:false}).limit(42),
     db.from("app_state").select("value").eq("key","supervisor_share_official").maybeSingle(),
     db.from("app_state").select("value").eq("key","meta_schedule").maybeSingle(),
-    db.from("estore_regional_weekly_history").select("week_start,week_end,week_number,regional,share,captured,orders").order("week_start",{ascending:false}).limit(210)
+    db.from("estore_regional_weekly_history").select("week_start,week_end,week_number,regional,share,captured,orders").order("week_start",{ascending:false}).limit(210),
+    db.from("app_state").select("key,value").like("key","regional_daily_shares_%").order("key",{ascending:false}).limit(60)
    ]);
-   if(be||de||oe||me||we)throw be||de||oe||me||we;
+   if(be||de||oe||me||we||re)throw be||de||oe||me||we||re;
    const reg=new Set(["073","084","108","113","138","142","146","175","177","222","238","258","262","314","318","344","350","552"]);
    const goalsByDay=meta?.value||{};
    const curve=(daily||[]).map((row:any)=>{
@@ -62,7 +63,7 @@ Deno.serve(async(req:Request)=>{
    const m=official?.value?.month||{},months=Object.entries(m).filter(([ym]:[string,unknown])=>/^\d{4}-\d{2}$/.test(ym)).map(([ym,x]:[string,any])=>({
     month:ym,through:String(x?.through||""),stores:Object.fromEntries(Object.entries(x?.stores||{}).filter(([st,v]:[string,any])=>reg.has(st)&&v!=null&&Number.isFinite(Number(v))).map(([st,v]:[string,any])=>[st,Number(v)]))
    }));
-   return reply({ok:true,benchmarks:bench||[],daily:curve,official_months:months,competitive_weeks:weekly||[]});
+   return reply({ok:true,benchmarks:bench||[],daily:curve,official_months:months,competitive_weeks:weekly||[],competitive_periods:{day:(dailyRegions||[]).flatMap((entry:any)=>Array.isArray(entry.value)?entry.value:[])}});
   }
   if(body.action==="save"){
    // Nunca confiar apenas na matrícula: o principal deve autenticar com a senha administrativa.
