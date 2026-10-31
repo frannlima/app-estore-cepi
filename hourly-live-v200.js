@@ -703,6 +703,9 @@ async function createPoster(j){
  put(ctx,'Meta: '+money(total.meta)+'   •   Captação: '+money(total.captured)+'   •   Flash: '+Number(j.regionalFlash?.covered_stores||0)+'/18 lojas',54,fb+111,18,GREEN,true);
  ctx.fillStyle=GREEN;ctx.fillRect(0,c.height-54,1080,54);
  put(ctx,'Moda que inspira o Brasil  •  App eStore CE+PI',55,c.height-26,18,'#FFFFFF',true);
+ // Regional signature in the footer, keeping the official Riachuelo logo and all KPIs untouched.
+ const regionalBrand=await image('./assets/ce-pi-marca-nordestina.svg');
+ if(regionalBrand){ctx.fillStyle='#FFF9EB';ctx.fillRect(844,c.height-50,182,45);ctx.drawImage(regionalBrand,852,c.height-47,164,37)}
  return c;
 }
 shareHourlyV5=async function(){
