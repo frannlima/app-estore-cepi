@@ -19,6 +19,12 @@ const count=(v)=>v==null?"—":new Intl.NumberFormat("pt-BR").format(Math.round(
 const percent=(v)=>v==null?"—":(n(v)*100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+"%";
 const pp=(v)=>v==null?"—":(v>0?"+":"")+(n(v)*100).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+" p.p.";
 const dia=(v)=>v?String(v).split("-").reverse().join("/"):"—";
+function execZeroDateTag(date){
+ const weekday=new Date(String(date)+"T12:00:00Z").getUTCDay();
+ const mark=weekday===1?"eDay":weekday===6?"SÁB":weekday===0?"DOM":"";
+ const cls=weekday===1?"execDateEdayV4":weekday===6?"execDateSaturdayV4":weekday===0?"execDateSundayV4":"";
+ return '<span class="execZeroDateV4 '+cls+'" title="'+e(dia(date))+(mark?' • '+mark:'')+'">'+e(dia(date).slice(0,5))+(mark?'<em>'+mark+'</em>':'')+'</span>';
+}
 const isoWeek=(d)=>{let x=new Date(d+"T12:00:00Z"),z=x.getUTCDay()||7;x.setUTCDate(x.getUTCDate()-z+1);return x.toISOString().slice(0,10)};
 function weekNumber(d){const x=new Date(d+"T12:00:00Z"),t=new Date(Date.UTC(x.getUTCFullYear(),x.getUTCMonth(),x.getUTCDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const first=new Date(Date.UTC(t.getUTCFullYear(),0,1));return Math.ceil((((t-first)/86400000)+1)/7)}
 const firstMonth=(d)=>d.slice(0,7)+"-01";
@@ -140,7 +146,7 @@ function opportunities(){
  for(const day of entries.filter(d=>d.date>=historyStart&&d.date<=end)){
   for(const x of day.stores||[]){
    const st=String(x.st||"").padStart(3,"0"),c=Number(x.c),o=Number(x.o);
-   if(!STORES.includes(st)||!Number.isFinite(c)||!Number.isFinite(o)||c<0||o<0)continue;
+   if(!STORES.includes(st)||!(x.target!=null&&Number(x.target)>0)||!Number.isFinite(c)||!Number.isFinite(o)||c<0||o<0)continue;
    const v=history.get(st)||{observed:0,captured:0,orders:0,activeDays:0};
    v.observed++;v.captured+=c;v.orders+=o;if(o>0)v.activeDays++;
    history.set(st,v);
@@ -161,6 +167,8 @@ function opportunities(){
     if(!incompleteDays.includes(date))incompleteDays.push(date);
     continue;
    }
+   const eligible=item.target!=null&&Number.isFinite(Number(item.target))&&Number(item.target)>0;
+   if(!eligible)continue; // Sem meta positiva não há oportunidade de venda nem zeragem.
    validStoreDays++;
    regionCaptured+=captured;
    if(captured!==0||orders!==0)continue;
@@ -174,7 +182,7 @@ function opportunities(){
    zero.potential+=averageDailyCapture;
   }
  }
- const complete=daysMissing.length===0&&incompleteDays.length===0&&daysCovered===allDates.length&&daysCovered>0&&validStoreDays===daysCovered*STORES.length;
+ const complete=daysMissing.length===0&&incompleteDays.length===0&&daysCovered===allDates.length&&daysCovered>0&&true;
  const official=matchBenchmark()?.regional_captured;
  const regionalCaptured=official!=null&&Number.isFinite(Number(official))&&Number(official)>0?Number(official):(complete&&regionCaptured>0?regionCaptured:null);
  const rawPotential=daysCovered>0?[...byStore.values()].reduce((sum,x)=>sum+x.potential,0):null;
@@ -478,7 +486,7 @@ function render(){
  (daily?'<button type="button" class="execSecondaryV2" onclick="execToggleStoresV2()">Ver todas as lojas ▾</button><div id="execAllStoresV2" class="execAllStoresV2" hidden>'+[...d.rows].sort((a,b)=>n(b.c)-n(a.c)).map(x=>'<div><b>L'+e(x.st)+'</b><span>'+money(x.c)+'</span></div>').join("")+'</div>':"")+'</section>';
  const zeroCard='<div class="execZeroV1 execZeroPeriodV3"><h4>'+(daily?'LOJAS ZERADAS NO DIA':'LOJAS COM ZERAGEM NO PERÍODO')+'</h4>'+
  '<strong class="execNumBigV2">'+(opp.daysCovered?opp.zeros.length:'—')+'</strong>'+
- '<small>'+(daily?'Com captação igual a zero':opp.zeroDays+' ocorrências loja-dia zeradas • '+opp.validStoreDays+' loja-dias válidos')+'</small>'+
+ '<small>'+(daily?'Com captação igual a zero':opp.zeroDays+' ocorrências loja-dia zeradas • '+opp.validStoreDays+' loja-dias com meta')+'</small>'+
  '<div class="execZeroStatsV2"><span>Oportunidade estimada (R$)</span><b>'+money2(opp.potential)+'</b>'+
  '<span>Parcela da oportunidade (%)</span><b>'+percent(opp.ratio)+'</b>'+ 
  '<span>Taxa de zeragem (%)</span><b>'+percent(opp.zeroRate)+'</b></div>'+
@@ -486,12 +494,12 @@ function render(){
  '</div>';
  const rightCard='<div class="execPriorityV1 execZeroStoresV3"><h4>'+(daily?'LOJAS SEM CAPTAÇÃO DE VENDA NO DIA':'LOJAS COM ZERAGEM DE VENDAS NO PERÍODO')+'</h4>'+
  (daily?'<div class="execZeroHeadV3"><span>Filial</span><span>Situação</span></div>':
- '<div class="execZeroHeadV3"><span>Filial</span><span>Dias zerados</span><span>Impacto regional</span></div>')+
+ '<div class="execZeroHeadV3"><span>Filial</span><span>Ocorrências e datas</span><span>Impacto regional</span></div><div class="execZeroLegendV4"><span><i class="execLegendEdayV4"></i> eDay</span><span><i class="execLegendSaturdayV4"></i> Sábado</span><span><i class="execLegendSundayV4"></i> Domingo</span></div>')+
  (opp.zeros.length?'<div class="execZeroListV3">'+opp.zeros.map(x=>'<div class="execZeroRowV3"><b>L'+e(x.st)+'</b>'+
- (daily?'<strong class="execDangerV1">ZERADA</strong>':'<span><b>'+x.days+' dia'+(x.days===1?'':'s')+'</b><small style="display:block;font-size:10px;color:#66746b">('+x.dates.map(d=>dia(d)).join(' • ')+')</small></span><strong class="execDangerV1">'+percent(x.impact)+'<small style="display:block;font-size:10px">'+(x.potential==null?'Sem histórico':'('+money(x.potential)+')')+'</small></strong>')+
+ (daily?'<strong class="execDangerV1">ZERADA</strong>':'<span class="execZeroDatesCellV4"><b>'+x.days+' dia'+(x.days===1?'':'s')+'</b><span class="execZeroDatesV4">'+x.dates.map(execZeroDateTag).join('')+'</span></span><strong class="execDangerV1">'+percent(x.impact)+'<small style="display:block;font-size:10px">'+(x.potential==null?'Sem histórico':'('+money(x.potential)+')')+'</small></strong>')+
  '</div>').join("")+'</div>':
  '<div class="execHelpV1">'+(opp.daysCovered?'Nenhuma filial com zeragem registrada no período.':'Aguardando registros oficiais do período.')+'</div>')+
- '<small class="execTinyV2">Estimativa = média de pedidos por dia observado × ticket médio real de cada filial (42 dias anteriores). Parcela potencial = oportunidade ÷ (captação real + oportunidade). Dias sem registro não são zeragens.</small></div>';
+ '<small class="execTinyV2">Estimativa = média de pedidos por dia observado × ticket médio real de cada filial (42 dias anteriores). Parcela potencial = oportunidade ÷ (captação real + oportunidade). Dias sem meta positiva ou registro não são zeragens.</small></div>';
  const moves=shareMovements();
  const lines=(list,cls)=>list.length?list.map(x=>'<div class="execMoveRowV188"><strong>L'+e(x.st)+'</strong><b class="'+cls+'">'+pp(x.delta)+'</b></div>').join(""):'<div class="execHelpV1">Nenhuma filial neste critério.</div>';
  const movementPanel=daily?"":'<section class="execSectionV1"><div class="execSectionHeadV2"><h3>EVOLUÇÃO DO SHARE | '+(EX.period==="week"?"SEMANA":"MÊS")+'</h3><span class="execTinyV2">'+e(moves.source)+'</span></div>'+
