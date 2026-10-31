@@ -19,7 +19,7 @@ const text=()=>edits[current]===undefined?base[current]:edits[current];
 
 function operationalData(){
  try{
-  const j=typeof HOURLY_CACHE!=='undefined'?HOURLY_CACHE:null;
+  const j=typeof window.cepiHourlySnapshotV1==='function'?window.cepiHourlySnapshotV1():null;
   if(!j||!Array.isArray(j.stores)||!j.stores.length)return null;
   const d=today();if(j.result_date!==d)return {stale:true,date:j.result_date};
   const rows=j.stores,meta=rows.reduce((v,r)=>v+Number(r.metaValue||0),0),captured=rows.reduce((v,r)=>v+Number(r.captured||0),0),orders=rows.reduce((v,r)=>v+Number(r.orders||0),0);
