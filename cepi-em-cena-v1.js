@@ -86,7 +86,8 @@ c.fillStyle='#E6CA89';c.font='bold 36px Arial';c.fillText('CE+PI EM CENA  ·  '+
 c.fillStyle='#FFFFFF';c.font='bold 60px Arial';const words=items[current][1].split(' ');let line='',y=300;for(const w of words){const next=(line+' '+w).trim();if(c.measureText(next).width>1050){c.fillText(line,65,y);y+=78;line=w}else line=next}if(line)c.fillText(line,65,y);
 c.fillStyle='#DDE8E2';c.font='28px Arial';c.fillText('Presença · Conexão · Liderança',65,530);
 c.fillStyle='#E6CA89';c.font='bold 30px Arial';c.fillText('O MOVIMENTO É NOSSO.',65,610);
-try{const mark=new Image();mark.src='./assets/ce-pi-marca-nordestina.svg';await new Promise(ok=>{mark.onload=ok;mark.onerror=ok;setTimeout(ok,1800)});if(mark.complete&&mark.naturalWidth){c.fillStyle='#ffffff';c.fillRect(890,27,255,106);c.drawImage(mark,903,37,226,88)}}catch(e){}\nconst blob=await new Promise(resolve=>cv.toBlob(resolve,'image/png'));if(!blob)return alert('Falha ao gerar card.');
+try{const mark=new Image();mark.src='./assets/ce-pi-marca-nordestina.svg';await new Promise(ok=>{mark.onload=ok;mark.onerror=ok;setTimeout(ok,1800)});if(mark.complete&&mark.naturalWidth){c.fillStyle='#ffffff';c.fillRect(890,27,255,106);c.drawImage(mark,903,37,226,88)}}catch(e){}
+const blob=await new Promise(resolve=>cv.toBlob(resolve,'image/png'));if(!blob)return alert('Falha ao gerar card.');
 const file=new File([blob],'CE+PI_em_Cena_'+items[current][0]+'.png',{type:'image/png'});
 try{if(navigator.share&&navigator.canShare?.({files:[file]})){await navigator.share({files:[file],text:text(),title:'CE+PI em Cena'});return}}catch(e){if(e.name==='AbortError')return}
 const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000);
