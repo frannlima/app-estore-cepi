@@ -672,6 +672,26 @@ function officialD1Totals(rows:any[],expectedCaptured:number|null){
   regional_orders:orders(region)
  }};
 }
+async function saveOfficialRegionalDaily(date:string,rows:any[]){
+ const result:any[]=[],seen=new Set<string>();
+ for(const row of rows||[]){
+  const region=String(pick(row,"Regional")||"").trim();
+  const loja=String(pick(row,"Loja")||"").trim();
+  if(!region||!/^total$/i.test(loja)||/^(TOTAL|EMPRESA|BRASIL|TOTAL GERAL)$/i.test(region))continue;
+  const share=officialD1Number(pick(row,"Share Loja %","Share Loja","Share %"));
+  if(share===null||share<0||share>.05)continue;
+  const key=region.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/gi,"").toUpperCase();
+  if(seen.has(key))continue;seen.add(key);
+  result.push({regional:region,share,period_end:date});
+ }
+ // Não substituir um retrato nacional válido por um gerencial parcial.
+ if(result.length<21||!result.some(x=>isCePiRegion(x.regional)))return false;
+ const {error}=await db.from("app_state").upsert({
+  key:"regional_daily_shares_"+date,value:result,updated_at:new Date().toISOString()
+ },{onConflict:"key"});
+ if(error)throw error;
+ return true;
+}
 async function publishOfficialD1(date:string,matricula:string,totals:any){
  const record={period:"day",start_date:date,end_date:date,...totals,submitted_by:matricula,updated_at:new Date().toISOString()};
  const {error}=await db.from("estore_executive_benchmark").upsert(record,{onConflict:"period,start_date,end_date"});
@@ -1727,6 +1747,7 @@ Deno.serve(async(req)=>{
         const parsed=officialD1Totals(await sheetRows(file),captured);
         if(!parsed.ok)return json({error:parsed.reason},400);
         const benchmark=await publishOfficialD1(requested,matricula,parsed.record);
+        await saveOfficialRegionalDaily(requested,await sheetRows(file));
         return json({ok:true,date:requested,benchmark,message:"Comparativo CE+PI × Empresa conciliado. Vendas, pedidos e comissões anteriores preservados."});
       }
       if(action!=="daily_update")return json({error:"Ação inválida."},400);
@@ -1814,7 +1835,7 @@ Deno.serve(async(req)=>{
       let dailyBenchmarkWarning="";
       if(managementMode==="daily"){
         const parsed=officialD1Totals(mr,managementCaptured);
-        if(parsed.ok)dailyOfficialBenchmark=await publishOfficialD1(requested,matricula,parsed.record);
+        if(parsed.ok){dailyOfficialBenchmark=await publishOfficialD1(requested,matricula,parsed.record);await saveOfficialRegionalDaily(requested,mr);}
         else dailyBenchmarkWarning=parsed.reason;
       }else dailyBenchmarkWarning="Gerencial identificado como acumulado: não publicar como D-1.";
 
