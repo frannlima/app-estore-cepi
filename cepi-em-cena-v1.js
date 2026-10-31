@@ -25,7 +25,7 @@ function operationalData(){
   const rows=j.stores,meta=rows.reduce((v,r)=>v+Number(r.metaValue||0),0),captured=rows.reduce((v,r)=>v+Number(r.captured||0),0),orders=rows.reduce((v,r)=>v+Number(r.orders||0),0);
   const informed=rows.filter(r=>Boolean(r.updated_at||r.last_input_at||r.last_updated_at));
   const pending=rows.length-informed.length;
-  return {date:d,meta,captured,orders,informed:informed.length,total:rows.length,pending,coverage:Math.round(informed.length/rows.length*100)};
+  return {date:d,meta,captured,orders,informed:informed.length,total:rows.length,pending,coverage:Math.round(informed.length/rows.length*100),rows:informed};
  }catch(e){return null}
 }
 const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
@@ -38,7 +38,7 @@ function suggestion(){
  let message='';
  if(current===3)message='📊 *CEPI EM CENA | RADAR DO MOVIMENTO*\n\n'+numbers+'\n\n'+hint+'\n\nCada informação contribui para um consolidado mais completo. Vamos manter o acompanhamento vivo!';
  else if(current===4)message='🔥 *CEPI EM CENA | ACOMPANHAMENTO DA TARDE*\n\n'+numbers+'\n\nAinda temos oportunidades de ação nas próximas horas. Seguimos acompanhando e apoiando as operações!';
- else if(current===5)message='👏 *CEPI EM CENA | LIDERANÇA PRESENTE*\n\n'+numbers+'\n\nObrigado às lideranças que mantêm o acompanhamento da operação em dia. Qual boa prática da sua equipe merece ser compartilhada?';
+ else if(current===5){const ranked=d.rows.filter(x=>Number(x.captured||0)>0).sort((a,b)=>Number(b.captured||0)-Number(a.captured||0));const top=ranked[0];message='👏 *CEPI EM CENA | LIDERANÇA PRESENTE*\n\n'+(top?'Filial *'+String(top.st)+'*: '+money(top.captured)+' captados, '+Number(top.orders||0)+' pedidos informados.\n\n':'')+'Supervisores e gerentes, que boa prática da equipe merece reconhecimento hoje?';}
  else if(current===6)message='🌟 *CEPI EM CENA | MOVIMENTO DO DIA*\n\n'+numbers+'\n\nObrigado pela participação! Seguimos acompanhando as operações até o fechamento, conforme o horário de cada filial.';
  else message='🎬 *CEPI EM CENA | O MOVIMENTO É NOSSO*\n\n'+numbers+'\n\nVamos construir uma visão mais completa da CEPI ao longo do dia!';
  return {label:'Dados atuais disponíveis para contextualizar',detail:numbers+' · '+hint,value:message};
