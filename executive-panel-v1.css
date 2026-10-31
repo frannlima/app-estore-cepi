@@ -349,3 +349,9 @@
  .execZeroDateV4 em{font-size:7px}
  .execZeroLegendV4{gap:9px;font-size:9px}
 }
+
+/* D-1: duas colunas para filial e impacto potencial, inclusive no mobile */
+.execZeroStoresV3.execZeroDailyV5 .execZeroHeadV3,.execZeroStoresV3.execZeroDailyV5 .execZeroRowV3{grid-template-columns:minmax(75px,1fr) minmax(125px,1fr)}
+.execZeroDailyImpactV5{display:flex;flex-direction:column;align-items:flex-end;gap:3px;text-align:right}
+.execZeroDailyImpactV5 small{font-size:11px;color:#687770;font-weight:600}
+@media(max-width:650px){.execZeroStoresV3.execZeroDailyV5 .execZeroRowV3{grid-template-columns:minmax(65px,1fr) minmax(105px,1fr)}.execZeroDailyImpactV5 small{font-size:10px}}
