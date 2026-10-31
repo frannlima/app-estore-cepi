@@ -15,7 +15,7 @@ const today=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Fortaleza'}).
 const storage=()=> 'cepi-em-cena:'+today();
 const completed=()=>{try{return JSON.parse(localStorage.getItem(storage())||'{}')}catch(e){return {}}};
 const escape=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const text=()=>edits[current]===undefined?base[current]:edits[current];
+const text=()=>edits[current]===undefined?(suggestion().value||''):edits[current];
 
 function operationalData(){
  try{
@@ -75,17 +75,21 @@ const tx=el.querySelector('#cepiText');if(tx)tx.oninput=()=>edits[current]=tx.va
 const sug=el.querySelector('#cepiSuggest');if(sug)sug.onclick=applySuggestion;
 const cp=el.querySelector('#cepiCopy');if(cp)cp.onclick=()=>navigator.clipboard.writeText(text()).then(()=>alert('Legenda copiada.'),()=>alert('Selecione o texto para copiar.'));
 const mr=el.querySelector('#cepiMark');if(mr)mr.onclick=()=>{const d=completed();d[current]=true;localStorage.setItem(storage(),JSON.stringify(d));render()};
-const sn=el.querySelector('#cepiSend');if(sn)sn.onclick=share;
+const sn=el.querySelector('#cepiSend');if(sn){sn.disabled=!suggestion().value;sn.title=sn.disabled?'Parcial atual validada necessária para compartilhar':'';sn.onclick=share;}
 el.querySelector('#cepiHourly').onclick=()=>{close();if(typeof go==='function')go('hourly')};
 }
 async function share(){
+const data=operationalData();
+if(!data||data.stale||!data.informed||current<2){alert('Card operacional indisponível: atualize a parcial do dia no Hora a Hora.');return;}
 const cv=document.createElement('canvas');cv.width=1200;cv.height=675;
 const c=cv.getContext('2d');c.fillStyle='#173F35';c.fillRect(0,0,1200,675);c.fillStyle='#E6CA89';c.fillRect(65,115,1070,5);
 c.font='bold 32px Arial';c.fillStyle='#FFFFFF';c.fillText('eSTORE CONNECT',65,80);
 c.fillStyle='#E6CA89';c.font='bold 36px Arial';c.fillText('EM CENA  ·  '+items[current][0],65,200);
 c.fillStyle='#FFFFFF';c.font='bold 60px Arial';const words=items[current][1].split(' ');let line='',y=300;for(const w of words){const next=(line+' '+w).trim();if(c.measureText(next).width>1050){c.fillText(line,65,y);y+=78;line=w}else line=next}if(line)c.fillText(line,65,y);
-c.fillStyle='#DDE8E2';c.font='28px Arial';c.fillText('Presença · Conexão · Liderança',65,530);
-c.fillStyle='#E6CA89';c.font='bold 30px Arial';c.fillText('O MOVIMENTO É NOSSO.',65,610);
+c.fillStyle='#DDE8E2';c.font='bold 32px Arial';c.fillText('CAPTADO '+money(data.captured)+'  |  '+data.orders+' PEDIDOS',65,460);
+c.font='27px Arial';c.fillText('Meta '+money(data.meta)+'  |  Atingimento '+(data.meta>0?(100*data.captured/data.meta).toFixed(1).replace('.',',')+'%':'Em apuração'),65,515);
+c.fillText('Filiais informadas '+data.informed+'/'+data.total+'  |  Sem atualização '+data.pending,65,565);
+c.fillStyle='#E6CA89';c.font='bold 25px Arial';c.fillText('PARCIAL DO DIA · DADOS INFORMADOS',65,625);
 try{const mark=new Image();mark.src='./assets/ce-pi-marca-nordestina.svg';await new Promise(ok=>{mark.onload=ok;mark.onerror=ok;setTimeout(ok,1800)});if(mark.complete&&mark.naturalWidth){c.save();c.globalAlpha=.86;c.drawImage(mark,919,36,210,82);c.restore()}}catch(e){}
 const blob=await new Promise(resolve=>cv.toBlob(resolve,'image/png'));if(!blob)return alert('Falha ao gerar card.');
 const file=new File([blob],'CE+PI_em_Cena_'+items[current][0]+'.png',{type:'image/png'});
