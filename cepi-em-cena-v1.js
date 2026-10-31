@@ -22,10 +22,13 @@ function operationalData(){
   const j=typeof window.cepiHourlySnapshotV1==='function'?window.cepiHourlySnapshotV1():null;
   if(!j||!Array.isArray(j.stores)||!j.stores.length)return null;
   const d=today();if(j.result_date!==d)return {stale:true,date:j.result_date};
-  const rows=j.stores,meta=rows.reduce((v,r)=>v+Number(r.metaValue||0),0),captured=rows.reduce((v,r)=>v+Number(r.captured||0),0),orders=rows.reduce((v,r)=>v+Number(r.orders||0),0);
+  const rows=j.stores;
   const informed=rows.filter(r=>Boolean(r.updated_at||r.last_input_at||r.last_updated_at));
+  const sum=(key)=>informed.reduce((v,r)=>v+(Number.isFinite(Number(r[key]))?Number(r[key]):0),0);
   const pending=rows.length-informed.length;
-  return {date:d,meta,captured,orders,informed:informed.length,total:rows.length,pending,coverage:Math.round(informed.length/rows.length*100),rows:informed};
+  return {date:d,meta:sum('metaValue'),captured:sum('captured'),orders:sum('orders'),
+   informed:informed.length,total:rows.length,pending,coverage:Math.round(informed.length/rows.length*100),rows:informed};
+
  }catch(e){return null}
 }
 const money=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
