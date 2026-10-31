@@ -38,7 +38,7 @@ function suggestion(){
  if(!d.informed)return {label:'Sem filiais atualizadas',detail:'Nenhuma parcial validada hoje. Atualize Hora a Hora antes de preparar a mensagem.',value:null};
  if(current===0||current===1)return {label:'Rotina oficial preservada',detail:'Para D-1, indicadores e campanhas, utilize os cards já existentes no aplicativo.',value:null};
  const numbers='Captado: '+money(d.captured)+' • Pedidos: '+d.orders+' • ATG: '+(d.meta>0?(d.captured/d.meta*100).toFixed(0)+'%':'não calculável')+' • Cobertura: '+d.informed+'/'+d.total+' filiais';
- const hint=d.pending>0?'Ainda existem '+d.pending+' filiais sem atualização registrada.':'Todas as filiais da base consultada possuem atualização registrada.';
+ const hint=d.pending>0?'Atenção: '+d.pending+' filiais ainda sem parcial informada.':'Todas as filiais consultadas informaram a parcial.';
  let message='';
  if(current===3)message='📊 *CE+PI EM CENA | RADAR DO MOVIMENTO*\n\n'+numbers+'\n\n'+hint+'\n\nCada informação contribui para um consolidado mais completo. Vamos manter o acompanhamento vivo!';
  else if(current===4)message='🔥 *CE+PI EM CENA | ACOMPANHAMENTO DA TARDE*\n\n'+numbers+'\n\nAinda temos oportunidades de ação nas próximas horas. Seguimos acompanhando e apoiando as operações!';
@@ -49,7 +49,7 @@ function suggestion(){
   const entry=top?directory.find(e=>String(e.st).padStart(3,'0')===String(top.st).padStart(3,'0')):null;
   const names=(entry?.people||[]).map(p=>p.name.trim()).filter(Boolean);
   const label=names.length?'Supervisão vinculada à filial: '+names.join(', ')+'.\n\n':'';
-  message='👏 *CE+PI EM CENA | LIDERANÇA PRESENTE*\n\n'+(top?'A filial *'+String(top.st)+'* está no acompanhamento com '+money(top.captured)+' captados e '+Number(top.orders||0)+' pedidos informados.\n\n'+label:'')+'Supervisores e gerentes, qual iniciativa da equipe merece ser reconhecida hoje?';
+  message='👏 *CE+PI EM CENA | LIDERANÇA PRESENTE*\n\n'+(top?'A filial *'+String(top.st)+'* está no acompanhamento com '+money(top.captured)+' captados e '+Number(top.orders||0)+' pedidos informados.\n\n'+label:'')+'Reconhecimento pelo resultado informado até esta parcial. Vamos sustentar a entrega e ampliar a participação das demais filiais.';
  }
  else if(current===6)message='🌟 *CE+PI EM CENA | MOVIMENTO DO DIA*\n\n'+numbers+'\n\nObrigado pela participação! Seguimos acompanhando as operações até o fechamento, conforme o horário de cada filial.';
  else message='🎬 *CE+PI EM CENA | O MOVIMENTO É NOSSO*\n\n'+numbers+'\n\nVamos construir uma visão mais completa da CE+PI ao longo do dia!';
@@ -77,7 +77,7 @@ el.querySelectorAll('[data-row]').forEach(b=>b.onclick=()=>{current=Number(b.dat
 const sel=el.querySelector('#cepiSelect');if(sel)sel.onchange=()=>{current=Number(sel.value);render()};
 const tx=el.querySelector('#cepiText');if(tx)tx.oninput=()=>edits[current]=tx.value;
 const sug=el.querySelector('#cepiSuggest');if(sug)sug.onclick=applySuggestion;
-const cp=el.querySelector('#cepiCopy');if(cp)cp.onclick=()=>navigator.clipboard.writeText(text()).then(()=>alert('Legenda copiada.'),()=>alert('Selecione o texto para copiar.'));
+const cp=el.querySelector('#cepiCopy');if(cp)cp.onclick=()=>{if(!suggestion().value)return alert('Sem parcial válida para copiar.');return navigator.clipboard.writeText(text()).then(()=>alert('Legenda copiada.'),()=>alert('Selecione o texto para copiar.'))};
 const mr=el.querySelector('#cepiMark');if(mr)mr.onclick=()=>{const d=completed();d[current]=true;localStorage.setItem(storage(),JSON.stringify(d));render()};
 const sn=el.querySelector('#cepiSend');if(sn){sn.disabled=!suggestion().value;sn.title=sn.disabled?'Parcial atual validada necessária para compartilhar':'';sn.onclick=share;}
 el.querySelector('#cepiHourly').onclick=()=>{close();if(typeof go==='function')go('hourly')};
