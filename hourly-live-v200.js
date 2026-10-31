@@ -212,6 +212,11 @@ async function directory(){
  const j=await r.json();
  if(!r.ok||!j.ok){adminPassword='';throw Error(j.error||'Consulta indisponível')}
  supervisors=j.contacts||[];
+ // Eligible supervisors already validated by the existing Central de Alertas directory.
+ window.cepiCenaEligibleSupervisorsV1=function(){
+  if(typeof isAdmin!=='function'||!isAdmin())return [];
+  return (supervisors||[]).map(entry=>({st:String(entry.st||''),people:(entry.people||[]).filter(p=>!p.onLeave&&!p.onVacation&&!p.away&&/supervisor/i.test(String(p.role||''))&&/(efici|opera|experi|comercial)/i.test(String(p.role||''))).map(p=>({name:String(p.name||''),matricula:String(p.matricula||p.id||''),role:String(p.role||'')}))}));
+ };
  groupStatuses=j.groupStatus||{};
  groupStatusesDate=curr()?.result_date||clock().date;
  try{decorateScreen()}catch(_){}
