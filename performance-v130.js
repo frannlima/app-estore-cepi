@@ -7,6 +7,7 @@
   var PERF_FCA_V130=null;
   var PERF_SCOPE_V130='regional';
   var PERF_PERIOD_V130='closed';
+  var PERF_PERIOD_MANUAL_V130=false;
   var PERF_FOCUS_V130='share';
   var PERF_ACTIONS_CURRENT_V130=[];
   var PERF_DRAFT_V130=null;
@@ -379,12 +380,30 @@
   function priorityRowV130(x,i){
     return '<div class=performanceRankRowV130><span class=performanceRankNoV130>'+pesc(x.priority_rank||i+1)+'</span><span class=main><b>'+pesc(pstoreName(x))+'</b><small>'+pesc(priorityReasonV130(x))+'</small></span><span class=value><span class=performancePriorityPillV130>'+(i<2?'ALTO':'MÉDIO')+'</span><small class=down>'+ppp(x.share_delta)+'</small></span></div>';
   }
+  function preventiveRiskV131(d,s){
+    if(!s.isCurrent)return '';
+    var items=currentStores(d).filter(function(x){return phas(x.share_delta)&&phas(x.share)&&String(x.st||'')});
+    var complete=items.length>=18;
+    if(!complete)return '<section class="performancePanelV130"><div class="performancePanelHeadV130"><div><h3>Radar Preventivo • Semana '+pesc(d.currentWeekNumber||'atual')+'</h3><p>Aguardando base parcial por loja suficientemente completa. Priorização oficial da semana fechada permanece disponível no filtro.</p></div></div></section>';
+    items.sort(function(a,b){return pnum(a.share_delta)-pnum(b.share_delta)||String(a.st).localeCompare(String(b.st))});
+    var risk=items.slice(0,5),attention=items.slice(5,7),growth=items.filter(function(x){return pnum(x.share_delta)>0});
+    var entry=function(x,i,cls){
+      var prior=phas(x.previous_share)?Number(x.previous_share):Number(x.share)-Number(x.share_delta);
+      return '<div class="performanceRankRowV130"><span class="performanceRankNoV130">'+(i+1)+'</span><span class="main"><b>'+pesc(pstoreName(x))+'</b><small>Anterior '+ppct(prior,2)+' • Parcial '+ppct(x.share,2)+' • Captado '+pmoney(x.captured)+'</small></span><span class="value"><b class="'+cls+'">'+ppp(x.share_delta)+'</b></span></div>';
+    };
+    return '<section class="performancePanelV130"><div class="performancePanelHeadV130"><div><h3>Radar Preventivo • Semana '+pesc(d.currentWeekNumber||'atual')+'</h3><p>Comparativo parcial versus semana fechada • classificação provisória até o fechamento.</p></div></div>'+
+      '<div class="performanceKpisV130"><div class="performanceKpiV130"><span>5 menores evoluções</span><b>'+risk.length+'</b></div><div class="performanceKpiV130"><span>Em atenção</span><b>'+attention.length+'</b></div><div class="performanceKpiV130"><span>Com evolução</span><b>'+growth.length+'</b></div></div>'+
+      '<div class="performanceRankGridV130"><section class="performancePanelV130"><h3>Risco de priorização • simulação</h3>'+risk.map(function(x,i){return entry(x,i,'down')}).join('')+'</section>'+
+      '<section class="performancePanelV130"><h3>Atenção • próximas da linha de corte</h3>'+attention.map(function(x,i){return entry(x,i+5,'')}).join('')+'</section></div>'+
+      '<p class="performanceNoticeV130">Não é a lista oficial de priorizadas. A classificação será recalculada a cada nova importação do acumulado semanal, sem presumir captação adicional quando o denominador de vendas não estiver validado.</p></section>';
+  }
+
   function ranksHtmlV130(d,s,top,bottom){
-    var pri=d&&d.prioritized||[];
+    var pri=s.isCurrent?[]:(d&&d.prioritized||[]);
     return '<div class=performanceRankGridV130>'+
       '<section class="performancePanelV130 performanceRankPanelV130"><div class="performanceRankHeaderV130 top"><div><h3>Top 5 Performance</h3><small>'+pesc(PERF_FOCUS_LABELS_V130[PERF_FOCUS_V130])+' • resultado entregue</small></div></div><div class=performanceRankTableV130>'+(top.length?top.map(function(x,i){return rankRowV130(x,i,false)}).join(''):'<div class=performanceEmptyV130>Sem dados suficientes.</div>')+'</div></section>'+
       '<section class="performancePanelV130 performanceRankPanelV130"><div class="performanceRankHeaderV130 bottom"><div><h3>Bottom 5 Performance</h3><small>'+pesc(PERF_FOCUS_LABELS_V130[PERF_FOCUS_V130])+' • menor desempenho</small></div></div><div class=performanceRankTableV130>'+(bottom.length?bottom.map(function(x,i){return rankRowV130(x,i,false)}).join(''):'<div class=performanceEmptyV130>Sem dados suficientes.</div>')+'</div></section>'+
-      '<section class="performancePanelV130 performanceRankPanelV130"><div class="performanceRankHeaderV130 priority"><div><h3>Lojas Priorizadas FCA</h3><small>Priorizadas por retração de Share</small></div></div><div class=performanceRankTableV130>'+(pri.length?pri.slice(0,5).map(priorityRowV130).join(''):'<div class=performanceEmptyV130>Nenhuma prioridade validada neste ciclo.</div>')+'</div></section>'+
+      '<section class="performancePanelV130 performanceRankPanelV130"><div class="performanceRankHeaderV130 priority"><div><h3>'+(s.isCurrent?'Priorização oficial • semana fechada':'Lojas Priorizadas FCA')+'</h3><small>'+(s.isCurrent?'Consulte a semana fechada no filtro para visualizar':'Priorizadas por retração de Share')+'</small></div></div><div class=performanceRankTableV130>'+(pri.length?pri.slice(0,5).map(priorityRowV130).join(''):'<div class=performanceEmptyV130>Nenhuma prioridade validada neste ciclo.</div>')+'</div></section>'+
     '</div>';
   }
 
@@ -477,7 +496,7 @@
     var notice=s.partialFallback?'<div class=performanceNoticeV130>A parcial atual da sua filial não veio no recorte individual disponível. Para não inferir dados, a Central mantém o último fechamento certificado da operação e usa a parcial apenas como referência regional.</div>':'';
     root.innerHTML=filtersHtmlV130(d)+notice+kpiHtmlV130(d,s)+
       '<div class=performanceGridV130>'+shareCompareHtmlV130(d,s)+diagnosisHtmlV130(d,s)+contributionHtmlV130(d,s,top)+'</div>'+
-      ranksHtmlV130(d,s,top,bottom)+
+      (s.isCurrent?preventiveRiskV131(d,s):'')+ranksHtmlV130(d,s,top,bottom)+
       analysisHtmlV130(d,s,causes,evidences,actions)+
       planHtmlV130(d,s)+
       execPreviewHtmlV130(d,s,top,d.prioritized||[],causes);
@@ -491,6 +510,11 @@
     try{
       var d=await api({action:'fca_dashboard',matricula:U.u.id});
       PERF_FCA_V130=d;
+      if(!PERF_PERIOD_MANUAL_V130){
+        var weekday=Number(new Intl.DateTimeFormat('en-US',{timeZone:'America/Fortaleza',weekday:'short'}).format(new Date()).match(/^(Sun|Mon|Tue|Wed|Thu|Fri|Sat)$/)?['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(new Intl.DateTimeFormat('en-US',{timeZone:'America/Fortaleza',weekday:'short'}).format(new Date())):-1);
+        PERF_PERIOD_V130=weekday>=5||weekday===0?'current':'closed';
+        if(!(d&&d.showPartial&&d.currentPartial))PERF_PERIOD_V130='closed';
+      }
       renderPerformanceV130();
     }catch(e){
       root.innerHTML='<div class="notice danger"><b>Não foi possível consolidar a Central de Performance.</b><br>'+pesc(e&&e.message||'Tente novamente.')+'</div>';
@@ -498,7 +522,7 @@
   };
   window.performanceRefreshV130=function(){syncNoteV130();PERF_FCA_V130=null;loadPerformanceV130(true)};
   window.performanceSetScopeV130=function(v){syncNoteV130();PERF_SCOPE_V130=v==='operation'?'operation':'regional';renderPerformanceV130()};
-  window.performanceSetPeriodV130=function(v){syncNoteV130();PERF_PERIOD_V130=v==='current'?'current':'closed';renderPerformanceV130()};
+  window.performanceSetPeriodV130=function(v){syncNoteV130();PERF_PERIOD_MANUAL_V130=true;PERF_PERIOD_V130=v==='current'?'current':'closed';renderPerformanceV130()};
   window.performanceSetFocusV130=function(v){syncNoteV130();PERF_FOCUS_V130=PERF_FOCUS_LABELS_V130[v]?v:'share';renderPerformanceV130()};
   window.performanceToggleActionV130=function(i,on){
     if(!PERF_DRAFT_V130)return;
