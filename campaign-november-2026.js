@@ -18,14 +18,14 @@ return '<section class="card" id="campanhaNov2026" style="border:2px solid #b18a
 }
 function patch(){
 if(!november())return;
-if(typeof window.campaigns==='function'&&!window.campaigns.__nov2026){
- const old=window.campaigns;
+if(typeof campaigns==='function'&&!campaigns.__nov2026){
+ const old=campaigns;
  const wrapped=function(){return html()+String(old.apply(this,arguments)||'').replace(/eStore no Volume Máximo/gi,'Campanha anterior (encerrada)').replace(/PARCIAL NO VOLUME MÁXIMO/gi,'Histórico de campanha');};
- wrapped.__nov2026=true;window.campaigns=wrapped;try{campaigns=wrapped;}catch(_){}
+ wrapped.__nov2026=true;try{campaigns=wrapped;window.campaigns=wrapped;}catch(_){}
 }
-if(typeof window.commission==='function'&&!window.commission.__nov2026){
- const old=window.commission;const wrapped=function(){return '<div class="notice"><b>Novembro: Bateu? Levou!</b><br>Se a loja alcançar 1% de share ao fechar o mês, 10% substituem os 3% sobre vendas próprias aprovadas elegíveis. Terças-feiras já têm 10%: sem acumular. O pool de supervisores continua 3%. Simulações padrão abaixo não incluem a apuração condicional de novembro.</div>'+old.apply(this,arguments);};
- wrapped.__nov2026=true;window.commission=wrapped;try{commission=wrapped;}catch(_){}
+if(typeof commission==='function'&&!commission.__nov2026){
+ const old=commission;const wrapped=function(){return '<div class="notice"><b>Novembro: Bateu? Levou!</b><br>Se a loja alcançar 1% de share ao fechar o mês, 10% substituem os 3% sobre vendas próprias aprovadas elegíveis. Terças-feiras já têm 10%: sem acumular. O pool de supervisores continua 3%. Simulações padrão abaixo não incluem a apuração condicional de novembro.</div>'+old.apply(this,arguments);};
+ wrapped.__nov2026=true;try{commission=wrapped;window.commission=wrapped;}catch(_){}
 }
 }
 function popup(){
