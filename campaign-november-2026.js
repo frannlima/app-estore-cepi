@@ -48,7 +48,11 @@ function upgradeSimulator(){
  const option=document.createElement('option');option.value='.10';option.textContent='Bateu? Levou! • 10% (condicionado a 1% de share no fechamento)';select.appendChild(option);
  const hint=document.createElement('div');hint.className='notice';hint.style.marginTop='8px';hint.textContent='Novembro: Dia E 10% nas terças. Se a loja fechar o mês com 1% de share, 10% substituem os 3% nas vendas próprias elegíveis. Não acumula. O simulador não valida o atingimento da meta.';select.parentNode.appendChild(hint);
 }
-function tick(){patch();popup();upgradeSimulator();}
+function enforceNovemberEday(){
+ if(!november())return;
+ try{if(typeof EDAY==='object'&&EDAY){EDAY.weekdays=[2];EDAY.rate=.10;EDAY.active=true;EDAY.start='2026-11-01';EDAY.end='2026-11-30';}}catch(_){}
+}
+function tick(){enforceNovemberEday();patch();popup();upgradeSimulator();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',tick);else tick();
 setInterval(tick,1500);
 })();
