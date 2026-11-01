@@ -58,12 +58,11 @@ setInterval(tick,1500);
  if(localDate()<'2026-11-01'||localDate()>'2026-11-30')return;
  async function read(){
   try{
-   const client=window.supabaseClient||window.supabaseDb||window.sb;
-   if(!client||typeof client.from!=='function')return;
-   const {data,error}=await client.from('estore_campaign_rules').select('campaign_id,competency,title,rules').eq('competency','2026-11');
-   if(error)throw error;
-   window.estoreNovemberCampaignRules=data||[];
-   document.dispatchEvent(new CustomEvent('estore:campaign-rules-ready',{detail:{count:(data||[]).length}}));
+   if(typeof api!=='function')return;
+   const response=await api({action:'campaign_rules_november'});
+   if(!response||!response.ok)throw new Error('Regulamento indisponível');
+   window.estoreNovemberCampaignRules=response.campaigns||[];
+   document.dispatchEvent(new CustomEvent('estore:campaign-rules-ready',{detail:{count:window.estoreNovemberCampaignRules.length}}));
   }catch(error){console.warn('[eStore] Campanha novembro: leitura remota indisponível; regulamento local mantido.',error);}
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',read,{once:true});else read();
