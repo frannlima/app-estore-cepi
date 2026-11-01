@@ -2527,6 +2527,11 @@ Deno.serve(async(req)=>{
       }).sort((a:any,b:any)=>b.month.localeCompare(a.month));
       return json({ok:true,source:"monthly_collaborator_history",commissionEligible:commissionEligibility.eligible,commissionEligibilityReason:commissionEligibility.reason,contractRole:commissionEligibility.role,rule:{normalRate:.03,edayRate:.10,edayStart:"2026-08-01"},months});
     }
+    if(body.action==="campaign_rules_november"){
+      const {data,error}=await db.from("estore_campaign_rules").select("campaign_id,competency,starts_on,ends_on,title,rules").eq("competency","2026-11");
+      if(error)throw error;
+      return json({ok:true,competency:"2026-11",campaigns:data||[]});
+    }
     if(body.action==="commission_period"){
       const matricula=String(body.matricula||"").trim(),month=String(body.month||"");
       if(!/^\d+$/.test(matricula)||!/^\d{4}-\d{2}$/.test(month))return json({error:"Parâmetros inválidos."},400);
