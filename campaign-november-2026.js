@@ -40,7 +40,15 @@ function close(){try{sessionStorage.setItem('estore-campanha-nov2026-v1','1');}c
 el.querySelector('#novCampaignDismiss').onclick=close;
 el.querySelector('#novCampaignDetails').onclick=function(){close();if(typeof go==='function')go('campaigns');};
 }
-function tick(){patch();popup();}
+function upgradeSimulator(){
+ if(!november())return;
+ const select=document.getElementById('simr');
+ if(!select||select.dataset.nov2026)return;
+ select.dataset.nov2026='1';
+ const option=document.createElement('option');option.value='.10';option.textContent='Bateu? Levou! • 10% (condicionado a 1% de share no fechamento)';select.appendChild(option);
+ const hint=document.createElement('div');hint.className='notice';hint.style.marginTop='8px';hint.textContent='Novembro: Dia E 10% nas terças. Se a loja fechar o mês com 1% de share, 10% substituem os 3% nas vendas próprias elegíveis. Não acumula. O simulador não valida o atingimento da meta.';select.parentNode.appendChild(hint);
+}
+function tick(){patch();popup();upgradeSimulator();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',tick);else tick();
 setInterval(tick,1500);
 })();
