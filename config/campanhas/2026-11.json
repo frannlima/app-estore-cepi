@@ -1,0 +1,38 @@
+{
+  "competencia": "2026-11",
+  "inicio": "2026-11-01",
+  "fim": "2026-11-30",
+  "campanhas": [
+    {
+      "id": "dia-e-novembro",
+      "titulo": "Dia E agora é na terça!",
+      "diasSemana": [
+        2
+      ],
+      "comissaoVendaPropriaPercentual": 10,
+      "naoAcumulativa": true
+    },
+    {
+      "id": "bateu-levou-novembro",
+      "titulo": "Bateu? Levou!",
+      "shareMinimoPercentual": 1,
+      "comissaoVendaPropriaPercentual": 10,
+      "substituiComissaoPadrao": true,
+      "naoAcumulativa": true,
+      "pagamentoAte": "2026-12-31"
+    }
+  ],
+  "comissaoPadraoVendaPropriaPercentual": 3,
+  "poolSupervisoresPercentual": 3,
+  "excluidos": [
+    "gerentes",
+    "intermitentes",
+    "aprendizes"
+  ],
+  "vendasNaoElegiveis": [
+    "produto com estoque na própria loja",
+    "Retire Rápido na mesma filial",
+    "pagamento não aprovado"
+  ],
+  "historicoAnteriorIntocado": true
+}
