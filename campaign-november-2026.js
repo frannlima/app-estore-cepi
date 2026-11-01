@@ -52,3 +52,19 @@ function tick(){patch();popup();upgradeSimulator();}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',tick);else tick();
 setInterval(tick,1500);
 })();
+/* Regras vigentes: leitura pelo endpoint Supabase REST com chave pública do projeto. */
+(function(){
+ const localDate=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Fortaleza',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+ if(localDate()<'2026-11-01'||localDate()>'2026-11-30')return;
+ async function read(){
+  try{
+   const client=window.supabaseClient||window.supabaseDb||window.sb;
+   if(!client||typeof client.from!=='function')return;
+   const {data,error}=await client.from('estore_campaign_rules').select('campaign_id,competency,title,rules').eq('competency','2026-11');
+   if(error)throw error;
+   window.estoreNovemberCampaignRules=data||[];
+   document.dispatchEvent(new CustomEvent('estore:campaign-rules-ready',{detail:{count:(data||[]).length}}));
+  }catch(error){console.warn('[eStore] Campanha novembro: leitura remota indisponível; regulamento local mantido.',error);}
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',read,{once:true});else read();
+})();
