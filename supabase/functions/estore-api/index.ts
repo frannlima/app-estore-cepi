@@ -2546,12 +2546,12 @@ Deno.serve(async(req)=>{
         const d=String(r.date),st=String(r.store_code||"").padStart(3,"0"),aa=n(r.approved),
               ba=Math.min(aa,n(bm.get(d+"|"+st))),ca=Math.max(0,aa-ba),
               dow=new Date(d+"T12:00:00Z").getUTCDay(),eStart=String(cfg.start||"2026-08-01"),
-              isE=cfg.active!==false&&dow===1&&d>=eStart&&(!cfg.end||d<=cfg.end);
+              isE=(month==="2026-11"?dow===2:cfg.active!==false&&dow===1&&d>=eStart&&(!cfg.end||d<=cfg.end));
         commissionableApproved+=ca;bopisApproved+=ba;
         if(!commissionEligibility.eligible)continue;
         if(isE)eday+=ca*n(cfg.rate||.10);else normal+=ca*.03;
       }
-      return json({ok:true,month,commissionVerified:true,commissionableApproved:+commissionableApproved.toFixed(2),bopisApproved:+bopisApproved.toFixed(2),basis:"approved_minus_admin_bopis_report",commissionEligible:commissionEligibility.eligible,commissionEligibilityReason:commissionEligibility.reason,contractRole:commissionEligibility.role,individual:{normal:+normal.toFixed(2),eday:+eday.toFixed(2),total:+(normal+eday).toFixed(2)}});
+      return json({ok:true,month,commissionVerified:month==="2026-11"?false:true,campaignQualification:month==="2026-11"?"PENDING_OFFICIAL_MONTHLY_SHARE":null,commissionableApproved:+commissionableApproved.toFixed(2),bopisApproved:+bopisApproved.toFixed(2),basis:"approved_minus_admin_bopis_report",commissionEligible:commissionEligibility.eligible,commissionEligibilityReason:commissionEligibility.reason,contractRole:commissionEligibility.role,individual:{normal:+normal.toFixed(2),eday:+eday.toFixed(2),total:+(normal+eday).toFixed(2)}});
     }
     if(body.action==="pool_rankings"){
       const matricula=String(body.matricula||""),period=PERIODS.includes(String(body.period||"month"))?String(body.period||"month"):"month",month=String(body.month||"");
