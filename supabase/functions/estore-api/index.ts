@@ -2556,7 +2556,7 @@ Deno.serve(async(req)=>{
         if(!commissionEligibility.eligible)continue;
         if(isE)eday+=ca*n(cfg.rate||.10);else normal+=ca*.03;
       }
-      return json({ok:true,month,commissionVerified:month==="2026-11"?false:true,campaignQualification:month==="2026-11"?"PENDING_OFFICIAL_MONTHLY_SHARE":null,commissionableApproved:+commissionableApproved.toFixed(2),bopisApproved:+bopisApproved.toFixed(2),basis:"approved_minus_admin_bopis_report",commissionEligible:commissionEligibility.eligible,commissionEligibilityReason:commissionEligibility.reason,contractRole:commissionEligibility.role,individual:{normal:+normal.toFixed(2),eday:+eday.toFixed(2),total:+(normal+eday).toFixed(2)}});
+      return json({ok:true,month,commissionVerified:month==="2026-11"?false:true,campaignQualification:month==="2026-11"?"PENDING_OFFICIAL_MONTHLY_SHARE":null,conditionalMonthlyCommission:month==="2026-11"&&commissionEligibility.eligible?+(commissionableApproved*.10).toFixed(2):null,conditionalAdditionalCommission:month==="2026-11"&&commissionEligibility.eligible?+(Math.max(0,commissionableApproved*.10-normal-eday)).toFixed(2):null,commissionableApproved:+commissionableApproved.toFixed(2),bopisApproved:+bopisApproved.toFixed(2),basis:"approved_minus_admin_bopis_report",commissionEligible:commissionEligibility.eligible,commissionEligibilityReason:commissionEligibility.reason,contractRole:commissionEligibility.role,individual:{normal:+normal.toFixed(2),eday:+eday.toFixed(2),total:+(normal+eday).toFixed(2)}});
     }
     if(body.action==="pool_rankings"){
       const matricula=String(body.matricula||""),period=PERIODS.includes(String(body.period||"month"))?String(body.period||"month"):"month",month=String(body.month||"");
