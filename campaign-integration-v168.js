@@ -269,3 +269,6 @@
   script.onerror=function(){console.warn("[eStore] Central de Dados v206 indisponível.");};
   document.head.appendChild(script);
 })();
+
+/* Novembro 2026: carregar campanha isolada sem alterar regras de outubro. */
+(function(){if(window.__novCampaignLoaded)return;window.__novCampaignLoaded=true;const s=document.createElement('script');s.src='./campaign-november-2026.js?build=20261101';s.async=false;document.head.appendChild(s);})();
