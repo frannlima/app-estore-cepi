@@ -348,7 +348,7 @@ function competitiveRadar(){
  const rank=poorer==null?null:poorer+1,lastRank=rank==null?null:rank+tied-1;
  const definiteRisk=rank!=null&&lastRank<=cutoffCount,tieRisk=rank!=null&&rank<=cutoffCount&&!definiteRisk;
  const safe=rank!=null&&rank>cutoffCount;
- const label=!rows.length?"Aguardando duas semanas comparáveis do gerencial por regional":!consistent?"Histórico regional divergente do share oficial: ranking suspenso":safe?"CE+PI fora das 5 menores evoluções":tieRisk?"CE+PI empatada na linha de corte":definiteRisk?"CE+PI entre as 5 menores evoluções":"Acompanhamento semanal";
+ const label=!rows.length?"Aguardando duas semanas comparáveis do gerencial por regional":!consistent?"Ranking histórico disponível • share CE+PI em conciliação":safe?"CE+PI fora das 5 menores evoluções":tieRisk?"CE+PI empatada na linha de corte":definiteRisk?"CE+PI entre as 5 menores evoluções":"Acompanhamento semanal";
  const status=!consistent?"neutral":safe?"ok":"danger";
  const capture=cepi?.captured;
  const sales=cepi&&cepi.now>0&&Number.isFinite(capture)&&capture>=0?capture/cepi.now:null;
@@ -356,16 +356,16 @@ function competitiveRadar(){
  const target=cutoff!=null&&previous!=null?previous+cutoff+0.0000001:null;
  const need=consistent&&target!=null&&Number.isFinite(sales)&&sales>0&&Number.isFinite(capture)?
   Math.max(0,Math.ceil((target*sales-capture)*100)/100):null;
- const rankLabel=!consistent||rank==null?"—":(lastRank>rank?rank+"º–"+lastRank+"º":rank+"º")+" / "+rows.length;
+ const rankLabel=rank==null?"—":(lastRank>rank?rank+"º–"+lastRank+"º":rank+"º")+" / "+rows.length;
  const textDelta=delta==null?"—":(delta>0?"▲ ":delta<0?"▼ ":"= ")+pp4(delta);
  const latestWeekBenchmark=(EX.data?.benchmarks||[]).filter(x=>x.period==="week"&&x.start_date===pair?.start).sort((a,b)=>String(b.end_date||"").localeCompare(String(a.end_date||"")))[0];
  const importedThrough=latestWeekBenchmark?.end_date||pair?.end||"";
  const partial=!!pair&&!!importedThrough&&importedThrough<pair.end;
  const weekCaption=pair?"S"+weekNumber(pair.start)+" • "+dia(pair.start)+" a "+dia(partial?importedThrough:pair.end)+(partial?" • PARCIAL":" • FECHADA")+" vs S"+weekNumber(pair.previousStart):"Sem histórico comparável";
- const topFive=consistent&&rows.length?'<div class="execRadarTopV5"><strong>5 REGIONAIS COM MENOR EVOLUÇÃO</strong><div class="execRadarRankV4">'+
+ const topFive=rows.length?'<div class="execRadarTopV5"><strong>5 REGIONAIS COM MENOR EVOLUÇÃO</strong><div class="execRadarRankV4">'+
   rows.slice(0,5).map((x,i)=>'<div><span>'+(i+1)+'º • '+e(x.region)+(i===4?' • linha de corte':'')+'</span><b class="'+(x.delta<0?"execDangerV1":"execSuccessV1")+'">'+pp4(x.delta)+'</b></div>').join("")+
   '</div></div>':"";
- const fullRank=consistent&&rows.length?'<div class="execRadarRankV4">'+rows.map((x,i)=>
+ const fullRank=rows.length?'<div class="execRadarRankV4">'+rows.map((x,i)=>
   '<div><span>'+(i+1)+'º • '+e(x.region)+'</span><span>Antes: '+pct4(x.before)+' | Atual: '+pct4(x.now)+'</span><b class="'+(x.delta<0?"execDangerV1":"execSuccessV1")+'">'+pp4(x.delta)+'</b></div>').join("")+'</div>':
   '<p class="execHelpV1">Os dados de semanas completas serão usados automaticamente após a carga gerencial nível empresa.</p>';
  return '<section class="execSectionV1 execRadarV4" aria-label="Radar competitivo share semanal">'+
@@ -376,7 +376,8 @@ function competitiveRadar(){
   '<div><small>EVOLUÇÃO • CE+PI</small><strong class="'+(delta!=null&&delta<0?"execDangerV1":"execSuccessV1")+'">'+textDelta+'</strong></div>'+
   '<div><small>POSIÇÃO POR MENOR EVOLUÇÃO</small><strong>'+rankLabel+'</strong></div></div>'+
   '<div class="execRadarActionV4 '+status+'"><strong>'+e(label)+'</strong><span>Captação adicional teórica para superar a linha de corte: <b>'+money2(need)+'</b></span></div>'+
-  topFive+
+  (!consistent&&rows.length?'<p class="execHelpV1"><strong>Ranking provisório:</strong> classificação baseada no histórico nacional. Share CE+PI oficial: '+pct4(official)+'; histórico: '+pct4(cepi?.now)+'. A classificação pode mudar após conciliação dos dados.</p>':'')+
+   topFive+
   '<p class="execTinyV2">Fonte: histórico regional importado. Enquanto a semana estiver em andamento, ranking e priorização são parciais e podem mudar. A estimativa em R$ pressupõe denominador de vendas e demais regionais constantes; não é uma projeção garantida.</p>'+
   '<details class="execRadarDetailsV4"><summary>Ver ranking completo das '+rows.length+' regionais ▾</summary>'+fullRank+'</details></section>';
 }
