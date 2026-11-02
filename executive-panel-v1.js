@@ -341,6 +341,25 @@ function competitiveRadar(){
  const cepi=rows.find(x=>/^(CE\s*\+\s*PI|CEPI)$/i.test(x.region.trim()));
  const official=regionalData().share;
   const consistent=cepi&&official!=null&&Math.abs(cepi.now-Number(official))<0.0000005;
+  // O ranking de 21 regionais precisa corresponder ao mesmo fechamento nacional.
+  // Não publicar classificação antiga quando um benchmark mais recente já foi importado.
+  if(rows.length&&official!=null&&!consistent){
+    const latestOfficial=(EX.data?.benchmarks||[]).filter(x=>x.period==="week"&&x.start_date===pair?.start&&x.regional_share!=null)
+      .sort((a,b)=>String(b.end_date||"").localeCompare(String(a.end_date||"")))[0];
+    const caption="S"+weekNumber(pair.start)+" vs S"+weekNumber(pair.previousStart);
+    const importedEnd=latestOfficial?.end_date||"";
+    return '<section class="execSectionV1 execRadarV4" aria-label="Radar competitivo aguardando atualização regional">'+
+      '<div class="execSectionHeadV2"><h3>RADAR COMPETITIVO | SHARE SEMANAL</h3><span class="execTinyV2">'+e(caption)+'</span></div>'+
+      '<div class="execRadarGridV4"><div><small>SEMANA ANTERIOR • CE+PI</small><strong>'+pct4(cepi.before)+'</strong></div>'+
+      '<div><small>SEMANA ATUAL • CE+PI (OFICIAL)</small><strong>'+pct4(official)+'</strong></div>'+
+      '<div><small>EVOLUÇÃO OFICIAL • CE+PI</small><strong>'+pp4(Number(official)-cepi.before)+'</strong></div>'+
+      '<div><small>RANKING DAS 21 REGIONAIS</small><strong>AGUARDANDO BASE</strong></div></div>'+
+      '<div class="execRadarActionV4 neutral"><strong>Atualização regional pendente para '+e(caption)+'</strong>'+
+      '<span>O consolidado oficial'+(importedEnd?' até '+dia(importedEnd):'')+' registra '+pct4(official)+
+      ' para CE+PI, mas o histórico regional disponível ainda registra '+pct4(cepi.now)+
+      '. Para evitar uma priorização incorreta, o Top 5 e o ranking ficam suspensos até importar a mesma competência para as 21 regionais.</span></div></section>';
+  }
+
   const previous=cepi?cepi.before:null,current=cepi?(official==null?cepi.now:Number(official)):null,delta=cepi?current-cepi.before:null;
  const cutoffCount=5,cutoff=rows.length>=cutoffCount?rows[cutoffCount-1].delta:null;
  const poorer=cepi?rows.filter(x=>x.delta<cepi.delta-0.0000000001).length:null;
