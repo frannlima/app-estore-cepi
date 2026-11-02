@@ -271,4 +271,4 @@
 })();
 
 /* Novembro 2026: carregar campanha isolada sem alterar regras de outubro. */
-(function(){if(window.__novCampaignLoaded)return;window.__novCampaignLoaded=true;const s=document.createElement('script');s.src='./campaign-november-2026.js?build=20261101';s.async=false;document.head.appendChild(s);})();
+(function(){if(window.__novCampaignLoaded)return;window.__novCampaignLoaded=true;const s=document.createElement('script');s.src='./campaign-november-2026.js?build=20261102-natal-clean';s.async=false;document.head.appendChild(s);})();
