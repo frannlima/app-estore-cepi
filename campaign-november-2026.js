@@ -20,7 +20,7 @@ function patch(){
 if(!november())return;
 if(typeof campaigns==='function'&&!campaigns.__nov2026){
  const old=campaigns;
- const wrapped=function(){return html()+String(old.apply(this,arguments)||'').replace(/eStore no Volume Máximo/gi,'Campanha anterior (encerrada)').replace(/PARCIAL NO VOLUME MÁXIMO/gi,'Histórico de campanha');};
+ const wrapped=function(){return html();};
  wrapped.__nov2026=true;try{campaigns=wrapped;window.campaigns=wrapped;}catch(_){}
 }
 if(typeof commission==='function'&&!commission.__nov2026){
