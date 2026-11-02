@@ -123,7 +123,10 @@ window.centralWeeklyImportV206=async function(){
   fd.append("week_start",date);
   fd.append("weekly_report",file,file.name);
   const j=await apiForm(fd);if(j?.error)throw Error(j.error);
-  if(out)out.textContent=(j.message||"Histórico semanal incorporado.")+" • "+Number(j.stores||0)+" filiais.";
+  if(out)out.textContent=(j.message||"Histórico semanal incorporado.")+" • "+Number(j.stores||0)+" filiais. Atualizando os demais painéis...";
+  document.dispatchEvent(new CustomEvent("estore:weekly-data-updated",{detail:{week_start:date,stores:Number(j.stores||0)}}));
+  // Recarregar fontes independentes (Comparativo, Executivo, FCA) após persistência confirmada.
+  setTimeout(function(){window.location.reload()},1200);
  }catch(e){if(out)out.textContent="Não concluído: "+String(e.message||e)}
  finally{if(btn)btn.disabled=false}
 };
