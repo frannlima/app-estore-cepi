@@ -1,7 +1,7 @@
 /* eStore CE+PI | INTEGRACAO NATIVA V168 | 16/10/2026 */
 (function(){
  'use strict';
- const ACTIVE_UNTIL='2026-11-10';
+ const ACTIVE_UNTIL='2026-10-31';
  const state=window.__campaignNative168||(window.__campaignNative168={active:false});
  function today(){
    const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Fortaleza',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
