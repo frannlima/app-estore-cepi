@@ -523,8 +523,8 @@ function render(){
  const zeroCard='<div class="execZeroV1 execZeroPeriodV3"><h4>'+(daily?'LOJAS ZERADAS NO DIA':'LOJAS COM ZERAGEM NO PERÍODO')+'</h4>'+
  '<strong class="execNumBigV2">'+(opp.daysCovered?opp.zeros.length:'—')+'</strong>'+
  '<small>'+(daily?'Com captação igual a zero':opp.zeroDays+' ocorrências loja-dia zeradas • '+opp.validStoreDays+' loja-dias com meta')+'</small>'+
- '<div class="execZeroStatsV2"><span>Oportunidade estimada (R$)</span><b>'+money2(opp.potential)+'</b>'+
- '<span>Impacto potencial estimado (%)</span><b>'+impactPercent(opp.ratio)+'</b>'+ 
+ '<div class="execZeroStatsV2"><span>Impacto estimado de zeragens (%)</span><b>'+impactPercent(opp.ratio)+'</b>'+
+  
  '<span>Taxa de zeragem (%)</span><b>'+percent(opp.zeroRate)+'</b></div>'+
  (!opp.complete||opp.missingGoals||!opp.opportunityReliable?'<p class="execTinyV2 execZeroWarningV3">Cobertura '+opp.daysCovered+'/'+opp.daysExpected+' dias do calendário • '+opp.validStoreDays+' loja-dias com meta positiva'+(opp.missingGoals?' • histórico insuficiente em '+opp.missingEstimates+' ocorrência(s)':'')+'. Sem dados não é zeragem.'+(!opp.opportunityReliable?' • Oportunidade financeira suspensa: histórico insuficiente ou valor desproporcional à captação real.':'')+'</p>':'')+
  '</div>';
@@ -949,9 +949,9 @@ function paintShare(ctx,data){
  fit(isDaily?"LOJAS ZERADAS NO DIA":"LOJAS COM ZERAGEM NO PERÍODO",71,959,29,943,true,G);
  print(isDaily?"Lojas:":"Filiais:",73,1002,22,false,M);
  print(String(data.zeroCount??"—"),170,1002,29,true,R);
- print("Potencial dispersão:",283,1002,22,false,M);
- fit(money2(data.potential),505,1002,26,195,true,G);
- print("Impacto potencial:",724,1002,20,false,M);
+ print("Impacto estimado:",283,1002,22,false,M);
+ fit(impactPercent(data.ratio),505,1002,26,195,true,G);
+ print("Taxa zeragens:",724,1002,20,false,M);
  fit(impactPercent(data.ratio),1007,1002,27,155,true,R,"right");
  // D-1: manter apenas indicadores e a sequência das filiais, sem títulos intermediários.
  // Semana e mês: preservar dias de zeragem e impacto regional por loja.
@@ -1083,7 +1083,7 @@ async function execZeroDashboardV6(){
  block(0,0,w,h,"#f6f7f5");block(22,22,w-44,h-44,"white");block(45,55,5,45,"#173f35");
  t("eSTORE | CE+PI",65,70,17,"#173f35",true);t(title,65,111,32,"#173f35",true);t(dates,1073,86,20,"#62746d",false,"right");
  t("IMPACTO POTENCIAL ESTIMADO | HISTÓRICO REAL",65,153,16,"#62746d");
- const boxes=[["FILIAIS ZERADAS",rows.length],["IMPACTO POTENCIAL",impactPercent(opp.ratio)],["PARTICIPAÇÃO ESTIMADA",impactPercent(opp.ratio)]];
+ const boxes=[["FILIAIS ZERADAS",rows.length],["IMPACTO ESTIMADO",impactPercent(opp.ratio)],["TAXA DE ZERAGENS",percent(opp.zeroRate)]];
  boxes.forEach(([label,v],i)=>{let x=45+i*345;block(x,190,330,110,"#f1f5f2");t(label,x+15,216,14,"#62746d",true);t(v,x+15,260,i===2?26:32,i===0?"#b22b36":"#173f35",true)});
  block(45,333,1030,47,"#eaf0ec");t("FILIAL",60,356,15,"#62746d",true);t("DIAS / DATAS",180,356,15,"#62746d",true);t("IMPACTO",725,356,15,"#62746d",true);t("VALOR ESTIMADO",1060,356,15,"#62746d",true,"right");
  rows.forEach((row,i)=>{let y=380+i*rh,mid=y+rh/2;if(i%2)block(45,y,1030,rh,"#fafbfa");
