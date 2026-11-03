@@ -455,7 +455,7 @@ function competitivePeriodRadar(period){
  const past=period==="month"?(current.slice(0,7)+"-01"):(previous.toISOString().slice(0,10));
  const ref=period==="month"?(new Date(new Date(past+"T12:00:00Z").setUTCDate(0))).toISOString().slice(0,10):past;
  const data=EX.data?.competitive_periods?.[period]||[];
- if(period==="month"&&current.startsWith("2026-10")&&EX.octoberThrough===current&&EX.octoberRegions?.length>=21&&EX.septemberRegions?.length>=21)return officialOctoberRadar();
+ if(period==="month"&&current.slice(0,7)==="2026-10"&&EX.octoberThrough==="2026-10-31"&&EX.octoberRegions?.length>=21&&EX.septemberRegions?.length>=21)return officialOctoberRadar();
  if(period==="month"&&!data.length){return '<section class="execSectionV1 execRadarV4"><h3>RADAR COMPETITIVO | SHARE MENSAL</h3><p class="execHelpV1">Aguardando o gerencial nacional do mês selecionado e o comparativo anterior. Dados de outro mês não serão reutilizados.</p></section>';}
  const baseline=period==="month"&&ref==="2026-09-30"?(EX.septemberRegions||[]).map(x=>({...x,period_end:ref})):[];
  const latest=data.filter(x=>x.period_end===current),old=[...data.filter(x=>x.period_end===ref),...baseline];
@@ -583,7 +583,7 @@ async function loadExecutiveV1(){
   if(db.status==="rejected")throw db.reason;
   EX.data=db.value;
   if(!EX.septemberRegions){try{const response=await fetch("./data/radar-regional-setembro-2026.json",{cache:"no-store"});if(response.ok){const json=await response.json();EX.septemberRegions=Array.isArray(json.regions)?json.regions:[]}}catch(err){console.warn("Histórico setembro indisponível",err)}}
-  try{const response=await fetch("./data/radar-regional-outubro-2026-10-29.json",{cache:"no-store"});if(response.ok){const json=await response.json();EX.octoberRegions=json?.regions||[];EX.octoberThrough=json?.through||""}}catch(err){console.warn("Histórico outubro indisponível",err)}
+  try{const response=await fetch("./data/radar-regional-outubro-2026-10-31.json",{cache:"no-store"});if(response.ok){const json=await response.json();EX.octoberRegions=json?.regions||[];EX.octoberThrough=json?.through||""}}catch(err){console.warn("Histórico outubro indisponível",err)}
   EX.fca=fca.status==="fulfilled"?fca.value:null;
   EX.ranking=ranking.status==="fulfilled"?ranking.value:null;
   EX.highlight=highlights.status==="fulfilled"?highlights.value:null;
