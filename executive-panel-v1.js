@@ -309,7 +309,7 @@ function dailyStoreChart(rows){
 function executivePanelViewV1(){
  if(!isLeader())return '<div class="notice">Painel Executivo disponível para supervisores e gestores.</div>';
  EX.active=true;
- return '<div class="execPageV1"><div class="execToolbarV1"><div class="execSegmentV1"><button class="'+(EX.period==="day"?"on":"")+'" onclick="execSetPeriodV1(\'day\')">D-1</button><button class="'+(EX.period==="week"?"on":"")+'" onclick="execSetPeriodV1(\'week\')">Semana</button><button class="'+(EX.period==="month"?"on":"")+'" onclick="execSetPeriodV1(\'month\')">Mês</button></div><div id="execMonthSelectorV1" style="display:'+(EX.period==="month"?"flex":"none")+';align-items:center;gap:6px"><label for="execMonthSelectV1" style="font-weight:700;font-size:12px">Competência</label><select id="execMonthSelectV1" aria-label="Consultar competência mensal" onchange="execSelectMonthV1(this.value)" style="padding:7px;border:1px solid #ddd;border-radius:8px;background:#fff">'+executiveMonthOptions()+'</select></div><div style="display:flex;flex-wrap:wrap;gap:7px"><button class="light" onclick="execRefreshV1()">↻ Atualizar</button>'+(isMain()?'<button class="orange" onclick="execShowAdminV1()">＋ Importar Semana/Mês</button>':'')+'<button onclick="execShareV1()">↗ Card do período</button><button class="orange" onclick="execShareV1()">↗ Card + legenda deste período</button></div></div><div id="execMessageV1"></div><div id="execVisualV1"><div class="execSectionV1">Consolidando relatórios oficiais e o FCA...</div></div><div id="execAdminSlotV1"></div></div>';
+ return '<div class="execPageV1"><div class="execToolbarV1"><div class="execSegmentV1"><button class="'+(EX.period==="day"?"on":"")+'" onclick="execSetPeriodV1(\'day\')">D-1</button><button class="'+(EX.period==="week"?"on":"")+'" onclick="execSetPeriodV1(\'week\')">Semana</button><button class="'+(EX.period==="month"?"on":"")+'" onclick="execSetPeriodV1(\'month\')">Mês</button></div><div id="execMonthSelectorV1" style="display:'+(EX.period==="month"?"flex":"none")+';align-items:center;gap:6px"><label for="execMonthSelectV1" style="font-weight:700;font-size:12px">Competência</label><select id="execMonthSelectV1" aria-label="Consultar competência mensal" onchange="execSelectMonthV1(this.value)" style="padding:7px;border:1px solid #ddd;border-radius:8px;background:#fff">'+executiveMonthOptions()+'</select></div><div style="display:flex;flex-wrap:wrap;gap:7px"><button class="light" onclick="execRefreshV1()">↻ Atualizar</button>'+(isMain()?'<button class="orange" onclick="execShowAdminV1()">＋ Importar Semana/Mês</button>':'')+'<button onclick="execShareV1()">↗ Card do período</button><button class="orange" onclick="execShareV1()">↗ Card + legenda deste período</button><button type="button" class="orange" id="execPdfButtonV1" onclick="execExportPdfV1()">↓ PDF completo</button></div></div><div id="execMessageV1"></div><div id="execVisualV1"><div class="execSectionV1">Consolidando relatórios oficiais e o FCA...</div></div><div id="execAdminSlotV1"></div></div>';
 }
 
 // Radar competitivo alimentado pelo histórico oficial das semanas importadas.
@@ -1177,6 +1177,89 @@ function execShareMondayV1(){
  const msg="📊 *eSTORE CE+PI | Painel de Resultado*\\n\\nBom dia, time! ☀️\\nCompartilho nosso consolidado com os principais resultados e oportunidades.\\n\\n"+block("📍 *01 | RESULTADO D-1* • "+dia(reference),a)+"\\n\\n"+block("📍 *02 | SEMANA* • "+dia(b.start)+" a "+dia(reference)+(b.complete?" • FECHAMENTO":" • PARCIAL"),b)+"\\n\\n"+block("📍 *03 | MÊS* • "+dia(c.start)+" a "+dia(reference)+" • "+(reference.slice(8)==="30"||reference.slice(8)==="31"?"ACUMULADO / CONFERIR FECHAMENTO":"ACUMULADO"),c)+"\\n\\n🔎 *Explore o Relatório Executivo*\\n"+url+"\\n\\n🚀 *Talento é conquista!*";
  window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank","noopener");
 }
+
+/* Exportação integral do painel renderizado: reproduz os mesmos blocos da tela.
+   O PDF é dividido em A4, com preferência por cortes entre seções. */
+async function execExportPdfV1(){
+ const btn=document.getElementById("execPdfButtonV1"),report=document.getElementById("execShareCardV1");
+ if(!EX.data||!report){notify("Abra o Painel Executivo e aguarde o carregamento completo.");return}
+ if(btn?.disabled)return;
+ const original=btn?.textContent||"↓ PDF completo";
+ if(btn){btn.disabled=true;btn.textContent="Preparando PDF..."}
+ function loadScript(src,check){
+  if(check())return Promise.resolve();
+  return new Promise((resolve,reject)=>{
+   const script=document.createElement("script");script.src=src;script.async=true;
+   script.onload=()=>check()?resolve():reject(Error("Biblioteca de PDF não inicializada"));
+   script.onerror=()=>reject(Error("Biblioteca de exportação indisponível"));
+   document.head.appendChild(script);
+  });
+ }
+ let holder=null;
+ try{
+  await loadScript("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js",()=>typeof window.html2canvas==="function");
+  await loadScript("https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js",()=>!!window.jspdf?.jsPDF);
+  if(document.fonts?.ready)await document.fonts.ready;
+  holder=document.createElement("div");
+  holder.style.cssText="position:fixed;left:-20000px;top:0;width:1000px;background:#f7f5ef;pointer-events:none;z-index:-1";
+  const clone=report.cloneNode(true);
+  clone.id="execFullPdfCloneV1";clone.style.width="1000px";clone.style.maxWidth="none";clone.style.margin="0";
+  holder.appendChild(clone);document.body.appendChild(holder);
+  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  const canvas=await window.html2canvas(clone,{
+   backgroundColor:"#f7f5ef",scale:1.65,useCORS:true,allowTaint:false,
+   logging:false,width:1000,windowWidth:1200,scrollX:0,scrollY:0,
+   onclone:doc=>{
+    const root=doc.getElementById("execFullPdfCloneV1");
+    if(root){root.style.width="1000px";root.style.maxWidth="none";}
+   }
+  });
+  if(!canvas.width||!canvas.height)throw Error("Captura visual vazia");
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4",compress:true});
+  const margin=9,pw=210,ph=297,contentWidth=pw-margin*2,contentHeight=ph-margin*2;
+  const mmPerPixel=contentWidth/canvas.width,limit=Math.floor(contentHeight/mmPerPixel);
+  // Quebras preferenciais nos limites de blocos, sem cortar cards quando possível.
+  const rect=clone.getBoundingClientRect(),scale=canvas.width/rect.width;
+  const boundaries=[0,...Array.from(clone.querySelectorAll(".execBodyV1 > .execSectionV1, .execBodyV1 > .execPairV1, .execBodyV1 > .execRadarV4, .execBodyV1 > .execChartV1, .execBodyV1 > .execPairFixesV1"))
+   .map(el=>Math.round((el.getBoundingClientRect().bottom-rect.top)*scale))
+   .filter(v=>v>0&&v<canvas.height),canvas.height].sort((a,b)=>a-b);
+  let top=0,page=0;
+  while(top<canvas.height){
+   const maxBottom=Math.min(canvas.height,top+limit);
+   const viable=boundaries.filter(v=>v>top+limit*.48&&v<=maxBottom);
+   const bottom=maxBottom===canvas.height?canvas.height:(viable.length?viable[viable.length-1]:maxBottom);
+   const height=Math.max(1,bottom-top);
+   const slice=document.createElement("canvas");
+   slice.width=canvas.width;slice.height=height;
+   slice.getContext("2d").drawImage(canvas,0,top,canvas.width,height,0,0,canvas.width,height);
+   if(page>0)pdf.addPage();
+   pdf.addImage(slice.toDataURL("image/jpeg",.93),"JPEG",margin,margin,contentWidth,height*mmPerPixel,undefined,"FAST");
+   pdf.setFontSize(8);pdf.setTextColor(100,110,105);
+   pdf.text("eStore CE+PI | Painel Executivo | "+(EX.period==="month"?"Mês":EX.period==="week"?"Semana":"D-1"),margin,ph-4);
+   pdf.text(String(page+1),pw-margin,ph-4,{align:"right"});
+   top=bottom;page++;
+  }
+  const ref=latestDate(),filename="eStore-CEPI-Painel-Executivo-"+EX.period+"-"+ref+".pdf";
+  const blob=pdf.output("blob");
+  const file=new File([blob],filename,{type:"application/pdf"});
+  // No celular, compartilhar o arquivo PDF diretamente quando disponível.
+  if(typeof navigator.share==="function"&&typeof navigator.canShare==="function"&&navigator.canShare({files:[file]})){
+   try{await navigator.share({files:[file],title:"Painel Executivo eStore CE+PI",text:caption()});}
+   catch(err){if(err?.name!=="AbortError"){pdf.save(filename);notify("Compartilhamento indisponível. PDF baixado.");}}
+  }else{
+   pdf.save(filename);
+   notify("PDF completo gerado. Compartilhe o arquivo baixado no WhatsApp.");
+  }
+ }catch(err){
+  console.error("[eStore] Exportação PDF:",err);
+  notify("Não foi possível gerar o PDF: "+String(err.message||err));
+ }finally{
+  holder?.remove();if(btn){btn.disabled=false;btn.textContent=original;}
+ }
+}
+w.execExportPdfV1=execExportPdfV1;
+
 w.execShareMondayV1=execShareMondayV1;
 w.executivePanelViewV1=executivePanelViewV1;
 w.loadExecutiveV1=loadExecutiveV1;
