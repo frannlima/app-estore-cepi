@@ -982,7 +982,7 @@ async function fcaWeekMetrics(start:string,end:string,state:any){
       daily_dates:[...seenDates].sort(),
       baseline_days:(start===baselineWeek&&String(base.asof||"")===BASELINE)?Math.max(0,Math.min(7,Math.round((Date.parse(BASELINE)-Date.parse(start))/86400000)+1)):0,
       official_stores:[...REGIONAL].filter(st=>Object.prototype.hasOwnProperty.call(official?.stores||{},st)).length,
-      regional_share_official:typeof official?.regional_share==="number"&&Number.isFinite(official.regional_share),
+      regional_share_official:(typeof official?.regional_share==="number"&&Number.isFinite(official.regional_share))||!!(weeklyRegional&&Number.isFinite(Number(weeklyRegional.share))&&Number(weeklyRegional.share)>0)||!!(officialBenchmark&&Number.isFinite(Number(officialBenchmark.regional_share))&&Number(officialBenchmark.regional_share)>0),
       historical_full:weeklyHistoryMap.size>=18||(seenDates.size+((start===baselineWeek&&String(base.asof||"")===BASELINE)?Math.max(0,Math.min(7,Math.round((Date.parse(BASELINE)-Date.parse(start))/86400000)+1)):0))===7,
       weekly_history_stores:weeklyHistoryMap.size,
       weekly_volume_history_stores:historicalWeeklySources.size,
@@ -1223,14 +1223,18 @@ async function fcaWeeklyData(matricula:string){
   for(const x of stores)x.participation=regionalCaptured>0?n(x.captured)/regionalCaptured:0;
 
   // Gerencial semanal homologado também encerra o período: não exigir novo D-1 no domingo.
-  const officialWeeklyClose=Number(closed.coverage?.weekly_history_stores||0)>=18&&Number(previous.coverage?.weekly_history_stores||0)>=18&&!!closed.coverage?.regional_share_official&&!!previous.coverage?.regional_share_official;
+  const officialWeeklyClose=Number(closed.coverage?.weekly_history_stores||0)>=17&&Number(previous.coverage?.weekly_history_stores||0)>=17&&!!closed.coverage?.regional_share_official&&!!previous.coverage?.regional_share_official;
   const dataReady=latestData>=closedWeekEnd||officialWeeklyClose;
   const comparableCount=stores.filter(x=>x.has_verified_compare).length;
   // Não exigir que o share tenha sido importado manualmente quando há 7 dias de
   // gerencial com denominadores válidos. Exigir cobertura quase total evita falso Top 5.
-  const comparisonReady=dataReady&&comparableCount>=18;
+  // A semana fechada pode ter 17 lojas quando a 113 não possui resultado.
+  // Validar a exceção apenas com dois históricos semanais oficiais completos
+  // para as 17 lojas, sem imputar zero nem inventar share para a filial ausente.
   const missingPrior=previous.coverage.missing_share_stores||[];
   const missingCurrent=closed.coverage.missing_share_stores||[];
+  const exception113=officialWeeklyClose&&comparableCount===17&&missingCurrent.length===1&&missingCurrent[0]==="113"&&missingPrior.length===0;
+  const comparisonReady=dataReady&&(comparableCount>=18||exception113);
   const comparisonIssue=!dataReady?"Semana "+isoWeekNumber(closedWeekStart)+" ainda sem fechamento gerencial completo.":
     !comparisonReady?"Comparação semanal de share pendente de validação: semana "+isoWeekNumber(previousWeekStart)+" ("+previous.coverage.share_verified_stores+"/19 filiais com share comprovado), semana "+isoWeekNumber(closedWeekStart)+" ("+closed.coverage.share_verified_stores+"/19). "+
       "Falta venda total das lojas ou share gerencial oficial. Sem estimativas. "+
