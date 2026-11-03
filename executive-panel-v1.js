@@ -1181,82 +1181,99 @@ function execShareMondayV1(){
 /* Exportação integral do painel renderizado: reproduz os mesmos blocos da tela.
    O PDF é dividido em A4, com preferência por cortes entre seções. */
 async function execExportPdfV1(){
- const btn=document.getElementById("execPdfButtonV1"),report=document.getElementById("execShareCardV1");
- if(!EX.data||!report){notify("Abra o Painel Executivo e aguarde o carregamento completo.");return}
- if(btn?.disabled)return;
- const original=btn?.textContent||"↓ PDF completo";
- if(btn){btn.disabled=true;btn.textContent="Preparando PDF..."}
- function loadScript(src,check){
-  if(check())return Promise.resolve();
-  return new Promise((resolve,reject)=>{
-   const script=document.createElement("script");script.src=src;script.async=true;
-   script.onload=()=>check()?resolve():reject(Error("Biblioteca de PDF não inicializada"));
-   script.onerror=()=>reject(Error("Biblioteca de exportação indisponível"));
-   document.head.appendChild(script);
-  });
- }
- let holder=null;
+ const button=document.getElementById("execPdfButtonV1"),report=document.getElementById("execShareCardV1");
+ if(!EX.data||!report){notify("Aguarde o carregamento do Painel Executivo.");return}
+ if(button?.disabled)return;
+ const oldLabel=button?.textContent||"PDF completo";
+ if(button){button.disabled=true;button.textContent="Exportando PDF completo..."}
+ let stage=null;
+ const script=(url,test)=>test()?Promise.resolve():new Promise((ok,fail)=>{
+  const tag=document.createElement("script");tag.src=url;tag.async=true;tag.onload=()=>test()?ok():fail(Error("Biblioteca não inicializada"));tag.onerror=()=>fail(Error("Biblioteca de PDF indisponível"));document.head.appendChild(tag);
+ });
  try{
-  await loadScript("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js",()=>typeof window.html2canvas==="function");
-  await loadScript("https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js",()=>!!window.jspdf?.jsPDF);
-  if(document.fonts?.ready)await document.fonts.ready;
-  holder=document.createElement("div");
-  holder.style.cssText="position:fixed;left:-20000px;top:0;width:1000px;background:#f7f5ef;pointer-events:none;z-index:-1";
-  const clone=report.cloneNode(true);
-  clone.id="execFullPdfCloneV1";clone.style.width="1000px";clone.style.maxWidth="none";clone.style.margin="0";
-  holder.appendChild(clone);document.body.appendChild(holder);
-  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-  const canvas=await window.html2canvas(clone,{
-   backgroundColor:"#f7f5ef",scale:1.65,useCORS:true,allowTaint:false,
-   logging:false,width:1000,windowWidth:1200,scrollX:0,scrollY:0,
-   onclone:doc=>{
-    const root=doc.getElementById("execFullPdfCloneV1");
-    if(root){root.style.width="1000px";root.style.maxWidth="none";}
-   }
-  });
-  if(!canvas.width||!canvas.height)throw Error("Captura visual vazia");
-  const {jsPDF}=window.jspdf;
-  const pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4",compress:true});
-  const margin=9,pw=210,ph=297,contentWidth=pw-margin*2,contentHeight=ph-margin*2;
-  const mmPerPixel=contentWidth/canvas.width,limit=Math.floor(contentHeight/mmPerPixel);
-  // Quebras preferenciais nos limites de blocos, sem cortar cards quando possível.
-  const rect=clone.getBoundingClientRect(),scale=canvas.width/rect.width;
-  const boundaries=[0,...Array.from(clone.querySelectorAll(".execBodyV1 > .execSectionV1, .execBodyV1 > .execPairV1, .execBodyV1 > .execRadarV4, .execBodyV1 > .execChartV1, .execBodyV1 > .execPairFixesV1"))
-   .map(el=>Math.round((el.getBoundingClientRect().bottom-rect.top)*scale))
-   .filter(v=>v>0&&v<canvas.height),canvas.height].sort((a,b)=>a-b);
-  let top=0,page=0;
-  while(top<canvas.height){
-   const maxBottom=Math.min(canvas.height,top+limit);
-   const viable=boundaries.filter(v=>v>top+limit*.48&&v<=maxBottom);
-   const bottom=maxBottom===canvas.height?canvas.height:(viable.length?viable[viable.length-1]:maxBottom);
-   const height=Math.max(1,bottom-top);
-   const slice=document.createElement("canvas");
-   slice.width=canvas.width;slice.height=height;
-   slice.getContext("2d").drawImage(canvas,0,top,canvas.width,height,0,0,canvas.width,height);
-   if(page>0)pdf.addPage();
-   pdf.addImage(slice.toDataURL("image/jpeg",.93),"JPEG",margin,margin,contentWidth,height*mmPerPixel,undefined,"FAST");
-   pdf.setFontSize(8);pdf.setTextColor(100,110,105);
-   pdf.text("eStore CE+PI | Painel Executivo | "+(EX.period==="month"?"Mês":EX.period==="week"?"Semana":"D-1"),margin,ph-4);
-   pdf.text(String(page+1),pw-margin,ph-4,{align:"right"});
-   top=bottom;page++;
+  await script("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js",()=>typeof window.html2canvas==="function");
+  await script("https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js",()=>!!window.jspdf?.jsPDF);
+  await document.fonts?.ready;
+  const width=1040,scale=1.5;
+  stage=document.createElement("div");stage.id="execPdfStageV2";
+  stage.style.cssText="position:absolute;left:-20000px;top:0;width:1040px;max-width:none;overflow:visible;pointer-events:none;background:#F8F6F0";
+  const rules=document.createElement("style");
+  rules.textContent=[
+   "#execPdfStageV2,#execPdfStageV2 *{box-sizing:border-box!important;animation:none!important;transition:none!important}",
+   "#execPdfStageV2 .execReportV1{width:1040px!important;max-width:none!important;overflow:visible!important;margin:0!important;border-radius:0!important;box-shadow:none!important;border:0!important}",
+   "#execPdfStageV2 .execBodyV1{display:block!important;width:100%!important;overflow:visible!important}",
+   "#execPdfStageV2 .execBodyV1>*,#execPdfStageV2 .execSectionV1,#execPdfStageV2 .execPairV1{height:auto!important;max-height:none!important;overflow:visible!important;min-height:0!important;transform:none!important}",
+   "#execPdfStageV2 details,#execPdfStageV2 .execRadarRankV4,#execPdfStageV2 .execZeroListV3{height:auto!important;max-height:none!important;overflow:visible!important}",
+   "#execPdfStageV2 details>summary{display:none!important}",
+   "#execPdfStageV2 button,#execPdfStageV2 [onclick]{display:none!important}",
+   "#execPdfStageV2 .execHeaderV1,#execPdfStageV2 .execFootV1{position:relative!important}",
+   "#execPdfStageV2 .execSourceV1{position:static!important;display:block!important;margin:20px 12px!important}",
+   "#execPdfStageV2 .execPairFixedV1{display:flex!important;flex-direction:column!important;gap:14px!important;align-items:stretch!important}",
+   "#execPdfStageV2 .execRadarGridV4{grid-template-columns:repeat(4,minmax(0,1fr))!important}",
+   "#execPdfStageV2 .execAreaGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}"
+  ].join("");
+  stage.appendChild(rules);document.body.appendChild(stage);
+  const template=report.cloneNode(false);template.removeAttribute("id");
+  const header=report.querySelector(":scope > .execHeaderV1"),footer=report.querySelector(":scope > .execFootV1");
+  const body=report.querySelector(":scope > .execBodyV1");
+  if(!header||!body)throw Error("Estrutura do painel indisponível");
+  const parts=[...body.children];
+  const pdf=new window.jspdf.jsPDF({orientation:"portrait",unit:"mm",format:"a4",compress:true});
+  const margin=10,pageW=210,pageH=297,usableW=190,limitY=282;
+  let y=margin;
+  const page=()=>{pdf.addPage();y=margin};
+  async function addPart(element,inBody=true){
+   const shell=template.cloneNode(false);
+   if(inBody){const wrap=document.createElement("div");wrap.className="execBodyV1";wrap.appendChild(element.cloneNode(true));shell.appendChild(wrap)}
+   else shell.appendChild(element.cloneNode(true));
+   stage.appendChild(shell);
+   try{
+    shell.querySelectorAll("details").forEach(d=>{d.open=true;d.setAttribute("open","")});
+    shell.querySelectorAll("[hidden]").forEach(el=>{el.hidden=false;el.removeAttribute("hidden")});
+    await new Promise(ok=>requestAnimationFrame(()=>requestAnimationFrame(ok)));
+    await Promise.all([...shell.querySelectorAll("img")].map(img=>img.complete?Promise.resolve():new Promise(ok=>{img.addEventListener("load",ok,{once:true});img.addEventListener("error",ok,{once:true});setTimeout(ok,3000)})));
+    const canvas=await window.html2canvas(shell,{backgroundColor:"#F8F6F0",scale,useCORS:true,logging:false,width:1040,windowWidth:1200,scrollX:0,scrollY:0});
+    if(!canvas.width||!canvas.height)throw Error("Falha ao renderizar seção");
+    const toMm=usableW/canvas.width,rect=shell.getBoundingClientRect(),factor=canvas.height/Math.max(1,rect.height);
+    const selector=".execRadarRankV4 > div,.execZeroRowV3,.execMoveRowV1,.execAreaBox,.execKpiV1,.execPodiumPersonV2,p,li";
+    const cuts=[...new Set([...shell.querySelectorAll(selector)].map(el=>Math.round((el.getBoundingClientRect().bottom-rect.top)*factor)).filter(v=>v>8&&v<canvas.height-5))].sort((a,b)=>a-b);
+    let top=0;
+    while(top<canvas.height-1){
+     let remain=Math.floor((limitY-y)/toMm);
+     if(remain<Math.min(220,canvas.height-top)&&y>margin){page();continue}
+     const max=Math.min(canvas.height,top+Math.max(1,remain));
+     let end=max;
+     if(max<canvas.height){
+      const safe=cuts.filter(v=>v>top+90&&v<=max-4);
+      if(safe.length)end=safe[safe.length-1];
+      else if(y>margin){page();continue}
+     }
+     if(end<=top)throw Error("Falha na paginação");
+     const slice=document.createElement("canvas");slice.width=canvas.width;slice.height=end-top;
+     slice.getContext("2d").drawImage(canvas,0,top,canvas.width,end-top,0,0,canvas.width,end-top);
+     pdf.addImage(slice.toDataURL("image/png"),"PNG",margin,y,usableW,(end-top)*toMm,undefined,"FAST");
+     y+=(end-top)*toMm;top=end;if(top<canvas.height-1)page();
+    }
+    y+=3;
+   }finally{shell.remove()}
   }
-  const ref=latestDate(),filename="eStore-CEPI-Painel-Executivo-"+EX.period+"-"+ref+".pdf";
-  const blob=pdf.output("blob");
-  const file=new File([blob],filename,{type:"application/pdf"});
-  // No celular, compartilhar o arquivo PDF diretamente quando disponível.
-  if(typeof navigator.share==="function"&&typeof navigator.canShare==="function"&&navigator.canShare({files:[file]})){
-   try{await navigator.share({files:[file],title:"Painel Executivo eStore CE+PI",text:caption()});}
-   catch(err){if(err?.name!=="AbortError"){pdf.save(filename);notify("Compartilhamento indisponível. PDF baixado.");}}
-  }else{
-   pdf.save(filename);
-   notify("PDF completo gerado. Compartilhe o arquivo baixado no WhatsApp.");
+  await addPart(header,false);
+  for(const child of parts)await addPart(child,true);
+  if(footer)await addPart(footer,false);
+  const total=pdf.getNumberOfPages();
+  for(let p=1;p<=total;p++){
+   pdf.setPage(p);pdf.setFontSize(7);pdf.setTextColor(107,117,111);
+   pdf.text("eStore CE+PI | Painel Executivo | "+(EX.period==="month"?"Mês":EX.period==="week"?"Semana":"D-1"),margin,293);
+   pdf.text(p+" / "+total,pageW-margin,293,{align:"right"});
   }
- }catch(err){
-  console.error("[eStore] Exportação PDF:",err);
-  notify("Não foi possível gerar o PDF: "+String(err.message||err));
- }finally{
-  holder?.remove();if(btn){btn.disabled=false;btn.textContent=original;}
- }
+  const filename="eStore-CEPI-Painel-Executivo-"+EX.period+"-"+latestDate()+".pdf";
+  const file=new File([pdf.output("blob")],filename,{type:"application/pdf"});
+  if(navigator.canShare?.({files:[file]})&&typeof navigator.share==="function"){
+   try{await navigator.share({files:[file],title:"Painel Executivo eStore CE+PI",text:caption()})}
+   catch(error){if(error?.name!=="AbortError"){pdf.save(filename);notify("PDF gerado e baixado.")}}
+  }else{pdf.save(filename);notify("PDF completo gerado. Compartilhe o arquivo no WhatsApp.")}
+ }catch(error){console.error("PDF Executivo:",error);notify("Falha na exportação PDF: "+String(error.message||error))}
+ finally{stage?.remove();if(button){button.disabled=false;button.textContent=oldLabel}}
 }
 w.execExportPdfV1=execExportPdfV1;
 
