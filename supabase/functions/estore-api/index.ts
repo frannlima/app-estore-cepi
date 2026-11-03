@@ -3485,9 +3485,17 @@ Deno.serve(async(req)=>{
         if(ym===latest.slice(0,7)&&endDate>latest)endDate=latest;
       }else if(period==="year"){startDate=latest.slice(0,4)+"-01-01";endDate=latest;}
       const rows:any[]=[];
-      for(let from=0;;from+=500){
-        const {data:chunk,error}=await db.from("daily_collaborator").select("date,matricula,store_code,captured,approved,orders").gte("date",startDate).lte("date",endDate).range(from,from+499);
-        if(error)throw error;rows.push(...(chunk||[]));if(!chunk||chunk.length<500)break;
+      if(period==="month"){
+        // Fonte oficial do fechamento mensal importado; não somar parciais diárias.
+        for(let from=0;;from+=500){
+          const {data:chunk,error}=await db.from("monthly_collaborator_history").select("matricula,store_code,captured,approved,orders").eq("month",ym).range(from,from+499);
+          if(error)throw error;rows.push(...(chunk||[]));if(!chunk||chunk.length<500)break;
+        }
+      }else{
+        for(let from=0;;from+=500){
+          const {data:chunk,error}=await db.from("daily_collaborator").select("date,matricula,store_code,captured,approved,orders").gte("date",startDate).lte("date",endDate).range(from,from+499);
+          if(error)throw error;rows.push(...(chunk||[]));if(!chunk||chunk.length<500)break;
+        }
       }
       const {data:people}=await allCollaborators("matricula,nome,store_code");
       const names=new Map<string,string>();for(const x of people||[])if(String(x.matricula||""))names.set(String(x.matricula),String(x.nome||"").trim());
