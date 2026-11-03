@@ -952,7 +952,7 @@ function paintShare(ctx,data){
  print("Impacto estimado:",283,1002,22,false,M);
  fit(impactPercent(data.ratio),505,1002,26,195,true,G);
  print("Taxa zeragens:",724,1002,20,false,M);
- fit(impactPercent(data.ratio),1007,1002,27,155,true,R,"right");
+ fit(percent(data.zeroRate),1007,1002,27,155,true,R,"right");
  // D-1: manter apenas indicadores e a sequência das filiais, sem títulos intermediários.
  // Semana e mês: preservar dias de zeragem e impacto regional por loja.
  if(isDaily){
