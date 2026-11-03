@@ -1251,7 +1251,7 @@ async function execExportPdfV1(){
      if(end<=top)throw Error("Falha na paginação");
      const slice=document.createElement("canvas");slice.width=canvas.width;slice.height=end-top;
      slice.getContext("2d").drawImage(canvas,0,top,canvas.width,end-top,0,0,canvas.width,end-top);
-     pdf.addImage(slice.toDataURL("image/png"),"PNG",margin,y,usableW,(end-top)*toMm,undefined,"FAST");
+     pdf.addImage(slice.toDataURL("image/jpeg",0.94),"JPEG",margin,y,usableW,(end-top)*toMm,undefined,"FAST");
      y+=(end-top)*toMm;top=end;if(top<canvas.height-1)page();
     }
     y+=3;
