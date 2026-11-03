@@ -3066,3 +3066,29 @@ showCampaignPopupV37=function(){return; // Campanha visível apenas no menu, sem
   // Também atende restauração automática de login, troca de matrícula e fechamento de outros modais.
   setInterval(tryShow,1700);
 })();
+
+/* eStore Click — acesso ao estúdio fotográfico, sem alterar o roteador existente. */
+(function(){
+  'use strict';
+  const target='./estore-click/';
+  function attach(){
+    const sheet=document.querySelector('#drawer .sheet');
+    if(sheet && !sheet.querySelector('[data-estore-click-link]')){
+      const b=document.createElement('button');
+      b.type='button';b.setAttribute('data-estore-click-link','1');
+      b.textContent='📷 eStore Click · Talento em Cena';
+      b.addEventListener('click',()=>{window.location.href=target});
+      sheet.appendChild(b);
+    }
+    const grid=document.querySelector('.menuGridV13');
+    if(grid && !grid.querySelector('[data-estore-click-link]')){
+      const b=document.createElement('button');
+      b.type='button';b.className='green';b.setAttribute('data-estore-click-link','1');
+      b.innerHTML='<b>📷</b><span>eStore Click</span>';
+      b.addEventListener('click',()=>{window.location.href=target});
+      grid.appendChild(b);
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{attach();new MutationObserver(attach).observe(document.body,{childList:true,subtree:true})});
+  else {attach();new MutationObserver(attach).observe(document.body,{childList:true,subtree:true})}
+})();
