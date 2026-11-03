@@ -784,6 +784,37 @@ function caption(){
  const sign=desvio==null?"↕️":desvio<0?"🔻":desvio>0?"🔺":"➖";
  const date=EX.period==="day"?dia(ref):dia(start)+" a "+dia(ref);
  const labels=EX.period==="day"?"Lojas zeradas":"Lojas com zeragem";
+ const leaders=topRows("c").slice(0,3).map((x,i)=>["🥇","🥈","🥉"][i]+" *"+String(x.st).padStart(3,"0")+" - "+storeName(x.st)+":* "+money2(x.c)).join("\n");
+ if(EX.period==="month"||EX.period==="week"){
+   const monthly=EX.period==="month";
+   const state=monthly?"FECHAMENTO MENSAL":"PANORAMA SEMANAL";
+   const periodText=EX.period==="month"?"Outubro e os resultados consolidados":"A semana e seus resultados";
+   const risk=z.daysCovered?z.zeros.length+" lojas com ocorrência de zeragem":"base diária insuficiente para confirmar zeragens";
+   const insight=desvio==null?"A comparação nacional depende da referência oficial.":desvio<0?"O share regional está abaixo da empresa: ampliar a penetração das lojas com menor contribuição é o principal vetor de recuperação.":"CE+PI está acima da referência da empresa; o desafio é preservar a consistência e ampliar a participação das lojas.";
+   return [
+    "📊 *eSTORE CE+PI | "+state+"*",
+    "📅 *"+date+"*","",
+    "Boa noite, time!","",
+    periodText+" nos convidam a avaliar não apenas o volume, mas a qualidade da nossa evolução e a contribuição de cada operação.","",
+    "📌 *ENTREGA REGIONAL*",
+    "• Captação: *"+money2(cap)+"*",
+    "• Pedidos: *"+count(orders)+"*",
+    "• Share CE+PI: *"+percent(r.share)+"*",
+    "• Share empresa: *"+percent(company)+"*",
+    "• Desvio: *"+pp(desvio)+"*","",
+    "🏆 *RECONHECIMENTO | VOLUME DE CAPTAÇÃO*",
+    leaders||"Ranking por loja ainda indisponível.","",
+    "🎯 *OPORTUNIDADES E DIRECIONAMENTO*",
+    insight,
+    "Radar de zeragens: "+risk+".",
+    z.potential!=null?"Potencial histórico estimado: *"+money2(z.potential)+"*.":"O impacto financeiro exige histórico suficiente para apuração.",
+    "Precisamos reforçar BD/BT, disponibilidade dos mobiles, acompanhamento do Hora a Hora, conversão e reconhecimento dos destaques. Como cada operação está atuando para girar o ponteiro?","",
+    "*Nosso compromisso é transformar mobilização em captação e share mais consistentes.*","",
+    "🔎 *Painel Executivo:*",
+    (globalThis.EstoreIdentity?.url('')||'https://frannlima.github.io/app-estore-cepi/'),
+    "🏆 *Talento é conquista!*"
+   ].join("\n");
+ }
  const lines=[
   "📊 *PAINEL EXECUTIVO eSTORE | CE+PI*",
   "📅 *"+period+" • "+date+"*",
