@@ -807,7 +807,7 @@ function caption(){
     "🎯 *OPORTUNIDADES E DIRECIONAMENTO*",
     insight,
     "Radar de zeragens: "+risk+".",
-    z.potential!=null?"Potencial histórico estimado: *"+money2(z.potential)+"*.":"O impacto financeiro exige histórico suficiente para apuração.",
+    z.ratio!=null?"Impacto estimado das zeragens: *"+impactPercent(z.ratio)+"*.":"Impacto percentual indisponível: histórico insuficiente.",
     "Precisamos reforçar BD/BT, disponibilidade dos mobiles, acompanhamento do Hora a Hora, conversão e reconhecimento dos destaques. Como cada operação está atuando para girar o ponteiro?","",
     "*Nosso compromisso é transformar mobilização em captação e share mais consistentes.*","",
     "🔎 *Painel Executivo:*",
@@ -824,8 +824,8 @@ function caption(){
   sign+" *Desvio:* "+pp(desvio),
   "",
   "🏬 *"+labels+":* "+(z.daysCovered?z.zeros.length:"—"),
-  "💸 *Potencial de dispersão:* "+money2(z.potential),
-  "📉 *Impacto potencial estimado:* "+impactPercent(z.ratio)
+  "📉 *Impacto estimado das zeragens:* "+impactPercent(z.ratio),
+  "🏬 *Filiais com zeragem:* "+(z.daysCovered?z.zeros.length:"—")
  ];
  if(!z.complete||z.missingGoals)lines.push("⚠️ *Apuração parcial:* "+z.daysCovered+"/"+z.daysExpected+" dias.");
  lines.push("","🔎 *Explore os indicadores e a performance detalhada no app:*",
@@ -1028,7 +1028,7 @@ function zeroDashboardInsightV7(period,ref,opp,daily){
  const zeroStores=opp.zeros.length,zeroOccurrences=opp.zeroDays||0;
  const reliability=opp.missingEstimates===0&&opp.opportunityReliable!==false;
  const financial=reliability?
-  "💰 *Oportunidade histórica:* "+money(opp.potential)+" | *Impacto potencial:* "+impactPercent(opp.ratio)+".\n":
+  "📉 *Impacto estimado das zeragens:* "+impactPercent(opp.ratio)+".\n":
   "💰 *Impacto financeiro parcial:* histórico insuficiente para estimar todas as zeragens.\n";
  const partial=opp.daysCovered<opp.daysExpected?"\n⚠️ Base parcial: "+opp.daysCovered+"/"+opp.daysExpected+" datas carregadas. Taxas consideram apenas registros elegíveis.":"";
  const eday=eligibleEday>0?
@@ -1083,7 +1083,7 @@ async function execZeroDashboardV6(){
  block(0,0,w,h,"#f6f7f5");block(22,22,w-44,h-44,"white");block(45,55,5,45,"#173f35");
  t("eSTORE | CE+PI",65,70,17,"#173f35",true);t(title,65,111,32,"#173f35",true);t(dates,1073,86,20,"#62746d",false,"right");
  t("IMPACTO POTENCIAL ESTIMADO | HISTÓRICO REAL",65,153,16,"#62746d");
- const boxes=[["FILIAIS ZERADAS",rows.length],["IMPACTO POTENCIAL",impactPercent(opp.ratio)],["OPORTUNIDADE HISTÓRICA",money(opp.potential)]];
+ const boxes=[["FILIAIS ZERADAS",rows.length],["IMPACTO POTENCIAL",impactPercent(opp.ratio)],["PARTICIPAÇÃO ESTIMADA",impactPercent(opp.ratio)]];
  boxes.forEach(([label,v],i)=>{let x=45+i*345;block(x,190,330,110,"#f1f5f2");t(label,x+15,216,14,"#62746d",true);t(v,x+15,260,i===2?26:32,i===0?"#b22b36":"#173f35",true)});
  block(45,333,1030,47,"#eaf0ec");t("FILIAL",60,356,15,"#62746d",true);t("DIAS / DATAS",180,356,15,"#62746d",true);t("IMPACTO",725,356,15,"#62746d",true);t("VALOR ESTIMADO",1060,356,15,"#62746d",true,"right");
  rows.forEach((row,i)=>{let y=380+i*rh,mid=y+rh/2;if(i%2)block(45,y,1030,rh,"#fafbfa");
