@@ -8,7 +8,7 @@
 const API_EXEC="https://fndkjgveeojlywkdrtxe.supabase.co/functions/v1/estore-executive";
 const STORES=["073","084","108","113","138","142","146","175","177","222","238","258","262","314","318","344","350","552"];
 const EX={
- period:"day",data:null,loading:false,error:"",fca:null,ranking:null,highlight:null,date:null,
+ period:"day",selectedMonth:null,data:null,loading:false,error:"",fca:null,ranking:null,highlight:null,date:null,
  draft:null,ocrText:"",active:false
 };
 const e=(v)=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
@@ -50,6 +50,12 @@ function previousBusinessDate(){
 function latestDate(){
  const y=previousBusinessDate();
  if(EX.period==="day")return y;
+ if(EX.period==="month"&&EX.selectedMonth){
+  const start=EX.selectedMonth+"-01";
+  const limit=EX.selectedMonth===y.slice(0,7)?y:new Date(Date.UTC(Number(EX.selectedMonth.slice(0,4)),Number(EX.selectedMonth.slice(5,7)),0)).toISOString().slice(0,10);
+  const snap=(EX.data?.benchmarks||[]).filter(b=>b.period==="month"&&b.start_date>=start&&b.start_date<=limit&&b.end_date>=start&&b.end_date<=limit&&validBenchmark(b,0)).sort((a,b)=>String(b.end_date).localeCompare(String(a.end_date)))[0];
+  return snap?.end_date||limit;
+ }
  const start=EX.period==="week"?isoWeek(y):firstMonth(y);
  const snap=(EX.data?.benchmarks||[]).filter(b=>b.period===EX.period&&b.end_date>=start&&b.end_date<=y&&b.start_date>=start&&validBenchmark(b,0))
  .sort((a,b)=>String(b.end_date).localeCompare(String(a.end_date)))[0];
@@ -303,7 +309,7 @@ function dailyStoreChart(rows){
 function executivePanelViewV1(){
  if(!isLeader())return '<div class="notice">Painel Executivo disponível para supervisores e gestores.</div>';
  EX.active=true;
- return '<div class="execPageV1"><div class="execToolbarV1"><div class="execSegmentV1"><button class="'+(EX.period==="day"?"on":"")+'" onclick="execSetPeriodV1(\'day\')">D-1</button><button class="'+(EX.period==="week"?"on":"")+'" onclick="execSetPeriodV1(\'week\')">Semana</button><button class="'+(EX.period==="month"?"on":"")+'" onclick="execSetPeriodV1(\'month\')">Mês</button></div><div style="display:flex;flex-wrap:wrap;gap:7px"><button class="light" onclick="execRefreshV1()">↻ Atualizar</button>'+(isMain()?'<button class="orange" onclick="execShowAdminV1()">＋ Importar Semana/Mês</button>':'')+'<button onclick="execShareV1()">↗ Card do período</button><button class="orange" onclick="execShareMondayV1()">↗ Resumo D-1 + Semana + Mês</button></div></div><div id="execMessageV1"></div><div id="execVisualV1"><div class="execSectionV1">Consolidando relatórios oficiais e o FCA...</div></div><div id="execAdminSlotV1"></div></div>';
+ return '<div class="execPageV1"><div class="execToolbarV1"><div class="execSegmentV1"><button class="'+(EX.period==="day"?"on":"")+'" onclick="execSetPeriodV1(\'day\')">D-1</button><button class="'+(EX.period==="week"?"on":"")+'" onclick="execSetPeriodV1(\'week\')">Semana</button><button class="'+(EX.period==="month"?"on":"")+'" onclick="execSetPeriodV1(\'month\')">Mês</button></div><div id="execMonthSelectorV1" style="display:'+(EX.period==="month"?"flex":"none")+';align-items:center;gap:6px"><label for="execMonthSelectV1" style="font-weight:700;font-size:12px">Competência</label><select id="execMonthSelectV1" aria-label="Consultar competência mensal" onchange="execSelectMonthV1(this.value)" style="padding:7px;border:1px solid #ddd;border-radius:8px;background:#fff">'+executiveMonthOptions()+'</select></div><div style="display:flex;flex-wrap:wrap;gap:7px"><button class="light" onclick="execRefreshV1()">↻ Atualizar</button>'+(isMain()?'<button class="orange" onclick="execShowAdminV1()">＋ Importar Semana/Mês</button>':'')+'<button onclick="execShareV1()">↗ Card do período</button><button class="orange" onclick="execShareMondayV1()">↗ Resumo D-1 + Semana + Mês</button></div></div><div id="execMessageV1"></div><div id="execVisualV1"><div class="execSectionV1">Consolidando relatórios oficiais e o FCA...</div></div><div id="execAdminSlotV1"></div></div>';
 }
 
 // Radar competitivo alimentado pelo histórico oficial das semanas importadas.
@@ -570,7 +576,7 @@ async function loadExecutiveV1(){
   const [db,fca,ranking,highlights,team]=await Promise.allSettled([
    exApi({action:"get",matricula:id}),
    (typeof api==="function"?api({action:"fca_dashboard",matricula:id}):Promise.reject(Error("FCA indisponível"))),
-   (typeof api==="function"?api({action:"ranking_period",matricula:id,period:EX.period,month:EX.period==="month"?currentAsOf().slice(0,7):undefined,store:w.U?.u?.st}):Promise.reject(Error("Ranking indisponível"))),
+   (typeof api==="function"?api({action:"ranking_period",matricula:id,period:EX.period,month:EX.period==="month"?(EX.selectedMonth||previousBusinessDate().slice(0,7)):undefined,store:w.U?.u?.st}):Promise.reject(Error("Ranking indisponível"))),
    (typeof api==="function"?api({action:"supervisor_highlights",matricula:id,period:EX.period}):Promise.reject(Error("Destaques indisponíveis"))),
    (typeof api==="function"?api({action:"team_period",matricula:id,period:EX.period,store:STORES[0],reference_date:latestDate()}):Promise.reject(Error("Meu Time indisponível")))
   ]);
@@ -587,6 +593,20 @@ async function loadExecutiveV1(){
   render();
  }catch(err){EX.error=String(err.message||err);if(root)root.innerHTML='<div class="execErrorV1">Não foi possível obter o histórico do painel: '+e(EX.error)+' <button onclick="execRefreshV1()">Tentar novamente</button></div>'}
  finally{EX.loading=false}
+}
+function executiveMonthOptions(){
+ const current=previousBusinessDate().slice(0,7);
+ const months=new Set([current,"2026-10"]);
+ for(const b of EX.data?.benchmarks||[])if(b.period==="month"&&/^\d{4}-\d{2}/.test(String(b.start_date)))months.add(String(b.start_date).slice(0,7));
+ for(const b of EX.data?.official_months||[])if(/^\d{4}-\d{2}$/.test(String(b.month)))months.add(b.month);
+ const selected=EX.selectedMonth||current;
+ const label=m=>new Intl.DateTimeFormat("pt-BR",{month:"long",year:"numeric",timeZone:"UTC"}).format(new Date(m+"-01T12:00:00Z"));
+ return [...months].filter(m=>m<=current).sort().reverse().map(m=>'<option value="'+e(m)+'"'+(selected===m?' selected':'')+'>'+e(label(m))+'</option>').join("");
+}
+function execSelectMonthV1(month){
+ if(!/^\d{4}-\d{2}$/.test(month)||month>previousBusinessDate().slice(0,7))return;
+ EX.selectedMonth=month;EX.period="month";EX.date=null;
+ loadExecutiveV1();
 }
 function setPeriod(period){if(!["day","week","month"].includes(period))return;EX.period=period;const view=document.getElementById("view");if(view&&typeof go==="function"){go("executive")}else render()}
 /* V3: print como entrada principal; datas do D-1 vinculadas ao resultado importado. */
@@ -1124,6 +1144,7 @@ w.execShareMondayV1=execShareMondayV1;
 w.executivePanelViewV1=executivePanelViewV1;
 w.loadExecutiveV1=loadExecutiveV1;
 w.execSetPeriodV1=setPeriod;
+w.execSelectMonthV1=execSelectMonthV1;
 w.execRefreshV1=loadExecutiveV1;
 w.execBenchmarkPeriodChangedV3=benchmarkPeriodChangedV3;
 w.execBenchmarkReviewV3=benchmarkReviewV3;
