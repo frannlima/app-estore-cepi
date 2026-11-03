@@ -965,16 +965,22 @@ function paintShare(ctx,data){
   }else fit(data.hasDailyData?"Nenhuma filial com captação zerada":"Aguardando dados oficiais do dia",73,1059,21,929,false,M);
  }else{
   fit("LOJAS COM ZERAGEM DE VENDAS NO PERÍODO",73,1051,24,944,true,G);
-  for(let i=0;i<2;i++){
-   const x=73+i*487;
-   print("FILIAL  •  DIAS ZERADOS  •  IMPACTO",x,1087,17,true,M);
+  const cols=[73,560],colWidth=450;
+  for(const x of cols){
+   box(x-10,1070,colWidth+15,33,"#EDF2EE",7);
+   print("FILIAL",x,1087,16,true,M);
+   print("DIAS",x+198,1087,16,true,M);
+   print("IMPACTO (%)",x+colWidth,1087,16,true,M,"right");
   }
   if(zeroRows.length){
+   const perColumn=Math.ceil(zeroRows.length/2);
    for(let i=0;i<zeroRows.length;i++){
-    const item=zeroRows[i],x=73+(i%2)*487,y=1123+Math.floor(i/2)*37;
-    print("L"+String(item.st||"").padStart(3,"0"),x,y,22,true,G);
-    print(item.days+"d",x+179,y,21,true,G);
-    fit(percent(item.impact),x+461,y,21,195,true,R,"right");
+    const col=Math.floor(i/perColumn),line=i%perColumn;
+    const item=zeroRows[i],x=cols[col],y=1123+line*37;
+    if(line%2===1)box(x-10,y-16,colWidth+15,33,"#F7F9F7",5);
+    print("L"+String(item.st||"").padStart(3,"0"),x,y,21,true,G);
+    print(item.days+"d",x+198,y,20,true,G);
+    fit(percent(item.impact),x+colWidth,y,20,110,true,R,"right");
    }
   }else fit(data.hasDailyData?"Nenhuma filial com zeragem no período":"Aguardando dados oficiais do intervalo",73,1123,22,938,false,M);
  }
