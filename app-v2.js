@@ -3067,28 +3067,53 @@ showCampaignPopupV37=function(){return; // Campanha visível apenas no menu, sem
   setInterval(tryShow,1700);
 })();
 
-/* eStore Click — acesso ao estúdio fotográfico, sem alterar o roteador existente. */
+/* Foto eStore | acesso universal ao estúdio, na Home atual (V20) e no menu lateral.
+ * A Home antiga usava .menuGridV13; a versão atual usa .menuGridV20.
+ * Usar link de navegação evita interferir com o roteador interno do aplicativo. */
 (function(){
   'use strict';
-  const target='./estore-click/';
+  const TARGET='./estore-click/';
+  const ATTR='data-estore-click-link';
+  function openStudio(){window.location.href=TARGET;}
   function attach(){
     const sheet=document.querySelector('#drawer .sheet');
-    if(sheet && !sheet.querySelector('[data-estore-click-link]')){
-      const b=document.createElement('button');
-      b.type='button';b.setAttribute('data-estore-click-link','1');
-      b.textContent='📷 eStore Click · Talento em Cena';
-      b.addEventListener('click',()=>{window.location.href=target});
-      sheet.appendChild(b);
+    if(sheet&&!sheet.querySelector('['+ATTR+']')){
+      const button=document.createElement('button');
+      button.type='button';
+      button.setAttribute(ATTR,'drawer');
+      button.textContent='📸 Foto eStore · Personalizar vendas';
+      button.title='Abrir o estúdio de fotos dos colaboradores';
+      button.addEventListener('click',openStudio);
+      const logout=sheet.querySelector('.logoutBtn');
+      if(logout)sheet.insertBefore(button,logout);
+      else sheet.appendChild(button);
     }
-    const grid=document.querySelector('.menuGridV13');
-    if(grid && !grid.querySelector('[data-estore-click-link]')){
-      const b=document.createElement('button');
-      b.type='button';b.className='green';b.setAttribute('data-estore-click-link','1');
-      b.innerHTML='<b>📷</b><span>eStore Click</span>';
-      b.addEventListener('click',()=>{window.location.href=target});
-      grid.appendChild(b);
+    const grid=document.querySelector('#view .menuGridV20, #view .menuGridV13');
+    if(grid&&!grid.querySelector('['+ATTR+']')){
+      const button=document.createElement('button');
+      button.type='button';
+      button.className='green';
+      button.setAttribute(ATTR,'home');
+      button.setAttribute('aria-label','Foto eStore — personalizar foto de venda do colaborador');
+      if(grid.classList.contains('menuGridV20')){
+        button.innerHTML='<span class="miV20">📸</span><span><b>Foto eStore</b><small>Personalizar fotos de vendas</small></span><span class="maV20">›</span>';
+        grid.insertBefore(button,grid.firstChild);
+      }else{
+        button.innerHTML='<b>📸</b><span>Foto eStore</span>';
+        grid.insertBefore(button,grid.firstChild);
+      }
+      button.addEventListener('click',openStudio);
     }
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{attach();new MutationObserver(attach).observe(document.body,{childList:true,subtree:true})});
-  else {attach();new MutationObserver(attach).observe(document.body,{childList:true,subtree:true})}
+  function boot(){
+    attach();
+    let queued=false;
+    new MutationObserver(function(){
+      if(queued)return;
+      queued=true;
+      Promise.resolve().then(function(){queued=false;attach();});
+    }).observe(document.body,{childList:true,subtree:true});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
 })();
