@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v275-foto-estore';
-const BUILD='v275-foto-estore';
+const CACHE='estore-cepi-shell-v276-foto-estore-home';
+const BUILD='v276-foto-estore-home';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
