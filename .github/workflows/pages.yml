@@ -35,6 +35,11 @@ jobs:
           node --check campaign-integration-v168.js
           node --test tests/meta-upload-compact.test.cjs
           node --test tests/alert-center.test.mjs tests/hourly-alert-queue-v225.test.mjs
+      - name: Validate Foto eStore access
+        run: |
+          grep -Fq "Foto eStore" index.html
+          grep -Fq "window.location.href='./estore-click/'" index.html
+          test -s estore-click/index.html
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
@@ -66,3 +71,5 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          timeout: 1200000

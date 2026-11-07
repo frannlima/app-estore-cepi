@@ -1,5 +1,5 @@
-const CACHE='estore-cepi-shell-v276-foto-estore-home';
-const BUILD='v276-foto-estore-home';
+const CACHE='estore-cepi-shell-v277-photo-studio-deploy';
+const BUILD='v277-photo-studio-deploy';
 const PRESENTATION_SCRIPT='./presentation-v103.js?build=v155';
 const HOURLY_META_SCRIPT='./hourly-meta-v104.js?build=v104';
 const TEAM_SCRIPT='./team-v112.js?build=v155';
@@ -71,7 +71,7 @@ self.addEventListener('fetch',event=>{
   const url=new URL(req.url);
   if(url.origin!==self.location.origin) return;
 
-  if(url.pathname.endsWith('/parcial.html')||url.pathname.endsWith('/sobre-o-app.html')){
+  if(url.pathname.endsWith('/parcial.html')||url.pathname.endsWith('/sobre-o-app.html')||url.pathname.endsWith('/estore-click/')||url.pathname.endsWith('/estore-click/index.html')){
     // Painel autônomo: preservar o HTML completo, sem scripts legados injetados.
     event.respondWith(fetch(new Request(req,{cache:'no-store'})).catch(async()=>{
       const cache=await caches.open(CACHE);return (await cache.match(req))||Response.error();
